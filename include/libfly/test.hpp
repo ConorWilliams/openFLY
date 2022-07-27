@@ -29,8 +29,25 @@ namespace stuff {
 /**
  * @brief Build something.
  *
+ * Here are some details about builder: $a = a \times b$.
+ *
  * @tparam T Never an int.
  */
-template <typename T> struct builder {};
+template <typename T> struct builder {
+  public:
+    /** @brief An a */
+    int a;
+    int b; ///< An b.
+
+    /**
+     * @brief Do "The Thing"!
+     */
+    void foo();
+
+  private:
+    /** @brief An a */
+    int c;
+    int d; ///< An b.
+};
 
 } // namespace stuff

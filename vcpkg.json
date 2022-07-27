@@ -1,0 +1,8 @@
+{
+    "name": "openfly",
+    "version-semver": "0.1.0",
+    "dependencies": [
+        "catch2",
+        "fmt"
+    ]
+}

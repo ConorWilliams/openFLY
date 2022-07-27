@@ -14,3 +14,4 @@ paths                  = ["/tests/", "/src/", "/example/"]
 
 [pages]
 homepage = "README.md"
+paths    = ["docs/Building.md"]

@@ -15,6 +15,7 @@ jobs:
 
       - name: Install dependencies, then configure and build project
         run: |
+          sudo apt update
           sudo apt install cmake
           cmake -S . -B build -DCMAKE_EXPORT_COMPILE_COMMANDS=1
 

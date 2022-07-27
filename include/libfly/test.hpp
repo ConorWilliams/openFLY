@@ -33,7 +33,8 @@ namespace stuff {
 /**
  * @brief Build something.
  *
- * Here are some details about builder: $a = b$.
+ * Here are some details about builder: $a = b$. See the code in
+ * /examples/main.cpp or examples/main.cpp and the documentation for return_true
  *
 \code{.cpp}
 class Cpp {};

@@ -1,3 +1,3 @@
 #include "libfly/test.hpp"
 
-void test(int) {}
+int test(int) { return true; }

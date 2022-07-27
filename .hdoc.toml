@@ -4,7 +4,7 @@ version = "1.0.0"
 
 # Optional, adding this will enable direct links from the documentation
 # to your source code.
-git_repo_url = "https://github.com/ConorWilliams/openFLY"
+git_repo_url = "https://github.com/ConorWilliams/openFLY/main/"
 
 [paths]
 compile_commands = "build/compile_commands.json"

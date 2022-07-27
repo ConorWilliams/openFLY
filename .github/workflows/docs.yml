@@ -17,7 +17,7 @@ jobs:
         run: |
           sudo apt update
           sudo apt install cmake
-          cmake -S . -B build -DCMAKE_EXPORT_COMPILE_COMMANDS=1
+          cmake -S . -B build -DCMAKE_EXPORT_COMPILE_COMMANDS=1 -DFLY_TESTS=Off -DFLY_EXAMPLES=Off -DFLY_APPS=Off
 
       # New workflow step that runs hdoc and uploads documentation to docs.hdoc.io
       - name: Run hdoc to generate documentation and push it to docs.hdoc.io

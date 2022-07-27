@@ -17,10 +17,9 @@ endif()
 project(openFLY CXX)
 
 # Options that control generation of various targets.
-option(FLY_INSTALL_LIB "Generate the install target." ${FLY_MASTER_PROJECT})
-option(FLY_APPS "Generate the apps target." ${FLY_MASTER_PROJECT})
-option(FLY_EXAMPLE "Generate the example target." ${FLY_MASTER_PROJECT})
-option(FLY_TEST "Generate the test target." ${FLY_MASTER_PROJECT})
+option(FLY_APPS "Build the openFLY application." ${FLY_MASTER_PROJECT})
+option(FLY_EXAMPLES "Build the examples." ${FLY_MASTER_PROJECT})
+option(FLY_TESTS "Build the tests." ${FLY_MASTER_PROJECT})
 option(FMT_PEDANTIC "Enable extra warnings." ${FLY_MASTER_PROJECT})
 
 
@@ -58,11 +57,11 @@ endif ()
 # libFly is here
 add_subdirectory(src)
 
-if (FLY_EXAMPLE)
+if (FLY_EXAMPLES)
   add_subdirectory(examples)
 endif ()
 
-if (FLY_TEST)
+if (FLY_TESTS)
   include(CTest)
   enable_testing()
   add_subdirectory(tests)

@@ -31,6 +31,10 @@ namespace stuff {
  *
  * Here are some details about builder: $a = b$.
  *
+\code{.cpp}
+class Cpp {};
+\endcode
+ *
  * @tparam T Never an int.
  */
 template <typename T> struct builder {

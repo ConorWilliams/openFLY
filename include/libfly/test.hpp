@@ -23,3 +23,14 @@ int test(int i);
  * @return false Always.
  */
 bool return_true(int ignore);
+
+namespace stuff {
+
+/**
+ * @brief Build something.
+ *
+ * @tparam T Never an int.
+ */
+template <typename T> struct builder {};
+
+} // namespace stuff

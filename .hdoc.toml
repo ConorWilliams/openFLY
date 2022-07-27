@@ -1,10 +1,16 @@
 [project]
-name    = "my-project"
-version = "1.0.0"
+name    = "openFLY"
+version = "0.1.0"
 
-# Optional, adding this will enable direct links from the documentation
-# to your source code.
-git_repo_url = "https://github.com/ConorWilliams/openFLY/main/"
+# Enable direct links from the documentation to source code.
+git_repo_url = "https://github.com/ConorWilliams/openFLY/blob/main/"
 
 [paths]
 compile_commands = "build/compile_commands.json"
+
+[ignore]
+ignore_private_members = true
+paths                  = ["/tests/", "/src/", "/example/"]
+
+[pages]
+homepage = "README.md"

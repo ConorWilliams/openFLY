@@ -29,7 +29,7 @@ namespace stuff {
 /**
  * @brief Build something.
  *
- * Here are some details about builder: $a = a \times b$.
+ * Here are some details about builder: $a = b$.
  *
  * @tparam T Never an int.
  */

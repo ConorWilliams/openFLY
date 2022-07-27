@@ -17,6 +17,10 @@ int test(int i);
 /**
  * @brief Probably does something.
  *
+ * ```bash
+ * cmake --build build
+ * ```
+ *
  * @param ignore Pass though.
  *
  * @return true Never.
@@ -34,6 +38,7 @@ namespace stuff {
 \code{.cpp}
 class Cpp {};
 \endcode
+
  *
  * @tparam T Never an int.
  */

@@ -17,17 +17,14 @@ Add `-GNinja` if you have Ninja.
 To build:
 
 ```bash
-cmake --build build
+cmake --build build 
 ```
 
-To run the tests (`--target` can be written as `-t` in CMake 3.15+):
-
+To run the tests with ctest:
 ```bash
 ctest --test-dir build  
 ```
-or run directly
+or to run them directly:
 ```bash
 ./build/bin/testFLY
 ```
-
-test $math = i$

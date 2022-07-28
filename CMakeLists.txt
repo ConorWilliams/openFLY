@@ -18,8 +18,8 @@ project(openFLY CXX)
 
 # Options that control generation of various targets.
 option(FLY_APPS "Build the openFLY application." ${FLY_MASTER_PROJECT})
-option(FLY_EXAMPLES "Build the examples." ${FLY_MASTER_PROJECT})
-option(FLY_TESTS "Build the tests." ${FLY_MASTER_PROJECT})
+option(FLY_EXAMPLES "Build the examples." Off)
+option(FLY_TESTS "Build the tests." Off)
 option(FMT_PEDANTIC "Enable extra warnings." ${FLY_MASTER_PROJECT})
 
 
@@ -67,35 +67,5 @@ if (FLY_TESTS)
   add_subdirectory(tests)
 endif ()
 
-# # Control fuzzing independent of the unit tests.
-# if (FLY_FUZZ)
-#   add_subdirectory(test/fuzzing)
 
-#   # The FLY_FUZZ macro is used to prevent resource exhaustion in fuzzing
-#   # mode and make fuzzing practically possible. It is similar to
-#   # FUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION but uses a different name to
-#   # avoid interfering with fuzzing of projects that use {fly}.
-#   # See also https://llvm.org/docs/LibFuzzer.html#fuzzer-friendly-build-mode.
-#   target_compile_definitions(fly PUBLIC FLY_FUZZ)
-# endif ()
 
-# set(gitignore ${PROJECT_SOURCE_DIR}/.gitignore)
-# if (FLY_MASTER_PROJECT AND EXISTS ${gitignore})
-#   # Get the list of ignored files from .gitignore.
-#   file (STRINGS ${gitignore} lines)
-#   list(REMOVE_ITEM lines /doc/html)
-#   foreach (line ${lines})
-#     string(REPLACE "." "[.]" line "${line}")
-#     string(REPLACE "*" ".*" line "${line}")
-#     set(ignored_files ${ignored_files} "${line}$" "${line}/")
-#   endforeach ()
-#   set(ignored_files ${ignored_files}
-#     /.git /breathe /format-benchmark sphinx/ .buildinfo .doctrees)
-
-#   set(CPACK_SOURCE_GENERATOR ZIP)
-#   set(CPACK_SOURCE_IGNORE_FILES ${ignored_files})
-#   set(CPACK_SOURCE_PACKAGE_FILE_NAME fly-${FLY_VERSION})
-#   set(CPACK_PACKAGE_NAME fly)
-#   set(CPACK_RESOURCE_FILE_README ${PROJECT_SOURCE_DIR}/README.rst)
-#   include(CPack)
-# endif ()

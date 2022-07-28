@@ -1,4 +1,4 @@
-name: build-publish-docs
+name: configure-docs-publish
 
 # Triggers the workflow on push or pull request events but only for the main branch
 on:
@@ -15,8 +15,6 @@ jobs:
 
       - name: Install dependencies, then configure and build project
         run: |
-          sudo apt update
-          sudo apt install cmake
           cmake -S . -B build -DCMAKE_EXPORT_COMPILE_COMMANDS=1 -DFLY_TESTS=Off -DFLY_EXAMPLES=Off -DFLY_APPS=Off
 
       # New workflow step that runs hdoc and uploads documentation to docs.hdoc.io

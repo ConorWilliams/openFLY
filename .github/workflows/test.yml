@@ -1,0 +1,50 @@
+# - Restores vcpkg artifacts from cache.
+# - Sets up vcpkg if needed, then run CMake with CMakePreset.json using a configuration
+#   that leverages the vcpkg's toolchain file. This will automatically run vcpkg to install dependencies
+#   described by the vcpkg.json manifest file. It will be a no-op if those are restored from cache.
+# - Finally builds the sources with Ninja.
+name: hosted-ninja-vcpkg_submod-autocache
+
+# Triggers the workflow on push or pull request events but only for the main branch
+on:
+  push:
+    branches: [main]
+
+jobs:
+  job:
+    name: ${{ matrix.os }}-${{ github.workflow }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: true
+
+        # Setup the build machine with the most recent versions of CMake and Ninja.
+        # Both are cached if not already: on subsequent runs both will be quickly restored from GitHub cache service.
+      - uses: lukka/get-cmake@latest
+
+      - name: Restore artifacts, or setup vcpkg for building artifacts
+        uses: lukka/run-vcpkg@v10
+        id: runvcpkg
+        with:
+          vcpkgJsonGlob: "vcpkg.json"
+
+        # Run CMake to generate Ninja project files, using the vcpkg's toolchain file to resolve and install the dependencies.
+      - name: Install dependencies and generate project files
+        run: |
+          cmake -S . -B build -DCMAKE_TOOLCHAIN_FILE=vcpkg/scripts/buildsystems/vcpkg.cmake -DCMAKE_BUILD_TYPE=Debug -DFLY_TESTS=On -DFLY_EXAMPLES=On -DFLY_APPS=On -GNinja
+
+        # Build the whole project with Ninja (which is spawn by CMake). Debug configuration.
+      - name: Build (Debug)
+        run: |
+          cmake --build build
+
+        # Test the whole project with CTest.
+      - name: Test (Debug)
+        run: |
+          ctest --test-dir build

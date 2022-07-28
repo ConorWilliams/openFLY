@@ -9,9 +9,9 @@ if (NOT DEFINED FLY_MASTER_PROJECT)
   endif ()
 endif ()
 
-if (FLY_MASTER_PROJECT)
-  # Ensure -std=c++xx instead of -std=g++xx
-  set(CMAKE_CXX_EXTENSIONS OFF)
+if (FLY_MASTER_PROJECT AND NOT CMAKE_BUILD_TYPE)
+  set(CMAKE_BUILD_TYPE Release)
+  message(STATUS "Choose the type of build, options are: Debug Release RelWithDebInfo or MinSizeRel")
 endif()
 
 project(openFLY CXX)
@@ -21,7 +21,6 @@ option(FLY_APPS "Build the openFLY application." ${FLY_MASTER_PROJECT})
 option(FLY_EXAMPLES "Build the examples." Off)
 option(FLY_TESTS "Build the tests." Off)
 option(FMT_PEDANTIC "Enable extra warnings." ${FLY_MASTER_PROJECT})
-
 
 # Get version from version.h
 file(READ "include/libfly/version.hpp" version)
@@ -52,6 +51,7 @@ message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
 
 if (NOT CMAKE_RUNTIME_OUTPUT_DIRECTORY)
   set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+  message(STATUS "Binaries will be written to: ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
 endif ()
 
 # libFly is here
@@ -66,6 +66,8 @@ if (FLY_TESTS)
   enable_testing()
   add_subdirectory(tests)
 endif ()
+
+
 
 
 

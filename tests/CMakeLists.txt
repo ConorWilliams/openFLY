@@ -12,6 +12,7 @@ target_compile_options(testFLY PRIVATE
 
 target_compile_features(testFLY PRIVATE cxx_std_17)
 
-target_link_libraries(testFLY PRIVATE fly::fly Catch2::Catch2WithMain)
+target_link_libraries(testFLY PRIVATE libFLY::libFLY Catch2::Catch2WithMain)
 
 add_test(NAME testFLY COMMAND testFLY) 
+

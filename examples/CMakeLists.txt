@@ -10,6 +10,6 @@ target_compile_options(examplesFLY PRIVATE
 
 target_compile_features(examplesFLY PRIVATE cxx_std_17)
 
-target_link_libraries(examplesFLY PRIVATE fly::fly)
+target_link_libraries(examplesFLY PRIVATE libFLY::libFLY)
 
 

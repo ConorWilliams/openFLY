@@ -16,6 +16,10 @@ endif()
 
 project(openFLY CXX)
 
+if (MSCV)
+  set(CMAKE_EXE_LINKER_FLAGS /MANIFEST::NO)
+endif()
+
 # Options that control generation of various targets.
 option(FLY_APPS "Build the openFLY application." ${FLY_MASTER_PROJECT})
 option(FLY_EXAMPLES "Build the examples." Off)

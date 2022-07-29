@@ -6,22 +6,15 @@
 Welcome to openFLY's documentation!
 ===================================
 
+Welcome...
+
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
 
+   api.rst
 
 
-Indices and tables
-==================
 
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
 
-Docs
-====
-
-.. doxygenindex::
-   :project: openFLY
 

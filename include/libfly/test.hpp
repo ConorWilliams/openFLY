@@ -23,11 +23,11 @@ struct cat {
 /**
  * @brief A function
  *
- * Example of math
+ * Example of math d
  *
  * * \verbatim embed:rst:leading-asterisk
  * .. math::
- *    a = b
+ *    a = b \sqrt{67}
  *
  * or we can do it inline :math:`a=b` cool right!
  * \endverbatim
@@ -57,7 +57,7 @@ struct impl_S {};
  *
  * @tparam T Must be an int.
  */
-template <typename T> void noop(int) {}
+template <typename T> void noop(int param) {}
 
 /**
  * @brief Does nothing.

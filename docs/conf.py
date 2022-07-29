@@ -40,7 +40,6 @@ release = '0.1.0'
 # ones.
 extensions = [
     'sphinx.ext.mathjax',
-    'sphinx.ext.viewcode',
     'breathe',
 ]
 
@@ -113,6 +112,8 @@ htmlhelp_basename = 'openFLYdoc'
 
 # -- Options for LaTeX output ------------------------------------------------
 
+latex_engine = 'xelatex'
+
 latex_elements = {
     # The paper size ('letterpaper' or 'a4paper').
     #
@@ -124,7 +125,7 @@ latex_elements = {
 
     # Additional stuff for the LaTeX preamble.
     #
-    # 'preamble': '',
+    'preamble': r'\usepackage{unicode-math}',
 
     # Latex figure (float) alignment
     #

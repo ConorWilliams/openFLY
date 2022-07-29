@@ -24,5 +24,8 @@ Docs
 
 
 
-.. doxygennamespace:: fly
+
+
+.. doxygenindex::
+   :project: openFLY
 

@@ -6,7 +6,7 @@
  */
 struct cat {
   /**
-   * @brief stores the time of day $x = y$
+   * @brief stores the time of day
    *
    */
   int meow;
@@ -23,27 +23,17 @@ struct cat {
 /**
  * @brief A function
  *
- * Inserting additional reStructuredText information. ds
- *
- *  A inline formula: \f$ f(x) = a + b \f$
- *
- * A display style formula: dddd
- *
- * @f[
- * \int_a^b f(x) dx = F(b) - F(a)
- * @f]
+ * Example of math
  *
  *
- * Example usage:
+ *
+ * Example of an example:
+ *
  * \verbatim embed:rst:leading-asterisk
  * .. include:: ../examples/main.cpp
  *    :code:
  * \endverbatim
  *
- * @code
- * char *buffer = new char[42];
- * int charsAdded = sprintf(buffer, "Tabs are normally %d spaces\n", 8);
- * @endcode
  */
 inline constexpr void foo(){};
 
@@ -90,7 +80,7 @@ namespace stuff {
 /**
  * @brief Build something.
  *
- * Here are some details about builder: $a = b$. See the code in
+ * Here are some details about builder: See the code in
  * /examples/main.cpp or examples/main.cpp and the documentation for return_true
  *
 \code{.cpp}

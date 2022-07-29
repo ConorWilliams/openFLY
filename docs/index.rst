@@ -22,10 +22,6 @@ Indices and tables
 Docs
 ====
 
-
-
-
-
 .. doxygenindex::
    :project: openFLY
 

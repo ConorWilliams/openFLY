@@ -14,7 +14,7 @@ struct cat {
 
 namespace fly {
 /**
- * @brief an ugly cat.
+ * @brief an ugly cat. d
  */
 struct cat {
   int meow;
@@ -25,7 +25,12 @@ struct cat {
  *
  * Example of math
  *
+ * * \verbatim embed:rst:leading-asterisk
+ * .. math::
+ *    a = b
  *
+ * or we can do it inline :math:`a=b` cool right!
+ * \endverbatim
  *
  * Example of an example:
  *

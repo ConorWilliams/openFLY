@@ -1,4 +1,4 @@
-name: configure-build-test
+name: Test-Ubuntu-macOS-Windows
 
 # Triggers the workflow on push or pull request events but only for the main branch
 on:
@@ -12,7 +12,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [windows-latest]
+        os: [ubuntu-latest, macos-latest, windows-latest]
 
     steps:
       - uses: actions/checkout@v2

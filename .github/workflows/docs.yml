@@ -1,25 +1,25 @@
-name: configure-docs-publish
+# name: configure-docs-publish
 
-# Triggers the workflow on push or pull request events but only for the main branch
-on:
-  push:
-    branches: [main]
+# # Triggers the workflow on push or pull request events but only for the main branch
+# on:
+#   push:
+#     branches: [main]
 
-# A simple workflow to configure a C++ project and generate documentation with hdoc
-jobs:
-  build:
-    runs-on: ubuntu-latest
+# # A simple workflow to configure a C++ project and generate documentation with hdoc
+# jobs:
+#   build:
+#     runs-on: ubuntu-latest
 
-    steps:
-      - uses: actions/checkout@v2
+#     steps:
+#       - uses: actions/checkout@v2
 
-      - name: Install dependencies, then configure and build project
-        run: |
-          cmake -S . -B build -DCMAKE_EXPORT_COMPILE_COMMANDS=1 -DFLY_TESTS=Off -DFLY_EXAMPLES=Off -DFLY_APPS=Off
+#       - name: Install dependencies, then configure and build project
+#         run: |
+#           cmake -S . -B build -DCMAKE_EXPORT_COMPILE_COMMANDS=1 -DFLY_TESTS=Off -DFLY_EXAMPLES=Off -DFLY_APPS=Off
 
-      # New workflow step that runs hdoc and uploads documentation to docs.hdoc.io
-      - name: Run hdoc to generate documentation and push it to docs.hdoc.io
-        uses: hdoc/hdoc-github-action@v2
-        with:
-          compile-commands-path: build/compile_commands.json
-          hdoc-api-key: ${{ secrets.HDOC_PROJECT_API_KEY }}
+#       # New workflow step that runs hdoc and uploads documentation to docs.hdoc.io
+#       - name: Run hdoc to generate documentation and push it to docs.hdoc.io
+#         uses: hdoc/hdoc-github-action@v2
+#         with:
+#           compile-commands-path: build/compile_commands.json
+#           hdoc-api-key: ${{ secrets.HDOC_PROJECT_API_KEY }}

@@ -25,9 +25,7 @@ jobs:
 
       - name: Restore artifacts, or setup vcpkg for building artifacts
         uses: lukka/run-vcpkg@v10
-        id: runvcpkg
-        with:
-          vcpkgJsonGlob: "vcpkg.json"
+
 
         # Run CMake to generate Ninja project files, using the vcpkg's toolchain file to resolve and install the dependencies.
       - name: Install dependencies and generate project files

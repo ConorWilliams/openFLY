@@ -1,17 +1,21 @@
 cmake_minimum_required(VERSION 3.16...3.22)
 
-# Determine if openFLY is built as a subproject (using add_subdirectory) or if it is the master project.
-if (NOT DEFINED FLY_MASTER_PROJECT)
+# Determine if openFLY is built as a subproject (using add_subdirectory) or if
+# it is the master project.
+if(NOT DEFINED FLY_MASTER_PROJECT)
   set(FLY_MASTER_PROJECT OFF)
-  if (CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
+  if(CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
     set(FLY_MASTER_PROJECT ON)
     message(STATUS "CMake version: ${CMAKE_VERSION}")
-  endif ()
-endif ()
+  endif()
+endif()
 
-if (FLY_MASTER_PROJECT AND NOT CMAKE_BUILD_TYPE)
+if(FLY_MASTER_PROJECT AND NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE Release)
-  message(STATUS "Choose the type of build, options are: Debug Release RelWithDebInfo or MinSizeRel")
+  message(
+    STATUS
+      "Choose the type of build, options are: Debug Release RelWithDebInfo or MinSizeRel"
+  )
 endif()
 
 project(openFLY CXX)
@@ -20,54 +24,57 @@ project(openFLY CXX)
 option(FLY_APPS "Build the openFLY application." ${FLY_MASTER_PROJECT})
 option(FLY_EXAMPLES "Build the examples." Off)
 option(FLY_TESTS "Build the tests." Off)
+option(FLY_DOCS "Build the documentation." Off)
 option(FMT_PEDANTIC "Enable extra warnings." ${FLY_MASTER_PROJECT})
 
 # Get version from version.h
 file(READ "include/libfly/version.hpp" version)
 
-if (NOT version MATCHES "VERSION_MAJOR ([0-9]+)")
+if(NOT version MATCHES "VERSION_MAJOR ([0-9]+)")
   message(FATAL_ERROR "Cannot get FLY_VERSION from version.hpp.")
 else()
   math(EXPR CPACK_PACKAGE_VERSION_MAJOR ${CMAKE_MATCH_1})
-endif ()
+endif()
 
-if (NOT version MATCHES "VERSION_MINOR ([0-9]+)")
+if(NOT version MATCHES "VERSION_MINOR ([0-9]+)")
   message(FATAL_ERROR "Cannot get VERSION_MINOR from version.hpp.")
-else ()
+else()
   math(EXPR CPACK_PACKAGE_VERSION_MINOR ${CMAKE_MATCH_1})
-endif ()
+endif()
 
-if (NOT version MATCHES "VERSION_PATCH ([0-9]+)")
+if(NOT version MATCHES "VERSION_PATCH ([0-9]+)")
   message(FATAL_ERROR "Cannot get VERSION_PATCH from version.hpp.")
 else()
   math(EXPR CPACK_PACKAGE_VERSION_PATCH ${CMAKE_MATCH_1})
-endif ()
+endif()
 
-set(FLY_VERSION "${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}.${CPACK_PACKAGE_VERSION_PATCH}")
+set(FLY_VERSION
+    "${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}.${CPACK_PACKAGE_VERSION_PATCH}"
+)
 
 message(STATUS "openFLY version: ${FLY_VERSION}")
 
 message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
 
-if (NOT CMAKE_RUNTIME_OUTPUT_DIRECTORY)
+if(NOT CMAKE_RUNTIME_OUTPUT_DIRECTORY)
   set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
-  message(STATUS "Binaries will be written to: ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
-endif ()
+  message(
+    STATUS "Binaries will be written to: ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
+endif()
 
 # libFly is here
 add_subdirectory(src)
 
-if (FLY_EXAMPLES)
+if(FLY_EXAMPLES)
   add_subdirectory(examples)
-endif ()
+endif()
 
-if (FLY_TESTS)
+if(FLY_TESTS)
   include(CTest)
   enable_testing()
   add_subdirectory(tests)
-endif ()
+endif()
 
-
-
-
-
+if(FLY_DOCS)
+  add_subdirectory(docs)
+endif()

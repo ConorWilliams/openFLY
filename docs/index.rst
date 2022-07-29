@@ -13,6 +13,7 @@ Welcome...
    :caption: Contents:
 
    api.rst
+   building.rst
 
 
 

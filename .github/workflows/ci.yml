@@ -10,6 +10,7 @@ on:
     - main
 
 
+
 jobs:
   test:
     strategy:
@@ -21,36 +22,13 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     
-    - name: Restore artifacts, or setup vcpkg (do not install any package)
-      uses: lukka/run-vcpkg@v10
-      with:
-        # This is the default location of the directory containing vcpkg sources.
-        # Change it to the right location if needed.
-        # vcpkgDirectory: '${{ github.workspace }}/vcpkg'
-
-        # If not using a submodule for vcpkg sources, this specifies which commit
-        # id must be checkout from a Git repo. It must not set if using a submodule
-        # for vcpkg.
-        vcpkgGitCommitId: bae8f8c7d837c631ca72daec4b14e243824135a5
-
-        # This is the glob expression used to locate the vcpkg.json and add its
-        # hash to the cache key. Change it to match a single manifest file you want
-        # to use. 
-        # Note: do not use `${{ github.context }}` to compose the value as it 
-        # contains backslashes that would be misinterpreted. Instead
-        # compose a value relative to the root of the repository using 
-        # `**/path/from/root/of/repo/to/vcpkg.json` to match the desired `vcpkg.json`.
-        # vcpkgJsonGlob: '**/vcpkg.json'
-
-        # This is needed to run `vcpkg install` command (after vcpkg is built) in
-        # the directory where vcpkg.json has been located. Default is false,
-        # It is highly suggested to let `run-cmake` to run vcpkg (i.e. `false`)
-        # (i.e. let CMake run `vcpkg install`) using the vcpkg.cmake toolchain.
-        # runVcpkgInstall: true
+    - name: Install vcpkg
+      uses: friendlyanon/setup-vcpkg@v1
+      with: { committish: "bae8f8c7d837c631ca72daec4b14e243824135a5" }
 
     - name: Configure
       shell: pwsh
-      run: cmake "--preset=ci-$("${{ matrix.os }}".split("-")[0])"
+      run: cmake "--preset=ci-$("${{ matrix.os }}".split("-")[0])" -DCMAKE_TOOLCHAIN_FILE="./vcpkg/scripts/buildsystems/vcpkg.cmake"
 
     - name: Build
       run: cmake --build build --config Release -j 2

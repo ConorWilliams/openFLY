@@ -29,8 +29,7 @@ jobs:
 
     - name: Update vcpkg
       working-directory: ./vcpkg
-       run: |
-          git pull 
+      run: git pull 
 
     - name: Configure
       shell: pwsh

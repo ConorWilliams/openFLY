@@ -1,7 +1,23 @@
 {
-    "name": "openfly",
+    "name": "ref-init",
     "version-semver": "0.1.0",
     "dependencies": [
-        "catch2"
-    ]
+        {
+            "name": "fmt",
+            "version>=": "8.1.1#2"
+        }
+    ],
+    "default-features": [],
+    "features": {
+        "test": {
+            "description": "Dependencies for testing",
+            "dependencies": [
+                {
+                    "name": "catch2",
+                    "version>=": "3.0.1#1"
+                }
+            ]
+        }
+    },
+    "builtin-baseline": "bae8f8c7d837c631ca72daec4b14e243824135a5"
 }

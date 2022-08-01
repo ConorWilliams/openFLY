@@ -13,44 +13,44 @@ struct cat {
 };
 
 namespace fly {
-/**
- * @brief an ugly cat. d
- */
-struct cat {
-  int meow;
-};
+  /**
+   * @brief an ugly cat. d
+   */
+  struct cat {
+    int meow;
+  };
 
-/**
- * @brief A function
- *
- * Example of math d
- *
- * * \verbatim embed:rst:leading-asterisk
- * .. math::
- *    a = b \sqrt{67}
- *
- * or we can do it inline :math:`a=b` cool right!
- * \endverbatim
- *
- * Example of an example:
- *
- * \verbatim embed:rst:leading-asterisk
- * .. include:: ../examples/main.cpp
- *    :code:
- * \endverbatim
- *
- */
-inline constexpr void foo(){};
+  /**
+   * @brief A function
+   *
+   * Example of math d
+   *
+   * * \verbatim embed:rst:leading-asterisk
+   * .. math::
+   *    a = b \sqrt{67}
+   *
+   * or we can do it inline :math:`a=b` cool right!
+   * \endverbatim
+   *
+   * Example of an example:
+   *
+   * \verbatim embed:rst:leading-asterisk
+   * .. include:: ../examples/main.cpp
+   *    :code:
+   * \endverbatim
+   *
+   */
+  inline constexpr void foo() {}
 
-namespace impl {
-/**
- * @brief BAsic secreys
- *
- */
-struct impl_S {};
-} // namespace impl
+  namespace impl {
+    /**
+     * @brief BAsic secreys
+     *
+     */
+    struct impl_S {};
+  }  // namespace impl
 
-} // namespace fly
+}  // namespace fly
 
 /**
  * @brief A big noop.
@@ -82,34 +82,34 @@ bool return_true(int ignore);
 
 namespace stuff {
 
-/**
- * @brief Build something.
- *
- * Here are some details about builder: See the code in
- * /examples/main.cpp or examples/main.cpp and the documentation for return_true
- *
-\code{.cpp}
-class Cpp {};
-\endcode
-
- *
- * @tparam T Never an int.
- */
-template <typename T> struct builder {
-public:
-  /** @brief An a */
-  int a;
-  int b; ///< An b.
-
   /**
-   * @brief Do "The Thing"!
+   * @brief Build something.
+   *
+   * Here are some details about builder: See the code in
+   * /examples/main.cpp or examples/main.cpp and the documentation for return_true
+   *
+  \code{.cpp}
+  class Cpp {};
+  \endcode
+
+   *
+   * @tparam T Never an int.
    */
-  void foo();
+  template <typename T> struct builder {
+  public:
+    /** @brief An a */
+    int a;
+    int b;  ///< An b.
 
-private:
-  /** @brief An a */
-  int c;
-  int d; ///< An b.
-};
+    /**
+     * @brief Do "The Thing"!
+     */
+    void foo();
 
-} // namespace stuff
+  private:
+    /** @brief An a */
+    int c;
+    int d;  ///< An b.
+  };
+
+}  // namespace stuff

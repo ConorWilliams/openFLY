@@ -34,7 +34,7 @@ jobs:
         run: |
           cmake -S . -B build -DCMAKE_TOOLCHAIN_FILE=${{ env.VCPKG_ROOT }}/scripts/buildsystems/vcpkg.cmake -DCMAKE_BUILD_TYPE=Debug -DFLY_TESTS=On -DFLY_EXAMPLES=On -DFLY_APPS=On -GNinja
 
-        # Build the whole project with Ninja (which is spawn by CMake). Debug configuration.
+        # Build the whole project. Debug configuration.
       - name: Build (Debug)
         run: |
           cmake --build build

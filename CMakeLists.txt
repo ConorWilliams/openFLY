@@ -1,84 +1,88 @@
 cmake_minimum_required(VERSION 3.16...3.22)
 
-# Determine if openFLY is built as a subproject (using add_subdirectory) or if it is the master
-# project.
-if(NOT DEFINED FLY_MASTER_PROJECT)
-  set(FLY_MASTER_PROJECT OFF)
-  if(CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
-    set(FLY_MASTER_PROJECT ON)
-    message(STATUS "CMake version: ${CMAKE_VERSION}")
-  endif()
-endif()
-
-if(FLY_MASTER_PROJECT AND NOT CMAKE_BUILD_TYPE)
-  set(CMAKE_BUILD_TYPE Release)
+# In-source guard
+if(CMAKE_SOURCE_DIR STREQUAL CMAKE_BINARY_DIR)
   message(
-    STATUS "Choose the type of build, options are: Debug Release RelWithDebInfo or MinSizeRel"
+    FATAL_ERROR
+      "In-source builds are not supported. "
+      "Please read the BUILDING document before trying to build this project. "
+      "You may need to delete 'CMakeCache.txt' and 'CMakeFiles/' first."
   )
 endif()
 
-project(openFLY CXX)
-
-option(FLY_ALL "Build everything all at once" Off)
-
-# Options that control generation of various targets.
-option(FLY_APPS "Build the openFLY application." ${FLY_ALL})
-option(FLY_EXAMPLES "Build the examples." ${FLY_ALL})
-option(FLY_TESTS "Build the tests." ${FLY_ALL})
-option(FLY_DOCS "Build the documentation." ${FLY_ALL})
-option(FMT_PEDANTIC "Enable extra warnings." ${FLY_ALL})
-
-# Get version from version.h
-file(READ "include/libfly/version.hpp" version)
-
-if(NOT version MATCHES "VERSION_MAJOR ([0-9]+)")
-  message(FATAL_ERROR "Cannot get FLY_VERSION from version.hpp.")
-else()
-  math(EXPR CPACK_PACKAGE_VERSION_MAJOR ${CMAKE_MATCH_1})
+# Before project(...) as it may set there
+if(NOT CMAKE_BUILD_TYPE)
+  set(CMAKE_BUILD_TYPE Release)
+  message(
+    AUTHOR_WARNING "Choose the build type, options are: Debug Release RelWithDebInfo or MinSizeRel"
+  )
 endif()
 
-if(NOT version MATCHES "VERSION_MINOR ([0-9]+)")
-  message(FATAL_ERROR "Cannot get VERSION_MINOR from version.hpp.")
-else()
-  math(EXPR CPACK_PACKAGE_VERSION_MINOR ${CMAKE_MATCH_1})
-endif()
-
-if(NOT version MATCHES "VERSION_PATCH ([0-9]+)")
-  message(FATAL_ERROR "Cannot get VERSION_PATCH from version.hpp.")
-else()
-  math(EXPR CPACK_PACKAGE_VERSION_PATCH ${CMAKE_MATCH_1})
-endif()
-
-set(FLY_VERSION
-    "${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}.${CPACK_PACKAGE_VERSION_PATCH}"
+project(
+  openFLY
+  DESCRIPTION "The open off-lattice kniteic Monte Carlo simulation framework"
+  HOMEPAGE_URL "https://github.com/ConorWilliams/openFLY"
+  LANGUAGES CXX
 )
+
+# This variable is set by project() in CMake 3.21+
+if(NOT PROJECT_IS_TOP_LEVEL)
+  string(COMPARE EQUAL "${CMAKE_SOURCE_DIR}" "${PROJECT_SOURCE_DIR}" PROJECT_IS_TOP_LEVEL)
+endif()
+
+# Developer mode enables targets and code paths in the CMake scripts that are only relevant for the
+# developer(s) of openFLY Targets necessary to build the project must be provided unconditionally,
+# so consumers can trivially build and package the project
+option(FLY_DEVELOPER_MODE "Enable developer mode" PROJECT_IS_TOP_LEVEL)
+
+include(cmake/GetVersion.cmake)
 
 message(STATUS "openFLY version: ${FLY_VERSION}")
 
 message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
 
-if(NOT CMAKE_RUNTIME_OUTPUT_DIRECTORY)
-  set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
-  message(STATUS "Binaries will be written to: ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
-endif()
+# ---- Declare library ----
 
-# libFly is here
-add_subdirectory(src)
+file(GLOB_RECURSE FLY_SOURCES CONFIGURE_DEPENDS "${PROJECT_SOURCE_DIR}/src/*.cpp")
 
-if(FLY_APPS)
-  add_subdirectory(apps)
-endif()
+add_library(libFLY OBJECT ${FLY_SOURCES})
 
-if(FLY_EXAMPLES)
-  add_subdirectory(examples)
-endif()
+target_include_directories(libFLY PUBLIC "$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>")
 
-if(FLY_TESTS)
+target_compile_features(libFLY PUBLIC cxx_std_17)
+
+find_package(fmt REQUIRED)
+
+target_link_libraries(libFLY PRIVATE fmt::fmt)
+
+# ---- Declare executable ----
+
+add_executable(openFLY apps/main.cpp)
+
+add_executable(openfly::exe ALIAS openFLY)
+
+set_target_properties(openFLY PROPERTIES OUTPUT_NAME openfly)
+
+target_compile_features(openFLY PRIVATE cxx_std_17)
+
+target_link_libraries(openFLY PRIVATE libFLY)
+
+target_link_libraries(openFLY PRIVATE fmt::fmt)
+
+# ---- Dev mode ----
+
+if(FLY_DEVELOPER_MODE)
+
   include(CTest)
-  enable_testing()
-  add_subdirectory(tests)
-endif()
 
-if(FLY_DOCS)
-  add_subdirectory(docs)
+  add_subdirectory(tests)
+
+  add_subdirectory(examples)
+
+  option(FLY_DOCS "Build documentation using ..." OFF)
+
+  if(BUILD_MCSS_DOCS)
+    include(cmake/docs.cmake)
+  endif()
+
 endif()

@@ -48,7 +48,7 @@ Finally, to build libFLY:
     cmake --build build
 
 Building the openFLY application(s)
----------------------------------
+-----------------------------------
 
 Build requirements:
 

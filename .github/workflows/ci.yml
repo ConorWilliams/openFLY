@@ -9,7 +9,8 @@ on:
     branches:
     - main
 
-
+env:
+  VCPKG_COMMIT: "bae8f8c7d837c631ca72daec4b14e243824135a5"
 
 jobs:
   test:
@@ -23,8 +24,8 @@ jobs:
     - uses: actions/checkout@v2
     
     - name: Install vcpkg
-    - uses: friendlyanon/setup-vcpkg@v1
-      with: { committish: bae8f8c7d837c631ca72daec4b14e243824135a5 }
+      uses: friendlyanon/setup-vcpkg@v1
+      with: { committish: "bae8f8c7d837c631ca72daec4b14e243824135a5" }
 
     - name: Configure
       shell: pwsh

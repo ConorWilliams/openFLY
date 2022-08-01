@@ -28,7 +28,7 @@ jobs:
       with: { committish: "bae8f8c7d837c631ca72daec4b14e243824135a5" }
 
     - name: Update vcpkg
-      working-directory: ./vcpkg
+      working-directory: vcpkg
       run: git pull 
 
     - name: Configure

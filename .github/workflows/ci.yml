@@ -24,11 +24,11 @@ jobs:
     
     - name: Install vcpkg
       uses: friendlyanon/setup-vcpkg@v1
-      with: { committish: "bae8f8c7d837c631ca72daec4b14e243824135a5" }
+      with: { committish: "66045de4dcc5da3d1029c02b606307f5951dcb22" }
 
     - name: Configure
       shell: pwsh
-      run: cmake "--preset=ci-$("${{ matrix.os }}".split("-")[0])" -DCMAKE_TOOLCHAIN_FILE="./vcpkg/scripts/buildsystems/vcpkg.cmake"
+      run: cmake "--preset=ci-$("${{ matrix.os }}".split("-")[0])"
 
     - name: Build
       run: cmake --build build --config Release -j 2

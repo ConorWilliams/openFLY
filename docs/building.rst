@@ -4,6 +4,8 @@ Compiling
 Building libFLY
 ---------------
 
+cmake -S . -B build -DCMAKE_TOOLCHAIN_FILE=~vcpkg/scripts/buildsystems/vcpkg.cmake -DCMAKE_BUILD_TYPE=Release
+
 LibFLY is the library component of openFLY and designed to be reusable and composable.
 
 Build requirements:

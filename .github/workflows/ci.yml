@@ -27,6 +27,11 @@ jobs:
       uses: friendlyanon/setup-vcpkg@v1
       with: { committish: "bae8f8c7d837c631ca72daec4b14e243824135a5" }
 
+    - name: Update vcpkg
+      working-directory: ./vcpkg
+       run: |
+          git pull 
+
     - name: Configure
       shell: pwsh
       run: cmake "--preset=ci-$("${{ matrix.os }}".split("-")[0])"

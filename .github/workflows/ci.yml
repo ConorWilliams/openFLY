@@ -14,8 +14,6 @@ env:
 
 jobs:
   test:
-    needs: [lint]
-
     strategy:
       matrix:
         os: [macos-latest, ubuntu-latest, windows-2022]
@@ -45,7 +43,7 @@ jobs:
 
   docs:
     # Deploy docs only when builds succeed
-    needs: [sanitize, test]
+    needs: [test]
 
     runs-on: ubuntu-latest
 

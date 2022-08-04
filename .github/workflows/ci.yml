@@ -81,7 +81,7 @@ jobs:
         run: cmake --preset=ci-ubuntu -DFLY_DOCS=ON
 
       - name: Build docs
-        run: cmake --build --preset=ci-ubuntu -t docs
+        run: cmake --build --preset=ci-build --target docs
 
     # - name: Deploy docs
     #   uses: peaceiris/actions-gh-pages@v3

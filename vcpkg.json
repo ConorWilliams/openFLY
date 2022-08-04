@@ -5,6 +5,10 @@
         {
             "name": "fmt",
             "version>=": "8.1.1#2"
+        },
+        {
+            "name": "eigen3",
+            "version>=": "3.4.0#2"
         }
     ],
     "default-features": [],

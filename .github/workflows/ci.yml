@@ -49,14 +49,14 @@ jobs:
     #
     #    git switch --orphan gh-pages
     #    git commit --allow-empty -m "Initial commit"
-    #    git push -u origin gh-pages
+    #    h
     #
     # Edit the <name> placeholder below to your GitHub name, so this action
     # runs only in your repository and no one else's fork. After these, delete
     # this comment and the last line in the conditional below.
     # If you do not wish to use GitHub Pages for deploying documentation, then
     # simply delete this job similarly to the coverage one.
-    if: github.ref == 'refs/heads/master'
+    if: github.ref == 'refs/heads/main'
       && github.event_name == 'push'
       && github.repository_owner == 'conorwilliams'
 

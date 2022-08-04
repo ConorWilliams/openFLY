@@ -8,12 +8,21 @@ Welcome to openFLY's documentation!
 
 Welcome...
 
+
+
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
 
-   api.rst
    building.rst
+   api.rst
+   todo.rst
+
+
+
+
+
+
 
 
 

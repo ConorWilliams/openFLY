@@ -38,7 +38,7 @@ set(SPHINX_INDEX_FILE ${SPHINX_BUILD}/index.html)
 
 file(GLOB_RECURSE FLY_EXAMPLES CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/../examples/*.cpp")
 
-file(GLOB FLY_RSTS CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/*.rst")
+file(GLOB_RECURSE FLY_RSTS CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/*.rst")
 
 # Only regenerate Sphinx when: - Doxygen has rerun - Our doc files have been updated - The Sphinx
 # config has been updated

@@ -19,7 +19,8 @@
 
 # -- Project information -----------------------------------------------------
 
-project = 'openFLY'
+from textwrap import dedent
+project = 'OpenFLY'
 copyright = '2022, ConorWilliams'
 author = 'ConorWilliams'
 
@@ -40,10 +41,13 @@ release = '0.1.0'
 # ones.
 extensions = [
     'sphinx.ext.mathjax',
-    'sphinx.ext.autodoc',
     'sphinx.ext.viewcode',
+    'sphinx.ext.autosectionlabel',
+    'sphinx.ext.todo',
     'breathe',
 ]
+
+todo_include_todos = True
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -94,6 +98,8 @@ html_theme = 'furo'
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ['_static']
+
+html_logo = "_static/fly.svg"
 
 html_css_files = ["openfly.css"]
 

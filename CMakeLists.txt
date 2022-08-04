@@ -81,8 +81,8 @@ if(FLY_DEVELOPER_MODE)
 
   option(FLY_DOCS "Build documentation using ..." OFF)
 
-  if(BUILD_MCSS_DOCS)
-    include(cmake/docs.cmake)
+  if(FLY_DOCS)
+    add_subdirectory(docs)
   endif()
 
 endif()

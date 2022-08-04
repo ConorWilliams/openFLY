@@ -21,7 +21,7 @@ namespace fly {
   };
 
   /**
-   * @brief A function
+   * @brief A function \c in that .
    *
    * Example of math d
    *
@@ -34,10 +34,12 @@ namespace fly {
    *
    * Example of an example:
    *
-   * \verbatim embed:rst:leading-asterisk
+   * \rst
+   *
    * .. include:: ../examples/main.cpp
    *    :code:
-   * \endverbatim
+   *
+   * \endrst
    *
    */
   inline constexpr void foo() {}

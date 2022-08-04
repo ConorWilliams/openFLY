@@ -1,6 +1,11 @@
+Library API reference
+=====================
 
-OpenFLY API
-==================
+.. toctree::
+   :glob:
+   :caption: Modules
 
-.. doxygenindex::
-   :project: openFLY
+   api/*
+
+
+

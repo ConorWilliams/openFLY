@@ -20,13 +20,13 @@ file(GLOB_RECURSE FLY_HEADERS CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/../
 
 # Only regenerate Doxygen when the Doxyfile or public headers change
 add_custom_command(
-  OUTPUT ${DOXYGEN_INDEX_FILE}
-  DEPENDS ${FLY_HEADERS}
-  COMMAND ${DOXYGEN_EXECUTABLE} ${DOXYFILE_OUT}
-  MAIN_DEPENDENCY ${DOXYFILE_OUT}
-  ${DOXYFILE_IN}
-  COMMENT "Generating doxygen XML"
-  VERBATIM
+    OUTPUT ${DOXYGEN_INDEX_FILE}
+    DEPENDS ${FLY_HEADERS}
+    COMMAND ${DOXYGEN_EXECUTABLE} ${DOXYFILE_OUT}
+    MAIN_DEPENDENCY ${DOXYFILE_OUT}
+    ${DOXYFILE_IN}
+    COMMENT "Generating doxygen XML"
+    VERBATIM
 )
 
 # Nice named target so we can run the job easily
@@ -43,14 +43,14 @@ file(GLOB_RECURSE FLY_RSTS CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/*.rst"
 # Only regenerate Sphinx when: - Doxygen has rerun - Our doc files have been updated - The Sphinx
 # config has been updated
 add_custom_command(
-  OUTPUT ${SPHINX_INDEX_FILE}
-  COMMAND ${SPHINX_EXECUTABLE} -b html -Dbreathe_projects.openFLY=${DOXYGEN_OUTPUT_DIR}/xml
-          ${SPHINX_SOURCE} ${SPHINX_BUILD}
-  WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-  DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/conf.py ${FLY_RSTS} ${DOXYGEN_INDEX_FILE} ${FLY_EXAMPLES}
-  MAIN_DEPENDENCY ${SPHINX_SOURCE}/conf.py
-  COMMENT "Generating documentation with Sphinx"
+    OUTPUT ${SPHINX_INDEX_FILE}
+    COMMAND ${SPHINX_EXECUTABLE} -b html -Dbreathe_projects.openFLY=${DOXYGEN_OUTPUT_DIR}/xml
+    ${SPHINX_SOURCE} ${SPHINX_BUILD}
+    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+    DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/conf.py ${FLY_RSTS} ${DOXYGEN_INDEX_FILE} ${FLY_EXAMPLES}
+    MAIN_DEPENDENCY ${SPHINX_SOURCE}/conf.py
+    COMMENT "Generating documentation with Sphinx"
 )
 
 # Nice named target so we can run the job easily
-add_custom_target(Sphinx ALL DEPENDS ${SPHINX_INDEX_FILE})
+add_custom_target(docs ALL DEPENDS ${SPHINX_INDEX_FILE})

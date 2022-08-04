@@ -2,32 +2,32 @@ cmake_minimum_required(VERSION 3.16...3.22)
 
 # In-source guard
 if(CMAKE_SOURCE_DIR STREQUAL CMAKE_BINARY_DIR)
-  message(
-    FATAL_ERROR
-      "In-source builds are not supported. "
-      "Please read the BUILDING document before trying to build this project. "
-      "You may need to delete 'CMakeCache.txt' and 'CMakeFiles/' first."
-  )
+    message(
+        FATAL_ERROR
+        "In-source builds are not supported. "
+        "Please read the BUILDING document before trying to build this project. "
+        "You may need to delete 'CMakeCache.txt' and 'CMakeFiles/' first."
+    )
 endif()
 
 # Before project(...) as it may set there
 if(NOT CMAKE_BUILD_TYPE)
-  set(CMAKE_BUILD_TYPE Release)
-  message(
-    AUTHOR_WARNING "Choose the build type, options are: Debug Release RelWithDebInfo or MinSizeRel"
-  )
+    set(CMAKE_BUILD_TYPE Release)
+    message(
+        AUTHOR_WARNING "Choose the build type, options are: Debug Release RelWithDebInfo or MinSizeRel"
+    )
 endif()
 
 project(
-  openFLY
-  DESCRIPTION "The open off-lattice kniteic Monte Carlo simulation framework"
-  HOMEPAGE_URL "https://github.com/ConorWilliams/openFLY"
-  LANGUAGES CXX
+    openFLY
+    DESCRIPTION "The open off-lattice kniteic Monte Carlo simulation framework"
+    HOMEPAGE_URL "https://github.com/ConorWilliams/openFLY"
+    LANGUAGES CXX
 )
 
 # This variable is set by project() in CMake 3.21+
 if(NOT PROJECT_IS_TOP_LEVEL)
-  string(COMPARE EQUAL "${CMAKE_SOURCE_DIR}" "${PROJECT_SOURCE_DIR}" PROJECT_IS_TOP_LEVEL)
+    string(COMPARE EQUAL "${CMAKE_SOURCE_DIR}" "${PROJECT_SOURCE_DIR}" PROJECT_IS_TOP_LEVEL)
 endif()
 
 # Developer mode enables targets and code paths in the CMake scripts that are only relevant for the
@@ -41,8 +41,7 @@ message(STATUS "openFLY version: ${FLY_VERSION}")
 
 message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
 
-# ---- Declare library ----
-
+# Declare library
 file(GLOB_RECURSE FLY_SOURCES CONFIGURE_DEPENDS "${PROJECT_SOURCE_DIR}/src/*.cpp")
 
 add_library(libFLY OBJECT ${FLY_SOURCES})
@@ -55,8 +54,7 @@ find_package(fmt REQUIRED)
 
 target_link_libraries(libFLY PRIVATE fmt::fmt)
 
-# ---- Declare executable ----
-
+# Declare executable
 add_executable(openFLY apps/main.cpp)
 
 add_executable(openfly::exe ALIAS openFLY)
@@ -69,20 +67,13 @@ target_link_libraries(openFLY PRIVATE libFLY)
 
 target_link_libraries(openFLY PRIVATE fmt::fmt)
 
-# ---- Dev mode ----
-
+# Dev mode
 if(FLY_DEVELOPER_MODE)
+    include(CTest)
 
-  include(CTest)
+    add_subdirectory(tests)
 
-  add_subdirectory(tests)
+    add_subdirectory(examples)
 
-  add_subdirectory(examples)
-
-  option(FLY_DOCS "Build documentation using ..." OFF)
-
-  if(FLY_DOCS)
     add_subdirectory(docs)
-  endif()
-
 endif()

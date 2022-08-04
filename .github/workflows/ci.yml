@@ -3,11 +3,11 @@ name: Continuous Integration
 on:
   push:
     branches:
-    - main
+      - main
 
   pull_request:
     branches:
-    - main
+      - main
 
 jobs:
   test:
@@ -18,25 +18,25 @@ jobs:
     runs-on: ${{ matrix.os }}
 
     steps:
-    - uses: actions/checkout@v2
-    
-    - name: Install vcpkg
-      uses: friendlyanon/setup-vcpkg@v1
-      with: { committish: "66045de4dcc5da3d1029c02b606307f5951dcb22" }
+      - uses: actions/checkout@v2
 
-    - name: Configure
-      shell: pwsh
-      run: cmake "--preset=ci-$("${{ matrix.os }}".split("-")[0])"
+      - name: Install vcpkg
+        uses: friendlyanon/setup-vcpkg@v1
+        with: { committish: "66045de4dcc5da3d1029c02b606307f5951dcb22" }
 
-    - name: Build
-      run: cmake --build build --config Release -j 2
+      - name: Configure
+        shell: pwsh
+        run: cmake "--preset=ci-$("${{ matrix.os }}".split("-")[0])"
 
-    - name: Install
-      run: cmake --install build --config Release --prefix prefix
+      - name: Build
+        run: cmake --build build --config Release -j 2
 
-    - name: Test
-      working-directory: build
-      run: ctest --output-on-failure -C Release -j 2
+      - name: Install
+        run: cmake --install build --config Release --prefix prefix
+
+      - name: Test
+        working-directory: build
+        run: ctest --output-on-failure -C Release -j 2
 
   docs:
     # Deploy docs only when builds succeed
@@ -57,28 +57,26 @@ jobs:
     # simply delete this job similarly to the coverage one.
     if: github.ref == 'refs/heads/master'
       && github.event_name == 'push'
-      && github.repository_owner == '<name>'
-      && false
+      && github.repository_owner == 'conorwilliams'
 
     steps:
-    - uses: actions/checkout@v2
+      - uses: actions/checkout@v2
 
-    - uses: actions/setup-python@v2
-      with: { python-version: "3.8" }
+      - uses: actions/setup-python@v2
+        with: { python-version: "3.8" }
 
-    - name: Install m.css dependencies
-      run: pip3 install jinja2 Pygments
+      - name: Install m.css dependencies
+        run: pip3 install breathe sphinx furo
 
-    - name: Install Doxygen
-      run: sudo apt-get update -q
-        && sudo apt-get install doxygen -q -y
+      - name: Install Doxygen
+        run: sudo apt-get update -q
+          && sudo apt-get install doxygen -q -y
 
-    - name: Build docs
-      run: cmake "-DPROJECT_SOURCE_DIR=$PWD" "-DPROJECT_BINARY_DIR=$PWD/build"
-        -P cmake/docs-ci.cmake
+      - name: Build docs
+        run: cmake --build --preset=ci-unix -t docs
 
-    - name: Deploy docs
-      uses: peaceiris/actions-gh-pages@v3
-      with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: build/docs/html
+    # - name: Deploy docs
+    #   uses: peaceiris/actions-gh-pages@v3
+    #   with:
+    #     github_token: ${{ secrets.GITHUB_TOKEN }}
+    #     publish_dir: build/docs/html

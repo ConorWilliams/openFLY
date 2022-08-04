@@ -1,4 +1,4 @@
 format:
   tab_size: 2
-  line_width: 100
+  line_width: 135
   dangle_parens: true

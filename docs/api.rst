@@ -2,10 +2,10 @@ Library API reference
 =====================
 
 .. toctree::
-   :glob:
    :caption: Modules
 
-   api/*
+   api/utility.rst
+   api/potentials.rst
 
 
 

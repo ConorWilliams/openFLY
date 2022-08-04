@@ -1,4 +1,3 @@
 Potentials
 ==========
 
-.. doxygenfile:: test.hpp

@@ -32,7 +32,15 @@
 // ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-// MS compatible compilers support #pragma once
+/**
+ * \file current_function.hpp
+ *
+ * @brief Miscellaneous utilities.
+ */
+
+/**
+ * @brief Macro to fetch the name of the function.
+ */
 
 #if defined(__GNUC__) || (defined(__MWERKS__) && (__MWERKS__ >= 0x3000)) || (defined(__ICC) && (__ICC >= 600)) || defined(__ghs__)
 

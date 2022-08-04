@@ -24,10 +24,18 @@ TEST_CASE("defer", "[core]") {
   int i = 0;
 
   {
-    fly::Defer _ = [&]() noexcept { i = 1; };
+    fly::Defer _ = [&i]() noexcept { i = 1; };
 
     CHECK(i == 0);
   }
 
   CHECK(i == 1);
+
+  try {
+    fly::Defer _ = [&i]() noexcept { i = 2; };
+    CHECK(i == 1);
+    throw "!";
+  } catch (...) {
+    CHECK(i == 2);
+  }
 }

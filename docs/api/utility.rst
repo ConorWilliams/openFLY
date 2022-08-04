@@ -25,3 +25,11 @@ Asserts
 .. doxygenfile:: asserts.hpp
     :no-link:
 
+Timing
+-------
+
+``libfly/utility/timeit.hpp``
+
+.. doxygenfile:: timeit.hpp
+    :no-link:
+

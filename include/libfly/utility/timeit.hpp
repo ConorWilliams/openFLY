@@ -1,143 +1,76 @@
-// #pragma once
+#pragma once
 
-// #include <fmt/chrono.h>
-// #include <fmt/core.h>
+// Copyright © 2020 Conor Williams <conorwilliams@outlook.com>
 
-// #include <Eigen/Core>
-// #include <chrono>
-// #include <cmath>
-// #include <cstddef>
-// #include <functional>
-// #include <iterator>
-// #include <numeric>
-// #include <ratio>
-// #include <string_view>
-// #include <type_traits>
-// #include <utility>
-// #include <vector>
+// SPDX-License-Identifier: MPL-2.0
 
-// namespace fly {
+// This Source Code Form is subject to the terms of the Mozilla Public
+// License, v. 2.0. If a copy of the MPL was not distributed with this
+// file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-//   /**
-//    * @brief Transparent function wrapper that measures the execution time of a function.
-//    *
-//    * The execution time is printed to stdout.
-//    */
-//   template <typename F, typename... Args>
-//   std::invoke_result_t<F&&, Args&&...> time_call(std::string_view name, F&& f, Args&&... args) {
-//     //
-//     auto start = std::chrono::steady_clock::now();
+#include <fmt/chrono.h>
+#include <fmt/core.h>
 
-//     finally _ = [&] {
-//       //
-//       using namespace std::chrono;
+#include <chrono>
+#include <functional>
+#include <string_view>
+#include <type_traits>
+#include <utility>
 
-//       auto elapsed = std::chrono::steady_clock::now() - start;
+#include "libfly/utility/core.hpp"
 
-//       auto sec = duration_cast<seconds>(elapsed);
+/**
+ *
+ * \file timeit.hpp
+ *
+ * @brief Timing utilities.
+ *
+ */
 
-//       elapsed -= sec;
+namespace fly {
 
-//       auto mil = duration_cast<milliseconds>(elapsed);
+  /**
+   * @brief Transparent function wrapper that measures the execution time of a function.
+   *
+   * The execution time is printed to stdout. Garantees RVO.
+   *
+   * @param name Name of function being called, also printed to stdout.
+   * @param f Function call.
+   * @param args Arguments to call \c f with.
+   * @return std::invoke_result_t<F&&, Args&&...> The result of calling \c f with \c args... .
+   */
+  template <typename F, typename... Args> std::invoke_result_t<F&&, Args&&...> timeit(std::string_view name, F&& f, Args&&... args) {
+    //
+    auto start = std::chrono::steady_clock::now();
 
-//       elapsed -= mil;
+    Defer _ = [&]() noexcept {
+      //
+      using namespace std::chrono;
 
-//       auto mic = duration_cast<microseconds>(elapsed);
+      auto elapsed = steady_clock::now() - start;
 
-//       elapsed -= mic;
+      auto sec = duration_cast<seconds>(elapsed);
 
-//       auto nan = duration_cast<nanoseconds>(elapsed);
+      elapsed -= sec;
 
-//       fmt::print("Timing \"{}\" {:>4} {:>5} {:>5} {:>5}\n", name, sec, mil, mic, nan);
-//     };
+      auto mil = duration_cast<milliseconds>(elapsed);
 
-//     if constexpr (std::is_void_v<std::invoke_result_t<F&&, Args&&...>>) {
-//       std::invoke(std::forward<F>(f), std::forward<Args>(args)...);
-//     } else {
-//       return std::invoke(std::forward<F>(f), std::forward<Args>(args)...);
-//     }
-//   }
+      elapsed -= mil;
 
-//   /**
-//    * @brief Utility for defining floating chrono types.
-//    */
-//   template <typename T> using ftime_t = std::chrono::duration<floating, T>;
+      auto mic = duration_cast<microseconds>(elapsed);
 
-//   /**
-//    * @brief Quick and dirty timing utility, prints to stdout.
-//    *
-//    * @param name Give a name to what you are timing
-//    * @param f The function you want to time
-//    * @param timeout The maximum ammount of time you wish to time for, defaults to 1 second
-//    *
-//    * @return auto A struct with members .mean and .std sutible for structured binding decomposition
-//    */
-//   template <typename F> auto timeit(std::string_view name, F const& f, std::chrono::nanoseconds timeout = std::chrono::seconds{1}) {
-//     //
-//     using Duration = std::chrono::high_resolution_clock::duration;
+      elapsed -= mic;
 
-//     constexpr std::size_t max_runs = 10'000;
+      auto nan = duration_cast<nanoseconds>(elapsed);
 
-//     std::vector<Duration> dt;
+      fmt::print("Timing \"{}\" {:>4} {:>5} {:>5} {:>5}\n", name, sec, mil, mic, nan);
+    };
 
-//     dt.reserve(max_runs);
+    if constexpr (std::is_void_v<std::invoke_result_t<F&&, Args&&...>>) {
+      std::invoke(std::forward<F>(f), std::forward<Args>(args)...);
+    } else {
+      return std::invoke(std::forward<F>(f), std::forward<Args>(args)...);
+    }
+  }
 
-//     Duration elapsed{0};
-
-//     fmt::print("Timing \"{}\"...\n", name);
-
-//     do {
-//       auto start = std::chrono::high_resolution_clock::now();
-
-//       static_cast<void>(std::invoke(f));  // Discard result
-
-//       auto stop = std::chrono::high_resolution_clock::now();
-
-//       dt.push_back(stop - start);
-
-//       elapsed += stop - start;
-
-//     } while (elapsed < timeout && dt.size() < max_runs);
-
-//     fmt::print("Performed {} runs in {}\n", dt.size(), elapsed);
-
-//     using default_dur = ftime_t<Duration::period>;
-
-//     default_dur mean = std::accumulate(dt.begin(), dt.end(), default_dur{0}) / dt.size();
-
-//     default_dur nvar{std::accumulate(dt.begin(), dt.end(), 0.0, [&, mean](double acc, default_dur const& val) {
-//       return acc + (val.count() - mean.count()) * (val.count() - mean.count());
-//     })};
-
-//     default_dur std{std::sqrt(nvar.count() / dt.size())};
-
-//     constexpr auto str = "Average time = {} ± {}\n";
-
-//     if (mean < ftime_t<std::nano>{1000}) {
-//       fmt::print(str, ftime_t<std::nano>{mean}, ftime_t<std::nano>{std});
-//     } else if (mean < ftime_t<std::micro>{1000}) {
-//       fmt::print(str, ftime_t<std::micro>{mean}, ftime_t<std::micro>{std});
-//     } else if (mean < ftime_t<std::milli>{1000}) {
-//       fmt::print(str, ftime_t<std::milli>{mean}, ftime_t<std::milli>{std});
-//     } else {
-//       fmt::print(str, ftime_t<std::ratio<1>>{mean}, ftime_t<std::ratio<1>>{std});
-//     }
-
-//     struct Return {
-//       default_dur mean;
-//       default_dur std;
-//     };
-
-//     return Return{mean, std};
-//   }
-
-//   template <typename...> inline constexpr bool always_false = false;
-
-//   /**
-//    * @brief Strip all reference and const qualifications from \c T.
-//    *
-//    * @tparam T The type to strip ref/const qualifications from.
-//    */
-//   template <typename T> using remove_cref_t = std::remove_const_t<std::remove_reference_t<T>>;
-
-// }  // namespace fly
+}  // namespace fly

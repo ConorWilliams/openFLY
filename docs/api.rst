@@ -6,7 +6,8 @@ Library API reference
 
 
    api/utility.rst
-   api/potentials.rst
+   api/system.rst
+
 
 
 

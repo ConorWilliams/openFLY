@@ -8,21 +8,12 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-#include <fmt/chrono.h>
-#include <fmt/core.h>
-
 #include <Eigen/Core>
-#include <chrono>
 #include <cmath>
 #include <cstddef>
 #include <functional>
-#include <iterator>
-#include <numeric>
-#include <ratio>
-#include <string_view>
 #include <type_traits>
 #include <utility>
-#include <vector>
 
 /**
  * \file core.hpp

@@ -13,8 +13,11 @@ set(DOXYFILE_OUT ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile)
 # Replace variables inside @@ with the current values
 configure_file(${DOXYFILE_IN} ${DOXYFILE_OUT} @ONLY)
 
-# Doxygen won't create this for us
+# Doxygen won't create these for us
 file(MAKE_DIRECTORY ${DOXYGEN_OUTPUT_DIR})
+file(MAKE_DIRECTORY ${DOXYGEN_OUTPUT_DIR}/latex)
+file(MAKE_DIRECTORY ${DOXYGEN_OUTPUT_DIR}/html)
+file(MAKE_DIRECTORY ${DOXYGEN_OUTPUT_DIR}/xml)
 
 file(GLOB_RECURSE FLY_HEADERS CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/../include/*.hpp")
 

@@ -3,7 +3,7 @@
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
-<link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="Potentials" href="potentials.html" /><link rel="prev" title="Library API reference" href="../api.html" />
+<link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="System" href="system.html" /><link rel="prev" title="Library API reference" href="../api.html" />
 
     <meta name="generator" content="sphinx-5.1.1, furo 2022.06.21"/>
         <title>Utility - OpenFLY 0.1.0 documentation</title>
@@ -164,7 +164,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../building.html#hacking">Hacking</a></li>
 <li class="toctree-l1 current has-children"><a class="reference internal" href="../api.html">Library API reference</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
 <li class="toctree-l2 current current-page"><a class="current reference internal" href="#">Utility</a></li>
-<li class="toctree-l2"><a class="reference internal" href="potentials.html">Potentials</a></li>
+<li class="toctree-l2"><a class="reference internal" href="system.html">System</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../todo.html">Todo!</a></li>
@@ -206,28 +206,321 @@
 <section id="version">
 <h2>Version<a class="headerlink" href="#version" title="Permalink to this heading">#</a></h2>
 <p><code class="docutils literal notranslate"><span class="pre">libfly/utility/version.hpp</span></code></p>
-<p>Defines a set of version macros, read by CMake </p>
+<p>Defines a set of version macros, read by CMake. </p>
 <div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric" id="breathe-section-title-defines">Defines</p>
 <dl class="cpp macro">
-<dt class="sig sig-object cpp" id="c.FLY_VERSION_MAJOR">
-<span class="target" id="version_8hpp_1ac787f0d8dec8d08e562b2eacb9c6bf37"></span><span class="sig-name descname"><span class="n"><span class="pre">FLY_VERSION_MAJOR</span></span></span><a class="headerlink" href="#c.FLY_VERSION_MAJOR" title="Permalink to this definition">#</a><br /></dt>
+<dt class="sig sig-object cpp">
+<span class="sig-name descname"><span class="n"><span class="pre">FLY_VERSION_MAJOR</span></span></span><br /></dt>
 <dd><p>The major version umber. </p>
 </dd></dl>
 
 <dl class="cpp macro">
-<dt class="sig sig-object cpp" id="c.FLY_VERSION_MINOR">
-<span class="target" id="version_8hpp_1ace1416696199718f6a5b52f6026c19fa"></span><span class="sig-name descname"><span class="n"><span class="pre">FLY_VERSION_MINOR</span></span></span><a class="headerlink" href="#c.FLY_VERSION_MINOR" title="Permalink to this definition">#</a><br /></dt>
+<dt class="sig sig-object cpp">
+<span class="sig-name descname"><span class="n"><span class="pre">FLY_VERSION_MINOR</span></span></span><br /></dt>
 <dd><p>The minor version umber. </p>
 </dd></dl>
 
 <dl class="cpp macro">
-<dt class="sig sig-object cpp" id="c.FLY_VERSION_PATCH">
-<span class="target" id="version_8hpp_1a24de4a870d7ebb4e675683918dc84857"></span><span class="sig-name descname"><span class="n"><span class="pre">FLY_VERSION_PATCH</span></span></span><a class="headerlink" href="#c.FLY_VERSION_PATCH" title="Permalink to this definition">#</a><br /></dt>
+<dt class="sig sig-object cpp">
+<span class="sig-name descname"><span class="n"><span class="pre">FLY_VERSION_PATCH</span></span></span><br /></dt>
 <dd><p>The patch umber. </p>
 </dd></dl>
 
 </div>
+</section>
+<section id="core">
+<h2>Core<a class="headerlink" href="#core" title="Permalink to this heading">#</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">libfly/utility/core.hpp</span></code></p>
+<p>Miscellaneous utilities. </p>
+<dl class="cpp type">
+<dt class="sig sig-object cpp">
+<span class="k"><span class="pre">namespace</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">fly</span></span></span><br /></dt>
+<dd><div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-typedefs">Typedefs</p>
+<dl class="cpp type">
+<dt class="sig sig-object cpp">
+<span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">floating</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><br /></dt>
+<dd><p>Floating point type used for position, velocity, etc. </p>
+</dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp">
+<span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Vec3</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="n"><span class="pre">Eigen</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">Vector</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0EN3fly4Vec3E" title="fly::Vec3::T"><span class="n"><span class="pre">T</span></span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N3fly12spatial_dimsE" title="fly::spatial_dims"><span class="n"><span class="pre">spatial_dims</span></span></a><span class="p"><span class="pre">&gt;</span></span><br /></dt>
+<dd><p>Shorthand for creating an <code class="docutils literal notranslate"><span class="pre">Eigen::Vector</span></code> of length <code class="docutils literal notranslate"><span class="pre">spatial_dims</span></code>. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Template Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>T</strong> – The scalar type of the <code class="docutils literal notranslate"><span class="pre">Eigen::Vector</span></code> </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp">
+<span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Mat3</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="n"><span class="pre">Eigen</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">Matrix</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0EN3fly4Mat3E" title="fly::Mat3::T"><span class="n"><span class="pre">T</span></span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N3fly12spatial_dimsE" title="fly::spatial_dims"><span class="n"><span class="pre">spatial_dims</span></span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N3fly12spatial_dimsE" title="fly::spatial_dims"><span class="n"><span class="pre">spatial_dims</span></span></a><span class="p"><span class="pre">&gt;</span></span><br /></dt>
+<dd><p>Shorthand for creating an <code class="docutils literal notranslate"><span class="pre">spatial_dims</span></code> x <code class="docutils literal notranslate"><span class="pre">spatial_dims</span></code> <code class="docutils literal notranslate"><span class="pre">Eigen::Matrix</span></code>. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Template Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>T</strong> – The scalar type of the <code class="docutils literal notranslate"><span class="pre">Eigen::Matrix</span></code> </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp">
+<span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="sig-name descname"><span class="n"><span class="pre">Ts</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">first_t</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="n"><span class="pre">detail</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">First</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4IDpEN3fly7first_tE" title="fly::first_t::Ts"><span class="n"><span class="pre">Ts</span></span></a><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">type</span></span><br /></dt>
+<dd><p>Extracts the first type from a parameter pack. </p>
+</dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp">
+<span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">remove_cref_t</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">remove_const_t</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">remove_reference_t</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0EN3fly13remove_cref_tE" title="fly::remove_cref_t::T"><span class="n"><span class="pre">T</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">&gt;</span></span><br /></dt>
+<dd><p>Strip all reference and const qualifications from <code class="docutils literal notranslate"><span class="pre">T</span></code>. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Template Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>T</strong> – The type to strip ref/const qualifications from. </p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-functions">Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp">
+<span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">E1</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">E2</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="kt"><span class="pre">auto</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">gdot</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">Eigen</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">ArrayBase</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I00EN3fly4gdotEDaRKN5Eigen9ArrayBaseI2E1EERKN5Eigen9ArrayBaseI2E2EE" title="fly::gdot::E1"><span class="n"><span class="pre">E1</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">a</span></span>, <span class="n"><span class="pre">Eigen</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">ArrayBase</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I00EN3fly4gdotEDaRKN5Eigen9ArrayBaseI2E1EERKN5Eigen9ArrayBaseI2E2EE" title="fly::gdot::E2"><span class="n"><span class="pre">E2</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">b</span></span><span class="sig-paren">)</span><br /></dt>
+<dd><p>Generalised dot-product between two <code class="docutils literal notranslate"><span class="pre">Eigen::Array</span></code> objects. </p>
+<p><p><p>Computes:</p>
+<div class="math-wrapper docutils container">
+<div class="math notranslate nohighlight">
+\[\sum_{i} \sum_{j} a_{ij} b_{ij}\]</div>
+</div>
+</p>
+ </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp">
+<span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">E</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="kt"><span class="pre">auto</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">norm_sq</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">Eigen</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">ArrayBase</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0EN3fly7norm_sqEDaRKN5Eigen9ArrayBaseI1EEE" title="fly::norm_sq::E"><span class="n"><span class="pre">E</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">r</span></span><span class="sig-paren">)</span><br /></dt>
+<dd><p>Generic squared Frobenius norm of an <code class="docutils literal notranslate"><span class="pre">Eigen::Array</span></code>. </p>
+<p><p><p>Computes:</p>
+<div class="math-wrapper docutils container">
+<div class="math notranslate nohighlight">
+\[\sum_{i} \sum_{j} r^2_{ij}\]</div>
+</div>
+</p>
+ </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp">
+<span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">E</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="kt"><span class="pre">auto</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">norm</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">Eigen</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">ArrayBase</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0EN3fly4normEDaRKN5Eigen9ArrayBaseI1EEE" title="fly::norm::E"><span class="n"><span class="pre">E</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">r</span></span><span class="sig-paren">)</span><br /></dt>
+<dd><p>Generic Frobenius norm of an <code class="docutils literal notranslate"><span class="pre">Eigen::Array</span></code>. </p>
+<p><p><p>Computes:</p>
+<div class="math-wrapper docutils container">
+<div class="math notranslate nohighlight">
+\[\sqrt{\sum_{i} \sum_{j} r^2_{ij}}\]</div>
+</div>
+</p>
+ </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp">
+<span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Exp</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">enable_if_t</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">is_arithmetic_v</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I_NSt6size_tE0EN3fly4ipowENSt11enable_if_tINSt15is_arithmetic_vI1TEE1TEE1T" title="fly::ipow::T"><span class="n"><span class="pre">T</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I_NSt6size_tE0EN3fly4ipowENSt11enable_if_tINSt15is_arithmetic_vI1TEE1TEE1T" title="fly::ipow::T"><span class="n"><span class="pre">T</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ipow</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I_NSt6size_tE0EN3fly4ipowENSt11enable_if_tINSt15is_arithmetic_vI1TEE1TEE1T" title="fly::ipow::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">x</span></span><span class="sig-paren">)</span><br /></dt>
+<dd><p>Compute integer powers of arithmetic types at compile time. </p>
+<p><p><p>Computes:</p>
+<div class="math-wrapper docutils container">
+<div class="math notranslate nohighlight">
+\[\text{x}^{\text{Exp}}\]</div>
+</div>
+</p>
+ </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp">
+<span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">F</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="sig-name descname"><span class="n"><span class="pre">Defer</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0EN3fly5DeferE5DeferI1FERR1F" title="fly::Defer::F"><span class="n"><span class="pre">F</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="o"><span class="pre">-&gt;</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0EN3fly5DeferE5DeferI1FERR1F" title="fly::Defer"><span class="n"><span class="pre">Defer</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0EN3fly5DeferE5DeferI1FERR1F" title="fly::Defer::F"><span class="n"><span class="pre">F</span></span></a><span class="p"><span class="pre">&gt;</span></span><br /></dt>
+<dd><p>Forwarding deduction guide. </p>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-variables">Variables</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp">
+<span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">spatial_dims</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">3</span></span><br /></dt>
+<dd><p>Number of spatial dimensions. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp">
+<span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">max_atomic_num</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">111</span></span><br /></dt>
+<dd><p>The maximum atomic number that any atom can have. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp">
+<span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">always_false</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">false</span></span><br /></dt>
+<dd><p>Non-deducable <code class="docutils literal notranslate"><span class="pre">false</span></code> for use in <code class="docutils literal notranslate"><span class="pre">static_assert</span></code>. </p>
+<p><p><p>Example:</p>
+<div class="code highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;libfly/utility/core.hpp&quot;</span><span class="cp"></span>
+
+<span class="k">template</span><span class="w"> </span><span class="o">&lt;</span><span class="k">typename</span><span class="w"> </span><span class="nc">T</span><span class="o">&gt;</span><span class="w"> </span><span class="k">struct</span><span class="w"> </span><span class="nc">referance_banned</span><span class="w"> </span><span class="p">{};</span><span class="w"></span>
+
+<span class="k">template</span><span class="w"> </span><span class="o">&lt;</span><span class="k">typename</span><span class="w"> </span><span class="nc">T</span><span class="o">&gt;</span><span class="w"> </span><span class="k">struct</span><span class="w"> </span><span class="nc">referance_banned</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&amp;&gt;</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">  </span><span class="c1">// This static_assert will always fail but the compiler cannot deduce this</span>
+<span class="w">  </span><span class="c1">// until it is instanciated as fly::always_false&lt;T&gt; could be specialised</span>
+<span class="w">  </span><span class="c1">// at any point.</span>
+<span class="w">  </span><span class="k">static_assert</span><span class="p">(</span><span class="n">fly</span><span class="o">::</span><span class="n">always_false</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;T cannot be an l-value referances!&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="p">};</span><span class="w"></span>
+</pre></div>
+</div>
+</p>
+ </p>
+</dd></dl>
+
+</div>
+<dl class="cpp class">
+<dt class="sig sig-object cpp">
+<span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">F</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">enable_if_t</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">is_nothrow_invocable_v</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I00EN3fly5DeferE" title="fly::Defer::F"><span class="n"><span class="pre">F</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Defer</span></span></span><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;core.hpp&gt;</em></div>
+<p>Basic implementation of a Golang like defer. </p>
+<p><p><p>Example:</p>
+<div class="code highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;vector&gt;</span><span class="cp"></span>
+
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;libfly/utility/core.hpp&quot;</span><span class="cp"></span>
+
+<span class="kt">void</span><span class="w"> </span><span class="nf">add_count</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&amp;</span><span class="w"> </span><span class="n">counts</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">  </span><span class="c1">//</span>
+<span class="w">  </span><span class="kt">bool</span><span class="w"> </span><span class="n">commit</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">false</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">  </span><span class="n">counts</span><span class="p">.</span><span class="n">push_back</span><span class="p">(</span><span class="mi">42</span><span class="p">);</span><span class="w">  </span><span class="c1">// (1) direct action.</span>
+
+<span class="w">  </span><span class="c1">// Lambda executed when the enclosing scope exits (function returns).</span>
+<span class="w">  </span><span class="n">fly</span><span class="o">::</span><span class="n">Defer</span><span class="w"> </span><span class="n">_</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="o">&amp;</span><span class="p">]()</span><span class="w"> </span><span class="k">noexcept</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">commit</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">      </span><span class="n">counts</span><span class="p">.</span><span class="n">pop_back</span><span class="p">();</span><span class="w">  </span><span class="c1">// (2) rollback action.</span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="w">  </span><span class="p">};</span><span class="w"></span>
+
+<span class="w">  </span><span class="c1">// ...                 // (3) other operations that may throw.</span>
+
+<span class="w">  </span><span class="n">commit</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">true</span><span class="p">;</span><span class="w">  </span><span class="c1">// ...    (4) disable rollback actions if no throw.</span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+</p>
+ </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp">
+<span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Defer</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I00EN3fly5DeferE" title="fly::Defer::F"><span class="n"><span class="pre">F</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">f</span></span><span class="sig-paren">)</span><br /></dt>
+<dd><p>Construct a new Defer object. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>f</strong> – Forwarded into object and invoked by destructor. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp">
+<span class="sig-name descname"><span class="n"><span class="pre">Defer</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N3fly5Defer5DeferERK5Defer" title="fly::Defer::Defer"><span class="n"><span class="pre">Defer</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">delete</span></span><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp">
+<span class="sig-name descname"><span class="n"><span class="pre">Defer</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N3fly5Defer5DeferERR5Defer" title="fly::Defer::Defer"><span class="n"><span class="pre">Defer</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">other</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">delete</span></span><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp">
+<a class="reference internal" href="#_CPPv4I00EN3fly5DeferE" title="fly::Defer"><span class="n"><span class="pre">Defer</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">=</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I00EN3fly5DeferE" title="fly::Defer"><span class="n"><span class="pre">Defer</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">delete</span></span><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp">
+<a class="reference internal" href="#_CPPv4I00EN3fly5DeferE" title="fly::Defer"><span class="n"><span class="pre">Defer</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">=</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I00EN3fly5DeferE" title="fly::Defer"><span class="n"><span class="pre">Defer</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">delete</span></span><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp">
+<span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">~Defer</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">noexcept</span></span><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-private-members">Private Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp">
+<a class="reference internal" href="#_CPPv4I00EN3fly5DeferE" title="fly::Defer::F"><span class="n"><span class="pre">F</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">m_f</span></span></span><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="asserts">
+<h2>Asserts<a class="headerlink" href="#asserts" title="Permalink to this heading">#</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">libfly/utility/asserts.hpp</span></code></p>
+<p>Defines a set of &lt;cassert&gt; like macros. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-defines">Defines</p>
+<dl class="cpp macro">
+<dt class="sig sig-object cpp">
+<span class="sig-name descname"><span class="n"><span class="pre">VERIFY</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">expr</span></span>, <span class="n"><span class="pre">msg</span></span><span class="sig-paren">)</span><br /></dt>
+<dd><p>Use like std <code class="docutils literal notranslate"><span class="pre">assert(expr)</span></code> but with an error message, not disabled by <code class="docutils literal notranslate"><span class="pre">NDEBUG</span></code>. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp">
+<span class="sig-name descname"><span class="n"><span class="pre">ASSERT</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">expr</span></span>, <span class="n"><span class="pre">msg</span></span><span class="sig-paren">)</span><br /></dt>
+<dd><p>Use like std <code class="docutils literal notranslate"><span class="pre">assert(expr)</span></code> but with an error message. </p>
+</dd></dl>
+
+</div>
+<dl class="cpp type">
+<dt class="sig sig-object cpp">
+<span class="k"><span class="pre">namespace</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">fly</span></span></span><br /></dt>
+<dd></dd></dl>
+
+</section>
+<section id="timing">
+<h2>Timing<a class="headerlink" href="#timing" title="Permalink to this heading">#</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">libfly/utility/timeit.hpp</span></code></p>
+<p>Timing utilities. </p>
+<dl class="cpp type">
+<dt class="sig sig-object cpp">
+<span class="k"><span class="pre">namespace</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">fly</span></span></span><br /></dt>
+<dd><div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-functions">Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp">
+<span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">F</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="sig-name descname"><span class="n"><span class="pre">Args</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">invoke_result_t</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0DpEN3fly6timeitENSt15invoke_result_tIRR1FDpRR4ArgsEENSt11string_viewERR1FDpRR4Args" title="fly::timeit::F"><span class="n"><span class="pre">F</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0DpEN3fly6timeitENSt15invoke_result_tIRR1FDpRR4ArgsEENSt11string_viewERR1FDpRR4Args" title="fly::timeit::Args"><span class="n"><span class="pre">Args</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">timeit</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string_view</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">name</span></span>, <a class="reference internal" href="#_CPPv4I0DpEN3fly6timeitENSt15invoke_result_tIRR1FDpRR4ArgsEENSt11string_viewERR1FDpRR4Args" title="fly::timeit::F"><span class="n"><span class="pre">F</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">f</span></span>, <a class="reference internal" href="#_CPPv4I0DpEN3fly6timeitENSt15invoke_result_tIRR1FDpRR4ArgsEENSt11string_viewERR1FDpRR4Args" title="fly::timeit::Args"><span class="n"><span class="pre">Args</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">...</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">args</span></span><span class="sig-paren">)</span><br /></dt>
+<dd><p>Transparent function wrapper that measures the execution time of a function. </p>
+<p>The execution time is printed to stdout. Garantees RVO.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> – Name of function being called, also printed to stdout. </p></li>
+<li><p><strong>f</strong> – Function call. </p></li>
+<li><p><strong>args</strong> – Arguments to call <code class="docutils literal notranslate"><span class="pre">f</span></code> with. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>std::invoke_result_t&lt;F&amp;&amp;, Args&amp;&amp;…&gt; The result of calling <code class="docutils literal notranslate"><span class="pre">f</span></code> with <code class="docutils literal notranslate"><span class="pre">args</span></code>… . </p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+</dd></dl>
+
 </section>
 </section>
 
@@ -236,12 +529,12 @@
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="potentials.html">
+          <a class="next-page" href="system.html">
               <div class="page-info">
                 <div class="context">
                   <span>Next</span>
                 </div>
-                <div class="title">Potentials</div>
+                <div class="title">System</div>
               </div>
               <svg><use href="#svg-arrow-right"></use></svg>
             </a>
@@ -290,6 +583,9 @@
             <ul>
 <li><a class="reference internal" href="#">Utility</a><ul>
 <li><a class="reference internal" href="#version">Version</a></li>
+<li><a class="reference internal" href="#core">Core</a></li>
+<li><a class="reference internal" href="#asserts">Asserts</a></li>
+<li><a class="reference internal" href="#timing">Timing</a></li>
 </ul>
 </li>
 </ul>
@@ -307,5 +603,6 @@
     <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
     <script src="../_static/scripts/furo.js"></script>
+    <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     </body>
 </html>

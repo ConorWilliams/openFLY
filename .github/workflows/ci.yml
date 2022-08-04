@@ -72,6 +72,9 @@ jobs:
         run: sudo apt-get update -q
           && sudo apt-get install doxygen -q -y
 
+      - name: Configure
+        run: cmake --preset=ci-unix -DFLY_DOCS=ON
+
       - name: Build docs
         run: cmake --build --preset=ci-unix -t docs
 

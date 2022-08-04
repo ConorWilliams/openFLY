@@ -83,8 +83,8 @@ jobs:
       - name: Build docs
         run: cmake --build build --target docs
 
-    # - name: Deploy docs
-    #   uses: peaceiris/actions-gh-pages@v3
-    #   with:
-    #     github_token: ${{ secrets.GITHUB_TOKEN }}
-    #     publish_dir: build/docs/html
+      - name: Deploy docs
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: build/dev/docs/sphinx

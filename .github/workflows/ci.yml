@@ -11,7 +11,6 @@ on:
 
 jobs:
   test:
-    if: false
     strategy:
       matrix:
         os: [macos-latest, ubuntu-latest, windows-latest]
@@ -41,7 +40,7 @@ jobs:
 
   docs:
     # Deploy docs only when builds succeed
-    # needs: [test]
+    needs: [test]
 
     runs-on: ubuntu-latest
 

@@ -98,7 +98,9 @@ html_logo = "_static/fly.svg"
 
 html_css_files = ["openfly.css"]
 
-
+html_theme_options = {
+    "navigation_with_keys": True,
+}
 
 # Custom sidebar templates, must be a dictionary that maps document names
 # to template names.

@@ -38,30 +38,6 @@ jobs:
         working-directory: build
         run: ctest --output-on-failure -C Release -j 2
 
-  # test_intel:
-  #   runs-on: ubuntu-latest
-
-  #   steps:
-  #     - uses: actions/checkout@v2
-
-  #     - name: Install vcpkg
-  #       uses: friendlyanon/setup-vcpkg@v1
-  #       with: { committish: "66045de4dcc5da3d1029c02b606307f5951dcb22" }
-
-  #     - name: Configure
-  #       shell: pwsh
-  #       run: cmake "--preset=ci-ubuntu"
-
-  #     - name: Build
-  #       run: cmake --build build --config Release -j 2
-
-  #     - name: Install
-  #       run: cmake --install build --config Release --prefix prefix
-
-  #     - name: Test
-  #       working-directory: build
-  #       run: ctest --output-on-failure -C Release -j 2
-
   docs:
     # Deploy docs only when builds succeed
     needs: [test]

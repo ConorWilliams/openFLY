@@ -19,7 +19,7 @@
 /**
  * \file SoA.hpp
  *
- * @brief Struct of Arrays implementation
+ * @brief Struct of Arrays implementation.
  */
 
 namespace fly::system {
@@ -39,8 +39,6 @@ namespace fly::system {
   /**
    * @brief A container for atoms that stores each member in its own array.
    *
-   * \rst
-   *
    * The default container type used in the libfly; an ``SoA`` models an array of ``Atom`` types
    * but decomposes the atom type and stores each member in a separate array. This enables efficient
    * cache use. Like ``Atom``, the members of the "atom" are described through a series of template parameters
@@ -49,6 +47,8 @@ namespace fly::system {
    *
    * SoA also supports slicing and reference members which transform that member into a view, this enables SoA to act as a concrete
    * type in interfaces.
+   *
+   * \rst
    *
    * Example:
    *

@@ -132,9 +132,9 @@ namespace fly {
   /**
    * @brief Compute integer powers of arithmetic types at compile time.
    *
-   * \rst
-   *
    * Only SFINE if base is an arithmetic type.
+   *
+   * \rst
    *
    * Computes:
    *
@@ -161,11 +161,11 @@ namespace fly {
   /**
    * @brief Basic implementation of a Golang like defer.
    *
+   * Only SFINE if callable is noexcept.
+   *
    * \rst
    *
    * Example:
-   *
-   * Only SFINE if callable is noexcept.
    *
    * .. include:: ../../examples/utility/defer.cpp
    *    :code:

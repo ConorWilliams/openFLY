@@ -111,10 +111,10 @@ namespace fly::system {
   /**
    * @brief The libfly representation of an atom.
    *
-   * \rst
-   *
    * Libfly uses this type to build atoms to allow integration with libfly's containers.
    * An Atom behaves as a struct of its members, which are accessed through ``operator[]``.
+   *
+   * \rst
    *
    * Example:
    *
@@ -149,60 +149,114 @@ namespace fly::system {
     using detail::AtomMem<Mems>::operator[]...;
   };
 
+}  // namespace fly::system
+
+namespace fly {
+
   /**
-   * @brief A inline namespace providing selection of canonical members for atom.
+   * @brief An inline namespace providing selection of canonical members for Atom.
    */
   inline namespace builtin_m {
     /**
      * @brief Tag type for position (xyz).
      */
-    struct Position : MemTag<floating, spatial_dims> {};
+    struct Position : system::MemTag<floating, spatial_dims> {};
+
+    /**
+     * @brief Position literal.
+     */
+    inline constexpr Position r_;
 
     /**
      * @brief Tag type for dimer axis (xyz).
      */
-    struct Axis : MemTag<floating, spatial_dims> {};
+    struct Axis : system::MemTag<floating, spatial_dims> {};
+
+    /**
+     * @brief Axis literal.
+     */
+    inline constexpr Axis ax_;
 
     /**
      * @brief Tag type for gradient of the potential.
      */
-    struct Gradient : MemTag<floating, spatial_dims> {};
+    struct Gradient : system::MemTag<floating, spatial_dims> {};
+
+    /**
+     * @brief Gradient literal.
+     */
+    inline constexpr Gradient grad_;
 
     /**
      * @brief Tag type for velocity.
      */
-    struct Velocity : MemTag<floating, spatial_dims> {};
+    struct Velocity : system::MemTag<floating, spatial_dims> {};
+
+    /**
+     * @brief Velocity literal.
+     */
+    inline constexpr Gradient v_;
 
     /**
      * @brief Tag type for atomic number.
      */
-    struct AtomicNum : MemTag<int> {};
+    struct AtomicNum : system::MemTag<int> {};
+
+    /**
+     * @brief AtomicNum literal.
+     */
+    inline constexpr AtomicNum z_;
 
     /**
      * @brief Tag type for atomic mass.
      */
-    struct Mass : MemTag<int> {};
+    struct Mass : system::MemTag<int> {};
+
+    /**
+     * @brief Mass literal.
+     */
+    inline constexpr Mass mass_;
 
     /**
      * @brief Tag type for index.
      */
-    struct Index : MemTag<int> {};
+    struct Index : system::MemTag<int> {};
+
+    /**
+     * @brief Index literal.
+     */
+    inline constexpr Index ix_;
 
     /**
      * @brief Tag type for atomic symbol.
      */
-    struct Symbol : MemTag<std::string_view> {};
+    struct Symbol : system::MemTag<std::string_view> {};
+
+    /**
+     * @brief Symbol literal.
+     */
+    inline constexpr Symbol sy_;
 
     /**
      * @brief Tag type for frozen atoms.
      */
-    struct Frozen : MemTag<bool> {};
+    struct Frozen : system::MemTag<bool> {};
+
+    /**
+     * @brief Frozen literal.
+     */
+    inline constexpr Frozen fz_;
 
     /**
      * @brief Tag type for atom colour (generalisation of atomic number)
      */
-    struct Colour : MemTag<int> {};
+    struct Colour : system::MemTag<int> {};
+
+    /**
+     * @brief Colour literal.
+     */
+    inline constexpr Colour c_;
 
   }  // namespace builtin_m
 
-}  // namespace fly::system
+}  // namespace fly

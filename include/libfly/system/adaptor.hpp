@@ -22,7 +22,7 @@
 
 namespace fly::system::detail {
 
-  template <class Mem> struct Adaptor {
+  template <typename Mem> struct Adaptor {
   public:
     Adaptor() = default;
 
@@ -125,7 +125,7 @@ namespace fly::system::detail {
      */
   };
 
-  template <class Mem> struct Adaptor<Mem&> {
+  template <typename Mem> struct Adaptor<Mem&> {
   public:
     Adaptor() = default;
 
@@ -184,7 +184,7 @@ namespace fly::system::detail {
     friend struct Adaptor<Mem const&>;
   };
 
-  template <class Mem> struct Adaptor<Mem const&> {
+  template <typename Mem> struct Adaptor<Mem const&> {
   public:
     Adaptor() = default;
 
@@ -244,8 +244,8 @@ namespace fly::system::detail {
     friend struct Adaptor<Mem&>;
   };
 
-  template <class Mem> struct Adaptor<Mem&&> { static_assert(always_false<Mem>, "Rvalue reference to member is illegal."); };
+  template <typename Mem> struct Adaptor<Mem&&> { static_assert(always_false<Mem>, "Rvalue reference to member is illegal."); };
 
-  template <class Mem> struct Adaptor<Mem const&&> { static_assert(always_false<Mem>, "Rvalue reference to member is illegal."); };
+  template <typename Mem> struct Adaptor<Mem const&&> { static_assert(always_false<Mem>, "Rvalue reference to member is illegal."); };
 
 }  // namespace fly::system::detail

@@ -1,8 +1,8 @@
 #include "libfly/utility/core.hpp"
 
-template <class T> struct referance_banned {};
+template <typename T> struct referance_banned {};
 
-template <class T> struct referance_banned<T&> {
+template <typename T> struct referance_banned<T&> {
   // This static_assert will always fail but the compiler cannot deduce this
   // until it is instanciated as fly::always_false<T> could be specialised
   // at any point.

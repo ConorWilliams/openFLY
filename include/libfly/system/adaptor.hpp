@@ -54,7 +54,7 @@ namespace fly::system::detail {
     }
 
     /**
-     * @brief Fetch a view of the ith member stored in the array, tagged dispatch on Mem.
+     * @brief Fetch a view of the i th member stored in the array, tagged dispatch on Mem.
      *
      * This is an owning Adaptor hence, model value const-semantics.
      */
@@ -106,21 +106,21 @@ namespace fly::system::detail {
     /**
      * Possibilities
      *
-     *  void foo1(Adaptor<Pos>)
-     *  void foo2(Adaptor<Pos> &)
-     *  void foo3(Adaptor<Pos> const &)
+     *  void foo1(Adaptor<Position>)
+     *  void foo2(Adaptor<Position> &)
+     *  void foo3(Adaptor<Position> const &)
      *
-     *  foo1(Adaptor<Pos>{})          use defaulted copy/move
-     *  foo1(Adaptor<Pos &>{})        ok to do implicitly as user wants a copy
-     *  foo1(Adaptor<Pos const&>{})   ok to do implicitly as user wants a copy
+     *  foo1(Adaptor<Position>{})          use defaulted copy/move
+     *  foo1(Adaptor<Position &>{})        ok to do implicitly as user wants a copy
+     *  foo1(Adaptor<Position const&>{})   ok to do implicitly as user wants a copy
      *
-     *  foo2(Adaptor<Pos>{})          use defaulted copy/move, compiler will not allow ref to temp
-     *  foo2(Adaptor<Pos &>{})        compiler will not allow ref to temp
-     *  foo2(Adaptor<Pos const&>{})   compiler will not allow ref to temp
+     *  foo2(Adaptor<Position>{})          use defaulted copy/move, compiler will not allow ref to temp
+     *  foo2(Adaptor<Position &>{})        compiler will not allow ref to temp
+     *  foo2(Adaptor<Position const&>{})   compiler will not allow ref to temp
      *
-     *  foo3(Adaptor<Pos>{})          Just a const ref
-     *  foo3(Adaptor<Pos &>{})        must not allow implicit construction from a view else this would create a temporary
-     *  foo3(Adaptor<Pos const&>{})   same as above ^
+     *  foo3(Adaptor<Position>{})          Just a const ref
+     *  foo3(Adaptor<Position &>{})        must not allow implicit construction from a view else this would create a temporary
+     *  foo3(Adaptor<Position const&>{})   same as above ^
      *
      */
   };

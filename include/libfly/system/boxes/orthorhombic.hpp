@@ -30,7 +30,7 @@ namespace fly::system {
   class Orthorhombic {
   public:
     /**
-     * @brief Construct a new Ortho Sim Box object.
+     * @brief Construct a new Orthorhombic object.
      *
      * @param extents Length of simulation box along each axis.
      * @param periodic True for each periodic axis.
@@ -53,12 +53,22 @@ namespace fly::system {
     Arr<bool> const &periodic() const noexcept { return m_periodic; }
 
     /**
-     * @brief Maps atom into canonical cell, 0 <= r_i < extent_i for all i which are periodic.
+     * @brief Maps atom into the canonical cell.
      *
-     * Non-periodic atoms are within the simbox extents so x[i] * inv_extents less than 1 and x[i]
-     * remains unaffected, hence no non-periodic switch/select.
+     * \rst
+     *
+     * Guarantees:
+     *
+     * .. math::
+     *    0 \le x_i < \text{extent}_i
+     *
+     * for all :math:`i`.
+     *
+     * \endrst
      */
     template <typename T> Arr<floating> canon_image(Eigen::ArrayBase<T> const &x) const noexcept {
+      // Non-periodic atoms are within the simulation box extents so x[i] * inv_extents less than 1 and x[i]
+      // remains unaffected, hence no non-periodic switch/select.
       ASSERT((m_periodic || (x >= Arr<floating>::Zero() && x < m_extents)).all(), "Out of box");
       return x - m_extents * (x * m_inv_extents).floor();
     }

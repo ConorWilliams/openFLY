@@ -3,10 +3,10 @@
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
-<link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="Todo!" href="../todo.html" /><link rel="prev" title="Utility" href="utility.html" />
+<link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="Todo!" href="../todo.html" /><link rel="prev" title="Utilities (libfly/utility)" href="utility.html" />
 
     <meta name="generator" content="sphinx-5.1.1, furo 2022.06.21"/>
-        <title>System - OpenFLY 0.1.0 documentation</title>
+        <title>System (libfly/system) - OpenFLY 0.1.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?digest=40978830699223671f4072448e654b5958f38b89" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?digest=30d1aed668e5c3a91c3e3bf6a60b675221979f0e" />
@@ -163,8 +163,8 @@
 <li class="toctree-l1"><a class="reference internal" href="../building.html">Building</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../building.html#hacking">Hacking</a></li>
 <li class="toctree-l1 current has-children"><a class="reference internal" href="../api.html">Library API reference</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="utility.html">Utility</a></li>
-<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">System</a></li>
+<li class="toctree-l2"><a class="reference internal" href="utility.html">Utilities (<code class="docutils literal notranslate"><span class="pre">libfly/utility</span></code>)</a></li>
+<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">System (<code class="docutils literal notranslate"><span class="pre">libfly/system</span></code>)</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../todo.html">Todo!</a></li>
@@ -201,26 +201,50 @@
           </label>
         </div>
         <article role="main">
-          <section id="system">
-<h1>System<a class="headerlink" href="#system" title="Permalink to this heading">#</a></h1>
+          <section id="system-libfly-system">
+<h1>System (<code class="docutils literal notranslate"><span class="pre">libfly/system</span></code>)<a class="headerlink" href="#system-libfly-system" title="Permalink to this heading">#</a></h1>
+<p>The <code class="docutils literal notranslate"><span class="pre">system</span></code> folder and namespace contains a collection of data structures for representing atoms, groups of atoms and the space the atoms exist in.</p>
 <section id="atoms">
 <h2>Atoms<a class="headerlink" href="#atoms" title="Permalink to this heading">#</a></h2>
-<p><code class="docutils literal notranslate"><span class="pre">libfly/system/atom.hpp</span></code></p>
-<dl class="cpp type">
+<section id="atom-class">
+<h3>Atom class<a class="headerlink" href="#atom-class" title="Permalink to this heading">#</a></h3>
+<dl class="cpp struct">
 <dt class="sig sig-object cpp">
-<span class="k"><span class="pre">namespace</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">fly</span></span></span><br /></dt>
-<dd><dl class="cpp type">
-<dt class="sig sig-object cpp">
-<span class="k"><span class="pre">namespace</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">system</span></span></span><br /></dt>
-<dd><dl class="cpp struct">
-<dt class="sig sig-object cpp">
-<span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="sig-name descname"><span class="n"><span class="pre">Mems</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Atom</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv43fly" title="fly"><span class="n"><span class="pre">fly</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N3fly6systemE" title="fly::system"><span class="n"><span class="pre">system</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">detail</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">AtomMem</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4IDpEN3fly6system4AtomE" title="fly::system::Atom::Mems"><span class="n"><span class="pre">Mems</span></span></a><span class="p"><span class="pre">&gt;</span></span><br /></dt>
-<dd><div class="docutils container">
-<em>#include &lt;libfly/system/atom.hpp&gt;</em></div>
-<p>The libfly representation of an atom. </p>
+<span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="sig-name descname"><span class="n"><span class="pre">Mems</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Atom</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><a class="reference internal" href="utility.html#_CPPv43fly" title="fly"><span class="n"><span class="pre">fly</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">system</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">detail</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">AtomMem</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4IDpEN3fly6system4AtomE" title="fly::system::Atom::Mems"><span class="n"><span class="pre">Mems</span></span></a><span class="p"><span class="pre">&gt;</span></span><br /></dt>
+<dd><p>The libfly representation of an atom. </p>
+<p><p>Libfly uses this type to build atoms to allow integration with libfly’s containers.
+An Atom behaves as a struct of its members, which are accessed through <code class="docutils literal notranslate"><span class="pre">operator[]</span></code>.</p>
+<p>Example:</p>
+<div class="code highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;libfly/system/atom.hpp&quot;</span><span class="cp"></span>
+
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;Eigen/src/Core/Matrix.h&gt;</span><span class="cp"></span>
+
+<span class="kt">void</span><span class="w"> </span><span class="nf">example_atom</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">  </span><span class="c1">// Define a member to represent spin that is a scalar of type bool.</span>
+<span class="w">  </span><span class="k">struct</span><span class="w"> </span><span class="nc">spin</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">fly</span><span class="o">::</span><span class="n">system</span><span class="o">::</span><span class="n">MemTag</span><span class="o">&lt;</span><span class="kt">bool</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{};</span><span class="w"></span>
+
+<span class="w">  </span><span class="c1">// Define a member to represent position that is a vector of 3 doubles.</span>
+<span class="w">  </span><span class="k">struct</span><span class="w"> </span><span class="nc">xyz</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">fly</span><span class="o">::</span><span class="n">system</span><span class="o">::</span><span class="n">MemTag</span><span class="o">&lt;</span><span class="kt">double</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{};</span><span class="w"></span>
+
+<span class="w">  </span><span class="c1">// Define a member to represent the inertia tensor that is a 3x3 matrix of doubles.</span>
+<span class="w">  </span><span class="k">struct</span><span class="w"> </span><span class="nc">I</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">fly</span><span class="o">::</span><span class="n">system</span><span class="o">::</span><span class="n">MemTag</span><span class="o">&lt;</span><span class="kt">double</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{};</span><span class="w"></span>
+
+<span class="w">  </span><span class="c1">// Create an atom</span>
+<span class="w">  </span><span class="n">fly</span><span class="o">::</span><span class="n">system</span><span class="o">::</span><span class="n">Atom</span><span class="o">&lt;</span><span class="n">spin</span><span class="p">,</span><span class="w"> </span><span class="n">xyz</span><span class="p">,</span><span class="w"> </span><span class="n">I</span><span class="o">&gt;</span><span class="w"> </span><span class="n">atom</span><span class="p">{</span><span class="w"></span>
+<span class="w">      </span><span class="nb">true</span><span class="p">,</span><span class="w"></span>
+<span class="w">      </span><span class="p">{</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">},</span><span class="w"></span>
+<span class="w">      </span><span class="n">I</span><span class="o">::</span><span class="n">matrix_t</span><span class="o">::</span><span class="n">Zero</span><span class="p">(),</span><span class="w">  </span><span class="c1">// I::matrix_t is Eigen::Matrix&lt;double, 3, 3&gt;</span>
+<span class="w">  </span><span class="p">};</span><span class="w"></span>
+
+<span class="w">  </span><span class="c1">//   Access and set the spin property</span>
+<span class="w">  </span><span class="n">atom</span><span class="p">[</span><span class="n">spin</span><span class="p">{}]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">false</span><span class="p">;</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+</p>
 <dl class="field-list simple">
 <dt class="field-odd">Template Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>Mems</strong> – a series of empty types, derived from otf::MemTag, to describe each member. </p>
+<dd class="field-odd"><p><strong>Mems</strong> – a series of empty types, derived from <code class="docutils literal notranslate"><span class="pre">MemTag</span></code>, to describe each member. </p>
 </dd>
 </dl>
 <div class="breathe-sectiondef docutils container">
@@ -252,14 +276,16 @@
 </div>
 </dd></dl>
 
+</section>
+<section id="memtag">
+<h3>MemTag<a class="headerlink" href="#memtag" title="Permalink to this heading">#</a></h3>
 <dl class="cpp struct">
 <dt class="sig sig-object cpp">
 <span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Scalar</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Rows</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">1</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Cols</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">1</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="kt"><span class="pre">auto</span></span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Rep</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="n"><span class="pre">Eigen</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">Matrix</span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">MemTag</span></span></span><br /></dt>
-<dd><div class="docutils container">
-<em>#include &lt;libfly/system/atom.hpp&gt;</em></div>
-<p>A base type to derive from for defining members of an Atom type. </p>
+<dd><p>A base type to derive from for defining members of an Atom type. </p>
 <p>Members must be matrices of arithmetic types or default constructible 1x1 matricies.</p>
 <p>1x1 matricies are unwrapped into scalars.</p>
+<p>A selection of canonical members, deriving from this type, are provided in the namespace <code class="docutils literal notranslate"><span class="pre">builtin_m</span></code>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Template Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -347,57 +373,150 @@
 </div>
 </dd></dl>
 
+</section>
+<section id="bultin-members">
+<h3>Bultin members<a class="headerlink" href="#bultin-members" title="Permalink to this heading">#</a></h3>
+<dl class="cpp type">
+<dt class="sig sig-object cpp">
+<span class="k"><span class="pre">namespace</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">builtin_m</span></span></span><br /></dt>
+<dd><p>A inline namespace providing selection of canonical members for atom. </p>
+<dl class="cpp struct">
+<dt class="sig sig-object cpp">
+<span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">AtomicNum</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><a class="reference internal" href="utility.html#_CPPv43fly" title="fly"><span class="n"><span class="pre">fly</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">system</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4I0_i_iI0_DpDaE0EN3fly6system6MemTagE" title="fly::system::MemTag"><span class="n"><span class="pre">MemTag</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">int</span></span><span class="p"><span class="pre">&gt;</span></span><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;libfly/system/atom.hpp&gt;</em></div>
+<p>Tag type for atomic number. </p>
+</dd></dl>
+
+<dl class="cpp struct">
+<dt class="sig sig-object cpp">
+<span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Axis</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><a class="reference internal" href="utility.html#_CPPv43fly" title="fly"><span class="n"><span class="pre">fly</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">system</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4I0_i_iI0_DpDaE0EN3fly6system6MemTagE" title="fly::system::MemTag"><span class="n"><span class="pre">MemTag</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="utility.html#_CPPv4N3fly8floatingE" title="fly::floating"><span class="n"><span class="pre">floating</span></span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="utility.html#_CPPv4N3fly12spatial_dimsE" title="fly::spatial_dims"><span class="n"><span class="pre">spatial_dims</span></span></a><span class="p"><span class="pre">&gt;</span></span><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;libfly/system/atom.hpp&gt;</em></div>
+<p>Tag type for dimer axis (xyz). </p>
+</dd></dl>
+
+<dl class="cpp struct">
+<dt class="sig sig-object cpp">
+<span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Colour</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><a class="reference internal" href="utility.html#_CPPv43fly" title="fly"><span class="n"><span class="pre">fly</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">system</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4I0_i_iI0_DpDaE0EN3fly6system6MemTagE" title="fly::system::MemTag"><span class="n"><span class="pre">MemTag</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">int</span></span><span class="p"><span class="pre">&gt;</span></span><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;libfly/system/atom.hpp&gt;</em></div>
+<p>Tag type for atom colour (generalisation of atomic number) </p>
+</dd></dl>
+
+<dl class="cpp struct">
+<dt class="sig sig-object cpp">
+<span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Frozen</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><a class="reference internal" href="utility.html#_CPPv43fly" title="fly"><span class="n"><span class="pre">fly</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">system</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4I0_i_iI0_DpDaE0EN3fly6system6MemTagE" title="fly::system::MemTag"><span class="n"><span class="pre">MemTag</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">bool</span></span><span class="p"><span class="pre">&gt;</span></span><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;libfly/system/atom.hpp&gt;</em></div>
+<p>Tag type for frozen atoms. </p>
+</dd></dl>
+
+<dl class="cpp struct">
+<dt class="sig sig-object cpp">
+<span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Gradient</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><a class="reference internal" href="utility.html#_CPPv43fly" title="fly"><span class="n"><span class="pre">fly</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">system</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4I0_i_iI0_DpDaE0EN3fly6system6MemTagE" title="fly::system::MemTag"><span class="n"><span class="pre">MemTag</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="utility.html#_CPPv4N3fly8floatingE" title="fly::floating"><span class="n"><span class="pre">floating</span></span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="utility.html#_CPPv4N3fly12spatial_dimsE" title="fly::spatial_dims"><span class="n"><span class="pre">spatial_dims</span></span></a><span class="p"><span class="pre">&gt;</span></span><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;libfly/system/atom.hpp&gt;</em></div>
+<p>Tag type for gradient of the potential. </p>
+</dd></dl>
+
+<dl class="cpp struct">
+<dt class="sig sig-object cpp">
+<span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Index</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><a class="reference internal" href="utility.html#_CPPv43fly" title="fly"><span class="n"><span class="pre">fly</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">system</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4I0_i_iI0_DpDaE0EN3fly6system6MemTagE" title="fly::system::MemTag"><span class="n"><span class="pre">MemTag</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">int</span></span><span class="p"><span class="pre">&gt;</span></span><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;libfly/system/atom.hpp&gt;</em></div>
+<p>Tag type for index. </p>
+</dd></dl>
+
+<dl class="cpp struct">
+<dt class="sig sig-object cpp">
+<span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Mass</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><a class="reference internal" href="utility.html#_CPPv43fly" title="fly"><span class="n"><span class="pre">fly</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">system</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4I0_i_iI0_DpDaE0EN3fly6system6MemTagE" title="fly::system::MemTag"><span class="n"><span class="pre">MemTag</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">int</span></span><span class="p"><span class="pre">&gt;</span></span><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;libfly/system/atom.hpp&gt;</em></div>
+<p>Tag type for atomic mass. </p>
+</dd></dl>
+
+<dl class="cpp struct">
+<dt class="sig sig-object cpp">
+<span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Position</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><a class="reference internal" href="utility.html#_CPPv43fly" title="fly"><span class="n"><span class="pre">fly</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">system</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4I0_i_iI0_DpDaE0EN3fly6system6MemTagE" title="fly::system::MemTag"><span class="n"><span class="pre">MemTag</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="utility.html#_CPPv4N3fly8floatingE" title="fly::floating"><span class="n"><span class="pre">floating</span></span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="utility.html#_CPPv4N3fly12spatial_dimsE" title="fly::spatial_dims"><span class="n"><span class="pre">spatial_dims</span></span></a><span class="p"><span class="pre">&gt;</span></span><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;libfly/system/atom.hpp&gt;</em></div>
+<p>Tag type for position (xyz). </p>
+</dd></dl>
+
+<dl class="cpp struct">
+<dt class="sig sig-object cpp">
+<span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Symbol</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><a class="reference internal" href="utility.html#_CPPv43fly" title="fly"><span class="n"><span class="pre">fly</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">system</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4I0_i_iI0_DpDaE0EN3fly6system6MemTagE" title="fly::system::MemTag"><span class="n"><span class="pre">MemTag</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string_view</span></span><span class="p"><span class="pre">&gt;</span></span><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;libfly/system/atom.hpp&gt;</em></div>
+<p>Tag type for atomic symbol. </p>
+</dd></dl>
+
+<dl class="cpp struct">
+<dt class="sig sig-object cpp">
+<span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Velocity</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><a class="reference internal" href="utility.html#_CPPv43fly" title="fly"><span class="n"><span class="pre">fly</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">system</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4I0_i_iI0_DpDaE0EN3fly6system6MemTagE" title="fly::system::MemTag"><span class="n"><span class="pre">MemTag</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="utility.html#_CPPv4N3fly8floatingE" title="fly::floating"><span class="n"><span class="pre">floating</span></span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="utility.html#_CPPv4N3fly12spatial_dimsE" title="fly::spatial_dims"><span class="n"><span class="pre">spatial_dims</span></span></a><span class="p"><span class="pre">&gt;</span></span><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;libfly/system/atom.hpp&gt;</em></div>
+<p>Tag type for velocity. </p>
 </dd></dl>
 
 </dd></dl>
 
 </section>
-<section id="struct-of-arrays">
-<h2>Struct of arrays<a class="headerlink" href="#struct-of-arrays" title="Permalink to this heading">#</a></h2>
-<p><code class="docutils literal notranslate"><span class="pre">libfly/system/SoA.hpp</span></code></p>
-<p>Atom type and basic building blocks. </p>
-<p>Struct of Arrays implementation.</p>
-<dl class="cpp type">
-<dt class="sig sig-object cpp">
-<span class="k"><span class="pre">namespace</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">fly</span></span></span><br /></dt>
-<dd><dl class="cpp type">
-<dt class="sig sig-object cpp">
-<span class="k"><span class="pre">namespace</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">system</span></span></span><br /></dt>
-<dd><dl class="cpp class">
+</section>
+<section id="generic-data-structures">
+<h2>Generic data structures<a class="headerlink" href="#generic-data-structures" title="Permalink to this heading">#</a></h2>
+<section id="structure-of-arrays">
+<h3>Structure of Arrays<a class="headerlink" href="#structure-of-arrays" title="Permalink to this heading">#</a></h3>
+<dl class="cpp class">
 <dt class="sig sig-object cpp">
 <span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="sig-name descname"><span class="n"><span class="pre">Ms</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SoA</span></span></span><br /></dt>
-<dd><div class="docutils container">
-<em>#include &lt;libfly/system/SoA.hpp&gt;</em></div>
-<p>Forward declaration. </p>
-<p>A container for atoms that stores each member in its own array.</p>
-<p>The default container type used in the libfly; an <code class="docutils literal notranslate"><span class="pre">SoA</span></code> models an array of <code class="docutils literal notranslate"><span class="pre">Atom</span></code> types
+<dd><p>A container for atoms that stores each member in its own array. </p>
+<p><p>The default container type used in the libfly; an <code class="docutils literal notranslate"><span class="pre">SoA</span></code> models an array of <code class="docutils literal notranslate"><span class="pre">Atom</span></code> types
 but decomposes the atom type and stores each member in a separate array. This enables efficient
-cache use. The members of the atom” are described through a series of template parameters
-which should inherit from <code class="docutils literal notranslate"><span class="pre">fly::MemTag</span></code>. A selection of canonical members are provided in the
-namespace <code class="docutils literal notranslate"><span class="pre">builtin_members</span></code>. The members of each atom can be accessed by the index of the
-atom or as an Eigen array to enable collective operations.</p>
-<p>Example of use:</p>
-<p><div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;libatom/atom.hpp&quot;</span><span class="cp"></span>
+cache use. Like <code class="docutils literal notranslate"><span class="pre">Atom</span></code>, the members of the “atom” are described through a series of template parameters
+which should inherit from <code class="docutils literal notranslate"><span class="pre">MemTag</span></code>. The members of each atom can be accessed by the index of the
+atom or as an <code class="docutils literal notranslate"><span class="pre">Eigen::Array</span></code> to enable collective operations.</p>
+<p>SoA also supports slicing and reference members which transform that member into a view, this enables SoA to act as a concrete
+type in interfaces.</p>
+<p>Example:</p>
+<div class="code highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;libfly/system/SoA.hpp&quot;</span><span class="cp"></span>
 
-<span class="k">using</span><span class="w"> </span><span class="k">namespace</span><span class="w"> </span><span class="nn">otf</span><span class="p">;</span><span class="w"></span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;libfly/system/atom.hpp&quot;</span><span class="c1">  //&lt; MemTag</span><span class="cp"></span>
 
-<span class="n">AtomArray</span><span class="o">&lt;</span><span class="n">Position</span><span class="p">,</span><span class="w"> </span><span class="n">AtomicNum</span><span class="o">&gt;</span><span class="w"> </span><span class="n">atoms</span><span class="p">{</span><span class="mi">10</span><span class="p">};</span><span class="w"> </span><span class="c1">// Initialise an array of 10 atoms.</span>
+<span class="c1">// Define a member to represent spin that is a scalar of type bool.</span>
+<span class="k">struct</span><span class="w"> </span><span class="nc">spin</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">fly</span><span class="o">::</span><span class="n">system</span><span class="o">::</span><span class="n">MemTag</span><span class="o">&lt;</span><span class="kt">bool</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{};</span><span class="w"></span>
 
-<span class="c1">// Add a hydrogen atom at the origin.</span>
+<span class="c1">// Define a member to represent position that is a vector of 3 doubles.</span>
+<span class="k">struct</span><span class="w"> </span><span class="nc">xyz</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">fly</span><span class="o">::</span><span class="n">system</span><span class="o">::</span><span class="n">MemTag</span><span class="o">&lt;</span><span class="kt">double</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{};</span><span class="w"></span>
 
-<span class="n">atoms</span><span class="p">(</span><span class="n">Position</span><span class="p">{},</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w">  </span><span class="n">Vec3</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;</span><span class="p">{</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">};</span><span class="w"></span>
-<span class="n">atoms</span><span class="p">(</span><span class="n">AtomicNum</span><span class="p">{},</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w"></span>
+<span class="c1">// Define a member to represent the inertia tensor that is a 3x3 matrix of doubles.</span>
+<span class="k">struct</span><span class="w"> </span><span class="nc">I</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">fly</span><span class="o">::</span><span class="n">system</span><span class="o">::</span><span class="n">MemTag</span><span class="o">&lt;</span><span class="kt">double</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{};</span><span class="w"></span>
 
-<span class="n">Vec3</span><span class="w"> </span><span class="n">xyz</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">atoms</span><span class="p">(</span><span class="n">Position</span><span class="p">{},</span><span class="w"> </span><span class="mi">0</span><span class="p">);</span><span class="w"> </span><span class="c1">// Get the position of the zeroth atom.</span>
+<span class="c1">// Use reference member -&gt; pass by value.</span>
+<span class="kt">void</span><span class="w"> </span><span class="nf">zero_xyz</span><span class="p">(</span><span class="n">fly</span><span class="o">::</span><span class="n">system</span><span class="o">::</span><span class="n">SoA</span><span class="o">&lt;</span><span class="n">xyz</span><span class="w"> </span><span class="o">&amp;&gt;</span><span class="w"> </span><span class="n">view_xyz</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">  </span><span class="c1">// Zero the positions</span>
+<span class="w">  </span><span class="n">view_xyz</span><span class="p">[</span><span class="n">xyz</span><span class="p">{}]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
 
-<span class="n">std</span><span class="o">::</span><span class="kt">size_t</span><span class="w"> </span><span class="n">n</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">atoms</span><span class="p">(</span><span class="n">AtomicNum</span><span class="p">{},</span><span class="w"> </span><span class="mi">0</span><span class="p">);</span><span class="w"> </span><span class="c1">// Get the atomic number of the zeroth atom.</span>
+<span class="kt">void</span><span class="w"> </span><span class="nf">example_SoA</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">  </span><span class="c1">// SoA of 10 unintialized atoms.</span>
+<span class="w">  </span><span class="n">fly</span><span class="o">::</span><span class="n">system</span><span class="o">::</span><span class="n">SoA</span><span class="o">&lt;</span><span class="n">spin</span><span class="p">,</span><span class="w"> </span><span class="n">xyz</span><span class="p">,</span><span class="w"> </span><span class="n">I</span><span class="o">&gt;</span><span class="w"> </span><span class="n">atoms</span><span class="p">(</span><span class="mi">10</span><span class="p">);</span><span class="w"></span>
 
-<span class="n">atoms</span><span class="p">(</span><span class="n">Position</span><span class="p">{})</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w"> </span><span class="c1">// Add 1 to each of every atoms coordinates.</span>
+<span class="w">  </span><span class="c1">// Set the spin of the fist atom.</span>
+<span class="w">  </span><span class="n">atoms</span><span class="p">(</span><span class="n">spin</span><span class="p">{},</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">true</span><span class="p">;</span><span class="w"></span>
 
-<span class="n">atoms</span><span class="p">(</span><span class="n">AtomicNum</span><span class="p">{})</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">6</span><span class="p">;</span><span class="w"> </span><span class="c1">// Set all the atoms to carbon atoms.</span>
+<span class="w">  </span><span class="c1">// Implicitly sliced at call.</span>
+<span class="w">  </span><span class="n">zero_xyz</span><span class="p">(</span><span class="n">atoms</span><span class="p">);</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
 </pre></div>
 </div>
- </p>
+</p>
+<dl class="field-list simple">
+<dt class="field-odd">Template Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>Ms</strong> – a series of empty types, derived from <code class="docutils literal notranslate"><span class="pre">MemTag</span></code>, to describe each member. </p>
+</dd>
+</dl>
 <div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
 <dl class="cpp function">
@@ -421,55 +540,78 @@ atom or as an Eigen array to enable collective operations.</p>
 <dl class="cpp function">
 <dt class="sig sig-object cpp">
 <span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">OwnsAll</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N3fly6system3SoA8owns_allE" title="fly::system::SoA::owns_all"><span class="n"><span class="pre">owns_all</span></span></a><span class="p"><span class="pre">&gt;</span></span><br /><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">explicit</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SoA</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">size</span></span>, <span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">enable_if_t</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I_bEN3fly6system3SoA3SoAEiPNSt11enable_if_tI7OwnsAllEE" title="fly::system::SoA::SoA::OwnsAll"><span class="n"><span class="pre">OwnsAll</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">*</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><span class="sig-paren">)</span><br /></dt>
-<dd><p>Construct a new SoA conatining ‘size’ uninitialized atoms. </p>
-<p>Only SFINE enabled if this SoA owns all its arrays. </p>
+<dd><p>Construct a new SoA conatining ‘size’ atoms. </p>
+<p><p>Only SFINE enabled if this SoA owns all its arrays.</p>
+ </p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>New atoms are uninitialized.</p>
+</div>
 </dd></dl>
 
 <dl class="cpp function">
 <dt class="sig sig-object cpp">
 <span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">enable_if_t</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0EN3fly6system3SoA15different_SoA_vE" title="fly::system::SoA::different_SoA_v"><span class="n"><span class="pre">different_SoA_v</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I00EN3fly6system3SoA3SoAERR1T" title="fly::system::SoA::SoA::T"><span class="n"><span class="pre">T</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="o"><span class="pre">&amp;&amp;</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N3fly6system3SoA9owns_noneE" title="fly::system::SoA::owns_none"><span class="n"><span class="pre">owns_none</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SoA</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I00EN3fly6system3SoA3SoAERR1T" title="fly::system::SoA::SoA::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">other</span></span><span class="sig-paren">)</span><br /></dt>
 <dd><p>Implicitly construct a new SoA object from SoA ‘other’ with different members. </p>
-<p>Only SFINE enabled if this SoA owns non of its arrays.</p>
-<p>.. note:: The implementation may <code class="docutils literal notranslate"><span class="pre">std::move</span></code> <code class="docutils literal notranslate"><span class="pre">other</span></code> multiple times but this is ok as the detail::Adaptor constructor will only move its corresponding base slice. </p>
+<p>Only SFINE enabled if this SoA owns non of its arrays. </p>
 </dd></dl>
 
 <dl class="cpp function">
 <dt class="sig sig-object cpp">
 <span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">enable_if_t</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0EN3fly6system3SoA15different_SoA_vE" title="fly::system::SoA::different_SoA_v"><span class="n"><span class="pre">different_SoA_v</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I000EN3fly6system3SoA3SoAERR1T" title="fly::system::SoA::SoA::T"><span class="n"><span class="pre">T</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="o"><span class="pre">&amp;&amp;</span></span><span class="w"> </span><span class="o"><span class="pre">!</span></span><a class="reference internal" href="#_CPPv4N3fly6system3SoA9owns_noneE" title="fly::system::SoA::owns_none"><span class="n"><span class="pre">owns_none</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">explicit</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SoA</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I000EN3fly6system3SoA3SoAERR1T" title="fly::system::SoA::SoA::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">other</span></span><span class="sig-paren">)</span><br /></dt>
 <dd><p>Explicitly construct a new SoA object from SoA ‘other’ with different members. </p>
-<p>SFINE enabled if this SoA owns some of its arrays.</p>
-<p>.. note:: The implementation may <code class="docutils literal notranslate"><span class="pre">std::move</span></code> <code class="docutils literal notranslate"><span class="pre">other</span></code> multiple times but this is ok as the detail::Adaptor constructor will only move its corresponding base slice. </p>
+<p>SFINE enabled if this SoA owns some of its arrays. </p>
 </dd></dl>
 
 <dl class="cpp function">
 <dt class="sig sig-object cpp">
 <a class="reference internal" href="#_CPPv4IDpEN3fly6system3SoAE" title="fly::system::SoA"><span class="n"><span class="pre">SoA</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">=</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4IDpEN3fly6system3SoAE" title="fly::system::SoA"><span class="n"><span class="pre">SoA</span></span></a><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><br /></dt>
 <dd><p>Defaulted copy assignment operator. </p>
-<p><p></p>
+<p><p>See the <a class="reference internal" href="#note-on-assignment-to-references">note on assignment to references</a>.</p>
  </p>
-<div class="admonition warning">
-<p class="admonition-title">Warning</p>
-<p>Assignement to reference members follows pointer-semantics.</p>
-</div>
 </dd></dl>
 
 <dl class="cpp function">
 <dt class="sig sig-object cpp">
 <a class="reference internal" href="#_CPPv4IDpEN3fly6system3SoAE" title="fly::system::SoA"><span class="n"><span class="pre">SoA</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">=</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4IDpEN3fly6system3SoAE" title="fly::system::SoA"><span class="n"><span class="pre">SoA</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><br /></dt>
 <dd><p>Defaulted move assignment operator. </p>
-<p><p></p>
+<p><p>See the <a class="reference internal" href="#note-on-assignment-to-references">note on assignment to references</a>.</p>
  </p>
-<div class="admonition warning">
-<p class="admonition-title">Warning</p>
-<p>Assignement to reference members follows pointer-semantics.</p>
-</div>
 </dd></dl>
 
 <dl class="cpp function">
 <dt class="sig sig-object cpp">
 <span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">enable_if_t</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0EN3fly6system3SoA15different_SoA_vE" title="fly::system::SoA::different_SoA_v"><span class="n"><span class="pre">different_SoA_v</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I00EN3fly6system3SoAaSER3SoARR1T" title="fly::system::SoA::operator=::T"><span class="n"><span class="pre">T</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4IDpEN3fly6system3SoAE" title="fly::system::SoA"><span class="n"><span class="pre">SoA</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">=</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I00EN3fly6system3SoAaSER3SoARR1T" title="fly::system::SoA::operator=::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">other</span></span><span class="sig-paren">)</span><br /></dt>
 <dd><p>Assign to a SoA with with different members. </p>
-<p>Assignement to reference members follows pointer-semantics. </p>
+<p><p><span class="target" id="note-on-assignment-to-references"></span></p>
+ </p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Assignement to reference members follows pointer-semantics:</p>
+<div class="code highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;libfly/system/SoA.hpp&quot;</span><span class="cp"></span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;libfly/system/atom.hpp&quot;</span><span class="c1">  //&lt; MemTag</span><span class="cp"></span>
+
+<span class="kt">void</span><span class="w"> </span><span class="nf">SoA_assign</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">  </span><span class="c1">// Define a member to represent position that is a vector of 3 doubles.</span>
+<span class="w">  </span><span class="k">struct</span><span class="w"> </span><span class="nc">xyz</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">fly</span><span class="o">::</span><span class="n">system</span><span class="o">::</span><span class="n">MemTag</span><span class="o">&lt;</span><span class="kt">double</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{};</span><span class="w"></span>
+
+<span class="w">  </span><span class="n">fly</span><span class="o">::</span><span class="n">system</span><span class="o">::</span><span class="n">SoA</span><span class="o">&lt;</span><span class="n">xyz</span><span class="o">&gt;</span><span class="w"> </span><span class="n">a</span><span class="p">(</span><span class="mi">10</span><span class="p">);</span><span class="w"></span>
+<span class="w">  </span><span class="n">fly</span><span class="o">::</span><span class="n">system</span><span class="o">::</span><span class="n">SoA</span><span class="o">&lt;</span><span class="n">xyz</span><span class="o">&gt;</span><span class="w"> </span><span class="n">b</span><span class="p">(</span><span class="mi">10</span><span class="p">);</span><span class="w"></span>
+
+<span class="w">  </span><span class="n">a</span><span class="p">[</span><span class="n">xyz</span><span class="p">{}]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w"></span>
+<span class="w">  </span><span class="n">b</span><span class="p">[</span><span class="n">xyz</span><span class="p">{}]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">2</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">  </span><span class="n">fly</span><span class="o">::</span><span class="n">system</span><span class="o">::</span><span class="n">SoA</span><span class="o">&lt;</span><span class="n">xyz</span><span class="w"> </span><span class="o">&amp;&gt;</span><span class="w"> </span><span class="n">view_a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">a</span><span class="p">;</span><span class="w"></span>
+<span class="w">  </span><span class="n">fly</span><span class="o">::</span><span class="n">system</span><span class="o">::</span><span class="n">SoA</span><span class="o">&lt;</span><span class="n">xyz</span><span class="w"> </span><span class="o">&amp;&gt;</span><span class="w"> </span><span class="n">view_b</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">b</span><span class="p">;</span><span class="w"></span>
+<span class="w">  </span><span class="n">fly</span><span class="o">::</span><span class="n">system</span><span class="o">::</span><span class="n">SoA</span><span class="o">&lt;</span><span class="n">xyz</span><span class="w"> </span><span class="o">&amp;&gt;</span><span class="w"> </span><span class="n">view_b2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">b</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">  </span><span class="n">view_a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">view_b</span><span class="p">;</span><span class="w">                 </span><span class="c1">// This does NOT set a[xyz{}] to  b[xyz{}]</span>
+<span class="w">  </span><span class="n">view_a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">move</span><span class="p">(</span><span class="n">view_b</span><span class="p">);</span><span class="w">      </span><span class="c1">// Neither does this</span>
+<span class="w">  </span><span class="n">view_a</span><span class="p">[</span><span class="n">xyz</span><span class="p">{}]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">view_b2</span><span class="p">[</span><span class="n">xyz</span><span class="p">{}];</span><span class="w">  </span><span class="c1">// This does :)</span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+</div>
 </dd></dl>
 
 <dl class="cpp function">
@@ -492,45 +634,95 @@ atom or as an Eigen array to enable collective operations.</p>
 
 </div>
 <div class="breathe-sectiondef docutils container">
-<p class="breathe-sectiondef-title rubric" id="breathe-section-title-private-members">Private Members</p>
-<dl class="cpp var">
-<dt class="sig sig-object cpp">
-<span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">m_size</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><br /></dt>
-<dd></dd></dl>
-
-</div>
-<div class="breathe-sectiondef docutils container">
-<p class="breathe-sectiondef-title rubric" id="breathe-section-title-private-static-attributes">Private Static Attributes</p>
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-static-attributes">Public Static Attributes</p>
 <dl class="cpp var">
 <dt class="sig sig-object cpp">
 <span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">owns_none</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="p"><span class="pre">(</span></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">is_reference_v</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4IDpEN3fly6system3SoAE" title="fly::system::SoA::Ms"><span class="n"><span class="pre">Ms</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="o"><span class="pre">&amp;&amp;</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">)</span></span><br /></dt>
-<dd></dd></dl>
+<dd><p>True if this SoA is a pure view i.e. all its members are reference types. </p>
+</dd></dl>
 
 <dl class="cpp var">
 <dt class="sig sig-object cpp">
 <span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">owns_all</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="p"><span class="pre">(</span></span><span class="o"><span class="pre">!</span></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">is_reference_v</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4IDpEN3fly6system3SoAE" title="fly::system::SoA::Ms"><span class="n"><span class="pre">Ms</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="o"><span class="pre">&amp;&amp;</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">)</span></span><br /></dt>
-<dd></dd></dl>
+<dd><p>True if this SoA is purely owning i.e. non of its members are reference types. </p>
+</dd></dl>
 
 <dl class="cpp var">
 <dt class="sig sig-object cpp">
 <span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">different_SoA_v</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="n"><span class="pre">detail</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">different_SoA</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4IDpEN3fly6system3SoAE" title="fly::system::SoA"><span class="n"><span class="pre">SoA</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4IDpEN3fly6system3SoAE" title="fly::system::SoA::Ms"><span class="n"><span class="pre">Ms</span></span></a><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="utility.html#_CPPv4I0EN3fly13remove_cref_tE" title="fly::remove_cref_t"><span class="n"><span class="pre">remove_cref_t</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0EN3fly6system3SoA15different_SoA_vE" title="fly::system::SoA::different_SoA_v::T"><span class="n"><span class="pre">T</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">value</span></span><br /></dt>
-<dd></dd></dl>
+<dd><p>Detect if a type is a spetialization of SoA different from this specialization. </p>
+</dd></dl>
 
 </div>
-<div class="breathe-sectiondef docutils container">
-<p class="breathe-sectiondef-title rubric" id="breathe-section-title-friends">Friends</p>
-<dl>
+</dd></dl>
+
+</section>
+<section id="vector-of-structures">
+<h3>Vector of Structures<a class="headerlink" href="#vector-of-structures" title="Permalink to this heading">#</a></h3>
+<dl class="cpp class">
 <dt class="sig sig-object cpp">
-<em class="property"><span class="pre">friend</span> <span class="pre">class</span></em> <span class="pre">SoA</span></dt>
+<span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="sig-name descname"><span class="n"><span class="pre">Mems</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">VoS</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">private</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4IDpEN3fly6system4AtomE" title="fly::system::Atom"><span class="n"><span class="pre">Atom</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4IDpEN3fly6system3VoSE" title="fly::system::VoS::Mems"><span class="n"><span class="pre">Mems</span></span></a><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">&gt;</span></span><br /></dt>
+<dd><p>A container that models a std::vector of atoms. </p>
+<p>The members of the “atom” are described through a series of template parameters which should inherit from <code class="docutils literal notranslate"><span class="pre">MemTag</span></code></p>
+<p><p>Example:</p>
+<div class="code highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;libfly/system/VoS.hpp&quot;</span><span class="cp"></span>
+
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;libfly/system/atom.hpp&quot;</span><span class="c1">  //&lt; MemTag, atom</span><span class="cp"></span>
+
+<span class="kt">void</span><span class="w"> </span><span class="nf">example_VoS</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">  </span><span class="c1">// Define a member to represent position that is a vector of 3 doubles.</span>
+<span class="w">  </span><span class="k">struct</span><span class="w"> </span><span class="nc">xyz</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">fly</span><span class="o">::</span><span class="n">system</span><span class="o">::</span><span class="n">MemTag</span><span class="o">&lt;</span><span class="kt">double</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{};</span><span class="w"></span>
+
+<span class="w">  </span><span class="n">fly</span><span class="o">::</span><span class="n">system</span><span class="o">::</span><span class="n">VoS</span><span class="o">&lt;</span><span class="n">xyz</span><span class="o">&gt;</span><span class="w"> </span><span class="n">atoms</span><span class="p">;</span><span class="w">  </span><span class="c1">// Empty VoS</span>
+
+<span class="w">  </span><span class="n">atoms</span><span class="p">.</span><span class="n">emplace_back</span><span class="p">({</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">});</span><span class="w">  </span><span class="c1">// Add an atom at position {1, 2, 3}</span>
+
+<span class="w">  </span><span class="n">fly</span><span class="o">::</span><span class="n">system</span><span class="o">::</span><span class="n">Atom</span><span class="o">&lt;</span><span class="n">xyz</span><span class="o">&gt;&amp;</span><span class="w"> </span><span class="n">first_atom</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">atoms</span><span class="p">[</span><span class="mi">0</span><span class="p">];</span><span class="w">  </span><span class="c1">// Referance to first atom.</span>
+
+<span class="w">  </span><span class="n">atoms</span><span class="p">.</span><span class="n">push_back</span><span class="p">(</span><span class="n">first_atom</span><span class="p">);</span><span class="w">  </span><span class="c1">// Make a second atom a copy of the first.</span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+<div class="admonition-todo admonition" id="id1">
+<p class="admonition-title">Todo</p>
+<p>Work out how to make inherited functions display with <code class="docutils literal notranslate"><span class="pre">using</span></code>.</p>
+</div>
+</p>
+<dl class="field-list simple">
+<dt class="field-odd">Template Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>Mems</strong> – a series of empty types, derived from <code class="docutils literal notranslate"><span class="pre">MemTag</span></code>, to describe each member. </p>
+</dd>
 </dl>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp">
+<span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">decltype</span></span><span class="p"><span class="pre">(</span></span><span class="k"><span class="pre">auto</span></span><span class="p"><span class="pre">)</span></span><span class="w"> </span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">[]</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">i</span></span><span class="sig-paren">)</span><br /></dt>
+<dd><p>Bounds checked version of operator []. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp">
+<span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">decltype</span></span><span class="p"><span class="pre">(</span></span><span class="k"><span class="pre">auto</span></span><span class="p"><span class="pre">)</span></span><span class="w"> </span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">[]</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">i</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><br /></dt>
+<dd><p>Bounds checked version of operator [] const. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp">
+<span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">decltype</span></span><span class="p"><span class="pre">(</span></span><span class="k"><span class="pre">auto</span></span><span class="p"><span class="pre">)</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">emplace_back</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4IDpEN3fly6system3VoSE" title="fly::system::VoS::Mems"><span class="n"><span class="pre">Mems</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">matrix_t</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">...</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">args</span></span><span class="sig-paren">)</span><br /></dt>
+<dd><p>Provides an emplace_back with explicit <code class="docutils literal notranslate"><span class="pre">matrix_t</span></code> parameters. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp">
+<span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">decltype</span></span><span class="p"><span class="pre">(</span></span><span class="k"><span class="pre">auto</span></span><span class="p"><span class="pre">)</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">emplace_back</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4IDpEN3fly6system3VoSE" title="fly::system::VoS::Mems"><span class="n"><span class="pre">Mems</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">matrix_t</span></span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">...</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">args</span></span><span class="sig-paren">)</span><br /></dt>
+<dd><p>Provides an emplace_back with explicit <code class="docutils literal notranslate"><span class="pre">matrix_t</span></code> parameters. </p>
+</dd></dl>
 
 </div>
 </dd></dl>
 
-</dd></dl>
-
-</dd></dl>
-
+</section>
 </section>
 </section>
 
@@ -555,7 +747,7 @@ atom or as an Eigen array to enable collective operations.</p>
                   <span>Previous</span>
                 </div>
                 
-                <div class="title">Utility</div>
+                <div class="title">Utilities (<code class="docutils literal notranslate"><span class="pre">libfly/utility</span></code>)</div>
                 
               </div>
             </a>
@@ -591,9 +783,18 @@ atom or as an Eigen array to enable collective operations.</p>
         <div class="toc-tree-container">
           <div class="toc-tree">
             <ul>
-<li><a class="reference internal" href="#">System</a><ul>
-<li><a class="reference internal" href="#atoms">Atoms</a></li>
-<li><a class="reference internal" href="#struct-of-arrays">Struct of arrays</a></li>
+<li><a class="reference internal" href="#">System (<code class="docutils literal notranslate"><span class="pre">libfly/system</span></code>)</a><ul>
+<li><a class="reference internal" href="#atoms">Atoms</a><ul>
+<li><a class="reference internal" href="#atom-class">Atom class</a></li>
+<li><a class="reference internal" href="#memtag">MemTag</a></li>
+<li><a class="reference internal" href="#bultin-members">Bultin members</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#generic-data-structures">Generic data structures</a><ul>
+<li><a class="reference internal" href="#structure-of-arrays">Structure of Arrays</a></li>
+<li><a class="reference internal" href="#vector-of-structures">Vector of Structures</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>

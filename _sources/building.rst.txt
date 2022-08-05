@@ -142,10 +142,6 @@ If you followed the above instructions, then you can configure, build and test t
 Developer mode targets
 ~~~~~~~~~~~~~~~~~~~~~~
 
-.. todo:: 
-
-    Document clang-format targets
-
 In developer mode the test and examples will be build automatically. Additionally if you want to build a local version of the documentation you will require:
 
 * doxygen

@@ -3,10 +3,10 @@
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
-<link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="System" href="system.html" /><link rel="prev" title="Library API reference" href="../api.html" />
+<link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="System (libfly/system)" href="system.html" /><link rel="prev" title="Library API reference" href="../api.html" />
 
     <meta name="generator" content="sphinx-5.1.1, furo 2022.06.21"/>
-        <title>Utility - OpenFLY 0.1.0 documentation</title>
+        <title>Utilities (libfly/utility) - OpenFLY 0.1.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?digest=40978830699223671f4072448e654b5958f38b89" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?digest=30d1aed668e5c3a91c3e3bf6a60b675221979f0e" />
@@ -163,8 +163,8 @@
 <li class="toctree-l1"><a class="reference internal" href="../building.html">Building</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../building.html#hacking">Hacking</a></li>
 <li class="toctree-l1 current has-children"><a class="reference internal" href="../api.html">Library API reference</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
-<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">Utility</a></li>
-<li class="toctree-l2"><a class="reference internal" href="system.html">System</a></li>
+<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">Utilities (<code class="docutils literal notranslate"><span class="pre">libfly/utility</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="system.html">System (<code class="docutils literal notranslate"><span class="pre">libfly/system</span></code>)</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../todo.html">Todo!</a></li>
@@ -201,11 +201,11 @@
           </label>
         </div>
         <article role="main">
-          <section id="utility">
-<h1>Utility<a class="headerlink" href="#utility" title="Permalink to this heading">#</a></h1>
-<section id="version">
-<h2>Version<a class="headerlink" href="#version" title="Permalink to this heading">#</a></h2>
-<p><code class="docutils literal notranslate"><span class="pre">libfly/utility/version.hpp</span></code></p>
+          <section id="utilities-libfly-utility">
+<h1>Utilities (<code class="docutils literal notranslate"><span class="pre">libfly/utility</span></code>)<a class="headerlink" href="#utilities-libfly-utility" title="Permalink to this heading">#</a></h1>
+<p>The <code class="docutils literal notranslate"><span class="pre">utility</span></code> folder contains a collection of non-specific utilities, it is documented by file.</p>
+<section id="versioning-version-hpp">
+<h2>Versioning (<code class="docutils literal notranslate"><span class="pre">version.hpp</span></code>)<a class="headerlink" href="#versioning-version-hpp" title="Permalink to this heading">#</a></h2>
 <p>Defines a set of version macros, read by CMake. </p>
 <div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric" id="breathe-section-title-defines">Defines</p>
@@ -229,9 +229,8 @@
 
 </div>
 </section>
-<section id="core">
-<h2>Core<a class="headerlink" href="#core" title="Permalink to this heading">#</a></h2>
-<p><code class="docutils literal notranslate"><span class="pre">libfly/utility/core.hpp</span></code></p>
+<section id="core-core-hpp">
+<h2>Core (<code class="docutils literal notranslate"><span class="pre">core.hpp</span></code>)<a class="headerlink" href="#core-core-hpp" title="Permalink to this heading">#</a></h2>
 <p>Miscellaneous utilities. </p>
 <dl class="cpp type">
 <dt class="sig sig-object cpp">
@@ -329,7 +328,8 @@
 <dt class="sig sig-object cpp">
 <span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Exp</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">enable_if_t</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">is_arithmetic_v</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I_NSt6size_tE0EN3fly4ipowENSt11enable_if_tINSt15is_arithmetic_vI1TEE1TEE1T" title="fly::ipow::T"><span class="n"><span class="pre">T</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I_NSt6size_tE0EN3fly4ipowENSt11enable_if_tINSt15is_arithmetic_vI1TEE1TEE1T" title="fly::ipow::T"><span class="n"><span class="pre">T</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ipow</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I_NSt6size_tE0EN3fly4ipowENSt11enable_if_tINSt15is_arithmetic_vI1TEE1TEE1T" title="fly::ipow::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">x</span></span><span class="sig-paren">)</span><br /></dt>
 <dd><p>Compute integer powers of arithmetic types at compile time. </p>
-<p><p><p>Computes:</p>
+<p><p><p>Only SFINE if base is an arithmetic type.</p>
+<p>Computes:</p>
 <div class="math-wrapper docutils container">
 <div class="math notranslate nohighlight">
 \[\text{x}^{\text{Exp}}\]</div>
@@ -388,6 +388,7 @@
 <em>#include &lt;libfly/utility/core.hpp&gt;</em></div>
 <p>Basic implementation of a Golang like defer. </p>
 <p><p><p>Example:</p>
+<p>Only SFINE if callable is noexcept.</p>
 <div class="code highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;vector&gt;</span><span class="cp"></span>
 
 <span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;libfly/utility/core.hpp&quot;</span><span class="cp"></span>
@@ -465,9 +466,8 @@
 </dd></dl>
 
 </section>
-<section id="asserts">
-<h2>Asserts<a class="headerlink" href="#asserts" title="Permalink to this heading">#</a></h2>
-<p><code class="docutils literal notranslate"><span class="pre">libfly/utility/asserts.hpp</span></code></p>
+<section id="asserts-asserts-hpp">
+<h2>Asserts (<code class="docutils literal notranslate"><span class="pre">asserts.hpp</span></code>)<a class="headerlink" href="#asserts-asserts-hpp" title="Permalink to this heading">#</a></h2>
 <p>Defines a set of &lt;cassert&gt; like macros. </p>
 <div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric" id="breathe-section-title-defines">Defines</p>
@@ -490,9 +490,8 @@
 <dd></dd></dl>
 
 </section>
-<section id="timing">
-<h2>Timing<a class="headerlink" href="#timing" title="Permalink to this heading">#</a></h2>
-<p><code class="docutils literal notranslate"><span class="pre">libfly/utility/timeit.hpp</span></code></p>
+<section id="timing-timeit-hpp">
+<h2>Timing: (<code class="docutils literal notranslate"><span class="pre">timeit.hpp</span></code>)<a class="headerlink" href="#timing-timeit-hpp" title="Permalink to this heading">#</a></h2>
 <p>Timing utilities. </p>
 <dl class="cpp type">
 <dt class="sig sig-object cpp">
@@ -534,7 +533,7 @@
                 <div class="context">
                   <span>Next</span>
                 </div>
-                <div class="title">System</div>
+                <div class="title">System (<code class="docutils literal notranslate"><span class="pre">libfly/system</span></code>)</div>
               </div>
               <svg><use href="#svg-arrow-right"></use></svg>
             </a>
@@ -581,11 +580,11 @@
         <div class="toc-tree-container">
           <div class="toc-tree">
             <ul>
-<li><a class="reference internal" href="#">Utility</a><ul>
-<li><a class="reference internal" href="#version">Version</a></li>
-<li><a class="reference internal" href="#core">Core</a></li>
-<li><a class="reference internal" href="#asserts">Asserts</a></li>
-<li><a class="reference internal" href="#timing">Timing</a></li>
+<li><a class="reference internal" href="#">Utilities (<code class="docutils literal notranslate"><span class="pre">libfly/utility</span></code>)</a><ul>
+<li><a class="reference internal" href="#versioning-version-hpp">Versioning (<code class="docutils literal notranslate"><span class="pre">version.hpp</span></code>)</a></li>
+<li><a class="reference internal" href="#core-core-hpp">Core (<code class="docutils literal notranslate"><span class="pre">core.hpp</span></code>)</a></li>
+<li><a class="reference internal" href="#asserts-asserts-hpp">Asserts (<code class="docutils literal notranslate"><span class="pre">asserts.hpp</span></code>)</a></li>
+<li><a class="reference internal" href="#timing-timeit-hpp">Timing: (<code class="docutils literal notranslate"><span class="pre">timeit.hpp</span></code>)</a></li>
 </ul>
 </li>
 </ul>

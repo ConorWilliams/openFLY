@@ -1,34 +1,29 @@
-Utility
-=======
+Utilities (``libfly/utility``)
+======================================
 
-Version
--------
+The ``utility`` folder contains a collection of non-specific utilities, it is documented by file.
 
-``libfly/utility/version.hpp``
+Versioning (``version.hpp``)
+---------------------------------------
 
 .. doxygenfile:: version.hpp
     :no-link:
 
-Core
--------
-
-``libfly/utility/core.hpp``
+Core (``core.hpp``)
+------------------------------------------
 
 .. doxygenfile:: core.hpp
     :no-link:
 
-Asserts
--------
-
-``libfly/utility/asserts.hpp``
+Asserts (``asserts.hpp``)
+------------------------------------------
 
 .. doxygenfile:: asserts.hpp
     :no-link:
+    
 
-Timing
--------
-
-``libfly/utility/timeit.hpp``
+Timing: (``timeit.hpp``)
+------------------------------------------
 
 .. doxygenfile:: timeit.hpp
     :no-link:

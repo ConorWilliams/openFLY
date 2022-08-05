@@ -56,6 +56,7 @@ jobs:
           rm GPG-PUB-KEY-INTEL-SW-PRODUCTS-2023.PUB
           echo "deb https://apt.repos.intel.com/oneapi all main" | sudo tee /etc/apt/sources.list.d/oneAPI.list
           sudo apt-get update
+
       - name: Install Intel oneAPI
         timeout-minutes: 5
         run: sudo apt-get install intel-oneapi-compiler-dpcpp-cpp-and-cpp-classic intel-oneapi-mpi intel-oneapi-mpi-devel
@@ -81,7 +82,7 @@ jobs:
 
   docs:
     # Deploy docs only when builds succeed
-    needs: [test]
+    needs: [test, intel]
 
     runs-on: ubuntu-latest
 

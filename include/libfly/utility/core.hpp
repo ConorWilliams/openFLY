@@ -43,25 +43,25 @@ namespace fly {
    *
    * @tparam T The scalar type of the \c Eigen::Vector
    */
-  template <typename T> using Vec3 = Eigen::Vector<T, spatial_dims>;
+  template <class T> using Vec3 = Eigen::Vector<T, spatial_dims>;
 
   /**
    * @brief Shorthand for creating an \c spatial_dims x \c spatial_dims \c Eigen::Matrix.
    *
    * @tparam T The scalar type of the \c Eigen::Matrix
    */
-  template <typename T> using Mat3 = Eigen::Matrix<T, spatial_dims, spatial_dims>;
+  template <class T> using Mat3 = Eigen::Matrix<T, spatial_dims, spatial_dims>;
 
   namespace detail {
 
-    template <typename T, typename...> struct First { using type = T; };
+    template <class T, class...> struct First { using type = T; };
 
   }  // namespace detail
 
   /**
    * @brief Extracts the first type from a parameter pack.
    */
-  template <typename... Ts> using first_t = typename detail::First<Ts...>::type;
+  template <class... Ts> using first_t = typename detail::First<Ts...>::type;
 
   /**
    * @brief Non-deducable \c false for use in \c static_assert.
@@ -75,14 +75,14 @@ namespace fly {
    *
    * \endrst
    */
-  template <typename...> inline constexpr bool always_false = false;
+  template <class...> inline constexpr bool always_false = false;
 
   /**
    * @brief Strip all reference and const qualifications from \c T.
    *
    * @tparam T The type to strip ref/const qualifications from.
    */
-  template <typename T> using remove_cref_t = std::remove_const_t<std::remove_reference_t<T>>;
+  template <class T> using remove_cref_t = std::remove_const_t<std::remove_reference_t<T>>;
 
   /**
    * @brief Generalised dot-product between two \c Eigen::Array objects.
@@ -97,7 +97,7 @@ namespace fly {
    *
    * \endrst
    */
-  template <typename E1, typename E2> auto gdot(Eigen::ArrayBase<E1> const& a, Eigen::ArrayBase<E2> const& b) { return (a * b).sum(); }
+  template <class E1, class E2> auto gdot(Eigen::ArrayBase<E1> const& a, Eigen::ArrayBase<E2> const& b) { return (a * b).sum(); }
 
   /**
    * @brief Generic squared Frobenius norm of an \c Eigen::Array.
@@ -112,7 +112,7 @@ namespace fly {
    *
    * \endrst
    */
-  template <typename E> auto norm_sq(Eigen::ArrayBase<E> const& r) { return (r * r).sum(); }
+  template <class E> auto norm_sq(Eigen::ArrayBase<E> const& r) { return (r * r).sum(); }
 
   /**
    * @brief Generic Frobenius norm of an \c Eigen::Array.
@@ -127,7 +127,7 @@ namespace fly {
    *
    * \endrst
    */
-  template <typename E> auto norm(Eigen::ArrayBase<E> const& r) { return std::sqrt(norm_sq(r)); }
+  template <class E> auto norm(Eigen::ArrayBase<E> const& r) { return std::sqrt(norm_sq(r)); }
 
   /**
    * @brief Compute integer powers of arithmetic types at compile time.
@@ -144,7 +144,7 @@ namespace fly {
    *
    * \endrst
    */
-  template <std::size_t Exp, typename T> constexpr std::enable_if_t<std::is_arithmetic_v<T>, T> ipow(T x) {
+  template <std::size_t Exp, class T> constexpr std::enable_if_t<std::is_arithmetic_v<T>, T> ipow(T x) {
     if constexpr (Exp == 0) {
       return T(1);
     }
@@ -172,7 +172,7 @@ namespace fly {
    *
    * \endrst
    */
-  template <class F, typename = std::enable_if_t<std::is_nothrow_invocable_v<F&&>>> class [[nodiscard]] Defer {
+  template <class F, class = std::enable_if_t<std::is_nothrow_invocable_v<F&&>>> class [[nodiscard]] Defer {
   public:
     /**
      * @brief Construct a new Defer object
@@ -195,6 +195,6 @@ namespace fly {
   /**
    * @brief Forwarding deduction guide.
    */
-  template <typename F> Defer(F&&) -> Defer<F>;
+  template <class F> Defer(F&&) -> Defer<F>;
 
 }  // namespace fly

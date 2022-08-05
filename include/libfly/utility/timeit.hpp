@@ -39,7 +39,7 @@ namespace fly {
    * @param args Arguments to call \c f with.
    * @return std::invoke_result_t<F&&, Args&&...> The result of calling \c f with \c args... .
    */
-  template <typename F, typename... Args> std::invoke_result_t<F&&, Args&&...> timeit(std::string_view name, F&& f, Args&&... args) {
+  template <class F, class... Args> std::invoke_result_t<F&&, Args&&...> timeit(std::string_view name, F&& f, Args&&... args) {
     //
     auto start = std::chrono::steady_clock::now();
 

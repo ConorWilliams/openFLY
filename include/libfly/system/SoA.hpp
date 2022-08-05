@@ -24,15 +24,15 @@
 
 namespace fly::system {
 
-  template <typename... Ms> class SoA;
+  template <class... Ms> class SoA;
 
   namespace detail {
 
-    template <typename, typename> struct different_SoA : std::false_type {};
+    template <class, class> struct different_SoA : std::false_type {};
 
-    template <typename... Ms> struct different_SoA<SoA<Ms...>, SoA<Ms...>> : std::false_type {};
+    template <class... Ms> struct different_SoA<SoA<Ms...>, SoA<Ms...>> : std::false_type {};
 
-    template <typename... Ms, typename... Mx> struct different_SoA<SoA<Ms...>, SoA<Mx...>> : std::true_type {};
+    template <class... Ms, class... Mx> struct different_SoA<SoA<Ms...>, SoA<Mx...>> : std::true_type {};
 
   }  // namespace detail
 
@@ -59,7 +59,7 @@ namespace fly::system {
    *
    * @tparam Ms a series of empty types, derived from ``MemTag``, to describe each member.
    */
-  template <typename... Ms> class SoA : private detail::Adaptor<Ms>... {
+  template <class... Ms> class SoA : private detail::Adaptor<Ms>... {
   public:
     /**
      * @brief True if this SoA is a pure view i.e. all its members are reference types.
@@ -74,7 +74,7 @@ namespace fly::system {
     /**
      * @brief Detect if a type is a spetialization of SoA different from this specialization.
      */
-    template <typename T> static constexpr bool different_SoA_v = detail::different_SoA<SoA<Ms...>, remove_cref_t<T>>::value;
+    template <class T> static constexpr bool different_SoA_v = detail::different_SoA<SoA<Ms...>, remove_cref_t<T>>::value;
 
     /**
      * @brief Construct a new empty SoA.
@@ -111,7 +111,7 @@ namespace fly::system {
      * Only SFINE enabled if this SoA owns non of its arrays.
      *
      */
-    template <typename T, typename = std::enable_if_t<different_SoA_v<T> && owns_none>> SoA(T&& other)
+    template <class T, class = std::enable_if_t<different_SoA_v<T> && owns_none>> SoA(T&& other)
         : detail::Adaptor<Ms>(std::forward<T>(other))..., m_size(other.size()) {
       // Ok to ``std::move`` ``other`` multiple times but this is ok as the detail::Adaptor constructor will only move its
       // corresponding base slice.
@@ -123,7 +123,7 @@ namespace fly::system {
      * SFINE enabled if this SoA owns some of its arrays.
      *
      */
-    template <typename T, typename = std::enable_if_t<different_SoA_v<T> && !owns_none>, typename = void> explicit SoA(T&& other)
+    template <class T, class = std::enable_if_t<different_SoA_v<T> && !owns_none>, class = void> explicit SoA(T&& other)
         : detail::Adaptor<Ms>(std::forward<T>(other))..., m_size(other.size()) {
       // Ok to ``std::move`` ``other`` multiple times but this is ok as the detail::Adaptor constructor will only move its
       // corresponding base slice.
@@ -166,7 +166,7 @@ namespace fly::system {
      *
      * \endrst
      */
-    template <typename T, typename = std::enable_if_t<different_SoA_v<T>>> SoA& operator=(T&& other) {
+    template <class T, class = std::enable_if_t<different_SoA_v<T>>> SoA& operator=(T&& other) {
       (static_cast<void>(static_cast<detail::Adaptor<Ms>&>(*this) = std::forward<T>(other)), ...);
       return *this;
     }
@@ -200,7 +200,7 @@ namespace fly::system {
   private:
     int m_size = 0;
 
-    /* clang-format off */ template <typename...>  friend class SoA; /* clang-format on */
+    /* clang-format off */ template <class...>  friend class SoA; /* clang-format on */
   };
 
 }  // namespace fly::system

@@ -32,7 +32,7 @@ DOXYFILE_ENCODING      = UTF-8
 # title of most generated pages and in a few other places.
 # The default value is: My Project.
 
-PROJECT_NAME           = "My Project"
+PROJECT_NAME           = "openFLY"
 
 # The PROJECT_NUMBER tag can be used to enter a project or revision number. This
 # could be handy for archiving the generated documentation or if some version
@@ -108,7 +108,7 @@ BRIEF_MEMBER_DESC      = YES
 # brief descriptions will be completely suppressed.
 # The default value is: YES.
 
-REPEAT_BRIEF           = YES
+REPEAT_BRIEF           = NO
 
 # This tag implements a quasi-intelligent brief description abbreviator that is
 # used to form the text in various listings. Each string in this list, if found
@@ -144,14 +144,14 @@ ALWAYS_DETAILED_SEC    = NO
 # operators of the base classes will not be shown.
 # The default value is: NO.
 
-INLINE_INHERITED_MEMB  = NO
+INLINE_INHERITED_MEMB  = YES
 
 # If the FULL_PATH_NAMES tag is set to YES, doxygen will prepend the full path
 # before files name in the file list and in the header files. If set to NO the
 # shortest path that makes the file name unique will be used
 # The default value is: YES.
 
-FULL_PATH_NAMES        = NO
+FULL_PATH_NAMES        = YES
 
 # The STRIP_FROM_PATH tag can be used to strip a user-defined part of the path.
 # Stripping is only done if one of the specified strings matches the left-hand
@@ -172,72 +172,8 @@ STRIP_FROM_PATH        = ../
 # specify the list of include paths that are normally passed to the compiler
 # using the -I flag.
 
-STRIP_FROM_INC_PATH    =
+STRIP_FROM_INC_PATH    = "@DOXYGEN_STRIP_FROM_INC_PATH@"
 
-# If the SHORT_NAMES tag is set to YES, doxygen will generate much shorter (but
-# less readable) file names. This can be useful is your file systems doesn't
-# support long names like on DOS, Mac, or CD-ROM.
-# The default value is: NO.
-
-SHORT_NAMES            = NO
-
-# If the JAVADOC_AUTOBRIEF tag is set to YES then doxygen will interpret the
-# first line (until the first dot) of a Javadoc-style comment as the brief
-# description. If set to NO, the Javadoc-style will behave just like regular Qt-
-# style comments (thus requiring an explicit @brief command for a brief
-# description.)
-# The default value is: NO.
-
-JAVADOC_AUTOBRIEF      = NO
-
-# If the JAVADOC_BANNER tag is set to YES then doxygen will interpret a line
-# such as
-# /***************
-# as being the beginning of a Javadoc-style comment "banner". If set to NO, the
-# Javadoc-style will behave just like regular comments and it will not be
-# interpreted by doxygen.
-# The default value is: NO.
-
-JAVADOC_BANNER         = NO
-
-# If the QT_AUTOBRIEF tag is set to YES then doxygen will interpret the first
-# line (until the first dot) of a Qt-style comment as the brief description. If
-# set to NO, the Qt-style will behave just like regular Qt-style comments (thus
-# requiring an explicit \brief command for a brief description.)
-# The default value is: NO.
-
-QT_AUTOBRIEF           = NO
-
-# The MULTILINE_CPP_IS_BRIEF tag can be set to YES to make doxygen treat a
-# multi-line C++ special comment block (i.e. a block of //! or /// comments) as
-# a brief description. This used to be the default behavior. The new default is
-# to treat a multi-line C++ comment block as a detailed description. Set this
-# tag to YES if you prefer the old behavior instead.
-#
-# Note that setting this tag to YES also means that rational rose comments are
-# not recognized any more.
-# The default value is: NO.
-
-MULTILINE_CPP_IS_BRIEF = NO
-
-# If the INHERIT_DOCS tag is set to YES then an undocumented member inherits the
-# documentation from any documented member that it re-implements.
-# The default value is: YES.
-
-INHERIT_DOCS           = YES
-
-# If the SEPARATE_MEMBER_PAGES tag is set to YES then doxygen will produce a new
-# page for each member. If set to NO, the documentation of a member will be part
-# of the file/class/namespace that contains it.
-# The default value is: NO.
-
-SEPARATE_MEMBER_PAGES  = NO
-
-# The TAB_SIZE tag can be used to set the number of spaces in a tab. Doxygen
-# uses this value to replace tabs by spaces in code fragments.
-# Minimum value: 1, maximum value: 16, default value: 4.
-
-TAB_SIZE               = 4
 
 # This tag can be used to specify a number of aliases that act as commands in
 # the documentation. An alias has the form:
@@ -260,158 +196,6 @@ ALIASES  = "rst=\verbatim embed:rst:leading-asterisk"
 
 ALIASES += "endrst=\endverbatim"
 
-
-# Set the OPTIMIZE_OUTPUT_FOR_C tag to YES if your project consists of C sources
-# only. Doxygen will then generate output that is more tailored for C. For
-# instance, some of the names that are used will be different. The list of all
-# members will be omitted, etc.
-# The default value is: NO.
-
-OPTIMIZE_OUTPUT_FOR_C  = NO
-
-# Set the OPTIMIZE_OUTPUT_JAVA tag to YES if your project consists of Java or
-# Python sources only. Doxygen will then generate output that is more tailored
-# for that language. For instance, namespaces will be presented as packages,
-# qualified scopes will look different, etc.
-# The default value is: NO.
-
-OPTIMIZE_OUTPUT_JAVA   = NO
-
-# Set the OPTIMIZE_FOR_FORTRAN tag to YES if your project consists of Fortran
-# sources. Doxygen will then generate output that is tailored for Fortran.
-# The default value is: NO.
-
-OPTIMIZE_FOR_FORTRAN   = NO
-
-# Set the OPTIMIZE_OUTPUT_VHDL tag to YES if your project consists of VHDL
-# sources. Doxygen will then generate output that is tailored for VHDL.
-# The default value is: NO.
-
-OPTIMIZE_OUTPUT_VHDL   = NO
-
-# Set the OPTIMIZE_OUTPUT_SLICE tag to YES if your project consists of Slice
-# sources only. Doxygen will then generate output that is more tailored for that
-# language. For instance, namespaces will be presented as modules, types will be
-# separated into more groups, etc.
-# The default value is: NO.
-
-OPTIMIZE_OUTPUT_SLICE  = NO
-
-# Doxygen selects the parser to use depending on the extension of the files it
-# parses. With this tag you can assign which parser to use for a given
-# extension. Doxygen has a built-in mapping, but you can override or extend it
-# using this tag. The format is ext=language, where ext is a file extension, and
-# language is one of the parsers supported by doxygen: IDL, Java, JavaScript,
-# Csharp (C#), C, C++, D, PHP, md (Markdown), Objective-C, Python, Slice,
-# Fortran (fixed format Fortran: FortranFixed, free formatted Fortran:
-# FortranFree, unknown formatted Fortran: Fortran. In the later case the parser
-# tries to guess whether the code is fixed or free formatted code, this is the
-# default for Fortran type files), VHDL, tcl. For instance to make doxygen treat
-# .inc files as Fortran files (default is PHP), and .f files as C (default is
-# Fortran), use: inc=Fortran f=C.
-#
-# Note: For files without extension you can use no_extension as a placeholder.
-#
-# Note that for custom extensions you also need to set FILE_PATTERNS otherwise
-# the files are not read by doxygen.
-
-EXTENSION_MAPPING      =
-
-# If the MARKDOWN_SUPPORT tag is enabled then doxygen pre-processes all comments
-# according to the Markdown format, which allows for more readable
-# documentation. See https://daringfireball.net/projects/markdown/ for details.
-# The output of markdown processing is further processed by doxygen, so you can
-# mix doxygen, HTML, and XML commands with Markdown formatting. Disable only in
-# case of backward compatibilities issues.
-# The default value is: YES.
-
-MARKDOWN_SUPPORT       = YES
-
-# When the TOC_INCLUDE_HEADINGS tag is set to a non-zero value, all headings up
-# to that level are automatically included in the table of contents, even if
-# they do not have an id attribute.
-# Note: This feature currently applies only to Markdown headings.
-# Minimum value: 0, maximum value: 99, default value: 5.
-# This tag requires that the tag MARKDOWN_SUPPORT is set to YES.
-
-TOC_INCLUDE_HEADINGS   = 5
-
-# When enabled doxygen tries to link words that correspond to documented
-# classes, or namespaces to their corresponding documentation. Such a link can
-# be prevented in individual cases by putting a % sign in front of the word or
-# globally by setting AUTOLINK_SUPPORT to NO.
-# The default value is: YES.
-
-AUTOLINK_SUPPORT       = YES
-
-# If you use STL classes (i.e. std::string, std::vector, etc.) but do not want
-# to include (a tag file for) the STL sources as input, then you should set this
-# tag to YES in order to let doxygen match functions declarations and
-# definitions whose arguments contain STL classes (e.g. func(std::string);
-# versus func(std::string) {}). This also make the inheritance and collaboration
-# diagrams that involve STL classes more complete and accurate.
-# The default value is: NO.
-
-BUILTIN_STL_SUPPORT    = NO
-
-# If you use Microsoft's C++/CLI language, you should set this option to YES to
-# enable parsing support.
-# The default value is: NO.
-
-CPP_CLI_SUPPORT        = NO
-
-# Set the SIP_SUPPORT tag to YES if your project consists of sip (see:
-# https://www.riverbankcomputing.com/software/sip/intro) sources only. Doxygen
-# will parse them like normal C++ but will assume all classes use public instead
-# of private inheritance when no explicit protection keyword is present.
-# The default value is: NO.
-
-SIP_SUPPORT            = NO
-
-# For Microsoft's IDL there are propget and propput attributes to indicate
-# getter and setter methods for a property. Setting this option to YES will make
-# doxygen to replace the get and set methods by a property in the documentation.
-# This will only work if the methods are indeed getting or setting a simple
-# type. If this is not the case, or you want to show the methods anyway, you
-# should set this option to NO.
-# The default value is: YES.
-
-IDL_PROPERTY_SUPPORT   = YES
-
-# If member grouping is used in the documentation and the DISTRIBUTE_GROUP_DOC
-# tag is set to YES then doxygen will reuse the documentation of the first
-# member in the group (if any) for the other members of the group. By default
-# all members of a group must be documented explicitly.
-# The default value is: NO.
-
-DISTRIBUTE_GROUP_DOC   = NO
-
-# If one adds a struct or class to a group and this option is enabled, then also
-# any nested class or struct is added to the same group. By default this option
-# is disabled and one has to add nested compounds explicitly via \ingroup.
-# The default value is: NO.
-
-GROUP_NESTED_COMPOUNDS = NO
-
-# Set the SUBGROUPING tag to YES to allow class member groups of the same type
-# (for instance a group of public functions) to be put as a subgroup of that
-# type (e.g. under the Public Functions section). Set it to NO to prevent
-# subgrouping. Alternatively, this can be done per class using the
-# \nosubgrouping command.
-# The default value is: YES.
-
-SUBGROUPING            = YES
-
-# When the INLINE_GROUPED_CLASSES tag is set to YES, classes, structs and unions
-# are shown inside the group in which they are included (e.g. using \ingroup)
-# instead of on a separate page (for HTML and Man pages) or section (for LaTeX
-# and RTF).
-#
-# Note that this feature does not work in combination with
-# SEPARATE_MEMBER_PAGES.
-# The default value is: NO.
-
-INLINE_GROUPED_CLASSES = NO
 
 # When the INLINE_SIMPLE_STRUCTS tag is set to YES, structs, classes, and unions
 # with only public data fields or simple typedef fields will be shown inline in
@@ -1031,7 +815,7 @@ USE_MDFILE_AS_MAINPAGE =
 # also VERBATIM_HEADERS is set to NO.
 # The default value is: NO.
 
-SOURCE_BROWSER         = NO
+SOURCE_BROWSER         = YES
 
 # Setting the INLINE_SOURCES tag to YES will include the body of functions,
 # classes and enums directly into the documentation.

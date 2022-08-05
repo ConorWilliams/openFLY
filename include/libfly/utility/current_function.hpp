@@ -35,7 +35,7 @@
 /**
  * \file current_function.hpp
  *
- * @brief Miscellaneous utilities.
+ * @brief A fille borrowed from boost, includes a single macro.
  */
 
 /**

@@ -39,11 +39,7 @@ jobs:
         run: ctest --output-on-failure -C Release -j 2
 
   intel:
-    strategy:
-      matrix:
-        os: [ubuntu-latest]
-
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v2
@@ -62,7 +58,7 @@ jobs:
           sudo apt-get update
       - name: Install Intel oneAPI
         timeout-minutes: 5
-        run: sudo apt-get install intel-oneapi-compiler-dpcpp-cpp-and-cpp-classic intel-oneapi-mpi intel-oneapi-mpi-devel intel-oneapi-mkl ninja-build
+        run: sudo apt-get install intel-oneapi-compiler-dpcpp-cpp-and-cpp-classic intel-oneapi-mpi intel-oneapi-mpi-devel
 
       - name: Setup Intel oneAPI environment
         run: |
@@ -71,7 +67,7 @@ jobs:
 
       - name: Configure
         shell: pwsh
-        run: cmake "--preset=ci-ubuntu -DCMAKE_CXX_COMPILER=icpx"
+        run: cmake --preset=ci-ubuntu -DCMAKE_CXX_COMPILER=icpx
 
       - name: Build
         run: cmake --build build --config Release -j 2

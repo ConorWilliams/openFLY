@@ -1,113 +1,110 @@
 {
-    "version": 2,
-    "configurePresets": [
-        {
-            "name": "dev-mode",
-            "hidden": true,
-            "cacheVariables": {
-                "FLY_DEVELOPER_MODE": "ON",
-                "VCPKG_MANIFEST_FEATURES": "test"
-            }
-        },
-        {
-            "name": "vcpkg",
-            "hidden": true,
-            "cacheVariables": {
-                "CMAKE_TOOLCHAIN_FILE": {
-                    "type": "FILEPATH",
-                    "value": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake"
-                }
-            }
-        },
-        {
-            "name": "vcpkg-win64-static",
-            "hidden": true,
-            "cacheVariables": {
-                "VCPKG_TARGET_TRIPLET": "x64-windows-static-md"
-            }
-        },
-        {
-            "name": "ci-std",
-            "description": "This preset makes sure the project actually builds with at least the specified standard",
-            "hidden": true,
-            "cacheVariables": {
-                "CMAKE_CXX_EXTENSIONS": "OFF",
-                "CMAKE_CXX_STANDARD": "17",
-                "CMAKE_CXX_STANDARD_REQUIRED": "ON"
-            }
-        },
-        {
-            "name": "flags-unix",
-            "hidden": true,
-            "cacheVariables": {
-                "CMAKE_CXX_FLAGS": "-Wall -Wextra -Wpedantic -Wconversion -Wsign-conversion -Wcast-qual -Wshadow -Wformat=2 -Wundef -Werror=float-equal"
-            }
-        },
-        {
-            "name": "flags-windows",
-            "description": "Note that all the flags after /W4 are required for MSVC to conform to the language standard",
-            "hidden": true,
-            "cacheVariables": {
-                "CMAKE_CXX_FLAGS": "/utf-8 /W4 /permissive- /volatile:iso /Zc:preprocessor /EHsc /Zc:__cplusplus /Zc:externConstexpr /Zc:throwingNew"
-            }
-        },
-        {
-            "name": "ci-unix",
-            "generator": "Unix Makefiles",
-            "hidden": true,
-            "inherits": [
-                "flags-unix",
-                "ci-std"
-            ],
-            "cacheVariables": {
-                "CMAKE_BUILD_TYPE": "Release"
-            }
-        },
-        {
-            "name": "ci-win64",
-            "inherits": [
-                "flags-windows",
-                "ci-std"
-            ],
-            "generator": "Visual Studio 17 2022",
-            "architecture": "x64",
-            "cacheVariables": {
-                "CMAKE_BUILD_TYPE": "Release"
-            },
-            "hidden": true
-        },
-        {
-            "name": "ci-build",
-            "binaryDir": "${sourceDir}/build",
-            "hidden": true
-        },
-        {
-            "name": "ci-macos",
-            "inherits": [
-                "ci-build",
-                "ci-unix",
-                "dev-mode",
-                "vcpkg"
-            ]
-        },
-        {
-            "name": "ci-ubuntu",
-            "inherits": [
-                "ci-build",
-                "ci-unix",
-                "vcpkg",
-                "dev-mode"
-            ]
-        },
-        {
-            "name": "ci-windows",
-            "inherits": [
-                "ci-build",
-                "ci-win64",
-                "dev-mode",
-                "vcpkg",
-                "vcpkg-win64-static"
-            ]
+  "version": 2,
+  "configurePresets": [
+    {
+      "name": "dev-mode",
+      "hidden": true,
+      "cacheVariables": {
+        "FLY_DEVELOPER_MODE": "ON",
+        "VCPKG_MANIFEST_FEATURES": "test"
+      }
+    },
+    {
+      "name": "vcpkg",
+      "hidden": true,
+      "cacheVariables": {
+        "CMAKE_TOOLCHAIN_FILE": {
+          "type": "FILEPATH",
+          "value": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake"
         }
-    ]
+      }
+    },
+    {
+      "name": "vcpkg-win64-static",
+      "hidden": true,
+      "cacheVariables": {
+        "VCPKG_TARGET_TRIPLET": "x64-windows-static-md"
+      }
+    },
+    {
+      "name": "ci-std",
+      "description": "This preset makes sure the project actually builds with at least the specified standard",
+      "hidden": true,
+      "cacheVariables": {
+        "CMAKE_CXX_EXTENSIONS": "OFF",
+        "CMAKE_CXX_STANDARD": "17",
+        "CMAKE_CXX_STANDARD_REQUIRED": "ON"
+      }
+    },
+    {
+      "name": "flags-unix",
+      "hidden": true,
+      "cacheVariables": {
+        "CMAKE_CXX_FLAGS": "-Wall -Wextra -Wpedantic -Wconversion -Wsign-conversion -Wcast-qual -Wshadow -Wformat=2 -Wundef -Werror=float-equal"
+      }
+    },
+    {
+      "name": "flags-windows",
+      "description": "Note that all the flags after /W4 are required for MSVC to conform to the language standard",
+      "hidden": true,
+      "cacheVariables": {
+        "CMAKE_CXX_FLAGS": "/utf-8 /W4 /permissive- /volatile:iso /Zc:preprocessor /EHsc /Zc:__cplusplus /Zc:externConstexpr /Zc:throwingNew"
+      }
+    },
+    {
+      "name": "ci-unix",
+      "generator": "Unix Makefiles",
+      "hidden": true,
+      "inherits": [
+        "flags-unix",
+        "ci-std"
+      ],
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release"
+      }
+    },
+    {
+      "name": "ci-win64",
+      "inherits": [
+        "flags-windows",
+        "ci-std"
+      ],
+      "generator": "Visual Studio 17 2022",
+      "architecture": "x64",
+      "hidden": true
+    },
+    {
+      "name": "ci-build",
+      "binaryDir": "${sourceDir}/build",
+      "hidden": true
+    },
+    {
+      "name": "ci-macos",
+      "inherits": [
+        "ci-build",
+        "ci-unix",
+        "dev-mode",
+        "vcpkg"
+      ]
+    },
+    {
+      "name": "ci-ubuntu",
+      "inherits": [
+        "ci-build",
+        "ci-unix",
+        "vcpkg",
+        "dev-mode"
+      ]
+    },
+    {
+      "name": "ci-windows",
+      "inherits": [
+        "ci-build",
+        "ci-win64",
+        "dev-mode",
+        "vcpkg",
+        "vcpkg-win64-static"
+      ]
+    }
+  ]
 }

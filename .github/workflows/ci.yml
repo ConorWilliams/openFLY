@@ -38,6 +38,51 @@ jobs:
         working-directory: build
         run: ctest --output-on-failure -C Release -j 2
 
+  intel:
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Install vcpkg
+        uses: friendlyanon/setup-vcpkg@v1
+        with: { committish: "66045de4dcc5da3d1029c02b606307f5951dcb22" }
+
+      - name: Intel Apt repository
+        timeout-minutes: 1
+        run: |
+          wget https://apt.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS-2023.PUB
+          sudo apt-key add GPG-PUB-KEY-INTEL-SW-PRODUCTS-2023.PUB
+          rm GPG-PUB-KEY-INTEL-SW-PRODUCTS-2023.PUB
+          echo "deb https://apt.repos.intel.com/oneapi all main" | sudo tee /etc/apt/sources.list.d/oneAPI.list
+          sudo apt-get update
+      - name: Install Intel oneAPI
+        timeout-minutes: 5
+        run: sudo apt-get install intel-oneapi-compiler-dpcpp-cpp-and-cpp-classic intel-oneapi-mpi intel-oneapi-mpi-devel intel-oneapi-mkl ninja-build
+
+      - name: Setup Intel oneAPI environment
+        run: |
+          source /opt/intel/oneapi/setvars.sh
+          printenv >> $GITHUB_ENV
+
+      - name: Configure
+        shell: pwsh
+        run: cmake "--preset=ci-ubuntu -DCMAKE_CXX_COMPILER=icpx"
+
+      - name: Build
+        run: cmake --build build --config Release -j 2
+
+      - name: Install
+        run: cmake --install build --config Release --prefix prefix
+
+      - name: Test
+        working-directory: build
+        run: ctest --output-on-failure -C Release -j 2
+
   docs:
     # Deploy docs only when builds succeed
     needs: [test]

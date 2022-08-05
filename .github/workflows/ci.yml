@@ -10,7 +10,7 @@ on:
       - main
 
 jobs:
-  test:
+  test_big_3:
     strategy:
       matrix:
         os: [macos-latest, ubuntu-latest]
@@ -38,7 +38,7 @@ jobs:
         working-directory: build
         run: ctest --output-on-failure -C Release -j 2
 
-  intel:
+  test_intel:
     runs-on: ubuntu-latest
 
     steps:
@@ -46,7 +46,11 @@ jobs:
 
       - name: Install vcpkg
         uses: friendlyanon/setup-vcpkg@v1
-        with: { committish: "66045de4dcc5da3d1029c02b606307f5951dcb22" }
+        with:
+          {
+            committish: "66045de4dcc5da3d1029c02b606307f5951dcb22",
+            cache-version: 2,
+          }
 
       - name: Intel Apt repository
         timeout-minutes: 1
@@ -82,7 +86,7 @@ jobs:
 
   docs:
     # Deploy docs only when builds succeed
-    needs: [test, intel]
+    needs: [test_big_3, test_intel]
 
     runs-on: ubuntu-latest
 

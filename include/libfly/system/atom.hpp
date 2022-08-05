@@ -39,7 +39,7 @@ namespace fly::system {
    * @tparam Cols Number of colums in this member.
    * @tparam Rep The Eigen3 template, Eigen::[matrix||array], to use for this member.
    */
-  template <class Scalar, int Rows = 1, int Cols = 1, template <class, auto...> class Rep = Eigen::Matrix> struct MemTag {
+  template <class Scalar, int Rows = 1, int Cols = 1, template <class, auto...> class Rep = ::Eigen::Matrix> struct MemTag {
     /** @brief True if this member represents a 1x1 matrix. */
     static constexpr bool is_1x1 = Rows == 1 && Cols == 1;
 

@@ -14,6 +14,12 @@
  * @brief orthorhombic simulation box implementation.
  */
 
+#include <Eigen/Core>
+
+#include "libfly/system/atom.hpp"
+#include "libfly/utility/asserts.hpp"
+#include "libfly/utility/core.hpp"
+
 namespace fly::system {
   /**
    * @brief Provides details of the simulations Orthogonal supercell geometry,
@@ -29,38 +35,44 @@ namespace fly::system {
      * @param extents Length of simulation box along each axis.
      * @param periodic True for each periodic axis.
      */
-    Orthorhombic(Vec3<floating> const &extents, Vec3<bool> const &periodic)
+    Orthorhombic(Arr<Position::scalar_t> const &extents, Arr<bool> const &periodic)
         : m_extents{extents}, m_periodic{periodic}, m_inv_extents(1.0 / extents) {
       VERIFY((m_extents > 0).all(), "Orthorhombic extents are negative");
     }
 
     /**
-     * @brief Extents getter (const).
+     * @brief Fetch the basis vectors of this cell.
+     *
+     * The result is in the form of an ``Eigen::DiagonalMatrix`` with each column corresponding to a basis vector.
      */
-    Vec3<floating> const &extents() const noexcept { return m_extents; }
+    Eigen::DiagonalMatrix<floating, spatial_dims> basis() const noexcept { return {m_extents[0], m_extents[1], m_extents[2]}; }
 
     /**
-     * @brief Periodicity getter (const).
+     * @brief Get an array detailing the periodicity along each axis.
      */
-    Vec3<bool> const &periodic() const noexcept { return m_periodic; }
+    Arr<bool> const &periodic() const noexcept { return m_periodic; }
 
     /**
      * @brief Maps atom into canonical cell, 0 <= r_i < extent_i for all i which are periodic.
+     *
      * Non-periodic atoms are within the simbox extents so x[i] * inv_extents less than 1 and x[i]
      * remains unaffected, hence no non-periodic switch/select.
      */
-    template <typename T> Vec3<floating> canon_image(Eigen::ArrayBase<T> const &x) const noexcept {
-      ASSERT((m_periodic || (x >= Vec3<floating>::Zero() && x < m_extents)).all(), "Out of box");
+    template <typename T> Arr<floating> canon_image(Eigen::ArrayBase<T> const &x) const noexcept {
+      ASSERT((m_periodic || (x >= Arr<floating>::Zero() && x < m_extents)).all(), "Out of box");
       return x - m_extents * (x * m_inv_extents).floor();
     }
 
     /**
-     * @brief Compute the shortest Vector connecting a to a periodic image of b. This function is
-     * branchy and should be avoided in hot code.
+     * @brief Compute shortest vector connecting ``a`` to a periodic image of ``b``.
+     *
+     * This function is branchy and should be avoided in hot code.
+     *
+     * See: https://doi.org/10.1524/zpch.2013.0311
      */
     template <typename A, typename B>
-    Vec3<floating> min_image(Eigen::ArrayBase<A> const &a, Eigen::ArrayBase<B> const &b) const noexcept {
-      Vec3<floating> dr = b - a;
+    Vec<floating> min_image(Eigen::ArrayBase<A> const &a, Eigen::ArrayBase<B> const &b) const noexcept {
+      Arr<floating> dr = b - a;
       return m_periodic.select(dr - m_extents * (dr * m_inv_extents + 0.5).floor(), dr);
     }
 
@@ -72,9 +84,9 @@ namespace fly::system {
     }
 
   private:
-    Vec3<floating> m_extents = Vec3<floating>::Zero();
-    Vec3<bool> m_periodic = Vec3<bool>::Zero();
-    Vec3<floating> m_inv_extents = Vec3<floating>::Zero();
+    Arr<floating> m_extents = Arr<floating>::Zero();
+    Arr<bool> m_periodic = Arr<bool>::Zero();
+    Arr<floating> m_inv_extents = Arr<floating>::Zero();
   };
 
 }  // namespace fly::system

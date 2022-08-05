@@ -28,8 +28,6 @@ Bultin members
 .. doxygennamespace:: fly::builtin_m
   
 
-
-
 Generic data structures
 -----------------------
 
@@ -40,8 +38,6 @@ Structure of Arrays
     :members:
     :undoc-members:
 
-
-
 Vector of Structures
 ~~~~~~~~~~~~~~~~~~~~~
 
@@ -50,4 +46,15 @@ Vector of Structures
     :undoc-members:
 
 
+Simulation box
+-----------------------
 
+Orthorhombic box
+~~~~~~~~~~~~~~~~~~~~
+
+.. doxygenclass:: fly::system::Orthorhombic
+    :members:
+    :undoc-members:
+
+Triclinic box
+~~~~~~~~~~~~~~~~~~~~

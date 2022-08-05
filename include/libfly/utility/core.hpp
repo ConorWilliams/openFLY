@@ -9,6 +9,7 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #include <Eigen/Core>
+#include <algorithm>
 #include <cmath>
 #include <cstddef>
 #include <functional>
@@ -43,14 +44,21 @@ namespace fly {
    *
    * @tparam T The scalar type of the \c Eigen::Vector
    */
-  template <typename T> using Vec3 = Eigen::Vector<T, spatial_dims>;
+  template <typename T> using Vec = Eigen::Vector<T, spatial_dims>;
+
+  /**
+   * @brief Shorthand for creating an \c spatial_dims x 1 \c Eigen::Array.
+   *
+   * @tparam T The scalar type of the \c Eigen::Array
+   */
+  template <typename T> using Arr = Eigen::Array<T, spatial_dims, 1>;
 
   /**
    * @brief Shorthand for creating an \c spatial_dims x \c spatial_dims \c Eigen::Matrix.
    *
    * @tparam T The scalar type of the \c Eigen::Matrix
    */
-  template <typename T> using Mat3 = Eigen::Matrix<T, spatial_dims, spatial_dims>;
+  template <typename T> using Mat = Eigen::Matrix<T, spatial_dims, spatial_dims>;
 
   namespace detail {
 
@@ -85,6 +93,13 @@ namespace fly {
   template <typename T> using remove_cref_t = std::remove_const_t<std::remove_reference_t<T>>;
 
   /**
+   * @brief Test if two floating point numbers are within 0.01% of each other.
+   */
+  template <typename T, typename = std::enable_if_t<std::is_floating_point_v<T>>> constexpr bool near(T a, T b) {
+    return std::abs(a - b) <= 0.0001 * std::max(std::abs(a), std::abs(b));
+  }
+
+  /**
    * @brief Generalised dot-product between two \c Eigen::Array objects.
    *
    * \rst
@@ -112,7 +127,7 @@ namespace fly {
    *
    * \endrst
    */
-  template <typename E> auto norm_sq(Eigen::ArrayBase<E> const& r) { return (r * r).sum(); }
+  template <typename E> auto norm_sq(E const& r) { return (r.array() * r.array()).sum(); }
 
   /**
    * @brief Generic Frobenius norm of an \c Eigen::Array.
@@ -127,7 +142,7 @@ namespace fly {
    *
    * \endrst
    */
-  template <typename E> auto norm(Eigen::ArrayBase<E> const& r) { return std::sqrt(norm_sq(r)); }
+  template <typename E> auto norm(E&& expr) { return std::sqrt(norm_sq(std::forward<E>(expr))); }
 
   /**
    * @brief Compute integer powers of arithmetic types at compile time.

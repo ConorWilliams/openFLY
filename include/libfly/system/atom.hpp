@@ -11,11 +11,10 @@
 
 #include <Eigen/Core>
 #include <cstddef>
+#include <string_view>
 #include <type_traits>
 #include <utility>
 
-#include "libfly/system/adaptor.hpp"
-#include "libfly/utility/asserts.hpp"
 #include "libfly/utility/core.hpp"
 
 /**
@@ -32,6 +31,8 @@ namespace fly::system {
    * Members must be matrices of arithmetic types or default constructible 1x1 matricies.
    *
    * 1x1 matricies are unwrapped into scalars.
+   *
+   * A selection of canonical members, deriving from this type, are provided in the namespace ``builtin_m``.
    *
    * @tparam Scalar This member represents a matrix of Scalar elements.
    * @tparam Rows Number of rows in this member.
@@ -110,7 +111,19 @@ namespace fly::system {
   /**
    * @brief The libfly representation of an atom.
    *
-   * @tparam Mems a series of empty types, derived from otf::MemTag, to describe each member.
+   * \rst
+   *
+   * Libfly uses this type to build atoms to allow integration with libfly's containers.
+   * An Atom behaves as a struct of its members, which are accessed through ``operator[]``.
+   *
+   * Example:
+   *
+   * .. include:: ../../examples/system/atom.cpp
+   *    :code:
+   *
+   * \endrst
+   *
+   * @tparam Mems a series of empty types, derived from ``MemTag``, to describe each member.
    */
   template <typename... Mems> struct Atom : detail::AtomMem<Mems>... {
     /**
@@ -133,8 +146,63 @@ namespace fly::system {
      */
     explicit Atom(typename Mems::matrix_t&&... args) : detail::AtomMem<Mems>(args)... {}
 
-    // Expose tagged dispatch.
     using detail::AtomMem<Mems>::operator[]...;
   };
+
+  /**
+   * @brief A inline namespace providing selection of canonical members for atom.
+   */
+  inline namespace builtin_m {
+    /**
+     * @brief Tag type for position (xyz).
+     */
+    struct Position : MemTag<floating, spatial_dims> {};
+
+    /**
+     * @brief Tag type for dimer axis (xyz).
+     */
+    struct Axis : MemTag<floating, spatial_dims> {};
+
+    /**
+     * @brief Tag type for gradient of the potential.
+     */
+    struct Gradient : MemTag<floating, spatial_dims> {};
+
+    /**
+     * @brief Tag type for velocity.
+     */
+    struct Velocity : MemTag<floating, spatial_dims> {};
+
+    /**
+     * @brief Tag type for atomic number.
+     */
+    struct AtomicNum : MemTag<int> {};
+
+    /**
+     * @brief Tag type for atomic mass.
+     */
+    struct Mass : MemTag<int> {};
+
+    /**
+     * @brief Tag type for index.
+     */
+    struct Index : MemTag<int> {};
+
+    /**
+     * @brief Tag type for atomic symbol.
+     */
+    struct Symbol : MemTag<std::string_view> {};
+
+    /**
+     * @brief Tag type for frozen atoms.
+     */
+    struct Frozen : MemTag<bool> {};
+
+    /**
+     * @brief Tag type for atom colour (generalisation of atomic number)
+     */
+    struct Colour : MemTag<int> {};
+
+  }  // namespace builtin_m
 
 }  // namespace fly::system

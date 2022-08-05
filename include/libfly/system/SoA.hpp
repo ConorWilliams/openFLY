@@ -14,7 +14,6 @@
 #include <utility>
 
 #include "libfly/system/adaptor.hpp"
-#include "libfly/utility/asserts.hpp"
 #include "libfly/utility/core.hpp"
 
 /**
@@ -25,9 +24,6 @@
 
 namespace fly::system {
 
-  /**
-   * @brief Forward declaration
-   */
   template <typename... Ms> class SoA;
 
   namespace detail {
@@ -47,46 +43,39 @@ namespace fly::system {
    *
    * The default container type used in the libfly; an ``SoA`` models an array of ``Atom`` types
    * but decomposes the atom type and stores each member in a separate array. This enables efficient
-   * cache use. The members of the atom" are described through a series of template parameters
-   * which should inherit from ``fly::MemTag``. A selection of canonical members are provided in the
-   * namespace ``builtin_members``. The members of each atom can be accessed by the index of the
-   * atom or as an Eigen array to enable collective operations.
+   * cache use. Like ``Atom``, the members of the "atom" are described through a series of template parameters
+   * which should inherit from ``MemTag``. The members of each atom can be accessed by the index of the
+   * atom or as an ``Eigen::Array`` to enable collective operations.
+   *
+   * SoA also supports slicing and reference members which transform that member into a view, this enables SoA to act as a concrete
+   * type in interfaces.
+   *
+   * Example:
+   *
+   * .. include:: ../../examples/system/SoA.cpp
+   *    :code:
    *
    * \endrst
    *
-   * Example of use:
-   *
-   * @code{.cpp}
-   *
-   * #include "libatom/atom.hpp"
-   *
-   * using namespace otf;
-   *
-   * AtomArray<Position, AtomicNum> atoms{10}; // Initialise an array of 10 atoms.
-   *
-   * // Add a hydrogen atom at the origin.
-   *
-   * atoms(Position{}, 0) =  Vec3<double>{0, 0, 0};
-   * atoms(AtomicNum{}, 0) = 1;
-   *
-   * Vec3 xyz = atoms(Position{}, 0); // Get the position of the zeroth atom.
-   *
-   * std::size_t n = = atoms(AtomicNum{}, 0); // Get the atomic number of the zeroth atom.
-   *
-   * atoms(Position{}) += 1; // Add 1 to each of every atoms coordinates.
-   *
-   * atoms(AtomicNum{}) = 6; // Set all the atoms to carbon atoms.
-   *
-   * @endcode
+   * @tparam Ms a series of empty types, derived from ``MemTag``, to describe each member.
    */
   template <typename... Ms> class SoA : private detail::Adaptor<Ms>... {
-  private:
+  public:
+    /**
+     * @brief True if this SoA is a pure view i.e. all its members are reference types.
+     */
     static constexpr bool owns_none = (std::is_reference_v<Ms> && ...);
+
+    /**
+     * @brief True if this SoA is purely owning i.e. non of its members are reference types.
+     */
     static constexpr bool owns_all = (!std::is_reference_v<Ms> && ...);
 
+    /**
+     * @brief Detect if a type is a spetialization of SoA different from this specialization.
+     */
     template <typename T> static constexpr bool different_SoA_v = detail::different_SoA<SoA<Ms...>, remove_cref_t<T>>::value;
 
-  public:
     /**
      * @brief Construct a new empty SoA.
      */
@@ -103,9 +92,15 @@ namespace fly::system {
     SoA(SoA const&) = default;
 
     /**
-     * @brief Construct a new SoA conatining 'size' uninitialized atoms.
+     * @brief Construct a new SoA conatining 'size' atoms.
+     *
+     * \rst
      *
      * Only SFINE enabled if this SoA owns all its arrays.
+     *
+     * .. warning::
+     *    New atoms are uninitialized.
+     * \endrst
      */
     template <bool OwnsAll = owns_all> explicit SoA(int size, std::enable_if_t<OwnsAll>* = 0)
         : detail::Adaptor<Ms>(size)..., m_size(size) {}
@@ -115,32 +110,32 @@ namespace fly::system {
      *
      * Only SFINE enabled if this SoA owns non of its arrays.
      *
-     * .. note::
-     *    The implementation may ``std::move`` ``other`` multiple times but this is ok as the detail::Adaptor constructor will only
-     *    move its corresponding base slice.
-     *
      */
     template <typename T, typename = std::enable_if_t<different_SoA_v<T> && owns_none>> SoA(T&& other)
-        : detail::Adaptor<Ms>(std::forward<T>(other))..., m_size(other.size()) {}
+        : detail::Adaptor<Ms>(std::forward<T>(other))..., m_size(other.size()) {
+      // Ok to ``std::move`` ``other`` multiple times but this is ok as the detail::Adaptor constructor will only move its
+      // corresponding base slice.
+    }
 
     /**
      * @brief Explicitly construct a new SoA object from SoA 'other' with different members.
      *
      * SFINE enabled if this SoA owns some of its arrays.
      *
-     * .. note::
-     *    The implementation may ``std::move`` ``other`` multiple times but this is ok as the detail::Adaptor constructor will only
-     *    move its corresponding base slice.
      */
     template <typename T, typename = std::enable_if_t<different_SoA_v<T> && !owns_none>, typename = void> explicit SoA(T&& other)
-        : detail::Adaptor<Ms>(std::forward<T>(other))..., m_size(other.size()) {}
+        : detail::Adaptor<Ms>(std::forward<T>(other))..., m_size(other.size()) {
+      // Ok to ``std::move`` ``other`` multiple times but this is ok as the detail::Adaptor constructor will only move its
+      // corresponding base slice.
+    }
 
     /**
      * @brief Defaulted copy assignment operator.
      *
      * \rst
-     * .. warning::
-     *    Assignement to reference members follows pointer-semantics.
+     *
+     * See the `note on assignment to references`_.
+     *
      * \endrst
      */
     SoA& operator=(SoA const&) = default;
@@ -149,8 +144,9 @@ namespace fly::system {
      * @brief Defaulted move assignment operator.
      *
      * \rst
-     * .. warning::
-     *    Assignement to reference members follows pointer-semantics.
+     *
+     * See the `note on assignment to references`_.
+     *
      * \endrst
      */
     SoA& operator=(SoA&&) = default;
@@ -158,14 +154,27 @@ namespace fly::system {
     /**
      * @brief Assign to a SoA with with different members.
      *
-     * Assignement to reference members follows pointer-semantics.
+     * \rst
+     *
+     * .. _`note on assignment to references`:
+     *
+     * .. note::
+     *    Assignement to reference members follows pointer-semantics:
+     *
+     *    .. include:: ../../examples/system/SoA_assign.cpp
+     *       :code:
+     *
+     * \endrst
      */
     template <typename T, typename = std::enable_if_t<different_SoA_v<T>>> SoA& operator=(T&& other) {
       (static_cast<void>(static_cast<detail::Adaptor<Ms>&>(*this) = std::forward<T>(other)), ...);
       return *this;
     }
 
+    // Inherit operators
+
     using detail::Adaptor<Ms>::operator()...;
+
     using detail::Adaptor<Ms>::operator[]...;
 
     /**

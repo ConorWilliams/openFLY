@@ -14,7 +14,7 @@
 #include <stdexcept>
 #include <string_view>
 
-namespace otf::detail {
+namespace fly::detail {
 
   struct libatom_unrecoverable : std::runtime_error {
     using std::runtime_error::runtime_error;
@@ -31,4 +31,4 @@ namespace otf::detail {
     throw libatom_unrecoverable("libatom encountered an unrecoverable error");
   }
 
-}  // namespace otf::detail
+}  // namespace fly::detail

@@ -37,7 +37,7 @@ namespace fly::system::detail {
     explicit Adaptor(Adaptor<Mem&> other) : m_data(*other.m_data_ptr) {}
 
     // OwnsAll specific.
-    explicit Adaptor(std::size_t size) : m_data(size * Mem::size()) {}
+    explicit Adaptor(int size) : m_data(size * Mem::size()) { ASSERT(size > 0, "Invalid size"); }
 
     Adaptor& operator=(Adaptor const&) = default;
 

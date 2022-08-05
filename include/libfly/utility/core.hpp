@@ -134,6 +134,8 @@ namespace fly {
    *
    * \rst
    *
+   * Only SFINE if base is an arithmetic type.
+   *
    * Computes:
    *
    * .. math::
@@ -162,6 +164,8 @@ namespace fly {
    * \rst
    *
    * Example:
+   *
+   * Only SFINE if callable is noexcept.
    *
    * .. include:: ../../examples/utility/defer.cpp
    *    :code:

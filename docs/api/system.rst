@@ -1,19 +1,53 @@
-System
-=======
+System (``libfly/system``)
+====================================
+
+The ``system`` folder and namespace contains a collection of data structures for representing atoms, groups of atoms and the space the atoms exist in.
 
 Atoms
-----------------
+-----
 
-``libfly/system/atom.hpp``
+Atom class
+~~~~~~~~~~
 
-.. doxygenfile:: atom.hpp
+.. doxygenstruct:: fly::system::Atom
+    :members:
+    :undoc-members:
+    :no-link:
+
+MemTag
+~~~~~~
+
+.. doxygenstruct:: fly::system::MemTag
+    :members:
+    :undoc-members:
+    :no-link:
+
+Bultin members
+~~~~~~~~~~~~~~~
+
+.. doxygennamespace:: fly::system::builtin_m
     :no-link:
 
 
-Struct of arrays
-----------------
 
-``libfly/system/SoA.hpp``
+Generic data structures
+-----------------------
 
-.. doxygenfile:: SoA.hpp
+Structure of Arrays
+~~~~~~~~~~~~~~~~~~~~
+
+.. doxygenclass:: fly::system::SoA
+    :members:
+    :undoc-members:
     :no-link:
+
+
+Vector of Structures
+~~~~~~~~~~~~~~~~~~~~~
+
+.. doxygenclass:: fly::system::VoS
+    :members:
+    :undoc-members:
+    :no-link:
+
+

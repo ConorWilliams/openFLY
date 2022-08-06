@@ -69,10 +69,10 @@ if(FLY_DEVELOPER_MODE)
     add_subdirectory(tests)
 
     add_subdirectory(examples)
+endif()
 
-    option(FLY_DOCS "Build documentation using ..." OFF)
+option(FLY_DOCS "Build documentation using ..." OFF)
 
-    if(FLY_DOCS)
-        add_subdirectory(docs)
-    endif()
+if(FLY_DOCS)
+    add_subdirectory(docs)
 endif()

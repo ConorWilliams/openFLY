@@ -44,6 +44,7 @@ extensions = [
     'sphinx.ext.autosectionlabel',
     'sphinx.ext.githubpages',
     'sphinx.ext.todo',
+    'sphinx.ext.intersphinx',
     'sphinx_inline_tabs',
     'sphinx_copybutton',
     'breathe',
@@ -101,8 +102,6 @@ html_theme_options = {
     "navigation_with_keys": True,
     "light_logo": "fly_light.svg",
     "dark_logo": "fly_dark.svg",
-    "top_of_page_button": "edit",
-    "announcement": "<b>Important</b> openFLY is pre-alpha, come back in a few weeks!",
     "footer_icons": [
         {
             "name": "GitHub",

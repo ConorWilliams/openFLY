@@ -3,10 +3,10 @@
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
-<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Utilities (libfly/utility)" href="api/utility.html" /><link rel="prev" title="Hacking" href="programmer/hacking.html" />
+<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Project Structure" href="programmer/structure.html" /><link rel="prev" title="Config file" href="user/config.html" />
 
     <meta name="generator" content="sphinx-4.5.0, furo 2022.04.07"/>
-        <title>Library API reference - OpenFLY 0.1.0 documentation</title>
+        <title>Programmer guide - OpenFLY 0.1.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?digest=68f4518137b9aefe99b631505a2064c3c42c9852" />
     <link rel="stylesheet" type="text/css" href="_static/tabs.css" />
@@ -168,13 +168,13 @@
 <li class="toctree-l2"><a class="reference internal" href="user/config.html">Config file</a></li>
 </ul>
 </li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="programmer.html">Programmer guide</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l1 current has-children current-page"><a class="current reference internal" href="#">Programmer guide</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="programmer/structure.html">Project Structure</a></li>
 <li class="toctree-l2"><a class="reference internal" href="programmer/libfly.html">Using libFLY</a></li>
 <li class="toctree-l2"><a class="reference internal" href="programmer/hacking.html">Hacking</a></li>
 </ul>
 </li>
-<li class="toctree-l1 current has-children current-page"><a class="current reference internal" href="#">Library API reference</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="api.html">Library API reference</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="api/utility.html">Utilities (<code class="docutils literal notranslate"><span class="pre">libfly/utility</span></code>)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="api/system.html">System (<code class="docutils literal notranslate"><span class="pre">libfly/system</span></code>)</a></li>
 </ul>
@@ -212,35 +212,15 @@
           </label>
         </div>
         <article role="main">
-          <section id="library-api-reference">
-<h1>Library API reference<a class="headerlink" href="#library-api-reference" title="Permalink to this headline">#</a></h1>
-<p>Welcome to the libFLY API reference this serves as information for developers to learn more about openFLY’s internals and as reference for programmers using libFLY.</p>
+          <section id="programmer-guide">
+<h1>Programmer guide<a class="headerlink" href="#programmer-guide" title="Permalink to this headline">#</a></h1>
 <div class="toctree-wrapper compound">
-<p class="caption" role="heading"><span class="caption-text">Modules</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="api/utility.html">Utilities (<code class="docutils literal notranslate"><span class="pre">libfly/utility</span></code>)</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="api/utility.html#versioning-version-hpp">Versioning (<code class="docutils literal notranslate"><span class="pre">version.hpp</span></code>)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="api/utility.html#core-core-hpp">Core (<code class="docutils literal notranslate"><span class="pre">core.hpp</span></code>)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="api/utility.html#asserts-asserts-hpp">Asserts (<code class="docutils literal notranslate"><span class="pre">asserts.hpp</span></code>)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="api/utility.html#timing-timeit-hpp">Timing: (<code class="docutils literal notranslate"><span class="pre">timeit.hpp</span></code>)</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="api/system.html">System (<code class="docutils literal notranslate"><span class="pre">libfly/system</span></code>)</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="api/system.html#atoms-atom-hpp">Atoms (<code class="docutils literal notranslate"><span class="pre">atom.hpp</span></code>)</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="api/system.html#atom-class">Atom class</a></li>
-<li class="toctree-l3"><a class="reference internal" href="api/system.html#memtag">MemTag</a></li>
-<li class="toctree-l3"><a class="reference internal" href="api/system.html#bultin-members">Bultin members</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="api/system.html#generic-data-structures">Generic data structures</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="api/system.html#structure-of-arrays-soa-hpp">Structure of Arrays (<code class="docutils literal notranslate"><span class="pre">SoA.hpp</span></code>)</a></li>
-<li class="toctree-l3"><a class="reference internal" href="api/system.html#vector-of-structures-vos-hpp">Vector of Structures (<code class="docutils literal notranslate"><span class="pre">VoS.hpp</span></code>)</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="api/system.html#simulation-box-box-hpp">Simulation box (<code class="docutils literal notranslate"><span class="pre">box.hpp</span></code>)</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="api/system.html#crystal-systems">Crystal Systems</a></li>
-</ul>
-</li>
+<li class="toctree-l1"><a class="reference internal" href="programmer/structure.html">Project Structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="programmer/libfly.html">Using libFLY</a></li>
+<li class="toctree-l1"><a class="reference internal" href="programmer/hacking.html">Hacking</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="programmer/hacking.html#presets">Presets</a></li>
+<li class="toctree-l2"><a class="reference internal" href="programmer/hacking.html#configure-build-and-test">Configure, build and test</a></li>
 </ul>
 </li>
 </ul>
@@ -252,23 +232,23 @@
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="api/utility.html">
+          <a class="next-page" href="programmer/structure.html">
               <div class="page-info">
                 <div class="context">
                   <span>Next</span>
                 </div>
-                <div class="title">Utilities (<code class="docutils literal notranslate"><span class="pre">libfly/utility</span></code>)</div>
+                <div class="title">Project Structure</div>
               </div>
               <svg><use href="#svg-arrow-right"></use></svg>
             </a>
-          <a class="prev-page" href="programmer/hacking.html">
+          <a class="prev-page" href="user/config.html">
               <svg><use href="#svg-arrow-right"></use></svg>
               <div class="page-info">
                 <div class="context">
                   <span>Previous</span>
                 </div>
                 
-                <div class="title">Hacking</div>
+                <div class="title">Config file</div>
                 
               </div>
             </a>

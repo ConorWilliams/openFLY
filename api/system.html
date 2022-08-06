@@ -115,11 +115,7 @@
   <div class="visually-hidden">Hide table of contents sidebar</div>
 </label>
 
-<div class="announcement">
-  <aside class="announcement-content">
-     <b>Important</b> openFLY is pre-alpha, come back in a few weeks! 
-  </aside>
-</div>
+
 
 <div class="page">
   <header class="mobile-header">
@@ -165,11 +161,20 @@
   <input type="hidden" name="area" value="default">
 </form>
 <div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
-  <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
-<ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="../building.html">Building</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../building.html#hacking">Hacking</a></li>
-<li class="toctree-l1 current has-children"><a class="reference internal" href="../api.html">Library API reference</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
+  <ul class="current">
+<li class="toctree-l1 has-children"><a class="reference internal" href="../user.html">User guide</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../user/building.html">Building</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../user/quickstart.html">Quickstart</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../user/config.html">Config file</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../programmer.html">Programmer guide</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../programmer/structure.html">Project Structure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../programmer/libfly.html">Using libFLY</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../programmer/hacking.html">Hacking</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current has-children"><a class="reference internal" href="../api.html">Library API reference</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="utility.html">Utilities (<code class="docutils literal notranslate"><span class="pre">libfly/utility</span></code>)</a></li>
 <li class="toctree-l2 current current-page"><a class="current reference internal" href="#">System (<code class="docutils literal notranslate"><span class="pre">libfly/system</span></code>)</a></li>
 </ul>
@@ -210,8 +215,8 @@
           <section id="system-libfly-system">
 <h1>System (<code class="docutils literal notranslate"><span class="pre">libfly/system</span></code>)<a class="headerlink" href="#system-libfly-system" title="Permalink to this headline">#</a></h1>
 <p>The <code class="docutils literal notranslate"><span class="pre">system</span></code> folder and namespace contains a collection of data structures for representing atoms, groups of atoms and the space the atoms exist in.</p>
-<section id="atoms">
-<h2>Atoms<a class="headerlink" href="#atoms" title="Permalink to this headline">#</a></h2>
+<section id="atoms-atom-hpp">
+<h2>Atoms (<code class="docutils literal notranslate"><span class="pre">atom.hpp</span></code>)<a class="headerlink" href="#atoms-atom-hpp" title="Permalink to this headline">#</a></h2>
 <section id="atom-class">
 <h3>Atom class<a class="headerlink" href="#atom-class" title="Permalink to this headline">#</a></h3>
 <dl class="cpp struct">
@@ -496,8 +501,8 @@
 </section>
 <section id="generic-data-structures">
 <h2>Generic data structures<a class="headerlink" href="#generic-data-structures" title="Permalink to this headline">#</a></h2>
-<section id="structure-of-arrays">
-<h3>Structure of Arrays<a class="headerlink" href="#structure-of-arrays" title="Permalink to this headline">#</a></h3>
+<section id="structure-of-arrays-soa-hpp">
+<h3>Structure of Arrays (<code class="docutils literal notranslate"><span class="pre">SoA.hpp</span></code>)<a class="headerlink" href="#structure-of-arrays-soa-hpp" title="Permalink to this headline">#</a></h3>
 <dl class="cpp class">
 <dt class="sig sig-object cpp" id="_CPPv4IDpEN3fly6system3SoAE">
 <span id="_CPPv3IDpEN3fly6system3SoAE"></span><span id="_CPPv2IDpEN3fly6system3SoAE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="sig-name descname"><span class="n"><span class="pre">Ms</span></span></span><span class="p"><span class="pre">&gt;</span></span><br/><span class="target" id="classfly_1_1system_1_1SoA"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SoA</span></span></span><a class="headerlink" href="#_CPPv4IDpEN3fly6system3SoAE" title="Permalink to this definition">#</a><br/></dt>
@@ -667,8 +672,8 @@
 </div>
 </dd></dl>
 </section>
-<section id="vector-of-structures">
-<h3>Vector of Structures<a class="headerlink" href="#vector-of-structures" title="Permalink to this headline">#</a></h3>
+<section id="vector-of-structures-vos-hpp">
+<h3>Vector of Structures (<code class="docutils literal notranslate"><span class="pre">VoS.hpp</span></code>)<a class="headerlink" href="#vector-of-structures-vos-hpp" title="Permalink to this headline">#</a></h3>
 <dl class="cpp class">
 <dt class="sig sig-object cpp" id="_CPPv4IDpEN3fly6system3VoSE">
 <span id="_CPPv3IDpEN3fly6system3VoSE"></span><span id="_CPPv2IDpEN3fly6system3VoSE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="sig-name descname"><span class="n"><span class="pre">Mems</span></span></span><span class="p"><span class="pre">&gt;</span></span><br/><span class="target" id="classfly_1_1system_1_1VoS"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">VoS</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">private</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4IDpEN3fly6system4AtomE" title="fly::system::Atom"><span class="n"><span class="pre">Atom</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4IDpEN3fly6system3VoSE" title="fly::system::VoS::Mems"><span class="n"><span class="pre">Mems</span></span></a><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4IDpEN3fly6system3VoSE" title="Permalink to this definition">#</a><br/></dt>
@@ -729,8 +734,8 @@
 </dd></dl>
 </section>
 </section>
-<section id="simulation-box">
-<h2>Simulation box<a class="headerlink" href="#simulation-box" title="Permalink to this headline">#</a></h2>
+<section id="simulation-box-box-hpp">
+<h2>Simulation box (<code class="docutils literal notranslate"><span class="pre">box.hpp</span></code>)<a class="headerlink" href="#simulation-box-box-hpp" title="Permalink to this headline">#</a></h2>
 <dl class="cpp class">
 <dt class="sig sig-object cpp" id="_CPPv4N3fly6system13AdjacentCellsE">
 <span id="_CPPv3N3fly6system13AdjacentCellsE"></span><span id="_CPPv2N3fly6system13AdjacentCellsE"></span><span id="fly::system::AdjacentCells"></span><span class="target" id="classfly_1_1system_1_1AdjacentCells"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">AdjacentCells</span></span></span><a class="headerlink" href="#_CPPv4N3fly6system13AdjacentCellsE" title="Permalink to this definition">#</a><br/></dt>
@@ -922,18 +927,18 @@
           <div class="toc-tree">
             <ul>
 <li><a class="reference internal" href="#">System (<code class="docutils literal notranslate"><span class="pre">libfly/system</span></code>)</a><ul>
-<li><a class="reference internal" href="#atoms">Atoms</a><ul>
+<li><a class="reference internal" href="#atoms-atom-hpp">Atoms (<code class="docutils literal notranslate"><span class="pre">atom.hpp</span></code>)</a><ul>
 <li><a class="reference internal" href="#atom-class">Atom class</a></li>
 <li><a class="reference internal" href="#memtag">MemTag</a></li>
 <li><a class="reference internal" href="#bultin-members">Bultin members</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#generic-data-structures">Generic data structures</a><ul>
-<li><a class="reference internal" href="#structure-of-arrays">Structure of Arrays</a></li>
-<li><a class="reference internal" href="#vector-of-structures">Vector of Structures</a></li>
+<li><a class="reference internal" href="#structure-of-arrays-soa-hpp">Structure of Arrays (<code class="docutils literal notranslate"><span class="pre">SoA.hpp</span></code>)</a></li>
+<li><a class="reference internal" href="#vector-of-structures-vos-hpp">Vector of Structures (<code class="docutils literal notranslate"><span class="pre">VoS.hpp</span></code>)</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#simulation-box">Simulation box</a><ul>
+<li><a class="reference internal" href="#simulation-box-box-hpp">Simulation box (<code class="docutils literal notranslate"><span class="pre">box.hpp</span></code>)</a><ul>
 <li><a class="reference internal" href="#crystal-systems">Crystal Systems</a><ul>
 <li><a class="reference internal" href="#orthorhombic">Orthorhombic</a></li>
 <li><a class="reference internal" href="#triclinic">Triclinic</a></li>

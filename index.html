@@ -3,7 +3,7 @@
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
-<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Building" href="building.html" />
+<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="User guide" href="user.html" />
 
     <meta name="generator" content="sphinx-4.5.0, furo 2022.04.07"/>
         <title>OpenFLY 0.1.0 documentation</title>
@@ -115,11 +115,7 @@
   <div class="visually-hidden">Hide table of contents sidebar</div>
 </label>
 
-<div class="announcement">
-  <aside class="announcement-content">
-     <b>Important</b> openFLY is pre-alpha, come back in a few weeks! 
-  </aside>
-</div>
+
 
 <div class="page">
   <header class="mobile-header">
@@ -165,11 +161,20 @@
   <input type="hidden" name="area" value="default">
 </form>
 <div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
-  <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="building.html">Building</a></li>
-<li class="toctree-l1"><a class="reference internal" href="building.html#hacking">Hacking</a></li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="api.html">Library API reference</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+  <ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="user.html">User guide</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="user/building.html">Building</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user/quickstart.html">Quickstart</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user/config.html">Config file</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="programmer.html">Programmer guide</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="programmer/structure.html">Project Structure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="programmer/libfly.html">Using libFLY</a></li>
+<li class="toctree-l2"><a class="reference internal" href="programmer/hacking.html">Hacking</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="api.html">Library API reference</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="api/utility.html">Utilities (<code class="docutils literal notranslate"><span class="pre">libfly/utility</span></code>)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="api/system.html">System (<code class="docutils literal notranslate"><span class="pre">libfly/system</span></code>)</a></li>
 </ul>
@@ -209,27 +214,18 @@
         <article role="main">
           <section id="openfly">
 <h1>OpenFLY<a class="headerlink" href="#openfly" title="Permalink to this headline">#</a></h1>
-<p>Welcome…</p>
 <div class="toctree-wrapper compound">
-<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="building.html">Building</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="building.html#prerequisite">Prerequisite</a></li>
-<li class="toctree-l2"><a class="reference internal" href="building.html#compiling">Compiling</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="building.html#hacking">Hacking</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="building.html#developer-mode">Developer mode</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="api.html">Library API reference</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="api/utility.html">Utilities (<code class="docutils literal notranslate"><span class="pre">libfly/utility</span></code>)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="api/system.html">System (<code class="docutils literal notranslate"><span class="pre">libfly/system</span></code>)</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="todo.html">Todo!</a></li>
-</ul>
 </div>
+<p>Welcome to openFLY, the on-the-fly kinetic Monte Carlo (KMC) framework.</p>
+<p>OpenFLY provides libraries and programs to run massivly parallel on-the-fly KMC simulations. OpenFLY is modelled on <a class="reference external" href="https://docs.lammps.org/Manual.html#">LAMMPS</a> and was originally developed at the University of Cambridge’s Department of Materials Science &amp; Metallurgy. It was designed to run efficiently on parallel computers. OpenFLY is an open-source code, distributed freely under the terms of the Mozilla Public License Version 2.0 (MPL-2.0).</p>
+<p>OpenFLY is developed on <a class="reference external" href="https://github.com/ConorWilliams/openFLY">GitHub</a>, this documentation is for the development version of the code. If needed, you can build a local copy of this site, for any version, by following the <a class="reference internal" href="user/building.html#building"><span class="std std-ref">guide</span></a>.</p>
+<p>This site is organized in three parts:</p>
+<ol class="arabic simple">
+<li><p>The <a class="reference internal" href="user.html#user-guide"><span class="std std-ref">User guide</span></a> for how to install and use openFLY.</p></li>
+<li><p>The <a class="reference internal" href="programmer.html#programmer-guide"><span class="std std-ref">Programmer guide</span></a> for how to write programs using the libFLY library.</p></li>
+<li><p>The <a class="reference internal" href="api.html#library-api-reference"><span class="std std-ref">Library API reference</span></a> which serves as information for developers to learn more about openFLY’s internals and as reference for programmers using libFLY.</p></li>
+</ol>
+<p>Once you are familiar with LAMMPS, you may want to bookmark this page since it gives quick access the documentation for all LAMMPS commands.</p>
 </section>
 
         </article>
@@ -237,12 +233,12 @@
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="building.html">
+          <a class="next-page" href="user.html">
               <div class="page-info">
                 <div class="context">
                   <span>Next</span>
                 </div>
-                <div class="title">Building</div>
+                <div class="title">User guide</div>
               </div>
               <svg><use href="#svg-arrow-right"></use></svg>
             </a>

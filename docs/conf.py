@@ -24,10 +24,7 @@ project = 'OpenFLY'
 copyright = '2022, ConorWilliams'
 author = 'ConorWilliams'
 
-# The short X.Y version
-version = ''
-# The full version, including alpha/beta/rc tags
-release = '0.1.0'
+
 
 
 # -- General configuration ---------------------------------------------------
@@ -83,7 +80,6 @@ highlight_language = 'c++'
 
 primary_domain = 'cpp'
 
-
 # -- Options for HTML output -------------------------------------------------
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
@@ -98,7 +94,16 @@ html_static_path = ['_static']
 
 html_css_files = ["openfly.css"]
 
+html_favicon = "_static/favicon.ico"
+
+
+
 html_theme_options = {
+    "sidebar_hide_name": True,
+    "top_of_page_button": "edit",
+    "source_repository": "https://github.com/ConorWilliams/openFLY/",
+    "source_branch": "main",
+    "source_directory": "docs/",
     "navigation_with_keys": True,
     "light_logo": "fly_light.svg",
     "dark_logo": "fly_dark.svg",

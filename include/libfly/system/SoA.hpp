@@ -4,9 +4,14 @@
 
 // SPDX-License-Identifier: GPL-2.0
 
-// This Source Code Form is subject to the terms of the Mozilla Public
-// License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License
+// as published by the Free Software Foundation; either version 2 of the License, or (at your option) any later version.
+
+// This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+
+// You should have received a copy of the GNU General Public License along with this program; if not, write to the Free Software
+// Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 #include <Eigen/Core>
 #include <cstddef>
@@ -24,7 +29,7 @@
 
 namespace fly::system {
 
-  template <typename... Ms> class SoA;
+  template <typename... Ms> class SoA;  // Required for detail below.
 
   namespace detail {
 
@@ -72,7 +77,7 @@ namespace fly::system {
     static constexpr bool owns_all = (!std::is_reference_v<Ms> && ...);
 
     /**
-     * @brief Detect if a type is a spetialization of SoA different from this specialization.
+     * @brief Detect if a type is a specialization of a SoA but different from this specialization.
      */
     template <typename T> static constexpr bool different_SoA_v = detail::different_SoA<SoA<Ms...>, remove_cref_t<T>>::value;
 

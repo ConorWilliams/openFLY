@@ -43,9 +43,9 @@ To build openFLY in release mode with a single-configuration generator, like the
 
 .. code:: console
 
-   cmake -S . -B build -DCMAKE_TOOLCHAIN_FILE=$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake -DCMAKE_BUILD_TYPE=Release
-   cmake --build build
-    
+    cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+    cmake --build build
+
 
 Similarly with a multi-configuration generator, like the Visual Studio ones:
 
@@ -53,6 +53,14 @@ Similarly with a multi-configuration generator, like the Visual Studio ones:
 
    cmake -S . -B build
    cmake --build build --config Release
+
+If you are using vcpkg to manage your dependancies then you will need to append:
+
+.. code:: console
+
+    -DCMAKE_TOOLCHAIN_FILE=$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake
+
+to the configure step.
 
 .. note::
     MSVC by default is not standards compliant and you need to pass some flags to make it behave properly. See the ``flags-windows`` preset in the `CMakePresets.json <https://github.com/ConorWilliams/openFLY/blob/master/CMakePresets.json>`_  file for the flags and with what variable to provide them to CMake during configuration.
@@ -66,7 +74,7 @@ Here is some wisdom to help you build and test this project as a developer and p
 Developer mode
 --------------
 
-Build system targets that are only useful for developers of this project are hidden if the ``FLY_DEVELOPER_MODE`` option is disabled. Enabling this option makes tests and other developer targets and options available. Not enabling this option means that you are a consumer of this project and thus you have no need for these targets and options.
+Build system targets that are only useful for developers of this project are hidden if the ``FLY_DEVELOPER_MODE`` option is disabled. Enabling this option makes tests and other developer targets/options available. Not enabling this option means that you are a consumer of this project and thus you have no need for these targets/options.
 
 Developer mode is always set to on in CI workflows.
 

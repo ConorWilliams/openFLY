@@ -154,7 +154,7 @@ namespace fly::system {
 namespace fly {
 
   /**
-   * @brief An inline namespace providing selection of canonical members for Atom.
+   * @brief An inline namespace providing a selection of canonical members for Atom.
    */
   inline namespace builtin_m {
     /**

@@ -53,15 +53,15 @@ Simulation box
     :members:
     :undoc-members:
 
-Crystal System
+Crystal Systems
 ~~~~~~~~~~~~~~~~~~~~
 
-Orthorhombic box
+Orthorhombic
 ``````````````````````
 
 .. doxygenclass:: fly::system::Orthorhombic
     :members:
     :undoc-members:
 
-Triclinic box
+Triclinic
 ``````````````````````

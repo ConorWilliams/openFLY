@@ -116,7 +116,7 @@ jobs:
         with: { python-version: "3.8" }
 
       - name: Install python dependancies
-        run: pip3 install breathe sphinx furo
+        run: pip3 install breathe sphinx furo sphinx-copybutton sphinx-inline-tabs
 
       - name: Install Doxygen
         run: sudo apt-get update -q

@@ -10,14 +10,6 @@ if(CMAKE_SOURCE_DIR STREQUAL CMAKE_BINARY_DIR)
     )
 endif()
 
-# Before project(...) as it may set there
-if(NOT CMAKE_BUILD_TYPE)
-    set(CMAKE_BUILD_TYPE Release)
-    message(
-        AUTHOR_WARNING "Choose the build type, options are: Debug Release RelWithDebInfo or MinSizeRel"
-    )
-endif()
-
 project(
     openFLY
     DESCRIPTION "The open off-lattice kniteic Monte Carlo simulation framework"

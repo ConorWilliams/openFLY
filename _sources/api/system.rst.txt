@@ -49,12 +49,19 @@ Vector of Structures
 Simulation box
 -----------------------
 
-Orthorhombic box
+.. doxygenclass:: fly::system::AdjacentCells
+    :members:
+    :undoc-members:
+
+Crystal System
 ~~~~~~~~~~~~~~~~~~~~
+
+Orthorhombic box
+``````````````````````
 
 .. doxygenclass:: fly::system::Orthorhombic
     :members:
     :undoc-members:
 
 Triclinic box
-~~~~~~~~~~~~~~~~~~~~
+``````````````````````

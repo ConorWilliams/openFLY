@@ -92,7 +92,7 @@ namespace fly::system {
 
       AtomMem(AtomMem const&) = default;
 
-      explicit AtomMem(typename Tag::matrix_t&& data) : m_data(data) {}
+      explicit AtomMem(typename Tag::matrix_t&& data) : m_data(std::move(data)) {}
 
       explicit AtomMem(typename Tag::matrix_t const& data) : m_data(data) {}
 

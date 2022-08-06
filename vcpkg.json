@@ -9,6 +9,10 @@
         {
             "name": "eigen3",
             "version>=": "3.4.0#2"
+        },
+        {
+            "name": "span-lite",
+            "version>=": "0.10.3"
         }
     ],
     "default-features": [],

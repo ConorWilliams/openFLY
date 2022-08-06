@@ -1,6 +1,6 @@
 #pragma once
 
-// Copyright © 2020 Conor Williams <conorwilliams@outlook.com>
+// Copyright © 2020 Conor Williams <conorwilliams@outloOK.com>
 
 // SPDX-License-Identifier: MPL-2.0
 
@@ -54,7 +54,7 @@ namespace fly::system::detail {
     }
 
     /**
-     * @brief Fetch a view of the i th member stored in the array, tagged dispatch on Mem.
+     * @brief Fetch a view of the ``i``th member stored in the array, tagged dispatch on ``Mem``.
      *
      * This is an owning Adaptor hence, model value const-semantics.
      */
@@ -69,7 +69,7 @@ namespace fly::system::detail {
     }
 
     /**
-     * @brief Fetch a view of the ith member stored in the array, tagged dispatch on Mem.
+     * @brief Fetch a view of the ``i``th member stored in the array, tagged dispatch on Mem.
      *
      * This is an owning Adaptor hence, model value const-semantics
      */
@@ -111,8 +111,8 @@ namespace fly::system::detail {
      *  void foo3(Adaptor<Position> const &)
      *
      *  foo1(Adaptor<Position>{})          use defaulted copy/move
-     *  foo1(Adaptor<Position &>{})        ok to do implicitly as user wants a copy
-     *  foo1(Adaptor<Position const&>{})   ok to do implicitly as user wants a copy
+     *  foo1(Adaptor<Position &>{})        OK to do implicitly as user wants a copy
+     *  foo1(Adaptor<Position const&>{})   OK to do implicitly as user wants a copy
      *
      *  foo2(Adaptor<Position>{})          use defaulted copy/move, compiler will not allow ref to temp
      *  foo2(Adaptor<Position &>{})        compiler will not allow ref to temp
@@ -153,7 +153,7 @@ namespace fly::system::detail {
     }
 
     /**
-     * @brief Fetch a view of the ith member stored in the array, tagged dispatch on Mem.
+     * @brief Fetch a view of the ``i``th member stored in the array, tagged dispatch on Mem.
      *
      * This is not an owning Adaptor hence, model pointer const-semantics.
      */
@@ -173,7 +173,7 @@ namespace fly::system::detail {
      * This is not an owning Adaptor hence, model pointer const-semantics.
      */
     constexpr typename Mem::array_ref_t operator[](Mem) const noexcept {
-      ASSERT(m_data_ptr, "Deferencing an empty view adaptor.");
+      ASSERT(m_data_ptr, "Dereferencing an empty view adaptor.");
       return *m_data_ptr;
     }
 
@@ -213,7 +213,7 @@ namespace fly::system::detail {
     }
 
     /**
-     * @brief Fetch a view of the ith member stored in the array, tagged dispatch on Mem.
+     * @brief Fetch a view of the ``i``th member stored in the array, tagged dispatch on Mem.
      *
      * This is not an owning Adaptor hence, model const-pointer const-semantics.
      */
@@ -233,7 +233,7 @@ namespace fly::system::detail {
      * This is not an owning Adaptor hence, model const-pointer const-semantics.
      */
     constexpr typename Mem::array_cref_t operator[](Mem) const noexcept {
-      ASSERT(m_data_ptr, "Deferencing an empty view adaptor.");
+      ASSERT(m_data_ptr, "Dereferencing an empty view adaptor.");
       return *m_data_ptr;
     }
 

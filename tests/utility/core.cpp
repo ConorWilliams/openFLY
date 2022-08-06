@@ -9,7 +9,7 @@ static_assert(!fly::always_false<int>);
 
 static_assert(!fly::always_false<int, float>);
 
-TEST_CASE("ipow", "[core]") {
+TEST_CASE("ipow", "[utility]") {
   //
   CHECK(fly::ipow<0>(10) == 1);
   CHECK(fly::ipow<1>(10) == 10);
@@ -19,7 +19,7 @@ TEST_CASE("ipow", "[core]") {
   CHECK(fly::ipow<5>(10) == 100000);
 }
 
-TEST_CASE("defer", "[core]") {
+TEST_CASE("defer", "[utility]") {
   //
   int i = 0;
 

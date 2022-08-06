@@ -12,7 +12,7 @@ OpenFLY
 
 Welcome to openFLY, the on-the-fly kinetic Monte Carlo (KMC) framework.
 
-OpenFLY provides libraries and programs to run massivly parallel on-the-fly KMC simulations. OpenFLY is modelled on `LAMMPS <https://docs.lammps.org/Manual.html#>`_ and was originally developed at the University of Cambridge's Department of Materials Science & Metallurgy. It was designed to run efficiently on parallel computers. OpenFLY is an open-source code, distributed freely under the terms of the Mozilla Public License Version 2.0 (MPL-2.0).
+OpenFLY provides libraries and programs to run massivly parallel on-the-fly KMC simulations. OpenFLY is modelled on `LAMMPS <https://docs.lammps.org/Manual.html#>`_ and was originally developed at the University of Cambridge's Department of Materials Science & Metallurgy. It was designed to run efficiently on parallel computers. OpenFLY is an open-source code, distributed freely under the terms of the Mozilla Public License Version 2.0 (GPL-2.0).
 
 OpenFLY is developed on `GitHub <https://github.com/ConorWilliams/openFLY>`_, this documentation is for the development version of the code. If needed, you can build a local copy of this site, for any version, by following the :ref:`guide <Building>`.
 

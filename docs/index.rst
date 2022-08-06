@@ -16,7 +16,7 @@ OpenFLY provides libraries and programs to run massivly parallel on-the-fly KMC 
 
 OpenFLY is developed on `GitHub <https://github.com/ConorWilliams/openFLY>`_, this documentation is for the development version of the code. If needed, you can build a local copy of this site, for any version, by following the :ref:`guide <Building>`.
 
-This site is organized in three parts: 
+This documentation is organized into three parts: 
 
 1. The :ref:`User guide` for how to install and use openFLY.
 

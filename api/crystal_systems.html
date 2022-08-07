@@ -233,7 +233,7 @@
 <dl class="cpp class">
 <dt class="sig sig-object cpp" id="_CPPv4N3fly6system12OrthorhombicE">
 <span id="_CPPv3N3fly6system12OrthorhombicE"></span><span id="_CPPv2N3fly6system12OrthorhombicE"></span><span id="fly::system::Orthorhombic"></span><span class="target" id="classfly_1_1system_1_1Orthorhombic"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Orthorhombic</span></span></span><a class="headerlink" href="#_CPPv4N3fly6system12OrthorhombicE" title="Permalink to this definition">#</a><br /></dt>
-<dd><p>Provides details of the simulations supercell geometry. </p>
+<dd><p>Generalised orthogonal simulation box. </p>
 <div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
 <dl class="cpp function">
@@ -284,7 +284,14 @@
 <span id="_CPPv3I00ENK3fly6system12Orthorhombic9min_imageERKN5Eigen10MatrixBaseI1AEERKN5Eigen10MatrixBaseI1BEE"></span><span id="_CPPv2I00ENK3fly6system12Orthorhombic9min_imageERKN5Eigen10MatrixBaseI1AEERKN5Eigen10MatrixBaseI1BEE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">A</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">B</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classfly_1_1system_1_1Orthorhombic_1a6d03a88bac3eece4814736683af3f8f1"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">Position</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">matrix_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">min_image</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">Eigen</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">MatrixBase</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I00ENK3fly6system12Orthorhombic9min_imageEN8Position8matrix_tERKN5Eigen10MatrixBaseI1AEERKN5Eigen10MatrixBaseI1BEE" title="fly::system::Orthorhombic::min_image::A"><span class="n"><span class="pre">A</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">a</span></span>, <span class="n"><span class="pre">Eigen</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">MatrixBase</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I00ENK3fly6system12Orthorhombic9min_imageEN8Position8matrix_tERKN5Eigen10MatrixBaseI1AEERKN5Eigen10MatrixBaseI1BEE" title="fly::system::Orthorhombic::min_image::B"><span class="n"><span class="pre">B</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">b</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="k"><span class="pre">noexcept</span></span><a class="headerlink" href="#_CPPv4I00ENK3fly6system12Orthorhombic9min_imageEN8Position8matrix_tERKN5Eigen10MatrixBaseI1AEERKN5Eigen10MatrixBaseI1BEE" title="Permalink to this definition">#</a><br /></dt>
 <dd><p>Compute shortest vector connecting <code class="docutils literal notranslate"><span class="pre">a</span></code> to a periodic image of <code class="docutils literal notranslate"><span class="pre">b</span></code>. </p>
 <p>This function is branchy and should be avoided in hot code.</p>
-<p>See: <a class="reference external" href="https://doi.org/10.1524/zpch.2013.0311">https://doi.org/10.1524/zpch.2013.0311</a> </p>
+<p>See: <a class="reference external" href="https://doi.org/10.1524/zpch.2013.0311">https://doi.org/10.1524/zpch.2013.0311</a></p>
+<p><dl>
+<dt class="sig sig-object cpp">
+<em><span class="pre">Deprecated:</span></em></dt>
+<dd><p>No triclinic generalization. </p>
+</dd></dl>
+
+</p>
 </dd></dl>
 
 <dl class="cpp function">

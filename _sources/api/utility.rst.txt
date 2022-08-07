@@ -10,22 +10,17 @@ File: ``version.hpp``
 
 .. doxygenfile:: version.hpp
 
-Core utilities
+Core 
 ------------------------------------------
 
 File: ``core.hpp``
 
-.. doxygenfile:: core.hpp
-
-Assertion
-------------------------------------------
-
-File: ``asserts.hpp``
-
 .. doxygenfile:: asserts.hpp
+
+.. doxygenfile:: core.hpp
     
 
-Timing utilities
+Timing 
 ------------------------------------------
 
 File ``timeit.hpp``

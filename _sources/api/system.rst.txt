@@ -13,7 +13,7 @@ File: ``libfly/system/boxes/box.hpp``
 .. doxygenfile:: libfly/system/box.hpp
     :sections: briefdescription detaileddescription
 
-If you would like to read more about the boxes specialised for simpler crystal-systems see:
+In theory libFLY could detect the most efficient crystal-system for any basis set and produce optimal code. Unfortunately, this is a lot of work hence, libFLY uses a smaller set - suitable for the majority of cases. If you would like to read more about these specialised boxes see:
 
 .. toctree::
    
@@ -46,8 +46,8 @@ MemTag
     :undoc-members:
 
 
-Bultin members
-~~~~~~~~~~~~~~~
+Built-in members
+~~~~~~~~~~~~~~~~~~
 
 .. doxygennamespace:: fly::builtin_m
   

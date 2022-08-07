@@ -1,4 +1,4 @@
-Neighbour (``libfly/neighbour``)
+Neighbour
 ======================================
 
 llll

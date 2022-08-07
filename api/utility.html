@@ -3,10 +3,10 @@
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
-<link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="System (libfly/system)" href="system.html" /><link rel="prev" title="Library API reference" href="../api.html" />
+<link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="System" href="system.html" /><link rel="prev" title="Library API reference" href="../api.html" />
 
     <link rel="shortcut icon" href="../_static/favicon.ico"/><meta name="generator" content="sphinx-5.1.1, furo 2022.06.21"/>
-        <title>Utilities (libfly/utility) - OpenFLY documentation</title>
+        <title>Utility - OpenFLY documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?digest=40978830699223671f4072448e654b5958f38b89" />
     <link rel="stylesheet" type="text/css" href="../_static/tabs.css" />
@@ -174,13 +174,13 @@
 </ul>
 </li>
 <li class="toctree-l1 current has-children"><a class="reference internal" href="../api.html">Library API reference</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
-<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">Utilities (<code class="docutils literal notranslate"><span class="pre">libfly/utility</span></code>)</a></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="system.html">System (<code class="docutils literal notranslate"><span class="pre">libfly/system</span></code>)</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">Utility</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="system.html">System</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="crystal_systems.html">Orthorhombic</a></li>
 <li class="toctree-l3"><a class="reference internal" href="crystal_systems.html#triclinic">Triclinic</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="neighbour.html">Neighbour (<code class="docutils literal notranslate"><span class="pre">libfly/neighbour</span></code>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="neighbour.html">Neighbour</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../todo.html">Todo!</a></li>
@@ -226,11 +226,12 @@
           </label>
         </div>
         <article role="main">
-          <section id="utilities-libfly-utility">
-<h1>Utilities (<code class="docutils literal notranslate"><span class="pre">libfly/utility</span></code>)<a class="headerlink" href="#utilities-libfly-utility" title="Permalink to this heading">#</a></h1>
+          <section id="utility">
+<h1>Utility<a class="headerlink" href="#utility" title="Permalink to this heading">#</a></h1>
 <p>The <code class="docutils literal notranslate"><span class="pre">utility</span></code> folder contains a collection of non-specific utilities, it is documented by file.</p>
-<section id="versioning-version-hpp">
-<h2>Versioning (<code class="docutils literal notranslate"><span class="pre">version.hpp</span></code>)<a class="headerlink" href="#versioning-version-hpp" title="Permalink to this heading">#</a></h2>
+<section id="versioning">
+<h2>Versioning<a class="headerlink" href="#versioning" title="Permalink to this heading">#</a></h2>
+<p>File: <code class="docutils literal notranslate"><span class="pre">version.hpp</span></code></p>
 <p>Defines a set of version macros, read by CMake. </p>
 <div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric" id="breathe-section-title-defines">Defines</p>
@@ -254,8 +255,9 @@
 
 </div>
 </section>
-<section id="core-core-hpp">
-<h2>Core (<code class="docutils literal notranslate"><span class="pre">core.hpp</span></code>)<a class="headerlink" href="#core-core-hpp" title="Permalink to this heading">#</a></h2>
+<section id="core-utilities">
+<h2>Core utilities<a class="headerlink" href="#core-utilities" title="Permalink to this heading">#</a></h2>
+<p>File: <code class="docutils literal notranslate"><span class="pre">core.hpp</span></code></p>
 <p>Miscellaneous utilities. </p>
 <div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric" id="breathe-section-title-defines">Defines</p>
@@ -540,8 +542,9 @@
 </dd></dl>
 
 </section>
-<section id="asserts-asserts-hpp">
-<h2>Asserts (<code class="docutils literal notranslate"><span class="pre">asserts.hpp</span></code>)<a class="headerlink" href="#asserts-asserts-hpp" title="Permalink to this heading">#</a></h2>
+<section id="assertion">
+<h2>Assertion<a class="headerlink" href="#assertion" title="Permalink to this heading">#</a></h2>
+<p>File: <code class="docutils literal notranslate"><span class="pre">asserts.hpp</span></code></p>
 <p>Defines a set of &lt;cassert&gt; like macros. </p>
 <div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric" id="breathe-section-title-defines">Defines</p>
@@ -564,8 +567,9 @@
 <dd></dd></dl>
 
 </section>
-<section id="timing-timeit-hpp">
-<h2>Timing: (<code class="docutils literal notranslate"><span class="pre">timeit.hpp</span></code>)<a class="headerlink" href="#timing-timeit-hpp" title="Permalink to this heading">#</a></h2>
+<section id="timing-utilities">
+<h2>Timing utilities<a class="headerlink" href="#timing-utilities" title="Permalink to this heading">#</a></h2>
+<p>File <code class="docutils literal notranslate"><span class="pre">timeit.hpp</span></code></p>
 <p>Timing utilities. </p>
 <dl class="cpp type">
 <dt class="sig sig-object cpp">
@@ -607,7 +611,7 @@
                 <div class="context">
                   <span>Next</span>
                 </div>
-                <div class="title">System (<code class="docutils literal notranslate"><span class="pre">libfly/system</span></code>)</div>
+                <div class="title">System</div>
               </div>
               <svg><use href="#svg-arrow-right"></use></svg>
             </a>
@@ -659,11 +663,11 @@
         <div class="toc-tree-container">
           <div class="toc-tree">
             <ul>
-<li><a class="reference internal" href="#">Utilities (<code class="docutils literal notranslate"><span class="pre">libfly/utility</span></code>)</a><ul>
-<li><a class="reference internal" href="#versioning-version-hpp">Versioning (<code class="docutils literal notranslate"><span class="pre">version.hpp</span></code>)</a></li>
-<li><a class="reference internal" href="#core-core-hpp">Core (<code class="docutils literal notranslate"><span class="pre">core.hpp</span></code>)</a></li>
-<li><a class="reference internal" href="#asserts-asserts-hpp">Asserts (<code class="docutils literal notranslate"><span class="pre">asserts.hpp</span></code>)</a></li>
-<li><a class="reference internal" href="#timing-timeit-hpp">Timing: (<code class="docutils literal notranslate"><span class="pre">timeit.hpp</span></code>)</a></li>
+<li><a class="reference internal" href="#">Utility</a><ul>
+<li><a class="reference internal" href="#versioning">Versioning</a></li>
+<li><a class="reference internal" href="#core-utilities">Core utilities</a></li>
+<li><a class="reference internal" href="#assertion">Assertion</a></li>
+<li><a class="reference internal" href="#timing-utilities">Timing utilities</a></li>
 </ul>
 </li>
 </ul>

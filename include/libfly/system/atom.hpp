@@ -23,9 +23,9 @@
 #include "libfly/utility/core.hpp"
 
 /**
- * \file SoA.hpp
+ * \file atom.hpp
  *
- * @brief Atom type and basic building blocks.
+ * @brief The basic building block for atoms in libFLY.
  */
 
 namespace fly::system {
@@ -44,7 +44,8 @@ namespace fly::system {
    * @tparam Cols Number of colums in this member.
    * @tparam Rep The Eigen3 template, Eigen::[matrix||array], to use for this member.
    */
-  template <typename Scalar, int Rows = 1, int Cols = 1, template <typename, auto...> typename Rep = Eigen::Matrix> struct MemTag {
+  template <typename Scalar, int Rows = 1, int Cols = 1, template <typename, auto...> typename Rep = Eigen::Matrix>
+  struct MemTag {
     /** @brief True if this member represents a 1x1 matrix. */
     static constexpr bool is_1x1 = Rows == 1 && Cols == 1;
 
@@ -89,7 +90,8 @@ namespace fly::system {
 
   namespace detail {
 
-    template <typename Tag> struct AtomMem {
+    template <typename Tag>
+    struct AtomMem {
     public:
       static_assert(std::is_empty_v<Tag>, "Member tag types are required to be empty");
 
@@ -101,7 +103,8 @@ namespace fly::system {
 
       explicit AtomMem(typename Tag::matrix_t const& data) : m_data(data) {}
 
-      template <typename T> explicit AtomMem(T&& x) : m_data(std::forward<T>(x)) {}
+      template <typename T>
+      explicit AtomMem(T&& x) : m_data(std::forward<T>(x)) {}
 
       typename Tag::matrix_t const& operator[](Tag) const { return m_data; }
 
@@ -130,7 +133,8 @@ namespace fly::system {
    *
    * @tparam Mems a series of empty types, derived from ``MemTag``, to describe each member.
    */
-  template <typename... Mems> struct Atom : detail::AtomMem<Mems>... {
+  template <typename... Mems>
+  struct Atom : detail::AtomMem<Mems>... {
     /**
      * @brief Copy construct a new Atom object
      */

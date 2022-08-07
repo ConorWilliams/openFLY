@@ -16,7 +16,7 @@
 /**
  * \file orthorhombic.hpp
  *
- * @brief orthorhombic simulation box implementation.
+ * @brief Specialised simulation box for orthorhombic supercells.
  */
 
 #include <Eigen/Core>
@@ -29,7 +29,7 @@
 namespace fly::system {
 
   /**
-   * @brief Provides details of the simulations orthorhombic supercell geometry.
+   * @brief Provides details of the simulations supercell geometry.
    */
   class Orthorhombic {
   public:

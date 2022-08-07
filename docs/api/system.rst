@@ -1,10 +1,17 @@
-System (``libfly/system``)
+System
 ====================================
 
-The ``system`` folder and namespace contains a collection of data structures for representing atoms, groups of atoms and the space the atoms exist in.
+Directory: ``libfly/system``
 
-Atoms (``atom.hpp``)
+The ``system`` folder contains a collection of data structures for representing atoms, groups of atoms and the space the atoms exist in. Everything in the systems folder is contained within the namespace ``fly::system``.
+
+Atoms
 ----------------------
+
+File: ``libfly/system/boxes/atom.hpp``
+
+.. doxygenfile:: libfly/system/atom.hpp
+    :sections: briefdescription detaileddescription
 
 Atom class
 ~~~~~~~~~~
@@ -28,26 +35,43 @@ Bultin members
 .. doxygennamespace:: fly::builtin_m
   
 
-Generic data structures
------------------------
+Generic data structures for Atoms
+-----------------------------------
 
-Structure of Arrays (``SoA.hpp``)
+The building block of many of the types in libFLY.
+
+SoA
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+File: ``libfly/system/boxes/SoA.hpp``
+
+.. doxygenfile:: libfly/system/SoA.hpp
+    :sections: briefdescription detaileddescription
 
 .. doxygenclass:: fly::system::SoA
     :members:
     :undoc-members:
 
-Vector of Structures (``VoS.hpp``)
+VoS
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+File: ``libfly/system/boxes/VoS.hpp``
+
+.. doxygenfile:: libfly/system/VoS.hpp
+    :sections: briefdescription detaileddescription
 
 .. doxygenclass:: fly::system::VoS
     :members:
     :undoc-members:
 
 
-Simulation box (``box.hpp``)
+Simulation space
 --------------------------------
+
+File: ``libfly/system/boxes/box.hpp``
+
+.. doxygenfile:: libfly/system/box.hpp
+    :sections: briefdescription detaileddescription
 
 If you would like to read about the specialised crystal systems use the links below:
 

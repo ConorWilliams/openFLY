@@ -26,7 +26,7 @@
 /**
  * \file VoS.hpp
  *
- * @brief Array of Structs implementation.
+ * @brief Array of Structures implementation.
  */
 
 namespace fly::system {
@@ -51,7 +51,8 @@ namespace fly::system {
    *
    * @tparam Mems a series of empty types, derived from ``MemTag``, to describe each member.
    */
-  template <typename... Mems> class VoS : private std::vector<Atom<Mems...>> {
+  template <typename... Mems>
+  class VoS : private std::vector<Atom<Mems...>> {
   private:
     static_assert(sizeof...(Mems) > 0, "Need at least one member in an VoS");
 

@@ -1,9 +1,13 @@
 #include "libfly/system/boxes/orthorhombic.hpp"
 
 #include <catch2/catch_test_macros.hpp>
+#include <optional>
 #include <random>
 
-TEST_CASE("Orthorhombic::mini_image_norm", "[system]") {
+#include "libfly/system/atom.hpp"
+#include "libfly/utility/core.hpp"
+
+TEST_CASE("Orthorhombic::min_image", "[system]") {
   //
   using namespace fly;
   using namespace fly::system;
@@ -48,18 +52,77 @@ TEST_CASE("Orthorhombic::canon_image", "[system]") {
   }
 }
 
-TEST_CASE("Orthorhombic::Grid", "[system]") {
+TEST_CASE("Orthorhombic::Grid::cell_idx", "[system]") {
   //
-  fly::system::Orthorhombic box{{10, 10, 10}, {true, true, true}};
+  using namespace fly;
+
+  system::Orthorhombic box{Arr<Position::scalar_t>::Constant(10), Arr<bool>::Constant(true)};
 
   auto grid = box.make_grid(3);
 
-  using V = fly::Vec<fly::Position::scalar_t>;
+  int A = grid.cell_idx(Vec<Position::scalar_t>::Constant(0));
+  int B = grid.cell_idx(Vec<Position::scalar_t>::Constant(5));
+  int C = grid.cell_idx(Vec<Position::scalar_t>::Constant(9.5));
 
-  REQUIRE(grid.cell_idx(box.canon_image(V{0, 0, 0})) == 1 + 1 * 5 + 1 * 5 * 5);
-  REQUIRE(grid.cell_idx(box.canon_image(V{0, 0, 0})) == 1 + 1 * 5 + 1 * 5 * 5);
+  if constexpr (spatial_dims == 3) {
+    REQUIRE(A == 1 + 1 * 5 + 1 * 5 * 5);
+    REQUIRE(B == 2 + 2 * 5 + 2 * 5 * 5);
+    REQUIRE(C == 3 + 3 * 5 + 3 * 5 * 5);
+  }
 
-  REQUIRE(grid.cell_idx(box.canon_image(V{5, 5, 5})) == 2 + 2 * 5 + 2 * 5 * 5);
+  if constexpr (spatial_dims == 2) {
+    REQUIRE(A == 1 + 1 * 5);
+    REQUIRE(B == 2 + 2 * 5);
+    REQUIRE(C == 3 + 3 * 5);
+  }
+}
 
-  REQUIRE(grid.cell_idx(box.canon_image(V{9.999, 9.999, 9.999})) == 3 + 3 * 5 + 3 * 5 * 5);
+TEST_CASE("Orthorhombic::Grid::gen_image", "[system]") {
+  using namespace fly;
+
+  system::Orthorhombic box{Arr<Position::scalar_t>::Constant(10), Arr<bool>::Constant(true)};
+
+  system::OrthorhombicGrid grid = box.make_grid(3);
+
+  {
+    std::optional im = grid.gen_image<Sign::plus>(Position::matrix_t::Constant(5), 0);
+
+    REQUIRE(!im);
+  }
+
+  {
+    Position::matrix_t origin = Position::matrix_t::Constant(0);
+
+    origin[0] += 0.2;
+
+    REQUIRE(!grid.gen_image<Sign::minus>(origin, 0));
+
+    auto im = grid.gen_image<Sign::plus>(origin, 0);
+
+    REQUIRE(im);
+
+    Position::matrix_t correct = origin;
+
+    correct[0] += 10;
+
+    REQUIRE(norm(correct - *im) < 0.001);
+  }
+
+  {
+    Position::matrix_t origin = Position::matrix_t::Constant(0);
+
+    origin[0] = 10 - 0.2;
+
+    REQUIRE(!grid.gen_image<Sign::plus>(origin, 0));
+
+    auto im = grid.gen_image<Sign::minus>(origin, 0);
+
+    REQUIRE(im);
+
+    Position::matrix_t correct = origin;
+
+    correct[0] -= 10;
+
+    REQUIRE(norm(correct - *im) < 0.001);
+  }
 }

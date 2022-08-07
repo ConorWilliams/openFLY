@@ -77,7 +77,8 @@ namespace fly::system {
     /**
      * @brief Get the ``n``th adjacent cell list.
      *
-     * A span containing the indexes of every cell adjacent to the ``n``th cell, does not include the ``n``th cell.
+     * @return nonstd::span<int const> A span containing the indexes of every cell adjacent to the ``n``th cell, does not include the
+     * ``n``th cell.
      */
     nonstd::span<int const> operator[](int n) const {
       auto sn = (std::size_t)n;

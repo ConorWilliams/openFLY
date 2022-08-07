@@ -52,8 +52,41 @@ namespace fly::system {
       return to_1D(clamp_to_grid_idxs(x + m_cell.matrix()));
     }
 
+    /**
+     * @brief
+     *
+     * @tparam S Direction along axis which to generate image.
+     * @param x Position of the atom who's image we are computing.
+     * @param ax Index of axis along which to generate image.
+     * @return std::optional<Position::matrix_t> If the atom's image is beyond the cut-off (``r_cut``) for atomic interactions then
+     * the image's position otherwise ``std::nullopt``.
+     */
+    template <Sign S>
+    std::optional<Position::matrix_t> gen_image(Position::matrix_t x, int ax) {
+      //
+      static_assert(S == Sign::plus || S == Sign::minus, "Unreachable");
+
+      if constexpr (S == Sign::plus) {
+        if (x[ax] < m_r_cut) {
+          x[ax] += m_extents[ax];
+          return x;
+        }
+      } else {
+        if (x[ax] > m_extents[ax] - m_r_cut) {
+          x[ax] -= m_extents[ax];
+          return x;
+        }
+      }
+
+      return std::nullopt;
+    }
+
   private:
     friend class Orthorhombic;
+
+    Arr<Position::scalar_t> m_extents = Arr<Position::scalar_t>::Zero();
+
+    Position::scalar_t m_r_cut = 0;
 
     Arr<int> m_shape = Arr<int>::Zero();
     Arr<int> m_prod_shape = Arr<int>::Zero();
@@ -61,7 +94,7 @@ namespace fly::system {
     Arr<Position::scalar_t> m_cell = Arr<Position::scalar_t>::Zero();
     Arr<Position::scalar_t> m_inv_cell = Arr<Position::scalar_t>::Zero();
 
-    OrthorhombicGrid(Arr<Position::scalar_t> const& extents, Position::scalar_t r_cut) {
+    OrthorhombicGrid(Arr<Position::scalar_t> const& extents, Position::scalar_t r_cut) : m_extents(extents), m_r_cut(r_cut) {
       // Sanity checks
       VERIFY(r_cut > 0, "r_cut is negative");
       VERIFY((extents > r_cut).all(), "r_cut is too big");
@@ -98,11 +131,6 @@ namespace fly::system {
    *
    * All queries of the space in which the atoms exist are provided by this class. It is assumed
    * (and must be ensured) all non-periodic atoms are within the Orthorhombic extents.
-   *
-   * \rst
-   * .. todo::
-   *    Make test for this class work in ND.
-   * \endrst
    */
   class Orthorhombic {
   public:
@@ -129,21 +157,6 @@ namespace fly::system {
      * @brief Get an array detailing the periodicity along each axis.
      */
     Arr<bool> const& periodic() const noexcept { return m_periodic; }
-
-    /**
-     * @brief Generate the periodic image of an atom.
-     *
-     * @param x Position of the atom who's image we are computing.
-     * @param ax Axis along which to generate image (magnitude = index, sign = direction).
-     * @param r_cut Cut-off radius for atomic interactions.
-     * @return std::optional<Position::matrix_t> If the atom's image is beyond the cut-off (``r_cut``) for atomic interactions then
-     * the image's position otherwise, ``std::nullopt``.
-     */
-    template <typename A, typename B>
-    std::optional<Position::matrix_t> gen_image(Eigen::MatrixBase<B> const& x, int ax, Position::scalar_t r_cut) {
-      x + ax + r_cut;
-      return {};
-    }
 
     /**
      * @brief Maps atom into the canonical cell.

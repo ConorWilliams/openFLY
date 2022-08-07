@@ -1,3 +1,9 @@
+cmake_minimum_required(VERSION 3.16...3.22)
+
+project(openFLY_DOCS)
+
+get_filename_component(ABSOLUTE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/../include ABSOLUTE)
+
 # Add the cmake folder so custom
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/../cmake" ${CMAKE_MODULE_PATH})
 
@@ -7,7 +13,7 @@ find_package(Sphinx REQUIRED)
 set(DOXYGEN_INPUT_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../include)
 set(DOXYGEN_OUTPUT_DIR ${CMAKE_CURRENT_BINARY_DIR}/doxygen)
 set(DOXYGEN_INDEX_FILE ${DOXYGEN_OUTPUT_DIR}/xml/index.xml)
-set(DOXYGEN_STRIP_FROM_INC_PATH "${PROJECT_SOURCE_DIR}/include/")
+set(DOXYGEN_STRIP_FROM_INC_PATH "${ABSOLUTE_PATH}/")
 set(DOXYFILE_IN ${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile.in)
 set(DOXYFILE_OUT ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile)
 

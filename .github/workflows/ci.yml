@@ -18,7 +18,7 @@ jobs:
     runs-on: ${{ matrix.os }}
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - name: Install vcpkg
         uses: friendlyanon/setup-vcpkg@v1
@@ -42,7 +42,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - name: Install vcpkg
         uses: friendlyanon/setup-vcpkg@v1
@@ -106,7 +106,7 @@ jobs:
       && github.repository_owner == 'conorwilliams'
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - name: Install vcpkg
         uses: friendlyanon/setup-vcpkg@v1

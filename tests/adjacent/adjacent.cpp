@@ -1,6 +1,6 @@
 
 
-#include "libfly/system/box.hpp"
+#include "libfly/neighbour/adjacent.hpp"
 
 #include <catch2/catch_test_macros.hpp>
 
@@ -8,14 +8,11 @@
 #include "libfly/system/boxes/orthorhombic.hpp"
 #include "libfly/utility/core.hpp"
 
-TEST_CASE("AdjacentCells", "[system]") {
+TEST_CASE("AdjacentCells", "[neighbour]") {
   //
   if constexpr (fly::spatial_dims == 3) {
-    fly::system::Orthorhombic box{{10, 10, 10}, {true, true, true}};
-
-    auto grid = box.make_grid(3);
-
-    fly::system::AdjacentCells cells(grid.shape());
+    //
+    fly::neighbour::AdjacentCells cells({5, 5, 5});
 
     {
       auto neigh = cells[(1) + (1) * 5 + (1) * 5 * 5];

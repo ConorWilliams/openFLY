@@ -5,7 +5,7 @@
     <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 <link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="Neighbour" href="neighbour.html" /><link rel="prev" title="System" href="system.html" />
 
-    <link rel="shortcut icon" href="../_static/favicon.ico"/><meta name="generator" content="sphinx-5.1.0, furo 2022.06.21"/>
+    <link rel="shortcut icon" href="../_static/favicon.ico"/><meta name="generator" content="sphinx-5.1.1, furo 2022.06.21"/>
         <title>Orthorhombic - OpenFLY documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?digest=40978830699223671f4072448e654b5958f38b89" />
@@ -372,9 +372,59 @@
 </section>
 <section id="triclinic">
 <h1>Triclinic<a class="headerlink" href="#triclinic" title="Permalink to this heading">#</a></h1>
-<p>related</p>
-<p>signal</p>
-<p>user-defined</p>
+<p>File: <code class="docutils literal notranslate"><span class="pre">libfly/system/boxes/triclinic.hpp</span></code></p>
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv4N3fly6system9TriclinicE">
+<span id="_CPPv3N3fly6system9TriclinicE"></span><span id="_CPPv2N3fly6system9TriclinicE"></span><span id="fly::system::Triclinic"></span><span class="target" id="classfly_1_1system_1_1Triclinic"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Triclinic</span></span></span><a class="headerlink" href="#_CPPv4N3fly6system9TriclinicE" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Generalized triclinic simulation box. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3fly6system9Triclinic9TriclinicERK3MatIN8Position8scalar_tEERK3ArrIbE">
+<span id="_CPPv3N3fly6system9Triclinic9TriclinicERK3MatIN8Position8scalar_tEERK3ArrIbE"></span><span id="_CPPv2N3fly6system9Triclinic9TriclinicERK3MatIN8Position8scalar_tEERK3ArrIbE"></span><span id="fly::system::Triclinic::Triclinic__Mat:Position::scalar_t:CR.Arr:b:CR"></span><span class="target" id="classfly_1_1system_1_1Triclinic_1a3405778a35ba1eee8658453b2bb0ab17"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Triclinic</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="utility.html#_CPPv4I0EN3fly3MatE" title="fly::Mat"><span class="n"><span class="pre">Mat</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">Position</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">scalar_t</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">basis</span></span>, <a class="reference internal" href="utility.html#_CPPv4I0EN3fly3ArrE" title="fly::Arr"><span class="n"><span class="pre">Arr</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">bool</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">pd</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3fly6system9Triclinic9TriclinicERK3MatIN8Position8scalar_tEERK3ArrIbE" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Construct a new <a class="reference internal" href="#classfly_1_1system_1_1Triclinic"><span class="std std-ref">Triclinic</span></a> box object. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>basis</strong> – Matrix with columns equal to the basis vectors of the parallelotope. </p></li>
+<li><p><strong>pd</strong> – True for each periodic axis. </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK3fly6system9Triclinic5basisEv">
+<span id="_CPPv3NK3fly6system9Triclinic5basisEv"></span><span id="_CPPv2NK3fly6system9Triclinic5basisEv"></span><span id="fly::system::Triclinic::basisC"></span><span class="target" id="classfly_1_1system_1_1Triclinic_1a2c7bc9f8f0ade4b17410693343ec3b32"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="utility.html#_CPPv4I0EN3fly3MatE" title="fly::Mat"><span class="n"><span class="pre">Mat</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">Position</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">scalar_t</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">basis</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="k"><span class="pre">noexcept</span></span><a class="headerlink" href="#_CPPv4NK3fly6system9Triclinic5basisEv" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Fetch the basis vectors of this cell. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Mat&lt;Position::scalar_t&gt; A matrix with each column corresponding to a basis vector. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK3fly6system9Triclinic8periodicEi">
+<span id="_CPPv3NK3fly6system9Triclinic8periodicEi"></span><span id="_CPPv2NK3fly6system9Triclinic8periodicEi"></span><span id="fly::system::Triclinic::periodic__iC"></span><span class="target" id="classfly_1_1system_1_1Triclinic_1a61924f9e0c51925e89a12eb09a5f192e"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">periodic</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">i</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="k"><span class="pre">noexcept</span></span><a class="headerlink" href="#_CPPv4NK3fly6system9Triclinic8periodicEi" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Query if the <code class="docutils literal notranslate"><span class="pre">i</span></code>th axis is periodic. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0ENK3fly6system9Triclinic11canon_imageEN8Position8matrix_tERKN5Eigen10MatrixBaseI1EEE">
+<span id="_CPPv3I0ENK3fly6system9Triclinic11canon_imageERKN5Eigen10MatrixBaseI1EEE"></span><span id="_CPPv2I0ENK3fly6system9Triclinic11canon_imageERKN5Eigen10MatrixBaseI1EEE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">E</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classfly_1_1system_1_1Triclinic_1a4575812a64edc3eaa26856de03229b08"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">Position</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">matrix_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">canon_image</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">Eigen</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">MatrixBase</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0ENK3fly6system9Triclinic11canon_imageEN8Position8matrix_tERKN5Eigen10MatrixBaseI1EEE" title="fly::system::Triclinic::canon_image::E"><span class="n"><span class="pre">E</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">x</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4I0ENK3fly6system9Triclinic11canon_imageEN8Position8matrix_tERKN5Eigen10MatrixBaseI1EEE" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Maps an atom into the canonical cell. </p>
+<p><p></p>
+ </p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Assumes atoms are within the extents of the non-periodic axes!</p>
+</div>
+</dd></dl>
+
+</div>
+</dd></dl>
+
 </section>
 
         </article>

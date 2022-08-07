@@ -15,16 +15,11 @@ File: ``libfly/system/boxes/orthorhombic.hpp``
 Triclinic
 ================================================
 
-related
+File: ``libfly/system/boxes/triclinic.hpp``
 
+.. doxygenfile:: libfly/system/boxes/triclinic.hpp
+    :sections: briefdescription detaileddescription
 
-
-signal
-
-
-
-
-
-
-
-user-defined
+.. doxygenclass:: fly::system::Triclinic
+    :members:
+    :undoc-members:

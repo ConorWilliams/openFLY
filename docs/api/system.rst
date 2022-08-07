@@ -3,7 +3,24 @@ System
 
 Directory: ``libfly/system``
 
-The ``system`` folder contains a collection of data structures for representing atoms, groups of atoms and the space the atoms exist in. Everything in the systems folder is contained within the namespace ``fly::system``.
+The ``system`` folder contains a collection of data structures for representing atoms, groups of atoms and the space the atoms exist in. Everything is contained within the namespace ``fly::system``.
+
+Simulation space
+--------------------------------
+
+File: ``libfly/system/boxes/box.hpp``
+
+.. doxygenfile:: libfly/system/box.hpp
+    :sections: briefdescription detaileddescription
+
+If you would like to read more about the boxes specialised for simpler crystal-systems see:
+
+.. toctree::
+   
+   crystal_systems.rst
+
+Generalised box
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Atoms
 ----------------------
@@ -64,18 +81,4 @@ File: ``libfly/system/boxes/VoS.hpp``
     :members:
     :undoc-members:
 
-
-Simulation space
---------------------------------
-
-File: ``libfly/system/boxes/box.hpp``
-
-.. doxygenfile:: libfly/system/box.hpp
-    :sections: briefdescription detaileddescription
-
-If you would like to read about the specialised crystal systems use the links below:
-
-.. toctree::
-   
-   crystal_systems.rst
 

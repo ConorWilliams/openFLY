@@ -24,7 +24,35 @@
 /**
  * \file box.hpp
  *
- * @brief Static polymorphism for box.
+ * @brief Classes for describing the simulation space.
+ *
+ * \rst
+ *
+ * Atoms in libFLY exist within a simulation space (or box) and this space is often periodic. Periodic boxes must tessellate in
+ * N-dimensional space hence, libFLY's boxes are parallelotopes. The parallelotopes is described by a series of *basis* vectors. These
+ * are assembled into a matrix of the form:
+ *
+ * .. math::
+ *
+ *     \begin{bmatrix}
+ *     a_1 & b_1 & c_1 & \cdots\\
+ *     0 & b_2 & c_2 & \\
+ *     0 & 0 & c_3 & \\
+ *     \vdots &  & & \ddots
+ *     \end{bmatrix}
+ *
+ * with each column corresponding to a basis vector and all non-zero entries positive. This constrains some of the rotational degrees
+ * of freedom of the parallelotope.
+ *
+ * The *canonical* cell/box/simulation-space is the volume of space inside the parallelotope with edges formed from these basis
+ * vectors rooted at the origin. Along periodic axes atoms are allowed to have projected coordinates outside the canonical cell
+ * however, along non-periodic axes atoms must be inside the canonical cell.
+ *
+ * LibFLY resolved periodicity using *ghost atoms*, these are the periodic images of *real atom*. To do this efficiently the canonical
+ * box is split into a *grid* of smaller parallelotopes. These *grid cells* are determined by the maximum interatomic interaction
+ * distance.
+ *
+ * \endrst
  */
 
 namespace fly::system {}  // namespace fly::system

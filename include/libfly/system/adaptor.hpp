@@ -16,7 +16,6 @@
 #include <Eigen/Core>
 #include <cstddef>
 
-#include "libfly/utility/asserts.hpp"
 #include "libfly/utility/core.hpp"
 
 /**
@@ -27,7 +26,8 @@
 
 namespace fly::system::detail {
 
-  template <typename Mem> struct Adaptor {
+  template <typename Mem>
+  struct Adaptor {
   public:
     Adaptor() = default;
 
@@ -130,7 +130,8 @@ namespace fly::system::detail {
      */
   };
 
-  template <typename Mem> struct Adaptor<Mem&> {
+  template <typename Mem>
+  struct Adaptor<Mem&> {
   public:
     Adaptor() = default;
 
@@ -189,7 +190,8 @@ namespace fly::system::detail {
     friend struct Adaptor<Mem const&>;
   };
 
-  template <typename Mem> struct Adaptor<Mem const&> {
+  template <typename Mem>
+  struct Adaptor<Mem const&> {
   public:
     Adaptor() = default;
 
@@ -249,8 +251,14 @@ namespace fly::system::detail {
     friend struct Adaptor<Mem&>;
   };
 
-  template <typename Mem> struct Adaptor<Mem&&> { static_assert(always_false<Mem>, "Rvalue reference to member is illegal."); };
+  template <typename Mem>
+  struct Adaptor<Mem&&> {
+    static_assert(always_false<Mem>, "Rvalue reference to member is illegal.");
+  };
 
-  template <typename Mem> struct Adaptor<Mem const&&> { static_assert(always_false<Mem>, "Rvalue reference to member is illegal."); };
+  template <typename Mem>
+  struct Adaptor<Mem const&&> {
+    static_assert(always_false<Mem>, "Rvalue reference to member is illegal.");
+  };
 
 }  // namespace fly::system::detail

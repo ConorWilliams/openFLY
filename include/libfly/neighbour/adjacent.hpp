@@ -18,13 +18,12 @@
 #include <nonstd/span.hpp>
 #include <vector>
 
-#include "libfly/utility/asserts.hpp"
 #include "libfly/utility/core.hpp"
 
 /**
  * \file adjacent.hpp
  *
- * @brief Static polymorphism for box.
+ * @brief Helper types for neighbour::List
  */
 
 namespace fly::neighbour {
@@ -109,7 +108,3 @@ namespace fly::neighbour {
   };
 
 }  // namespace fly::neighbour
-
-//    * The canonical grid cell is the parallelepiped of space spanned by the extents of the canonical cell, canon_grid_pos() maps a
-//    * point into the canonical cell and then nudges it by one grid cell in the (1,1,1) direction. This leaves room for a layer of
-//    * ghost atom cells around the canonical cell.

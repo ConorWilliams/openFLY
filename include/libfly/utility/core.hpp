@@ -88,20 +88,20 @@ namespace fly {
   using Arr = Eigen::Array<T, spatial_dims, 1>;
 
   /**
-   * @brief Strongly typed +/- sign.
-   */
-  enum class Sign : int {
-    plus = 1,
-    minus = -1,
-  };
-
-  /**
    * @brief Shorthand for creating an \c spatial_dims x \c spatial_dims \c Eigen::Matrix.
    *
    * @tparam T The scalar type of the \c Eigen::Matrix
    */
   template <typename T>
   using Mat = Eigen::Matrix<T, spatial_dims, spatial_dims>;
+
+  /**
+   * @brief Strongly typed +/- sign.
+   */
+  enum class Sign : int {
+    plus = 1,
+    minus = -1,
+  };
 
   namespace detail {
 
@@ -163,8 +163,8 @@ namespace fly {
    * \endrst
    */
   template <typename E1, typename E2>
-  auto gdot(Eigen::ArrayBase<E1> const& a, Eigen::ArrayBase<E2> const& b) {
-    return (a * b).sum();
+  auto gdot(E1 const& a, E2 const& b) {
+    return (a.array() * b.array()).sum();
   }
 
   /**

@@ -23,7 +23,6 @@
 #include <optional>
 
 #include "libfly/system/atom.hpp"
-#include "libfly/utility/asserts.hpp"
 #include "libfly/utility/core.hpp"
 
 namespace fly::system {

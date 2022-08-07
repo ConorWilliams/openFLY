@@ -90,27 +90,8 @@ jobs:
 
     runs-on: ubuntu-latest
 
-    # To enable, first you have to create an orphaned gh-pages branch:
-    #
-    #    git switch --orphan gh-pages
-    #    git commit --allow-empty -m "Initial commit"
-    #    h
-    #
-    # Edit the <name> placeholder below to your GitHub name, so this action
-    # runs only in your repository and no one else's fork. After these, delete
-    # this comment and the last line in the conditional below.
-    # If you do not wish to use GitHub Pages for deploying documentation, then
-    # simply delete this job similarly to the coverage one.
-    if: github.ref == 'refs/heads/main'
-      && github.event_name == 'push'
-      && github.repository_owner == 'conorwilliams'
-
     steps:
       - uses: actions/checkout@v3
-
-      - name: Install vcpkg
-        uses: friendlyanon/setup-vcpkg@v1
-        with: { committish: "66045de4dcc5da3d1029c02b606307f5951dcb22" }
 
       - uses: actions/setup-python@v4
         with: { python-version: "3.8" }
@@ -123,13 +104,14 @@ jobs:
           && sudo apt-get install doxygen -q -y
 
       - name: Configure
-        run: cmake --preset=ci-ubuntu -DFLY_DOCS=ON
+        run: cmake -S ./docs -B build/docs
 
       - name: Build docs
-        run: cmake --build build --target docs
+        run: cmake --build build/docs
 
       - name: Deploy docs
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./build/docs/sphinx
+        if: github.repository_owner == 'conorwilliams' && github.event_name == 'push'

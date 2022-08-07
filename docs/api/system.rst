@@ -63,5 +63,9 @@ Orthorhombic
     :members:
     :undoc-members:
 
+.. doxygenclass:: fly::system::OrthorhombicGrid
+    :members:
+    :undoc-members:
+
 Triclinic 
 ````````````````````````````````````````````

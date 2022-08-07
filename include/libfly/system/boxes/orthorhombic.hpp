@@ -20,17 +20,89 @@
  */
 
 #include <Eigen/Core>
+#include <optional>
 
 #include "libfly/system/atom.hpp"
 #include "libfly/utility/asserts.hpp"
 #include "libfly/utility/core.hpp"
 
 namespace fly::system {
+
+  /**
+   * @brief Maps position vector tuples to a 1D grid.
+   *
+   * The OrthorhombicGrid is responsible for managing the mapping from ND->1D for the neighbour::List. The supercell is cut into a grid
+   * of cells and each cell has a unique index. Atoms are assigned to a cell (at least as large in each dimension as r_cut).
+   *
+   */
+  class OrthorhombicGrid {
+  public:
+    /**
+     * @brief Get the total number of cells in the OrthorhombicGrid along each axis.
+     */
+    Arr<int> shape() const noexcept { return m_shape; }
+
+    /**
+     * @brief Compute the cell index from an atoms canonical position.
+     *
+     * This function only supports atoms in the canonical cell or atoms in the surrounding one grid-cell buffer i.e. ghost atoms.
+     */
+    template <typename E>
+    int cell_idx(Eigen::MatrixBase<E> const& x) const noexcept {
+      return to_1D(clamp_to_grid_idxs(x + m_cell.matrix()));
+    }
+
+  private:
+    friend class Orthorhombic;
+
+    Arr<int> m_shape = Arr<int>::Zero();
+    Arr<int> m_prod_shape = Arr<int>::Zero();
+
+    Arr<Position::scalar_t> m_cell = Arr<Position::scalar_t>::Zero();
+    Arr<Position::scalar_t> m_inv_cell = Arr<Position::scalar_t>::Zero();
+
+    OrthorhombicGrid(Arr<Position::scalar_t> const& extents, Position::scalar_t r_cut) {
+      // Sanity checks
+      VERIFY(r_cut > 0, "r_cut is negative");
+      VERIFY((extents > r_cut).all(), "r_cut is too big");
+      //
+      m_shape = 2 + (extents / r_cut).cast<int>();
+      m_cell = extents / (extents / r_cut).floor();
+      m_inv_cell = 1.0 / m_cell;
+
+      // Cumulative product of m_shape
+
+      m_prod_shape = Arr<int>::Ones();
+
+      for (int i = 1; i < spatial_dims; i++) {
+        m_prod_shape[i] = m_prod_shape[i - 1] * m_shape[i - 1];
+      }
+    }
+
+    /**
+     * @brief Cast a position to its grid indexes and clamp on interval [0, m_shape -1].
+     */
+    template <typename E>
+    Arr<int> clamp_to_grid_idxs(Eigen::MatrixBase<E> const& x) const noexcept {
+      return (x.array() * m_inv_cell).template cast<int>().cwiseMax(0).cwiseMin(m_shape - 1);
+    }
+
+    /**
+     * @brief Get the 1D index from the nD index.
+     */
+    int to_1D(Arr<int> const& indexes) const noexcept { return (indexes * m_prod_shape).sum(); }
+  };
+
   /**
    * @brief Provides details of the simulations orthorhombic supercell geometry.
    *
    * All queries of the space in which the atoms exist are provided by this class. It is assumed
    * (and must be ensured) all non-periodic atoms are within the Orthorhombic extents.
+   *
+   * \rst
+   * .. todo::
+   *    Make test for this class work in ND.
+   * \endrst
    */
   class Orthorhombic {
   public:
@@ -47,14 +119,31 @@ namespace fly::system {
     /**
      * @brief Fetch the basis vectors of this cell.
      *
-     * The result is in the form of an ``Eigen::DiagonalMatrix`` with each column corresponding to a basis vector.
+     * @return Eigen::DiagonalMatrix<Position::scalar_t, spatial_dims> A matrix with each column corresponding to a basis vector.
      */
-    Eigen::DiagonalMatrix<floating, spatial_dims> basis() const noexcept { return {m_extents[0], m_extents[1], m_extents[2]}; }
+    Eigen::DiagonalMatrix<Position::scalar_t, spatial_dims> basis() const noexcept {
+      return Eigen::DiagonalMatrix<Position::scalar_t, spatial_dims>{m_extents.matrix()};
+    }
 
     /**
      * @brief Get an array detailing the periodicity along each axis.
      */
     Arr<bool> const& periodic() const noexcept { return m_periodic; }
+
+    /**
+     * @brief Generate the periodic image of an atom.
+     *
+     * @param x Position of the atom who's image we are computing.
+     * @param ax Axis along which to generate image (magnitude = index, sign = direction).
+     * @param r_cut Cut-off radius for atomic interactions.
+     * @return std::optional<Position::matrix_t> If the atom's image is beyond the cut-off (``r_cut``) for atomic interactions then
+     * the image's position otherwise, ``std::nullopt``.
+     */
+    template <typename A, typename B>
+    std::optional<Position::matrix_t> gen_image(Eigen::MatrixBase<B> const& x, int ax, Position::scalar_t r_cut) {
+      x + ax + r_cut;
+      return {};
+    }
 
     /**
      * @brief Maps atom into the canonical cell.
@@ -70,10 +159,11 @@ namespace fly::system {
      *
      * \endrst
      */
-    Vec<floating> canon_image(Vec<floating> const& x) const noexcept {
+    template <typename E>
+    Position::matrix_t canon_image(Eigen::MatrixBase<E> const& x) const {
       // Non-periodic atoms are within the simulation box extents so x[i] * inv_extents less than 1 and x[i]
       // remains unaffected, hence no non-periodic switch/select.
-      ASSERT((m_periodic || (x.array() >= Arr<floating>::Zero() && x.array() < m_extents)).all(), "Out of box");
+      ASSERT((m_periodic || (x.array() >= Arr<Position::scalar_t>::Zero() && x.array() < m_extents)).all(), "Out of box");
       return x.array() - m_extents * (x.array() * m_inv_extents).floor();
     }
 
@@ -85,8 +175,8 @@ namespace fly::system {
      * See: https://doi.org/10.1524/zpch.2013.0311
      */
     template <typename A, typename B>
-    [[deprecated]] Vec<floating> min_image(Eigen::MatrixBase<A> const& a, Eigen::MatrixBase<B> const& b) const noexcept {
-      Arr<floating> dr = b - a;
+    Position::matrix_t min_image(Eigen::MatrixBase<A> const& a, Eigen::MatrixBase<B> const& b) const noexcept {
+      Arr<Position::scalar_t> dr = b - a;
       return m_periodic.select(dr - m_extents * (dr * m_inv_extents + 0.5).floor(), dr);
     }
 
@@ -98,83 +188,16 @@ namespace fly::system {
     }
 
     /**
-     * @brief Maps position vector tuples to a 1D grid.
+     * @brief Make an OrthorhombicGrid object.
      *
-     * The Grid is responsible for managing the mapping from ND->1D for the neighbour::List. The supercell is cut into a grid of cells
-     * and each cell has a unique index. Atoms are assigned to a cell (at least as large in each dimension as r_cut).
-     *
+     * @param r_cut The cut-off radius for atomic interactions.
      */
-    class Grid {
-    public:
-      /**
-       * @brief Get the total number of cells in the Grid along each axis.
-       */
-      Arr<int> shape() const noexcept { return m_shape; }
-
-      /**
-       * @brief Get a vector which displaces an atom by one grid cell along each axis.
-       */
-      Vec<floating> cell_offset() const noexcept { return m_cell; }
-
-      /**
-       * @brief Compute the cell index from an atoms position.
-       *
-       * Assumes atom is in the canonical cell + displaced by cell_offset().
-       */
-      int cell_idx(Vec<floating> const& x) const { return to_1D(clamp_to_grid_idxs(x)); }
-
-    private:
-      friend Orthorhombic;
-
-      Arr<int> m_shape = Vec<int>::Zero();
-      Arr<int> m_prod_shape = Vec<int>::Zero();
-
-      Arr<floating> m_cell = Vec<floating>::Zero();
-      Arr<floating> m_inv_cell = Vec<floating>::Zero();
-
-      Grid(Arr<floating> const& extents, floating rcut) {
-        m_shape = 2 + (extents / rcut).cast<int>();
-        m_cell = extents / (extents / rcut).floor();
-        m_inv_cell = 1.0 / m_cell;
-
-        // Sanity checks
-        VERIFY(rcut > 0, "r_cut is negative");
-        VERIFY((extents > rcut).all(), "r_cut is too big");
-
-        // Cumulative product of m_shape
-
-        m_prod_shape = Arr<int>::Ones();
-
-        for (int i = 1; i < spatial_dims; i++) {
-          m_prod_shape[i] = m_prod_shape[i - 1] * m_shape[i - 1];
-        }
-      }
-
-      /**
-       * @brief Cast a Vec<floating> to Vec<int> and clamp on interval [0, m_shape -1].
-       */
-      Arr<int> clamp_to_grid_idxs(Vec<floating> const& x) const& {
-        return (x.array() * m_inv_cell).cast<int>().cwiseMax(0).cwiseMin(m_shape - 1);
-      }
-
-      /**
-       * @brief Get the 1D index from the nD index.
-       */
-      int to_1D(Arr<int> const& indexes) const& { return (indexes * m_prod_shape).sum(); }
-    };
-
-    /**
-     * @brief Make a grid
-     *
-     * @param rcut
-     * @return Grid
-     */
-    Grid make_grid(floating rcut) const { return {m_extents, rcut}; }
+    OrthorhombicGrid make_grid(Position::scalar_t r_cut) const { return {m_extents, r_cut}; }
 
   private:
-    Arr<floating> m_extents = Arr<floating>::Zero();
+    Arr<Position::scalar_t> m_extents = Arr<Position::scalar_t>::Zero();
     Arr<bool> m_periodic = Arr<bool>::Zero();
-    Arr<floating> m_inv_extents = Arr<floating>::Zero();
+    Arr<Position::scalar_t> m_inv_extents = Arr<Position::scalar_t>::Zero();
   };
 
 }  // namespace fly::system

@@ -35,11 +35,6 @@ namespace fly {
   inline constexpr int spatial_dims = 3;
 
   /**
-   * @brief Floating point type used for position, velocity, etc.
-   */
-  using floating = double;
-
-  /**
    * @brief The maximum atomic number that any atom can have.
    */
   inline constexpr int max_atomic_num = 111;

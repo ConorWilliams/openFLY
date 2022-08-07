@@ -1,9 +1,10 @@
-// clang-format off
-#include <fmt/core.h>
+
+
 #include "libfly/system/box.hpp"
 
 #include <catch2/catch_test_macros.hpp>
 
+#include "libfly/system/atom.hpp"
 #include "libfly/system/boxes/orthorhombic.hpp"
 
 TEST_CASE("AdjacentCells", "[system]") {
@@ -12,27 +13,20 @@ TEST_CASE("AdjacentCells", "[system]") {
 
   auto grid = box.make_grid(3);
 
-  using V = fly::Vec<fly::floating>;
+  using V = fly::Vec<fly::Position::scalar_t>;
 
-  REQUIRE(grid.cell_idx(box.canon_image(V{0, 0, 0}) + grid.cell_offset()) == 1 + 1 * 5 + 1 * 5 * 5);
-  REQUIRE(grid.cell_idx(box.canon_image(V{0, 0, 0}) + grid.cell_offset()) == 1 + 1 * 5 + 1 * 5 * 5);
+  REQUIRE(grid.cell_idx(box.canon_image(V{0, 0, 0})) == 1 + 1 * 5 + 1 * 5 * 5);
+  REQUIRE(grid.cell_idx(box.canon_image(V{0, 0, 0})) == 1 + 1 * 5 + 1 * 5 * 5);
 
-  REQUIRE(grid.cell_idx(box.canon_image(V{5, 5, 5}) + grid.cell_offset()) == 2 + 2 * 5 + 2 * 5 * 5);
+  REQUIRE(grid.cell_idx(box.canon_image(V{5, 5, 5})) == 2 + 2 * 5 + 2 * 5 * 5);
 
-  REQUIRE(grid.cell_idx(box.canon_image(V{9.999, 9.999, 9.999}) + grid.cell_offset()) == 3 + 3 * 5 + 3 * 5 * 5);
+  REQUIRE(grid.cell_idx(box.canon_image(V{9.999, 9.999, 9.999})) == 3 + 3 * 5 + 3 * 5 * 5);
 
   fly::system::AdjacentCells cells(grid.shape());
-
-  //   // Test inner cell
-
- 
 
   {
     auto neigh = cells[(1) + (1) * 5 + (1) * 5 * 5];
 
-    for(auto elem : neigh){
-     fmt::print("{}\n", elem);
-}
     REQUIRE(neigh.size() == 26);
 
     REQUIRE(neigh[0] == (1 - 1) + (1 - 1) * 5 + (1 - 1) * 5 * 5);
@@ -72,27 +66,27 @@ TEST_CASE("AdjacentCells", "[system]") {
     REQUIRE(neigh[25] == (1 + 1) + (1 + 1) * 5 + (1 + 1) * 5 * 5);
   }
 
-    // Test face cell
+  // Test face cell
 
-    {
-      auto neigh = cells[((2) + (2) * 5 + (0) * 5 * 5)];
+  {
+    auto neigh = cells[((2) + (2) * 5 + (0) * 5 * 5)];
 
-      REQUIRE(neigh.size() == 9 + 8);
-    }
+    REQUIRE(neigh.size() == 9 + 8);
+  }
 
-    // Test Edge cell
+  // Test Edge cell
 
-    {
-      auto neigh = cells[((2) + (0) * 5 + (0) * 5 * 5)];
+  {
+    auto neigh = cells[((2) + (0) * 5 + (0) * 5 * 5)];
 
-      REQUIRE(neigh.size() == 11);
-    }
+    REQUIRE(neigh.size() == 11);
+  }
 
-    // Test corner cell
+  // Test corner cell
 
-    {
-      auto neigh = cells[((0) + (0) * 5 + (0) * 5 * 5)];
+  {
+    auto neigh = cells[((0) + (0) * 5 + (0) * 5 * 5)];
 
-      REQUIRE(neigh.size() == 7);
-    }
+    REQUIRE(neigh.size() == 7);
+  }
 }

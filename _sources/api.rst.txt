@@ -10,6 +10,7 @@ Welcome to the libFLY API reference this serves as information for developers to
 
    api/utility.rst
    api/system.rst
+   api/neighbour.rst
 
 
 

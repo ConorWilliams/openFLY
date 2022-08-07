@@ -3,7 +3,7 @@
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
-<link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="Todo!" href="../todo.html" /><link rel="prev" title="Utilities (libfly/utility)" href="utility.html" />
+<link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="Orthorhombic" href="crystal_systems.html" /><link rel="prev" title="Utilities (libfly/utility)" href="utility.html" />
 
     <link rel="shortcut icon" href="../_static/favicon.ico"/><meta name="generator" content="sphinx-5.1.1, furo 2022.06.21"/>
         <title>System (libfly/system) - OpenFLY documentation</title>
@@ -175,7 +175,12 @@
 </li>
 <li class="toctree-l1 current has-children"><a class="reference internal" href="../api.html">Library API reference</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="utility.html">Utilities (<code class="docutils literal notranslate"><span class="pre">libfly/utility</span></code>)</a></li>
-<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">System (<code class="docutils literal notranslate"><span class="pre">libfly/system</span></code>)</a></li>
+<li class="toctree-l2 current has-children current-page"><a class="current reference internal" href="#">System (<code class="docutils literal notranslate"><span class="pre">libfly/system</span></code>)</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="crystal_systems.html">Orthorhombic</a></li>
+<li class="toctree-l3"><a class="reference internal" href="crystal_systems.html#triclinic">Triclinic</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="neighbour.html">Neighbour (<code class="docutils literal notranslate"><span class="pre">libfly/neighbour</span></code>)</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../todo.html">Todo!</a></li>
@@ -472,7 +477,7 @@
 
 <dl class="cpp struct">
 <dt class="sig sig-object cpp" id="_CPPv4N3fly9builtin_m4AxisE">
-<span id="_CPPv3N3fly9builtin_m4AxisE"></span><span id="_CPPv2N3fly9builtin_m4AxisE"></span><span id="fly::builtin_m::Axis"></span><span class="target" id="structfly_1_1builtin__m_1_1Axis"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Axis</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><a class="reference internal" href="utility.html#_CPPv43fly" title="fly"><span class="n"><span class="pre">fly</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">system</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4I0_i_iI0_DpDaE0EN3fly6system6MemTagE" title="fly::system::MemTag"><span class="n"><span class="pre">MemTag</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="utility.html#_CPPv4N3fly8floatingE" title="fly::floating"><span class="n"><span class="pre">floating</span></span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="utility.html#_CPPv4N3fly12spatial_dimsE" title="fly::spatial_dims"><span class="n"><span class="pre">spatial_dims</span></span></a><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4N3fly9builtin_m4AxisE" title="Permalink to this definition">#</a><br /></dt>
+<span id="_CPPv3N3fly9builtin_m4AxisE"></span><span id="_CPPv2N3fly9builtin_m4AxisE"></span><span id="fly::builtin_m::Axis"></span><span class="target" id="structfly_1_1builtin__m_1_1Axis"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Axis</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><a class="reference internal" href="utility.html#_CPPv43fly" title="fly"><span class="n"><span class="pre">fly</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">system</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4I0_i_iI0_DpDaE0EN3fly6system6MemTagE" title="fly::system::MemTag"><span class="n"><span class="pre">MemTag</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4N3fly9builtin_m8PositionE" title="fly::builtin_m::Position"><span class="n"><span class="pre">Position</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">scalar_t</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="utility.html#_CPPv4N3fly12spatial_dimsE" title="fly::spatial_dims"><span class="n"><span class="pre">spatial_dims</span></span></a><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4N3fly9builtin_m4AxisE" title="Permalink to this definition">#</a><br /></dt>
 <dd><div class="docutils container">
 <em>#include &lt;libfly/system/atom.hpp&gt;</em></div>
 <p>Tag type for dimer axis (xyz). </p>
@@ -496,7 +501,7 @@
 
 <dl class="cpp struct">
 <dt class="sig sig-object cpp" id="_CPPv4N3fly9builtin_m8GradientE">
-<span id="_CPPv3N3fly9builtin_m8GradientE"></span><span id="_CPPv2N3fly9builtin_m8GradientE"></span><span id="fly::builtin_m::Gradient"></span><span class="target" id="structfly_1_1builtin__m_1_1Gradient"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Gradient</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><a class="reference internal" href="utility.html#_CPPv43fly" title="fly"><span class="n"><span class="pre">fly</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">system</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4I0_i_iI0_DpDaE0EN3fly6system6MemTagE" title="fly::system::MemTag"><span class="n"><span class="pre">MemTag</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="utility.html#_CPPv4N3fly8floatingE" title="fly::floating"><span class="n"><span class="pre">floating</span></span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="utility.html#_CPPv4N3fly12spatial_dimsE" title="fly::spatial_dims"><span class="n"><span class="pre">spatial_dims</span></span></a><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4N3fly9builtin_m8GradientE" title="Permalink to this definition">#</a><br /></dt>
+<span id="_CPPv3N3fly9builtin_m8GradientE"></span><span id="_CPPv2N3fly9builtin_m8GradientE"></span><span id="fly::builtin_m::Gradient"></span><span class="target" id="structfly_1_1builtin__m_1_1Gradient"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Gradient</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><a class="reference internal" href="utility.html#_CPPv43fly" title="fly"><span class="n"><span class="pre">fly</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">system</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4I0_i_iI0_DpDaE0EN3fly6system6MemTagE" title="fly::system::MemTag"><span class="n"><span class="pre">MemTag</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4N3fly9builtin_m8PositionE" title="fly::builtin_m::Position"><span class="n"><span class="pre">Position</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">scalar_t</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="utility.html#_CPPv4N3fly12spatial_dimsE" title="fly::spatial_dims"><span class="n"><span class="pre">spatial_dims</span></span></a><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4N3fly9builtin_m8GradientE" title="Permalink to this definition">#</a><br /></dt>
 <dd><div class="docutils container">
 <em>#include &lt;libfly/system/atom.hpp&gt;</em></div>
 <p>Tag type for gradient of the potential. </p>
@@ -520,7 +525,7 @@
 
 <dl class="cpp struct">
 <dt class="sig sig-object cpp" id="_CPPv4N3fly9builtin_m8PositionE">
-<span id="_CPPv3N3fly9builtin_m8PositionE"></span><span id="_CPPv2N3fly9builtin_m8PositionE"></span><span id="fly::builtin_m::Position"></span><span class="target" id="structfly_1_1builtin__m_1_1Position"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Position</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><a class="reference internal" href="utility.html#_CPPv43fly" title="fly"><span class="n"><span class="pre">fly</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">system</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4I0_i_iI0_DpDaE0EN3fly6system6MemTagE" title="fly::system::MemTag"><span class="n"><span class="pre">MemTag</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="utility.html#_CPPv4N3fly8floatingE" title="fly::floating"><span class="n"><span class="pre">floating</span></span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="utility.html#_CPPv4N3fly12spatial_dimsE" title="fly::spatial_dims"><span class="n"><span class="pre">spatial_dims</span></span></a><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4N3fly9builtin_m8PositionE" title="Permalink to this definition">#</a><br /></dt>
+<span id="_CPPv3N3fly9builtin_m8PositionE"></span><span id="_CPPv2N3fly9builtin_m8PositionE"></span><span id="fly::builtin_m::Position"></span><span class="target" id="structfly_1_1builtin__m_1_1Position"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Position</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><a class="reference internal" href="utility.html#_CPPv43fly" title="fly"><span class="n"><span class="pre">fly</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">system</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4I0_i_iI0_DpDaE0EN3fly6system6MemTagE" title="fly::system::MemTag"><span class="n"><span class="pre">MemTag</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">double</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="utility.html#_CPPv4N3fly12spatial_dimsE" title="fly::spatial_dims"><span class="n"><span class="pre">spatial_dims</span></span></a><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4N3fly9builtin_m8PositionE" title="Permalink to this definition">#</a><br /></dt>
 <dd><div class="docutils container">
 <em>#include &lt;libfly/system/atom.hpp&gt;</em></div>
 <p>Tag type for position (xyz). </p>
@@ -536,7 +541,7 @@
 
 <dl class="cpp struct">
 <dt class="sig sig-object cpp" id="_CPPv4N3fly9builtin_m8VelocityE">
-<span id="_CPPv3N3fly9builtin_m8VelocityE"></span><span id="_CPPv2N3fly9builtin_m8VelocityE"></span><span id="fly::builtin_m::Velocity"></span><span class="target" id="structfly_1_1builtin__m_1_1Velocity"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Velocity</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><a class="reference internal" href="utility.html#_CPPv43fly" title="fly"><span class="n"><span class="pre">fly</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">system</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4I0_i_iI0_DpDaE0EN3fly6system6MemTagE" title="fly::system::MemTag"><span class="n"><span class="pre">MemTag</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="utility.html#_CPPv4N3fly8floatingE" title="fly::floating"><span class="n"><span class="pre">floating</span></span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="utility.html#_CPPv4N3fly12spatial_dimsE" title="fly::spatial_dims"><span class="n"><span class="pre">spatial_dims</span></span></a><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4N3fly9builtin_m8VelocityE" title="Permalink to this definition">#</a><br /></dt>
+<span id="_CPPv3N3fly9builtin_m8VelocityE"></span><span id="_CPPv2N3fly9builtin_m8VelocityE"></span><span id="fly::builtin_m::Velocity"></span><span class="target" id="structfly_1_1builtin__m_1_1Velocity"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Velocity</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><a class="reference internal" href="utility.html#_CPPv43fly" title="fly"><span class="n"><span class="pre">fly</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">system</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4I0_i_iI0_DpDaE0EN3fly6system6MemTagE" title="fly::system::MemTag"><span class="n"><span class="pre">MemTag</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4N3fly9builtin_m8PositionE" title="fly::builtin_m::Position"><span class="n"><span class="pre">Position</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">scalar_t</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="utility.html#_CPPv4N3fly12spatial_dimsE" title="fly::spatial_dims"><span class="n"><span class="pre">spatial_dims</span></span></a><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4N3fly9builtin_m8VelocityE" title="Permalink to this definition">#</a><br /></dt>
 <dd><div class="docutils container">
 <em>#include &lt;libfly/system/atom.hpp&gt;</em></div>
 <p>Tag type for velocity. </p>
@@ -803,148 +808,13 @@
 </section>
 <section id="simulation-box-box-hpp">
 <h2>Simulation box (<code class="docutils literal notranslate"><span class="pre">box.hpp</span></code>)<a class="headerlink" href="#simulation-box-box-hpp" title="Permalink to this heading">#</a></h2>
-<dl class="cpp class">
-<dt class="sig sig-object cpp" id="_CPPv4N3fly6system13AdjacentCellsE">
-<span id="_CPPv3N3fly6system13AdjacentCellsE"></span><span id="_CPPv2N3fly6system13AdjacentCellsE"></span><span id="fly::system::AdjacentCells"></span><span class="target" id="classfly_1_1system_1_1AdjacentCells"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">AdjacentCells</span></span></span><a class="headerlink" href="#_CPPv4N3fly6system13AdjacentCellsE" title="Permalink to this definition">#</a><br /></dt>
-<dd><p>Construct a list of adjacent cell lists. </p>
-<div class="breathe-sectiondef docutils container">
-<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4N3fly6system13AdjacentCells13AdjacentCellsERK3ArrIiE">
-<span id="_CPPv3N3fly6system13AdjacentCells13AdjacentCellsERK3ArrIiE"></span><span id="_CPPv2N3fly6system13AdjacentCells13AdjacentCellsERK3ArrIiE"></span><span id="fly::system::AdjacentCells::AdjacentCells__Arr:i:CR"></span><span class="target" id="classfly_1_1system_1_1AdjacentCells_1ab2803cb99142bfce48033e2e4f35bea3"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">explicit</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">AdjacentCells</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="utility.html#_CPPv4I0EN3fly3ArrE" title="fly::Arr"><span class="n"><span class="pre">Arr</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">int</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">shape</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3fly6system13AdjacentCells13AdjacentCellsERK3ArrIiE" title="Permalink to this definition">#</a><br /></dt>
-<dd><p>Construct a new <a class="reference internal" href="#classfly_1_1system_1_1AdjacentCells"><span class="std std-ref">AdjacentCells</span></a> object from the <code class="docutils literal notranslate"><span class="pre">shape</span></code> of the Grid. </p>
-</dd></dl>
-
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4NK3fly6system13AdjacentCellsixEi">
-<span id="_CPPv3NK3fly6system13AdjacentCellsixEi"></span><span id="_CPPv2NK3fly6system13AdjacentCellsixEi"></span><span id="fly::system::AdjacentCells::subscript-operator__iC"></span><span class="target" id="classfly_1_1system_1_1AdjacentCells_1af7406abe996ddfb8dedddeba03afdd78"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">nonstd</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">span</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">[]</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">n</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK3fly6system13AdjacentCellsixEi" title="Permalink to this definition">#</a><br /></dt>
-<dd><p>Get the <code class="docutils literal notranslate"><span class="pre">n</span></code>th adjacent cell list. </p>
-<p>A span containing the indexes of every cell adjacent to the <code class="docutils literal notranslate"><span class="pre">n</span></code>th cell, does not include the <code class="docutils literal notranslate"><span class="pre">n</span></code>th cell. </p>
-</dd></dl>
-
-</div>
-</dd></dl>
-
-<section id="crystal-systems">
-<h3>Crystal Systems<a class="headerlink" href="#crystal-systems" title="Permalink to this heading">#</a></h3>
-<section id="orthorhombic">
-<h4>Orthorhombic<a class="headerlink" href="#orthorhombic" title="Permalink to this heading">#</a></h4>
-<dl class="cpp class">
-<dt class="sig sig-object cpp" id="_CPPv4N3fly6system12OrthorhombicE">
-<span id="_CPPv3N3fly6system12OrthorhombicE"></span><span id="_CPPv2N3fly6system12OrthorhombicE"></span><span id="fly::system::Orthorhombic"></span><span class="target" id="classfly_1_1system_1_1Orthorhombic"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Orthorhombic</span></span></span><a class="headerlink" href="#_CPPv4N3fly6system12OrthorhombicE" title="Permalink to this definition">#</a><br /></dt>
-<dd><p>Provides details of the simulations orthorhombic supercell geometry. </p>
-<p>All queries of the space in which the atoms exist are provided by this class. It is assumed (and must be ensured) all non-periodic atoms are within the <a class="reference internal" href="#classfly_1_1system_1_1Orthorhombic"><span class="std std-ref">Orthorhombic</span></a> extents. </p>
-<div class="breathe-sectiondef docutils container">
-<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4N3fly6system12Orthorhombic12OrthorhombicERK3ArrIN8Position8scalar_tEERK3ArrIbE">
-<span id="_CPPv3N3fly6system12Orthorhombic12OrthorhombicERK3ArrIN8Position8scalar_tEERK3ArrIbE"></span><span id="_CPPv2N3fly6system12Orthorhombic12OrthorhombicERK3ArrIN8Position8scalar_tEERK3ArrIbE"></span><span id="fly::system::Orthorhombic::Orthorhombic__Arr:Position::scalar_t:CR.Arr:b:CR"></span><span class="target" id="classfly_1_1system_1_1Orthorhombic_1a24f8abbcb053081517dbd94e67530a11"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Orthorhombic</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="utility.html#_CPPv4I0EN3fly3ArrE" title="fly::Arr"><span class="n"><span class="pre">Arr</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">Position</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">scalar_t</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">ex</span></span>, <a class="reference internal" href="utility.html#_CPPv4I0EN3fly3ArrE" title="fly::Arr"><span class="n"><span class="pre">Arr</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">bool</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">pd</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3fly6system12Orthorhombic12OrthorhombicERK3ArrIN8Position8scalar_tEERK3ArrIbE" title="Permalink to this definition">#</a><br /></dt>
-<dd><p>Construct a new <a class="reference internal" href="#classfly_1_1system_1_1Orthorhombic"><span class="std std-ref">Orthorhombic</span></a> box object. </p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>ex</strong> – Length of simulation box along each axis. </p></li>
-<li><p><strong>pd</strong> – True for each periodic axis. </p></li>
+<p>If you would like to read about the specialised crystal systems use the links below:</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="crystal_systems.html">Orthorhombic</a></li>
+<li class="toctree-l1"><a class="reference internal" href="crystal_systems.html#triclinic">Triclinic</a></li>
 </ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4NK3fly6system12Orthorhombic5basisEv">
-<span id="_CPPv3NK3fly6system12Orthorhombic5basisEv"></span><span id="_CPPv2NK3fly6system12Orthorhombic5basisEv"></span><span id="fly::system::Orthorhombic::basisC"></span><span class="target" id="classfly_1_1system_1_1Orthorhombic_1acf6cc0d8f81cab3ae2e25201eb6df16c"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">Eigen</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">DiagonalMatrix</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="utility.html#_CPPv4N3fly8floatingE" title="fly::floating"><span class="n"><span class="pre">floating</span></span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="utility.html#_CPPv4N3fly12spatial_dimsE" title="fly::spatial_dims"><span class="n"><span class="pre">spatial_dims</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">basis</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="k"><span class="pre">noexcept</span></span><a class="headerlink" href="#_CPPv4NK3fly6system12Orthorhombic5basisEv" title="Permalink to this definition">#</a><br /></dt>
-<dd><p>Fetch the basis vectors of this cell. </p>
-<p>The result is in the form of an <code class="docutils literal notranslate"><span class="pre">Eigen::DiagonalMatrix</span></code> with each column corresponding to a basis vector. </p>
-</dd></dl>
-
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4NK3fly6system12Orthorhombic8periodicEv">
-<span id="_CPPv3NK3fly6system12Orthorhombic8periodicEv"></span><span id="_CPPv2NK3fly6system12Orthorhombic8periodicEv"></span><span id="fly::system::Orthorhombic::periodicC"></span><span class="target" id="classfly_1_1system_1_1Orthorhombic_1a8b0ab75bd6ae241bf671a02c89edca6e"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="utility.html#_CPPv4I0EN3fly3ArrE" title="fly::Arr"><span class="n"><span class="pre">Arr</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">bool</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">periodic</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="k"><span class="pre">noexcept</span></span><a class="headerlink" href="#_CPPv4NK3fly6system12Orthorhombic8periodicEv" title="Permalink to this definition">#</a><br /></dt>
-<dd><p>Get an array detailing the periodicity along each axis. </p>
-</dd></dl>
-
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4NK3fly6system12Orthorhombic11canon_imageERK3VecI8floatingE">
-<span id="_CPPv3NK3fly6system12Orthorhombic11canon_imageERK3VecI8floatingE"></span><span id="_CPPv2NK3fly6system12Orthorhombic11canon_imageERK3VecI8floatingE"></span><span id="fly::system::Orthorhombic::canon_image__Vec:floating:CRC"></span><span class="target" id="classfly_1_1system_1_1Orthorhombic_1a81241298ee7cdf4524b0e7026bf5418b"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="utility.html#_CPPv4I0EN3fly3VecE" title="fly::Vec"><span class="n"><span class="pre">Vec</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="utility.html#_CPPv4N3fly8floatingE" title="fly::floating"><span class="n"><span class="pre">floating</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">canon_image</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="utility.html#_CPPv4I0EN3fly3VecE" title="fly::Vec"><span class="n"><span class="pre">Vec</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="utility.html#_CPPv4N3fly8floatingE" title="fly::floating"><span class="n"><span class="pre">floating</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">x</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="k"><span class="pre">noexcept</span></span><a class="headerlink" href="#_CPPv4NK3fly6system12Orthorhombic11canon_imageERK3VecI8floatingE" title="Permalink to this definition">#</a><br /></dt>
-<dd><p>Maps atom into the canonical cell. </p>
-<p><p><p>Guarantees:</p>
-<div class="math-wrapper docutils container">
-<div class="math notranslate nohighlight">
-\[0 \le x_i &lt; \text{extent}_i\]</div>
 </div>
-<p>for all <span class="math notranslate nohighlight">\(i\)</span>.</p>
-</p>
- </p>
-</dd></dl>
-
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4I00ENK3fly6system12Orthorhombic9min_imageE3VecI8floatingERKN5Eigen10MatrixBaseI1AEERKN5Eigen10MatrixBaseI1BEE">
-<span id="_CPPv3I00ENK3fly6system12Orthorhombic9min_imageERKN5Eigen10MatrixBaseI1AEERKN5Eigen10MatrixBaseI1BEE"></span><span id="_CPPv2I00ENK3fly6system12Orthorhombic9min_imageERKN5Eigen10MatrixBaseI1AEERKN5Eigen10MatrixBaseI1BEE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">A</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">B</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classfly_1_1system_1_1Orthorhombic_1aa39a38b035c5f9eef4e606363367a16d"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="utility.html#_CPPv4I0EN3fly3VecE" title="fly::Vec"><span class="n"><span class="pre">Vec</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="utility.html#_CPPv4N3fly8floatingE" title="fly::floating"><span class="n"><span class="pre">floating</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">min_image</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">Eigen</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">MatrixBase</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I00ENK3fly6system12Orthorhombic9min_imageE3VecI8floatingERKN5Eigen10MatrixBaseI1AEERKN5Eigen10MatrixBaseI1BEE" title="fly::system::Orthorhombic::min_image::A"><span class="n"><span class="pre">A</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">a</span></span>, <span class="n"><span class="pre">Eigen</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">MatrixBase</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I00ENK3fly6system12Orthorhombic9min_imageE3VecI8floatingERKN5Eigen10MatrixBaseI1AEERKN5Eigen10MatrixBaseI1BEE" title="fly::system::Orthorhombic::min_image::B"><span class="n"><span class="pre">B</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">b</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="k"><span class="pre">noexcept</span></span><a class="headerlink" href="#_CPPv4I00ENK3fly6system12Orthorhombic9min_imageE3VecI8floatingERKN5Eigen10MatrixBaseI1AEERKN5Eigen10MatrixBaseI1BEE" title="Permalink to this definition">#</a><br /></dt>
-<dd><p>Compute shortest vector connecting <code class="docutils literal notranslate"><span class="pre">a</span></code> to a periodic image of <code class="docutils literal notranslate"><span class="pre">b</span></code>. </p>
-<p>This function is branchy and should be avoided in hot code.</p>
-<p>See: <a class="reference external" href="https://doi.org/10.1524/zpch.2013.0311">https://doi.org/10.1524/zpch.2013.0311</a> </p>
-</dd></dl>
-
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4NK3fly6system12Orthorhombic9make_gridE8floating">
-<span id="_CPPv3NK3fly6system12Orthorhombic9make_gridE8floating"></span><span id="_CPPv2NK3fly6system12Orthorhombic9make_gridE8floating"></span><span id="fly::system::Orthorhombic::make_grid__floatingC"></span><span class="target" id="classfly_1_1system_1_1Orthorhombic_1a6c3ce91133c8d2aa5f2af9ba4a6718df"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N3fly6system12Orthorhombic4GridE" title="fly::system::Orthorhombic::Grid"><span class="n"><span class="pre">Grid</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">make_grid</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="utility.html#_CPPv4N3fly8floatingE" title="fly::floating"><span class="n"><span class="pre">floating</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">rcut</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK3fly6system12Orthorhombic9make_gridE8floating" title="Permalink to this definition">#</a><br /></dt>
-<dd><p>Make a grid. </p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>rcut</strong> – </p>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><a class="reference internal" href="#classfly_1_1system_1_1Orthorhombic_1_1Grid"><span class="std std-ref">Grid</span></a> </p>
-</dd>
-</dl>
-</dd></dl>
-
-</div>
-<div class="breathe-sectiondef docutils container">
-<p class="breathe-sectiondef-title rubric" id="breathe-section-title-friends">Friends</p>
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4N3fly6system12OrthorhombiceqERK12OrthorhombicRK12Orthorhombic">
-<span id="_CPPv3N3fly6system12OrthorhombiceqERK12OrthorhombicRK12Orthorhombic"></span><span id="_CPPv2N3fly6system12OrthorhombiceqERK12OrthorhombicRK12Orthorhombic"></span><span id="fly::system::Orthorhombic::eq-operator__OrthorhombicCR.OrthorhombicCR"></span><span class="target" id="classfly_1_1system_1_1Orthorhombic_1acebad828f67f929d19ad958be2972ad2"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">friend</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">==</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N3fly6system12OrthorhombicE" title="fly::system::Orthorhombic"><span class="n"><span class="pre">Orthorhombic</span></span></a><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">a</span></span>, <a class="reference internal" href="#_CPPv4N3fly6system12OrthorhombicE" title="fly::system::Orthorhombic"><span class="n"><span class="pre">Orthorhombic</span></span></a><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">b</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">noexcept</span></span><a class="headerlink" href="#_CPPv4N3fly6system12OrthorhombiceqERK12OrthorhombicRK12Orthorhombic" title="Permalink to this definition">#</a><br /></dt>
-<dd><p>Comparison operator, no surprises. </p>
-</dd></dl>
-
-</div>
-<dl class="cpp class">
-<dt class="sig sig-object cpp" id="_CPPv4N3fly6system12Orthorhombic4GridE">
-<span id="_CPPv3N3fly6system12Orthorhombic4GridE"></span><span id="_CPPv2N3fly6system12Orthorhombic4GridE"></span><span id="fly::system::Orthorhombic::Grid"></span><span class="target" id="classfly_1_1system_1_1Orthorhombic_1_1Grid"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Grid</span></span></span><a class="headerlink" href="#_CPPv4N3fly6system12Orthorhombic4GridE" title="Permalink to this definition">#</a><br /></dt>
-<dd><p>Maps position vector tuples to a 1D grid. </p>
-<p>The <a class="reference internal" href="#classfly_1_1system_1_1Orthorhombic_1_1Grid"><span class="std std-ref">Grid</span></a> is responsible for managing the mapping from ND-&gt;1D for the neighbour::List. The supercell is cut into a grid of cells and each cell has a unique index. Atoms are assigned to a cell (at least as large in each dimension as r_cut). </p>
-<div class="breathe-sectiondef docutils container">
-<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4NK3fly6system12Orthorhombic4Grid5shapeEv">
-<span id="_CPPv3NK3fly6system12Orthorhombic4Grid5shapeEv"></span><span id="_CPPv2NK3fly6system12Orthorhombic4Grid5shapeEv"></span><span id="fly::system::Orthorhombic::Grid::shapeC"></span><span class="target" id="classfly_1_1system_1_1Orthorhombic_1_1Grid_1a99fa036622eab865af7b608d48ffebc5"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="utility.html#_CPPv4I0EN3fly3ArrE" title="fly::Arr"><span class="n"><span class="pre">Arr</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">int</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">shape</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="k"><span class="pre">noexcept</span></span><a class="headerlink" href="#_CPPv4NK3fly6system12Orthorhombic4Grid5shapeEv" title="Permalink to this definition">#</a><br /></dt>
-<dd><p>Get the total number of cells in the <a class="reference internal" href="#classfly_1_1system_1_1Orthorhombic_1_1Grid"><span class="std std-ref">Grid</span></a> along each axis. </p>
-</dd></dl>
-
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4NK3fly6system12Orthorhombic4Grid11cell_offsetEv">
-<span id="_CPPv3NK3fly6system12Orthorhombic4Grid11cell_offsetEv"></span><span id="_CPPv2NK3fly6system12Orthorhombic4Grid11cell_offsetEv"></span><span id="fly::system::Orthorhombic::Grid::cell_offsetC"></span><span class="target" id="classfly_1_1system_1_1Orthorhombic_1_1Grid_1a50d1d617ca0ce50bec024f552da9953b"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="utility.html#_CPPv4I0EN3fly3VecE" title="fly::Vec"><span class="n"><span class="pre">Vec</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="utility.html#_CPPv4N3fly8floatingE" title="fly::floating"><span class="n"><span class="pre">floating</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">cell_offset</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="k"><span class="pre">noexcept</span></span><a class="headerlink" href="#_CPPv4NK3fly6system12Orthorhombic4Grid11cell_offsetEv" title="Permalink to this definition">#</a><br /></dt>
-<dd><p>Get a vector which displaces an atom by one grid cell along each axis. </p>
-</dd></dl>
-
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4NK3fly6system12Orthorhombic4Grid8cell_idxERK3VecI8floatingE">
-<span id="_CPPv3NK3fly6system12Orthorhombic4Grid8cell_idxERK3VecI8floatingE"></span><span id="_CPPv2NK3fly6system12Orthorhombic4Grid8cell_idxERK3VecI8floatingE"></span><span id="fly::system::Orthorhombic::Grid::cell_idx__Vec:floating:CRC"></span><span class="target" id="classfly_1_1system_1_1Orthorhombic_1_1Grid_1ad5e426ca882223b853ee8e340b793da1"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">cell_idx</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="utility.html#_CPPv4I0EN3fly3VecE" title="fly::Vec"><span class="n"><span class="pre">Vec</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="utility.html#_CPPv4N3fly8floatingE" title="fly::floating"><span class="n"><span class="pre">floating</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">x</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK3fly6system12Orthorhombic4Grid8cell_idxERK3VecI8floatingE" title="Permalink to this definition">#</a><br /></dt>
-<dd><p>Compute the cell index from an atoms position. </p>
-<p>Assumes atom is in the canonical cell + displaced by <a class="reference internal" href="#classfly_1_1system_1_1Orthorhombic_1_1Grid_1a50d1d617ca0ce50bec024f552da9953b"><span class="std std-ref">cell_offset()</span></a>. </p>
-</dd></dl>
-
-</div>
-</dd></dl>
-
-</dd></dl>
-
-</section>
-<section id="triclinic">
-<h4>Triclinic<a class="headerlink" href="#triclinic" title="Permalink to this heading">#</a></h4>
-</section>
-</section>
 </section>
 </section>
 
@@ -953,12 +823,12 @@
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="../todo.html">
+          <a class="next-page" href="crystal_systems.html">
               <div class="page-info">
                 <div class="context">
                   <span>Next</span>
                 </div>
-                <div class="title">Todo!</div>
+                <div class="title">Orthorhombic</div>
               </div>
               <svg><use href="#svg-arrow-right"></use></svg>
             </a>
@@ -1022,14 +892,7 @@
 <li><a class="reference internal" href="#vector-of-structures-vos-hpp">Vector of Structures (<code class="docutils literal notranslate"><span class="pre">VoS.hpp</span></code>)</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#simulation-box-box-hpp">Simulation box (<code class="docutils literal notranslate"><span class="pre">box.hpp</span></code>)</a><ul>
-<li><a class="reference internal" href="#crystal-systems">Crystal Systems</a><ul>
-<li><a class="reference internal" href="#orthorhombic">Orthorhombic</a></li>
-<li><a class="reference internal" href="#triclinic">Triclinic</a></li>
-</ul>
-</li>
-</ul>
-</li>
+<li><a class="reference internal" href="#simulation-box-box-hpp">Simulation box (<code class="docutils literal notranslate"><span class="pre">box.hpp</span></code>)</a></li>
 </ul>
 </li>
 </ul>
@@ -1050,6 +913,5 @@
     <script src="../_static/tabs.js"></script>
     <script src="../_static/clipboard.min.js"></script>
     <script src="../_static/copybutton.js"></script>
-    <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     </body>
 </html>

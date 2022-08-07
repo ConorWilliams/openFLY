@@ -175,7 +175,12 @@
 </li>
 <li class="toctree-l1 current has-children"><a class="reference internal" href="../api.html">Library API reference</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
 <li class="toctree-l2 current current-page"><a class="current reference internal" href="#">Utilities (<code class="docutils literal notranslate"><span class="pre">libfly/utility</span></code>)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="system.html">System (<code class="docutils literal notranslate"><span class="pre">libfly/system</span></code>)</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="system.html">System (<code class="docutils literal notranslate"><span class="pre">libfly/system</span></code>)</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="crystal_systems.html">Orthorhombic</a></li>
+<li class="toctree-l3"><a class="reference internal" href="crystal_systems.html#triclinic">Triclinic</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="neighbour.html">Neighbour (<code class="docutils literal notranslate"><span class="pre">libfly/neighbour</span></code>)</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../todo.html">Todo!</a></li>
@@ -252,17 +257,27 @@
 <section id="core-core-hpp">
 <h2>Core (<code class="docutils literal notranslate"><span class="pre">core.hpp</span></code>)<a class="headerlink" href="#core-core-hpp" title="Permalink to this heading">#</a></h2>
 <p>Miscellaneous utilities. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-defines">Defines</p>
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.FLY_SPATIAL_DIMS">
+<span class="target" id="core_8hpp_1a417994ea07b0f6a1fce3b729a376c15f"></span><span class="sig-name descname"><span class="n"><span class="pre">FLY_SPATIAL_DIMS</span></span></span><a class="headerlink" href="#c.FLY_SPATIAL_DIMS" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Specify the number of spatial dimensions at compile time, defaults to 3. </p>
+<p><p><span class="target" id="configure-fly-spatial-dims"></span><p>To customize, at the compilation <a class="reference internal" href="../user/building.html#compiling-openfly"><span class="std std-ref">configuration</span></a> step append:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">-DCMAKE_CXX_FLAGS=&#39;-DFLY_SPATIAL_DIMS=&lt;number&gt;&#39;</span>
+</pre></div>
+</div>
+<p>replacing <code class="docutils literal notranslate"><span class="pre">&lt;number&gt;</span></code> with the number of dimensions.</p>
+</p>
+ </p>
+</dd></dl>
+
+</div>
 <dl class="cpp type">
 <dt class="sig sig-object cpp" id="_CPPv43fly">
 <span id="_CPPv33fly"></span><span id="_CPPv23fly"></span><span id="fly"></span><span class="target" id="namespacefly"></span><span class="k"><span class="pre">namespace</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">fly</span></span></span><a class="headerlink" href="#_CPPv43fly" title="Permalink to this definition">#</a><br /></dt>
 <dd><div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric" id="breathe-section-title-typedefs">Typedefs</p>
-<dl class="cpp type">
-<dt class="sig sig-object cpp" id="_CPPv4N3fly8floatingE">
-<span id="_CPPv3N3fly8floatingE"></span><span id="_CPPv2N3fly8floatingE"></span><span class="target" id="core_8hpp_1a028c23d48c3bf9d80270c65131910f11"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">floating</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><a class="headerlink" href="#_CPPv4N3fly8floatingE" title="Permalink to this definition">#</a><br /></dt>
-<dd><p>Floating point type used for position, velocity, etc. </p>
-</dd></dl>
-
 <dl class="cpp type">
 <dt class="sig sig-object cpp" id="_CPPv4I0EN3fly3VecE">
 <span id="_CPPv3I0EN3fly3VecE"></span><span id="_CPPv2I0EN3fly3VecE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="core_8hpp_1ac6d98ff8350d217a21674203da78ce90"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Vec</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="n"><span class="pre">Eigen</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">Vector</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0EN3fly3VecE" title="fly::Vec::T"><span class="n"><span class="pre">T</span></span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N3fly12spatial_dimsE" title="fly::spatial_dims"><span class="n"><span class="pre">spatial_dims</span></span></a><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4I0EN3fly3VecE" title="Permalink to this definition">#</a><br /></dt>
@@ -311,6 +326,26 @@
 <dd class="field-odd"><p><strong>T</strong> – The type to strip ref/const qualifications from. </p>
 </dd>
 </dl>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-enums">Enums</p>
+<dl class="cpp enum-class">
+<dt class="sig sig-object cpp" id="_CPPv4N3fly4SignE">
+<span id="_CPPv3N3fly4SignE"></span><span id="_CPPv2N3fly4SignE"></span><span class="target" id="core_8hpp_1a30d86853b9486e72a97203bd400ff101"></span><span class="k"><span class="pre">enum</span></span><span class="w"> </span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Sign</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><a class="headerlink" href="#_CPPv4N3fly4SignE" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Strongly typed +/- sign. </p>
+<p><em>Values:</em></p>
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N3fly4Sign4plusE">
+<span id="_CPPv3N3fly4Sign4plusE"></span><span id="_CPPv2N3fly4Sign4plusE"></span><span class="target" id="core_8hpp_1a30d86853b9486e72a97203bd400ff101ad7d18cfb3a0d8293e2f5d94ea30e04d2"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">plus</span></span></span><a class="headerlink" href="#_CPPv4N3fly4Sign4plusE" title="Permalink to this definition">#</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N3fly4Sign5minusE">
+<span id="_CPPv3N3fly4Sign5minusE"></span><span id="_CPPv2N3fly4Sign5minusE"></span><span class="target" id="core_8hpp_1a30d86853b9486e72a97203bd400ff101adabe6e597b70e5760826aea1dcc564f7"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">minus</span></span></span><a class="headerlink" href="#_CPPv4N3fly4Sign5minusE" title="Permalink to this definition">#</a><br /></dt>
+<dd></dd></dl>
+
 </dd></dl>
 
 </div>
@@ -387,7 +422,9 @@
 <dl class="cpp var">
 <dt class="sig sig-object cpp" id="_CPPv4N3fly12spatial_dimsE">
 <span id="_CPPv3N3fly12spatial_dimsE"></span><span id="_CPPv2N3fly12spatial_dimsE"></span><span id="fly::spatial_dims__i"></span><span class="target" id="core_8hpp_1a2c9732ae95a862dd132adfe203bc74ee"></span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">spatial_dims</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">3</span></span><a class="headerlink" href="#_CPPv4N3fly12spatial_dimsE" title="Permalink to this definition">#</a><br /></dt>
-<dd><p>Number of spatial dimensions. </p>
+<dd><p>The number of spatial dimensions. </p>
+<p><p>Configurable using the <a class="reference internal" href="#configure-fly-spatial-dims"><span class="std std-ref">FLY_SPATIAL_DIMS</span></a> macro.</p>
+ </p>
 </dd></dl>
 
 <dl class="cpp var">

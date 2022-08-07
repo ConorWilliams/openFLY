@@ -49,19 +49,9 @@ Vector of Structures (``VoS.hpp``)
 Simulation box (``box.hpp``)
 --------------------------------
 
-.. doxygenclass:: fly::system::AdjacentCells
-    :members:
-    :undoc-members:
+If you would like to read about the specialised crystal systems use the links below:
 
-Crystal Systems 
-~~~~~~~~~~~~~~~~~~~~
+.. toctree::
+   
+   crystal_systems.rst
 
-Orthorhombic 
-````````````````````````````````````````````
-
-.. doxygenclass:: fly::system::Orthorhombic
-    :members:
-    :undoc-members:
-
-Triclinic 
-````````````````````````````````````````````

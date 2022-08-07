@@ -14,12 +14,15 @@
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 #include <Eigen/Core>
+#include <Eigen/Dense>
 #include <algorithm>
 #include <cmath>
 #include <cstddef>
 #include <functional>
 #include <type_traits>
 #include <utility>
+
+#include "libfly/utility/asserts.hpp"  // API specifies we must include this
 
 /**
  * \file core.hpp
@@ -198,6 +201,34 @@ namespace fly {
   template <typename E>
   auto norm(E&& expr) {
     return std::sqrt(norm_sq(std::forward<E>(expr)));
+  }
+
+  /**
+   * @brief Compute the unit normal of a hyperplane through a set of points.
+   *
+   * \rst
+   *
+   * See: `StackExchange <https://math.stackexchange.com/questions/2301110/fastest-way-to-find-equation-of-hyperplane>`_
+   *
+   * \endrst
+   *
+   * @param P An NxN fixed-size matrix.
+   * @return Eigen::Vector<Scalar, N> The unit normal of the hyperplane passing through the column vectors of ``P``.
+   */
+  template <typename Scalar, int N>
+  std::enable_if_t<N != Eigen::Dynamic, Eigen::Vector<Scalar, N>> hyperplane_normal(Eigen::Matrix<Scalar, N, N> const& P) {
+    //
+    Eigen::Matrix<Scalar, N, N + 1> H = Eigen::Matrix<Scalar, N, N + 1>::Ones();
+
+    H.template topLeftCorner<N, N>() = P.transpose();
+
+    Eigen::FullPivLU<decltype(H)> lu(H);
+
+    ASSERT(lu.dimensionOfKernel() == 1, "Points are linearly dependant!");
+
+    ASSERT(near(lu.kernel()(N, 0), 0.0), "Homogeneous coordinate of the kernel should be zero!");
+
+    return lu.kernel().template topLeftCorner<N, 1>().normalized();
   }
 
   /**

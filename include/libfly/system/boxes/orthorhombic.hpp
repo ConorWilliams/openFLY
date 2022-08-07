@@ -29,7 +29,7 @@
 namespace fly::system {
 
   /**
-   * @brief Provides details of the simulations supercell geometry.
+   * @brief Generalised orthogonal simulation box.
    */
   class Orthorhombic {
   public:
@@ -86,9 +86,12 @@ namespace fly::system {
      * This function is branchy and should be avoided in hot code.
      *
      * See: https://doi.org/10.1524/zpch.2013.0311
+     *
+     * @deprecated No triclinic generalization.
      */
     template <typename A, typename B>
-    Position::matrix_t min_image(Eigen::MatrixBase<A> const& a, Eigen::MatrixBase<B> const& b) const noexcept {
+    [[deprecated("No triclinic generalization")]] Position::matrix_t min_image(Eigen::MatrixBase<A> const& a,
+                                                                               Eigen::MatrixBase<B> const& b) const noexcept {
       Arr<Position::scalar_t> dr = b - a;
       return m_periodic.select(dr - m_extents * (dr * m_inv_extents + 0.5).floor(), dr);
     }

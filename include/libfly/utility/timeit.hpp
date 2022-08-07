@@ -2,16 +2,17 @@
 
 // Copyright © 2020 Conor Williams <conorwilliams@outlook.com>
 
-// SPDX-License-Identifier: GPL-2.0
+// SPDX-License-Identifier: GPL-3.0-or-later
 
-// This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License
-// as published by the Free Software Foundation; either version 2 of the License, or (at your option) any later version.
+// This file is part of openFLY.
 
-// This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+// OpenFLY is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License
+// as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 
-// You should have received a copy of the GNU General Public License along with this program; if not, write to the Free Software
-// Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+// OpenFLY is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
+// warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+
+// You should have received a copy of the GNU General Public License along with openFLY. If not, see <https://www.gnu.org/licenses/>.
 
 #include <fmt/chrono.h>
 #include <fmt/core.h>
@@ -44,7 +45,8 @@ namespace fly {
    * @param args Arguments to call \c f with.
    * @return std::invoke_result_t<F&&, Args&&...> The result of calling \c f with \c args... .
    */
-  template <typename F, typename... Args> std::invoke_result_t<F&&, Args&&...> timeit(std::string_view name, F&& f, Args&&... args) {
+  template <typename F, typename... Args>
+  std::invoke_result_t<F&&, Args&&...> timeit(std::string_view name, F&& f, Args&&... args) {
     //
     auto start = std::chrono::steady_clock::now();
 

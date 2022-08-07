@@ -2,22 +2,17 @@
 
 // Copyright © 2020 Conor Williams <conorwilliams@outlook.com>
 
-// SPDX-License-Identifier: GPL-2.0
+// SPDX-License-Identifier: GPL-3.0-or-later
 
-// This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License
-// as published by the Free Software Foundation; either version 2 of the License, or (at your option) any later version.
+// This file is part of openFLY.
 
-// This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+// OpenFLY is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License
+// as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 
-// You should have received a copy of the GNU General Public License along with this program; if not, write to the Free Software
-// Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+// OpenFLY is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
+// warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
 
-/**
- * \file orthorhombic.hpp
- *
- * @brief Specialised simulation box for orthorhombic supercells.
- */
+// You should have received a copy of the GNU General Public License along with openFLY. If not, see <https://www.gnu.org/licenses/>.
 
 #include <Eigen/Core>
 #include <optional>
@@ -25,6 +20,12 @@
 #include "libfly/system/atom.hpp"
 #include "libfly/utility/asserts.hpp"
 #include "libfly/utility/core.hpp"
+
+/**
+ * \file orthorhombic.hpp
+ *
+ * @brief Specialised simulation box for orthorhombic supercells.
+ */
 
 namespace fly::system {
 
@@ -52,6 +53,8 @@ namespace fly::system {
       VERIFY((m_basis.array() >= 0).all(), "Basis elements must be positive");
       VERIFY((m_basis.array().pow(2).colwise().sum().sqrt() > eps).all(), "Basis vectors too small");
       VERIFY((m_basis.diagonal().array() > eps).all(), "Diagonal elements must be non-zero");
+
+      ASSERT(m_basis.determinant() > eps, "Should be invertible by above.");
 
       // Compute hyperplane normals
       for (int i = 0; i < spatial_dims; i++) {

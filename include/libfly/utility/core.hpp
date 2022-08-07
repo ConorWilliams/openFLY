@@ -27,12 +27,41 @@
  * @brief Miscellaneous utilities.
  */
 
+/**
+ * @brief Specify the number of spatial dimensions at compile time, defaults to 3.
+ *
+ * \rst
+ *
+ * .. _`configure FLY_SPATIAL_DIMS`:
+ *
+ * To customize, at the compilation :ref:`configuration <Compiling openFLY>` step append:
+ *
+ * .. code:: console
+ *
+ *     -DCMAKE_CXX_FLAGS='-DFLY_SPATIAL_DIMS=<number>'
+ *
+ * replacing ``<number>`` with the number of dimensions.
+ *
+ * \endrst
+ */
+#ifndef FLY_SPATIAL_DIMS
+#  define FLY_SPATIAL_DIMS 3
+#endif  // !FLY_SPATIAL_DIMS
+
 namespace fly {
 
   /**
-   * @brief Number of spatial dimensions.
+   * @brief The number of spatial dimensions.
+   *
+   * \rst
+   *
+   * Configurable using the :ref:`FLY_SPATIAL_DIMS <configure FLY_SPATIAL_DIMS>` macro.
+   *
+   * \endrst
    */
-  inline constexpr int spatial_dims = 3;
+  inline constexpr int spatial_dims = FLY_SPATIAL_DIMS;
+
+  static_assert(spatial_dims >= 2, "libFLY is not optimal for 1D simulations");
 
   /**
    * @brief The maximum atomic number that any atom can have.

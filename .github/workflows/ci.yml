@@ -112,7 +112,7 @@ jobs:
         uses: friendlyanon/setup-vcpkg@v1
         with: { committish: "66045de4dcc5da3d1029c02b606307f5951dcb22" }
 
-      - uses: actions/setup-python@v2
+      - uses: actions/setup-python@v4
         with: { python-version: "3.8" }
 
       - name: Install python dependancies

@@ -74,3 +74,51 @@ TEST_CASE("Triclinic::canon_image", "[system]") {
     REQUIRE(std::abs(gnorm(b_undo - a) - fly::gnorm(a - b)) < 0.001);
   }
 }
+
+TEST_CASE("TriGrid::gen_image", "[system]") {
+  using namespace fly;
+
+  Mat<Position::scalar_t> basis = Mat<Position::scalar_t>::Constant(10).triangularView<Eigen::Upper>();
+
+  system::Triclinic box{basis, Arr<bool>::Constant(true)};
+
+  auto grid = box.make_grid(3);
+
+  {
+    std::optional im = grid.gen_image<Sign::plus>(basis * Position::matrix_t::Constant(0.5), 0);
+
+    REQUIRE(!im);
+  }
+
+  {
+    Position::matrix_t origin = basis * Position::matrix_t::Constant(0.1);
+
+    for (int i = 0; i < spatial_dims; i++) {
+      REQUIRE(!grid.gen_image<Sign::minus>(origin, i));
+
+      auto im = grid.gen_image<Sign::plus>(origin, i);
+
+      REQUIRE(im);
+
+      Position::matrix_t correct = origin + basis.col(i);
+
+      REQUIRE(gnorm(correct - *im) < 0.001);
+    }
+  }
+
+  {
+    Position::matrix_t origin = basis * Position::matrix_t::Constant(0.9);
+
+    for (int i = 0; i < spatial_dims; i++) {
+      REQUIRE(!grid.gen_image<Sign::plus>(origin, i));
+
+      auto im = grid.gen_image<Sign::minus>(origin, i);
+
+      REQUIRE(im);
+
+      Position::matrix_t correct = origin - basis.col(i);
+
+      REQUIRE(gnorm(correct - *im) < 0.001);
+    }
+  }
+}

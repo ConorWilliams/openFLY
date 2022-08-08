@@ -59,7 +59,7 @@ namespace fly::system {
         auto dx = gdot(m_basis.col(ax) - x, m_hyper.col(ax));
         ASSERT(dx > 0, "sign error");
         if (dx < HyperGrid::r_cut()) {
-          return x + m_basis.col(ax);
+          return x - m_basis.col(ax);
         }
       }
 

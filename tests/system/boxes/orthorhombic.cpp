@@ -66,32 +66,7 @@ TEST_CASE("Orthorhombic::canon_image", "[system]") {
   }
 }
 
-TEST_CASE("Orthorhombic::Grid::cell_idx", "[system]") {
-  //
-  using namespace fly;
-
-  system::Orthorhombic box{Arr<Position::scalar_t>::Constant(10), Arr<bool>::Constant(true)};
-
-  auto grid = box.make_grid(3);
-
-  int A = grid.cell_idx(Vec<Position::scalar_t>::Constant(0));
-  int B = grid.cell_idx(Vec<Position::scalar_t>::Constant(5));
-  int C = grid.cell_idx(Vec<Position::scalar_t>::Constant(9.5));
-
-  if constexpr (spatial_dims == 3) {
-    REQUIRE(A == 1 + 1 * 5 + 1 * 5 * 5);
-    REQUIRE(B == 2 + 2 * 5 + 2 * 5 * 5);
-    REQUIRE(C == 3 + 3 * 5 + 3 * 5 * 5);
-  }
-
-  if constexpr (spatial_dims == 2) {
-    REQUIRE(A == 1 + 1 * 5);
-    REQUIRE(B == 2 + 2 * 5);
-    REQUIRE(C == 3 + 3 * 5);
-  }
-}
-
-TEST_CASE("Orthorhombic::Grid::gen_image", "[system]") {
+TEST_CASE("OrthoGrid::gen_image", "[system]") {
   using namespace fly;
 
   system::Orthorhombic box{Arr<Position::scalar_t>::Constant(10), Arr<bool>::Constant(true)};

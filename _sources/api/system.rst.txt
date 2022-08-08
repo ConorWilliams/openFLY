@@ -8,7 +8,7 @@ The ``system`` folder contains a collection of data structures for representing 
 Simulation space
 --------------------------------
 
-File: ``libfly/system/boxes/box.hpp``
+File: ``libfly/system/box.hpp``
 
 .. doxygenfile:: libfly/system/box.hpp
     :sections: briefdescription detaileddescription
@@ -25,7 +25,7 @@ Generalised box
 Atoms
 ----------------------
 
-File: ``libfly/system/boxes/atom.hpp``
+File: ``libfly/system/atom.hpp``
 
 .. doxygenfile:: libfly/system/atom.hpp
     :sections: briefdescription detaileddescription
@@ -60,7 +60,7 @@ The building block of many of the types in libFLY.
 SoA
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-File: ``libfly/system/boxes/SoA.hpp``
+File: ``libfly/system/SoA.hpp``
 
 .. doxygenfile:: libfly/system/SoA.hpp
     :sections: briefdescription detaileddescription
@@ -69,10 +69,10 @@ File: ``libfly/system/boxes/SoA.hpp``
     :members:
     :undoc-members:
 
-VoS
+VoS 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-File: ``libfly/system/boxes/VoS.hpp``
+File: ``libfly/system/VoS.hpp``
 
 .. doxygenfile:: libfly/system/VoS.hpp
     :sections: briefdescription detaileddescription

@@ -6,7 +6,7 @@
 <link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="Neighbour" href="neighbour.html" /><link rel="prev" title="System" href="system.html" />
 
     <link rel="shortcut icon" href="../_static/favicon.ico"/><meta name="generator" content="sphinx-5.1.1, furo 2022.06.21"/>
-        <title>Orthorhombic - OpenFLY documentation</title>
+        <title>Hypergrid - OpenFLY documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?digest=40978830699223671f4072448e654b5958f38b89" />
     <link rel="stylesheet" type="text/css" href="../_static/tabs.css" />
@@ -176,8 +176,9 @@
 <li class="toctree-l1 current has-children"><a class="reference internal" href="../api.html">Library API reference</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="utility.html">Utility</a></li>
 <li class="toctree-l2 current has-children"><a class="reference internal" href="system.html">System</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
-<li class="toctree-l3 current current-page"><a class="current reference internal" href="#">Orthorhombic</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#triclinic">Triclinic</a></li>
+<li class="toctree-l3 current current-page"><a class="current reference internal" href="#">Hypergrid</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#orthorhombic-system">Orthorhombic system</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#triclinic-system">Triclinic system</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="neighbour.html">Neighbour</a></li>
@@ -227,8 +228,61 @@
           </label>
         </div>
         <article role="main">
-          <section id="orthorhombic">
-<h1>Orthorhombic<a class="headerlink" href="#orthorhombic" title="Permalink to this heading">#</a></h1>
+          <section id="hypergrid">
+<h1>Hypergrid<a class="headerlink" href="#hypergrid" title="Permalink to this heading">#</a></h1>
+<p>File: <code class="docutils literal notranslate"><span class="pre">libfly/system/boxes/hypergrid.hpp</span></code></p>
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv4N3fly6system9HyperGridE">
+<span id="_CPPv3N3fly6system9HyperGridE"></span><span id="_CPPv2N3fly6system9HyperGridE"></span><span id="fly::system::HyperGrid"></span><span class="target" id="classfly_1_1system_1_1HyperGrid"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">HyperGrid</span></span></span><a class="headerlink" href="#_CPPv4N3fly6system9HyperGridE" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Maps a position-vector -&gt; ND-integer-tuples -&gt; 1D-index. </p>
+<p>Dives a hyperrectangle into smaller hyperrectangle called cells. </p>
+<p>Subclassed by <a class="reference internal" href="#classfly_1_1system_1_1OrthoGrid"><span class="std std-ref">fly::system::OrthoGrid</span></a>, <a class="reference internal" href="#classfly_1_1system_1_1TriGrid"><span class="std std-ref">fly::system::TriGrid</span></a></p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3fly6system9HyperGrid9HyperGridERK3ArrIN8Position8scalar_tEEN8Position8scalar_tE">
+<span id="_CPPv3N3fly6system9HyperGrid9HyperGridERK3ArrIN8Position8scalar_tEEN8Position8scalar_tE"></span><span id="_CPPv2N3fly6system9HyperGrid9HyperGridERK3ArrIN8Position8scalar_tEEN8Position8scalar_tE"></span><span id="fly::system::HyperGrid::HyperGrid__Arr:Position::scalar_t:CR.Position::scalar_t"></span><span class="target" id="classfly_1_1system_1_1HyperGrid_1a89500495ad8bb9955dba0d65e2b2e387"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">HyperGrid</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="utility.html#_CPPv4I0EN3fly3ArrE" title="fly::Arr"><span class="n"><span class="pre">Arr</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">Position</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">scalar_t</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">extents</span></span>, <span class="n"><span class="pre">Position</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">scalar_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">r_cut</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3fly6system9HyperGrid9HyperGridERK3ArrIN8Position8scalar_tEEN8Position8scalar_tE" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Construct a new Grid object with cells at least <code class="docutils literal notranslate"><span class="pre">r_cut</span></code> along each axis. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>extents</strong> – The size of the box along each axis. </p></li>
+<li><p><strong>r_cut</strong> – The cut-off radius for atomic interactions. </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK3fly6system9HyperGrid5r_cutEv">
+<span id="_CPPv3NK3fly6system9HyperGrid5r_cutEv"></span><span id="_CPPv2NK3fly6system9HyperGrid5r_cutEv"></span><span id="fly::system::HyperGrid::r_cutC"></span><span class="target" id="classfly_1_1system_1_1HyperGrid_1ad6a953520e4679a5371e6907ec4251bc"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">Position</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">scalar_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">r_cut</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="k"><span class="pre">noexcept</span></span><a class="headerlink" href="#_CPPv4NK3fly6system9HyperGrid5r_cutEv" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Fetch the cut-off radius for atomic interactions. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK3fly6system9HyperGrid5shapeEv">
+<span id="_CPPv3NK3fly6system9HyperGrid5shapeEv"></span><span id="_CPPv2NK3fly6system9HyperGrid5shapeEv"></span><span id="fly::system::HyperGrid::shapeC"></span><span class="target" id="classfly_1_1system_1_1HyperGrid_1a42f70898958d806db0883f86898b4e5b"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="utility.html#_CPPv4I0EN3fly3ArrE" title="fly::Arr"><span class="n"><span class="pre">Arr</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">int</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">shape</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="k"><span class="pre">noexcept</span></span><a class="headerlink" href="#_CPPv4NK3fly6system9HyperGrid5shapeEv" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Get the total number of cells in the <a class="reference internal" href="#classfly_1_1system_1_1HyperGrid"><span class="std std-ref">HyperGrid</span></a> along each axis. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0ENK3fly6system9HyperGrid8cell_idxEiRKN5Eigen10MatrixBaseI1EEE">
+<span id="_CPPv3I0ENK3fly6system9HyperGrid8cell_idxERKN5Eigen10MatrixBaseI1EEE"></span><span id="_CPPv2I0ENK3fly6system9HyperGrid8cell_idxERKN5Eigen10MatrixBaseI1EEE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">E</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classfly_1_1system_1_1HyperGrid_1a4159276ab00df32cab63b3385b989f3f"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">cell_idx</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">Eigen</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">MatrixBase</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0ENK3fly6system9HyperGrid8cell_idxEiRKN5Eigen10MatrixBaseI1EEE" title="fly::system::HyperGrid::cell_idx::E"><span class="n"><span class="pre">E</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">x</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="k"><span class="pre">noexcept</span></span><a class="headerlink" href="#_CPPv4I0ENK3fly6system9HyperGrid8cell_idxEiRKN5Eigen10MatrixBaseI1EEE" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Compute the cell index from an atoms canonical position. </p>
+<p><p></p>
+ </p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Assumes atoms are in the extents of the HyperGrid or in the surrounding one-cell buffer i.e. ghost atoms.</p>
+</div>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+</section>
+<section id="orthorhombic-system">
+<h1>Orthorhombic system<a class="headerlink" href="#orthorhombic-system" title="Permalink to this heading">#</a></h1>
 <p>File: <code class="docutils literal notranslate"><span class="pre">libfly/system/boxes/orthorhombic.hpp</span></code></p>
 <p>Specialised simulation box for orthorhombic supercells. </p>
 <dl class="cpp class">
@@ -297,8 +351,8 @@
 
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4NK3fly6system12Orthorhombic9make_gridEN8Position8scalar_tE">
-<span id="_CPPv3NK3fly6system12Orthorhombic9make_gridEN8Position8scalar_tE"></span><span id="_CPPv2NK3fly6system12Orthorhombic9make_gridEN8Position8scalar_tE"></span><span id="fly::system::Orthorhombic::make_grid__Position::scalar_tC"></span><span class="target" id="classfly_1_1system_1_1Orthorhombic_1a874edee373653c122e057d451ed8c54b"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N3fly6system12Orthorhombic4GridE" title="fly::system::Orthorhombic::Grid"><span class="n"><span class="pre">Grid</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">make_grid</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">Position</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">scalar_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">r_cut</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK3fly6system12Orthorhombic9make_gridEN8Position8scalar_tE" title="Permalink to this definition">#</a><br /></dt>
-<dd><p>Make a <a class="reference internal" href="#classfly_1_1system_1_1Orthorhombic_1_1Grid"><span class="std std-ref">Grid</span></a> object. </p>
+<span id="_CPPv3NK3fly6system12Orthorhombic9make_gridEN8Position8scalar_tE"></span><span id="_CPPv2NK3fly6system12Orthorhombic9make_gridEN8Position8scalar_tE"></span><span id="fly::system::Orthorhombic::make_grid__Position::scalar_tC"></span><span class="target" id="classfly_1_1system_1_1Orthorhombic_1a80e8339f4441ac6435572a2c6a246b03"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N3fly6system9OrthoGridE" title="fly::system::OrthoGrid"><span class="n"><span class="pre">OrthoGrid</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">make_grid</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">Position</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">scalar_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">r_cut</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK3fly6system12Orthorhombic9make_gridEN8Position8scalar_tE" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Make an <a class="reference internal" href="#classfly_1_1system_1_1OrthoGrid"><span class="std std-ref">OrthoGrid</span></a> object. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>r_cut</strong> – The cut-off radius for atomic interactions. </p>
@@ -316,35 +370,21 @@
 </dd></dl>
 
 </div>
+</dd></dl>
+
+<section id="orthorhombic-grid">
+<h2>Orthorhombic Grid<a class="headerlink" href="#orthorhombic-grid" title="Permalink to this heading">#</a></h2>
 <dl class="cpp class">
-<dt class="sig sig-object cpp" id="_CPPv4N3fly6system12Orthorhombic4GridE">
-<span id="_CPPv3N3fly6system12Orthorhombic4GridE"></span><span id="_CPPv2N3fly6system12Orthorhombic4GridE"></span><span id="fly::system::Orthorhombic::Grid"></span><span class="target" id="classfly_1_1system_1_1Orthorhombic_1_1Grid"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Grid</span></span></span><a class="headerlink" href="#_CPPv4N3fly6system12Orthorhombic4GridE" title="Permalink to this definition">#</a><br /></dt>
+<dt class="sig sig-object cpp" id="_CPPv4N3fly6system9OrthoGridE">
+<span id="_CPPv3N3fly6system9OrthoGridE"></span><span id="_CPPv2N3fly6system9OrthoGridE"></span><span id="fly::system::OrthoGrid"></span><span class="target" id="classfly_1_1system_1_1OrthoGrid"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">OrthoGrid</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><span class="n"><span class="pre">fly</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">system</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N3fly6system9HyperGridE" title="fly::system::HyperGrid"><span class="n"><span class="pre">HyperGrid</span></span></a><a class="headerlink" href="#_CPPv4N3fly6system9OrthoGridE" title="Permalink to this definition">#</a><br /></dt>
 <dd><p>Maps position vector -&gt; ND integer-tuples -&gt; 1D index. </p>
-<p><a class="reference internal" href="#classfly_1_1system_1_1Orthorhombic_1_1Grid"><span class="std std-ref">Grid</span></a> is constructable using the <a class="reference internal" href="#classfly_1_1system_1_1Orthorhombic_1a874edee373653c122e057d451ed8c54b"><span class="std std-ref">Orthorhombic::make_grid</span></a> factory. </p>
+<p><a class="reference internal" href="#classfly_1_1system_1_1OrthoGrid"><span class="std std-ref">OrthoGrid</span></a> is constructable using the <a class="reference internal" href="#classfly_1_1system_1_1Orthorhombic_1a80e8339f4441ac6435572a2c6a246b03"><span class="std std-ref">Orthorhombic::make_grid</span></a> factory. </p>
 <div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
 <dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4NK3fly6system12Orthorhombic4Grid5shapeEv">
-<span id="_CPPv3NK3fly6system12Orthorhombic4Grid5shapeEv"></span><span id="_CPPv2NK3fly6system12Orthorhombic4Grid5shapeEv"></span><span id="fly::system::Orthorhombic::Grid::shapeC"></span><span class="target" id="classfly_1_1system_1_1Orthorhombic_1_1Grid_1a99fa036622eab865af7b608d48ffebc5"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="utility.html#_CPPv4I0EN3fly3ArrE" title="fly::Arr"><span class="n"><span class="pre">Arr</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">int</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">shape</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="k"><span class="pre">noexcept</span></span><a class="headerlink" href="#_CPPv4NK3fly6system12Orthorhombic4Grid5shapeEv" title="Permalink to this definition">#</a><br /></dt>
-<dd><p>Get the total number of cells in the <a class="reference internal" href="#classfly_1_1system_1_1Orthorhombic_1_1Grid"><span class="std std-ref">Grid</span></a> along each axis. </p>
-</dd></dl>
-
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4I0ENK3fly6system12Orthorhombic4Grid8cell_idxEiRKN5Eigen10MatrixBaseI1EEE">
-<span id="_CPPv3I0ENK3fly6system12Orthorhombic4Grid8cell_idxERKN5Eigen10MatrixBaseI1EEE"></span><span id="_CPPv2I0ENK3fly6system12Orthorhombic4Grid8cell_idxERKN5Eigen10MatrixBaseI1EEE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">E</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classfly_1_1system_1_1Orthorhombic_1_1Grid_1aa4b3c27c31b5fedb9598907e5d444402"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">cell_idx</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">Eigen</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">MatrixBase</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0ENK3fly6system12Orthorhombic4Grid8cell_idxEiRKN5Eigen10MatrixBaseI1EEE" title="fly::system::Orthorhombic::Grid::cell_idx::E"><span class="n"><span class="pre">E</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">x</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="k"><span class="pre">noexcept</span></span><a class="headerlink" href="#_CPPv4I0ENK3fly6system12Orthorhombic4Grid8cell_idxEiRKN5Eigen10MatrixBaseI1EEE" title="Permalink to this definition">#</a><br /></dt>
-<dd><p>Compute the cell index from an atoms canonical position. </p>
-<p><p></p>
- </p>
-<div class="admonition warning">
-<p class="admonition-title">Warning</p>
-<p>Assumes atoms are in the canonical cell or in the surrounding one Grid-cell buffer i.e. ghost atoms.</p>
-</div>
-</dd></dl>
-
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4I_4SignEN3fly6system12Orthorhombic4Grid9gen_imageENSt8optionalIN8Position8matrix_tEEEN8Position8matrix_tEi">
-<span id="_CPPv3I_4SignEN3fly6system12Orthorhombic4Grid9gen_imageEN8Position8matrix_tEi"></span><span id="_CPPv2I_4SignEN3fly6system12Orthorhombic4Grid9gen_imageEN8Position8matrix_tEi"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="utility.html#_CPPv4N3fly4SignE" title="fly::Sign"><span class="n"><span class="pre">Sign</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">S</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classfly_1_1system_1_1Orthorhombic_1_1Grid_1aad4558273dbbba96ea086ac2e065e961"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">optional</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">Position</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">matrix_t</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">gen_image</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">Position</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">matrix_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">x</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">ax</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_4SignEN3fly6system12Orthorhombic4Grid9gen_imageENSt8optionalIN8Position8matrix_tEEEN8Position8matrix_tEi" title="Permalink to this definition">#</a><br /></dt>
-<dd><p>Generate the image of an atom along a particular axis <code class="docutils literal notranslate"><span class="pre">ax</span></code>. </p>
+<dt class="sig sig-object cpp" id="_CPPv4I_4SignEN3fly6system9OrthoGrid9gen_imageENSt8optionalIN8Position8matrix_tEEEN8Position8matrix_tEi">
+<span id="_CPPv3I_4SignEN3fly6system9OrthoGrid9gen_imageEN8Position8matrix_tEi"></span><span id="_CPPv2I_4SignEN3fly6system9OrthoGrid9gen_imageEN8Position8matrix_tEi"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="utility.html#_CPPv4N3fly4SignE" title="fly::Sign"><span class="n"><span class="pre">Sign</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">S</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classfly_1_1system_1_1OrthoGrid_1aba5d282723eb34648a65e491c0c15c33"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">optional</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">Position</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">matrix_t</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">gen_image</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">Position</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">matrix_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">x</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">ax</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_4SignEN3fly6system9OrthoGrid9gen_imageENSt8optionalIN8Position8matrix_tEEEN8Position8matrix_tEi" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Generate the periodic image of an atom along a particular axis <code class="docutils literal notranslate"><span class="pre">ax</span></code>. </p>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
 <p>Only supports atoms in the canonical cell.</p>
@@ -368,12 +408,12 @@
 </div>
 </dd></dl>
 
-</dd></dl>
-
 </section>
-<section id="triclinic">
-<h1>Triclinic<a class="headerlink" href="#triclinic" title="Permalink to this heading">#</a></h1>
+</section>
+<section id="triclinic-system">
+<h1>Triclinic system<a class="headerlink" href="#triclinic-system" title="Permalink to this heading">#</a></h1>
 <p>File: <code class="docutils literal notranslate"><span class="pre">libfly/system/boxes/triclinic.hpp</span></code></p>
+<p>Specialised simulation box for Triclinic supercells. </p>
 <dl class="cpp class">
 <dt class="sig sig-object cpp" id="_CPPv4N3fly6system9TriclinicE">
 <span id="_CPPv3N3fly6system9TriclinicE"></span><span id="_CPPv2N3fly6system9TriclinicE"></span><span id="fly::system::Triclinic"></span><span class="target" id="classfly_1_1system_1_1Triclinic"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Triclinic</span></span></span><a class="headerlink" href="#_CPPv4N3fly6system9TriclinicE" title="Permalink to this definition">#</a><br /></dt>
@@ -423,9 +463,67 @@
 </div>
 </dd></dl>
 
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK3fly6system9Triclinic9make_gridEN8Position8scalar_tE">
+<span id="_CPPv3NK3fly6system9Triclinic9make_gridEN8Position8scalar_tE"></span><span id="_CPPv2NK3fly6system9Triclinic9make_gridEN8Position8scalar_tE"></span><span id="fly::system::Triclinic::make_grid__Position::scalar_tC"></span><span class="target" id="classfly_1_1system_1_1Triclinic_1a48e062ec89829b9415f50b163069ed8e"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N3fly6system7TriGridE" title="fly::system::TriGrid"><span class="n"><span class="pre">TriGrid</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">make_grid</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">Position</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">scalar_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">r_cut</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK3fly6system9Triclinic9make_gridEN8Position8scalar_tE" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Make a <a class="reference internal" href="#classfly_1_1system_1_1TriGrid"><span class="std std-ref">TriGrid</span></a> object. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>r_cut</strong> – The cut-off radius for atomic interactions. </p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-friends">Friends</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3fly6system9TricliniceqERK9TriclinicRK9Triclinic">
+<span id="_CPPv3N3fly6system9TricliniceqERK9TriclinicRK9Triclinic"></span><span id="_CPPv2N3fly6system9TricliniceqERK9TriclinicRK9Triclinic"></span><span id="fly::system::Triclinic::eq-operator__TriclinicCR.TriclinicCR"></span><span class="target" id="classfly_1_1system_1_1Triclinic_1a74ea99d83429e222b834ddd60a3012c0"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">friend</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">==</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N3fly6system9TriclinicE" title="fly::system::Triclinic"><span class="n"><span class="pre">Triclinic</span></span></a><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">a</span></span>, <a class="reference internal" href="#_CPPv4N3fly6system9TriclinicE" title="fly::system::Triclinic"><span class="n"><span class="pre">Triclinic</span></span></a><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">b</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">noexcept</span></span><a class="headerlink" href="#_CPPv4N3fly6system9TricliniceqERK9TriclinicRK9Triclinic" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Comparison operator, no surprises. </p>
+</dd></dl>
+
 </div>
 </dd></dl>
 
+<section id="triclinic-grid">
+<h2>Triclinic Grid<a class="headerlink" href="#triclinic-grid" title="Permalink to this heading">#</a></h2>
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv4N3fly6system7TriGridE">
+<span id="_CPPv3N3fly6system7TriGridE"></span><span id="_CPPv2N3fly6system7TriGridE"></span><span id="fly::system::TriGrid"></span><span class="target" id="classfly_1_1system_1_1TriGrid"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">TriGrid</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><span class="n"><span class="pre">fly</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">system</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N3fly6system9HyperGridE" title="fly::system::HyperGrid"><span class="n"><span class="pre">HyperGrid</span></span></a><a class="headerlink" href="#_CPPv4N3fly6system7TriGridE" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Maps position vector -&gt; ND integer-tuples -&gt; 1D index. </p>
+<p><a class="reference internal" href="#classfly_1_1system_1_1TriGrid"><span class="std std-ref">TriGrid</span></a> is constructable using the <a class="reference internal" href="#classfly_1_1system_1_1Triclinic_1a48e062ec89829b9415f50b163069ed8e"><span class="std std-ref">Triclinic::make_grid</span></a> factory.</p>
+<p>Although the grid is for an triclinic cell it still uses a <a class="reference internal" href="#classfly_1_1system_1_1HyperGrid"><span class="std std-ref">HyperGrid</span></a> as triclinic cells are worse approximations to spheres so the neighbour list construction would become more expensive. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I_4SignEN3fly6system7TriGrid9gen_imageENSt8optionalIN8Position8matrix_tEEEN8Position8matrix_tEi">
+<span id="_CPPv3I_4SignEN3fly6system7TriGrid9gen_imageEN8Position8matrix_tEi"></span><span id="_CPPv2I_4SignEN3fly6system7TriGrid9gen_imageEN8Position8matrix_tEi"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="utility.html#_CPPv4N3fly4SignE" title="fly::Sign"><span class="n"><span class="pre">Sign</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">S</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classfly_1_1system_1_1TriGrid_1a0cbfa66a2fec9dad20bc2ed029f7ce71"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">optional</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">Position</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">matrix_t</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">gen_image</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">Position</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">matrix_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">x</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">ax</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_4SignEN3fly6system7TriGrid9gen_imageENSt8optionalIN8Position8matrix_tEEEN8Position8matrix_tEi" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Generate the periodic image of an atom along a particular axis <code class="docutils literal notranslate"><span class="pre">ax</span></code>. </p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Only supports atoms in the canonical cell.</p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Template Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>S</strong> – Direction along axis which to generate image. </p>
+</dd>
+<dt class="field-even">Parameters<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>x</strong> – <a class="reference internal" href="system.html#structfly_1_1builtin__m_1_1Position"><span class="std std-ref">Position</span></a> of the atom who’s image we are computing. </p></li>
+<li><p><strong>ax</strong> – <a class="reference internal" href="system.html#structfly_1_1builtin__m_1_1Index"><span class="std std-ref">Index</span></a> of axis along which to generate image. </p></li>
+</ul>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>std::optional&lt;Position::matrix_t&gt; If the atom’s image is beyond the cut-off (<code class="docutils literal notranslate"><span class="pre">r_cut</span></code>) for atomic interactions then the image’s position otherwise <code class="docutils literal notranslate"><span class="pre">std::nullopt</span></code>. </p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+</section>
 </section>
 
         </article>

@@ -174,8 +174,9 @@
 <li class="toctree-l1 has-children"><a class="reference internal" href="api.html">Library API reference</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="api/utility.html">Utility</a></li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="api/system.html">System</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
-<li class="toctree-l3"><a class="reference internal" href="api/crystal_systems.html">Orthorhombic</a></li>
-<li class="toctree-l3"><a class="reference internal" href="api/crystal_systems.html#triclinic">Triclinic</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/crystal_systems.html">Hypergrid</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/crystal_systems.html#orthorhombic-system">Orthorhombic system</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/crystal_systems.html#triclinic-system">Triclinic system</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="api/neighbour.html">Neighbour</a></li>
@@ -235,8 +236,6 @@
   <h2>F</h2>
   <table style="width: 100%" class="indextable genindextable"><tr>
     <td style="width: 33%; vertical-align: top;"><ul>
-        <li><a href="api/utility.html#_CPPv43fly">fly (C++ type)</a>, <a href="api/utility.html#_CPPv43fly">[1]</a>, <a href="api/utility.html#_CPPv43fly">[2]</a>
-</li>
         <li><a href="api/utility.html#_CPPv4IDpEN3fly12always_falseE">fly::always_false (C++ member)</a>
 </li>
         <li><a href="api/utility.html#_CPPv4I0EN3fly3ArrE">fly::Arr (C++ type)</a>
@@ -284,14 +283,8 @@
         <li><a href="api/system.html#_CPPv4N3fly9builtin_m2z_E">fly::builtin_m::z_ (C++ member)</a>
 </li>
         <li><a href="api/utility.html#_CPPv4I00EN3fly5DeferE">fly::Defer (C++ class)</a>
-
-        <ul>
-          <li><a href="api/utility.html#_CPPv4I0EN3fly5DeferE5DeferI1FERR1F">(C++ function)</a>
 </li>
-        </ul></li>
         <li><a href="api/utility.html#_CPPv4N3fly5Defer5DeferERK5Defer">fly::Defer::Defer (C++ function)</a>, <a href="api/utility.html#_CPPv4N3fly5Defer5DeferERR1F">[1]</a>, <a href="api/utility.html#_CPPv4N3fly5Defer5DeferERR5Defer">[2]</a>
-</li>
-        <li><a href="api/utility.html#_CPPv4N3fly5Defer3m_fE">fly::Defer::m_f (C++ member)</a>
 </li>
         <li><a href="api/utility.html#_CPPv4N3fly5DeferaSERK5Defer">fly::Defer::operator= (C++ function)</a>, <a href="api/utility.html#_CPPv4N3fly5DeferaSERR5Defer">[1]</a>
 </li>
@@ -300,6 +293,10 @@
         <li><a href="api/utility.html#_CPPv4IDpEN3fly7first_tE">fly::first_t (C++ type)</a>
 </li>
         <li><a href="api/utility.html#_CPPv4I00EN3fly4gdotEDaRK2E1RK2E2">fly::gdot (C++ function)</a>
+</li>
+        <li><a href="api/utility.html#_CPPv4I0EN3fly5gnormEDaRR1E">fly::gnorm (C++ function)</a>
+</li>
+        <li><a href="api/utility.html#_CPPv4I0EN3fly8gnorm_sqEDaRK1E">fly::gnorm_sq (C++ function)</a>
 </li>
         <li><a href="api/utility.html#_CPPv4I0_iEN3fly17hyperplane_normalENSt11enable_if_tIXne1NN5Eigen7DynamicEEN5Eigen6VectorI6Scalar1NEEEERKN5Eigen6MatrixI6Scalar1N1NEE">fly::hyperplane_normal (C++ function)</a>
 </li>
@@ -311,9 +308,7 @@
 </li>
         <li><a href="api/utility.html#_CPPv4I00EN3fly4nearEb1T1T">fly::near (C++ function)</a>
 </li>
-        <li><a href="api/utility.html#_CPPv4I0EN3fly4normEDaRR1E">fly::norm (C++ function)</a>
-</li>
-        <li><a href="api/utility.html#_CPPv4I0EN3fly7norm_sqEDaRK1E">fly::norm_sq (C++ function)</a>
+        <li><a href="api/utility.html#_CPPv4I0_iEN3fly12product_scanEN5Eigen5ArrayI1T1NXL1EEEEN5Eigen5ArrayI1T1NXL1EEEE">fly::product_scan (C++ function)</a>
 </li>
         <li><a href="api/utility.html#_CPPv4I0EN3fly13remove_cref_tE">fly::remove_cref_t (C++ type)</a>
 </li>
@@ -329,8 +324,18 @@
 </li>
         <li><a href="api/system.html#_CPPv4N3fly6system4Atom4AtomEDpRKN4Mems8matrix_tE">fly::system::Atom::Atom (C++ function)</a>, <a href="api/system.html#_CPPv4N3fly6system4Atom4AtomEDpRRN4Mems8matrix_tE">[1]</a>, <a href="api/system.html#_CPPv4N3fly6system4Atom4AtomERK4Atom">[2]</a>, <a href="api/system.html#_CPPv4N3fly6system4Atom4AtomERR4Atom">[3]</a>
 </li>
+        <li><a href="api/crystal_systems.html#_CPPv4N3fly6system9HyperGridE">fly::system::HyperGrid (C++ class)</a>
+</li>
+        <li><a href="api/crystal_systems.html#_CPPv4I0ENK3fly6system9HyperGrid8cell_idxEiRKN5Eigen10MatrixBaseI1EEE">fly::system::HyperGrid::cell_idx (C++ function)</a>
+</li>
+        <li><a href="api/crystal_systems.html#_CPPv4N3fly6system9HyperGrid9HyperGridERK3ArrIN8Position8scalar_tEEN8Position8scalar_tE">fly::system::HyperGrid::HyperGrid (C++ function)</a>
+</li>
+        <li><a href="api/crystal_systems.html#_CPPv4NK3fly6system9HyperGrid5r_cutEv">fly::system::HyperGrid::r_cut (C++ function)</a>
+</li>
     </ul></td>
     <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/crystal_systems.html#_CPPv4NK3fly6system9HyperGrid5shapeEv">fly::system::HyperGrid::shape (C++ function)</a>
+</li>
         <li><a href="api/system.html#_CPPv4I0_i_iI0_DpDaE0EN3fly6system6MemTagE">fly::system::MemTag (C++ struct)</a>
 </li>
         <li><a href="api/system.html#_CPPv4N3fly6system6MemTag12array_cref_tE">fly::system::MemTag::array_cref_t (C++ type)</a>
@@ -355,19 +360,15 @@
 </li>
         <li><a href="api/system.html#_CPPv4N3fly6system6MemTag4sizeEv">fly::system::MemTag::size (C++ function)</a>
 </li>
+        <li><a href="api/crystal_systems.html#_CPPv4N3fly6system9OrthoGridE">fly::system::OrthoGrid (C++ class)</a>
+</li>
+        <li><a href="api/crystal_systems.html#_CPPv4I_4SignEN3fly6system9OrthoGrid9gen_imageENSt8optionalIN8Position8matrix_tEEEN8Position8matrix_tEi">fly::system::OrthoGrid::gen_image (C++ function)</a>
+</li>
         <li><a href="api/crystal_systems.html#_CPPv4N3fly6system12OrthorhombicE">fly::system::Orthorhombic (C++ class)</a>
 </li>
         <li><a href="api/crystal_systems.html#_CPPv4NK3fly6system12Orthorhombic5basisEv">fly::system::Orthorhombic::basis (C++ function)</a>
 </li>
         <li><a href="api/crystal_systems.html#_CPPv4I0ENK3fly6system12Orthorhombic11canon_imageEN8Position8matrix_tERKN5Eigen10MatrixBaseI1EEE">fly::system::Orthorhombic::canon_image (C++ function)</a>
-</li>
-        <li><a href="api/crystal_systems.html#_CPPv4N3fly6system12Orthorhombic4GridE">fly::system::Orthorhombic::Grid (C++ class)</a>
-</li>
-        <li><a href="api/crystal_systems.html#_CPPv4I0ENK3fly6system12Orthorhombic4Grid8cell_idxEiRKN5Eigen10MatrixBaseI1EEE">fly::system::Orthorhombic::Grid::cell_idx (C++ function)</a>
-</li>
-        <li><a href="api/crystal_systems.html#_CPPv4I_4SignEN3fly6system12Orthorhombic4Grid9gen_imageENSt8optionalIN8Position8matrix_tEEEN8Position8matrix_tEi">fly::system::Orthorhombic::Grid::gen_image (C++ function)</a>
-</li>
-        <li><a href="api/crystal_systems.html#_CPPv4NK3fly6system12Orthorhombic4Grid5shapeEv">fly::system::Orthorhombic::Grid::shape (C++ function)</a>
 </li>
         <li><a href="api/crystal_systems.html#_CPPv4NK3fly6system12Orthorhombic9make_gridEN8Position8scalar_tE">fly::system::Orthorhombic::make_grid (C++ function)</a>
 </li>
@@ -401,9 +402,17 @@
 </li>
         <li><a href="api/crystal_systems.html#_CPPv4I0ENK3fly6system9Triclinic11canon_imageEN8Position8matrix_tERKN5Eigen10MatrixBaseI1EEE">fly::system::Triclinic::canon_image (C++ function)</a>
 </li>
+        <li><a href="api/crystal_systems.html#_CPPv4NK3fly6system9Triclinic9make_gridEN8Position8scalar_tE">fly::system::Triclinic::make_grid (C++ function)</a>
+</li>
+        <li><a href="api/crystal_systems.html#_CPPv4N3fly6system9TricliniceqERK9TriclinicRK9Triclinic">fly::system::Triclinic::operator== (C++ function)</a>
+</li>
         <li><a href="api/crystal_systems.html#_CPPv4NK3fly6system9Triclinic8periodicEi">fly::system::Triclinic::periodic (C++ function)</a>
 </li>
         <li><a href="api/crystal_systems.html#_CPPv4N3fly6system9Triclinic9TriclinicERK3MatIN8Position8scalar_tEERK3ArrIbE">fly::system::Triclinic::Triclinic (C++ function)</a>
+</li>
+        <li><a href="api/crystal_systems.html#_CPPv4N3fly6system7TriGridE">fly::system::TriGrid (C++ class)</a>
+</li>
+        <li><a href="api/crystal_systems.html#_CPPv4I_4SignEN3fly6system7TriGrid9gen_imageENSt8optionalIN8Position8matrix_tEEEN8Position8matrix_tEi">fly::system::TriGrid::gen_image (C++ function)</a>
 </li>
         <li><a href="api/system.html#_CPPv4IDpEN3fly6system3VoSE">fly::system::VoS (C++ class)</a>
 </li>

@@ -11,8 +11,6 @@ OpenFLY 0.1.0-alpha
    todo.rst
 
 
-
-
 Welcome to openFLY, the open-source on-the-fly kinetic Monte Carlo (KMC) framework.
 
 OpenFLY provides libraries and programs to run massively-parallel on-the-fly KMC simulations. 
@@ -36,7 +34,6 @@ If you are referencing openFLY in a publication please cite the following paper:
     @misc{Key,
         title     = {title}
     }
-
 
 
 

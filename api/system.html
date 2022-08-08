@@ -248,8 +248,8 @@ a_1 &amp; b_1 &amp; c_1 &amp; \cdots\\
 \vdots &amp;  &amp; &amp; \ddots
 \end{bmatrix}\end{split}\]</div>
 </div>
-<p>with each column corresponding to a basis vector and all non-zero entries positive. This constrains some of the rotational degrees
-of freedom of the parallelotope.</p>
+<p>with each column corresponding to a basis vector and all non-zero entries positive and all diagonal elements non-zero. This
+constrains some of the rotational degrees of freedom of the parallelotope and ensures the existence of an inverse.</p>
 <p>The <em>canonical</em> cell/box/simulation-space is the volume of space inside the parallelotope with edges formed from these basis
 vectors rooted at the origin. Along periodic axes atoms are allowed to have projected coordinates outside the canonical cell
 however, along non-periodic axes atoms must be inside the canonical cell.</p>
@@ -274,6 +274,78 @@ distance.</p>
 </div>
 <section id="generalised-box">
 <h3>Generalised box<a class="headerlink" href="#generalised-box" title="Permalink to this heading">#</a></h3>
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv4N3fly6system3BoxE">
+<span id="_CPPv3N3fly6system3BoxE"></span><span id="_CPPv2N3fly6system3BoxE"></span><span id="fly::system::Box"></span><span class="target" id="classfly_1_1system_1_1Box"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Box</span></span></span><a class="headerlink" href="#_CPPv4N3fly6system3BoxE" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Generalised orthogonal simulation box. </p>
+<p>Essentially a <code class="docutils literal notranslate"><span class="pre">std::variant</span></code> of all supported crystal systems. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3fly6system3Box3BoxERK3MatIN8Position8scalar_tEERK3ArrIbE">
+<span id="_CPPv3N3fly6system3Box3BoxERK3MatIN8Position8scalar_tEERK3ArrIbE"></span><span id="_CPPv2N3fly6system3Box3BoxERK3MatIN8Position8scalar_tEERK3ArrIbE"></span><span id="fly::system::Box::Box__Mat:Position::scalar_t:CR.Arr:b:CR"></span><span class="target" id="classfly_1_1system_1_1Box_1a9b6d3340a30231692a82fcd4d1d96d5c"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Box</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="utility.html#_CPPv4I0EN3fly3MatE" title="fly::Mat"><span class="n"><span class="pre">Mat</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">Position</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">scalar_t</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">basis</span></span>, <a class="reference internal" href="utility.html#_CPPv4I0EN3fly3ArrE" title="fly::Arr"><span class="n"><span class="pre">Arr</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">bool</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">periodic</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3fly6system3Box3BoxERK3MatIN8Position8scalar_tEERK3ArrIbE" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Construct a new <a class="reference internal" href="#classfly_1_1system_1_1Box"><span class="std std-ref">Box</span></a> box object. </p>
+<p>Automatically select the optimal underlying crystal system.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>basis</strong> – Matrix with columns equal to the basis vectors of the box (parallelotope). </p></li>
+<li><p><strong>periodic</strong> – True for each periodic axis. </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK3fly6system3Box5basisEv">
+<span id="_CPPv3NK3fly6system3Box5basisEv"></span><span id="_CPPv2NK3fly6system3Box5basisEv"></span><span id="fly::system::Box::basisC"></span><span class="target" id="classfly_1_1system_1_1Box_1a2838de8946b17e55aa967c44b64f190d"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="utility.html#_CPPv4I0EN3fly3MatE" title="fly::Mat"><span class="n"><span class="pre">Mat</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">Position</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">scalar_t</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">basis</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK3fly6system3Box5basisEv" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Fetch the basis vectors of this cell. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Mat&lt;Position::scalar_t&gt; A matrix with each column corresponding to a basis vector. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK3fly6system3Box8periodicEi">
+<span id="_CPPv3NK3fly6system3Box8periodicEi"></span><span id="_CPPv2NK3fly6system3Box8periodicEi"></span><span id="fly::system::Box::periodic__iC"></span><span class="target" id="classfly_1_1system_1_1Box_1a129890f2d892a0bdd400a099d29f50fe"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">periodic</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">i</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK3fly6system3Box8periodicEi" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Query if the <code class="docutils literal notranslate"><span class="pre">i</span></code>th axis is periodic. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0ENK3fly6system3Box11canon_imageEN8Position8matrix_tERKN5Eigen10MatrixBaseI1EEE">
+<span id="_CPPv3I0ENK3fly6system3Box11canon_imageERKN5Eigen10MatrixBaseI1EEE"></span><span id="_CPPv2I0ENK3fly6system3Box11canon_imageERKN5Eigen10MatrixBaseI1EEE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">E</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classfly_1_1system_1_1Box_1ad27f535ae456cfe0c39b7d1cd7343b37"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">Position</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">matrix_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">canon_image</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">Eigen</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">MatrixBase</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0ENK3fly6system3Box11canon_imageEN8Position8matrix_tERKN5Eigen10MatrixBaseI1EEE" title="fly::system::Box::canon_image::E"><span class="n"><span class="pre">E</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">x</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4I0ENK3fly6system3Box11canon_imageEN8Position8matrix_tERKN5Eigen10MatrixBaseI1EEE" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Maps an atom into the canonical cell. </p>
+<p><p></p>
+ </p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Assumes atoms are within the extents of the non-periodic axes!</p>
+</div>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK3fly6system3Box9make_gridEN8Position8scalar_tE">
+<span id="_CPPv3NK3fly6system3Box9make_gridEN8Position8scalar_tE"></span><span id="_CPPv2NK3fly6system3Box9make_gridEN8Position8scalar_tE"></span><span id="fly::system::Box::make_grid__Position::scalar_tC"></span><span class="target" id="classfly_1_1system_1_1Box_1a69a12104209beec255d2a019319541ca"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">variant</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="crystal_systems.html#_CPPv4N3fly6system9OrthoGridE" title="fly::system::OrthoGrid"><span class="n"><span class="pre">OrthoGrid</span></span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="crystal_systems.html#_CPPv4N3fly6system7TriGridE" title="fly::system::TriGrid"><span class="n"><span class="pre">TriGrid</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">make_grid</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">Position</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">scalar_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">r_cut</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK3fly6system3Box9make_gridEN8Position8scalar_tE" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Make an <code class="docutils literal notranslate"><span class="pre">std::variant</span></code> of grid objects. </p>
+<p>Grids have a common API, unwrap with <code class="docutils literal notranslate"><span class="pre">std::visit</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>r_cut</strong> – The cut-off radius for atomic interactions. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0ENK3fly6system3Box7holdingEbv">
+<span id="_CPPv3I0ENK3fly6system3Box7holdingEv"></span><span id="_CPPv2I0ENK3fly6system3Box7holdingEv"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classfly_1_1system_1_1Box_1ad6039986b1662d820c5baa70ad696ef2"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">holding</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="k"><span class="pre">noexcept</span></span><a class="headerlink" href="#_CPPv4I0ENK3fly6system3Box7holdingEbv" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Check if <a class="reference internal" href="#classfly_1_1system_1_1Box"><span class="std std-ref">Box</span></a> is currently using <code class="docutils literal notranslate"><span class="pre">T</span></code> as its crystal system. </p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
 </section>
 </section>
 <section id="atoms">

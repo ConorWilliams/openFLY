@@ -35,7 +35,7 @@ TEST_CASE("Orthorhombic::min_image", "[system]") {
 
   Vec<Position::scalar_t> x = Vec<Position::scalar_t>::Constant(-2);
 
-  REQUIRE(norm(m - x) < 0.001);
+  REQUIRE(gnorm(m - x) < 0.001);
 }
 
 TEST_CASE("Orthorhombic::canon_image", "[system]") {
@@ -62,7 +62,7 @@ TEST_CASE("Orthorhombic::canon_image", "[system]") {
     Vec<Position::scalar_t> b_prime = periodic.select(b.array() + (10 * vrand()).floor() * extents, b);
 
     // Check in same position
-    REQUIRE(std::abs(norm(box.canon_image(b_prime) - a) - fly::norm(a - b)) < 0.001);
+    REQUIRE(std::abs(gnorm(box.canon_image(b_prime) - a) - fly::gnorm(a - b)) < 0.001);
   }
 }
 
@@ -119,7 +119,7 @@ TEST_CASE("Orthorhombic::Grid::gen_image", "[system]") {
 
     correct[0] += 10;
 
-    REQUIRE(norm(correct - *im) < 0.001);
+    REQUIRE(gnorm(correct - *im) < 0.001);
   }
 
   {
@@ -137,6 +137,6 @@ TEST_CASE("Orthorhombic::Grid::gen_image", "[system]") {
 
     correct[0] -= 10;
 
-    REQUIRE(norm(correct - *im) < 0.001);
+    REQUIRE(gnorm(correct - *im) < 0.001);
   }
 }

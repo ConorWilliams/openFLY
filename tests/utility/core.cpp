@@ -36,7 +36,7 @@ TEST_CASE("hyperplane_normal", "[utility]") {
 
     auto n = hyperplane_normal(points);
 
-    REQUIRE(norm(n - Eigen::Vector<double, 4>{0, 0, 0, 1}) < 0.001);
+    REQUIRE(gnorm(n - Eigen::Vector<double, 4>{0, 0, 0, 1}) < 0.001);
   }
 
   {
@@ -48,7 +48,7 @@ TEST_CASE("hyperplane_normal", "[utility]") {
 
     auto n = hyperplane_normal(points);
 
-    REQUIRE(norm(n - Eigen::Vector<double, 3>{1 / std::sqrt(2.), 1 / std::sqrt(2.), 0}) < 0.001);
+    REQUIRE(gnorm(n - Eigen::Vector<double, 3>{1 / std::sqrt(2.), 1 / std::sqrt(2.), 0}) < 0.001);
   }
 }
 

@@ -211,7 +211,7 @@ namespace fly {
    * \endrst
    */
   template <typename E>
-  auto norm_sq(E const& r) {
+  auto gnorm_sq(E const& r) {
     return (r.array() * r.array()).sum();
   }
 
@@ -229,8 +229,8 @@ namespace fly {
    * \endrst
    */
   template <typename E>
-  auto norm(E&& expr) {
-    return std::sqrt(norm_sq(std::forward<E>(expr)));
+  auto gnorm(E&& expr) {
+    return std::sqrt(gnorm_sq(std::forward<E>(expr)));
   }
 
   /**

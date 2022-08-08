@@ -71,6 +71,6 @@ TEST_CASE("Triclinic::canon_image", "[system]") {
     Position::matrix_t b_undo = box.canon_image(b_prime);
 
     // // Check in same position
-    REQUIRE(std::abs(norm(b_undo - a) - fly::norm(a - b)) < 0.001);
+    REQUIRE(std::abs(gnorm(b_undo - a) - fly::gnorm(a - b)) < 0.001);
   }
 }

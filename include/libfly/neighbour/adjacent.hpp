@@ -44,11 +44,7 @@ namespace fly::neighbour {
       m_adj_cells.resize(static_cast<std::size_t>(shape.prod()));
 
       // Cumulative product of m_shape.
-      Arr<int> cumprod = Arr<int>::Ones();
-
-      for (int i = 1; i < spatial_dims; i++) {
-        cumprod[i] = cumprod[i - 1] * shape[i - 1];
-      }
+      Arr<int> cumprod = product_scan(shape);
 
       // ND -> 1D
       auto to_1D = [=](Arr<int> const& x) { return (x * cumprod).sum(); };

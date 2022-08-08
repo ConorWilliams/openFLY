@@ -46,7 +46,7 @@ namespace fly::system {
      * \copydoc OrthoGrid::gen_image
      */
     template <Sign S, typename E>
-    std::optional<Position::matrix_t> gen_image(Eigen::MatrixBase<E> const& x, int ax) {
+    std::optional<Vec<double>> gen_image(Eigen::MatrixBase<E> const& x, int ax) {
       //
       if constexpr (S == Sign::plus) {
         // Shortest distance point to hyperplane
@@ -69,15 +69,15 @@ namespace fly::system {
   private:
     friend class Triclinic;
 
-    Mat<Position::scalar_t> m_basis = Mat<Position::scalar_t>::Zero();
-    Mat<Position::scalar_t> m_hyper = Mat<Position::scalar_t>::Zero();
+    Mat<double> m_basis = Mat<double>::Zero();
+    Mat<double> m_hyper = Mat<double>::Zero();
 
     // Private constructor
-    TriGrid(Mat<Position::scalar_t> const& bs, Position::scalar_t r_cut) : HyperGrid(bs.colwise().sum(), r_cut), m_basis(bs) {
+    TriGrid(Mat<double> const& bs, double r_cut) : HyperGrid(bs.colwise().sum(), r_cut), m_basis(bs) {
       // Compute hyperplane normals and hyper plane spacing.
       for (int i = 0; i < spatial_dims; i++) {
         //
-        Mat<Position::scalar_t> points = m_basis;
+        Mat<double> points = m_basis;
 
         points.col(i).array() = 0;  // ith hyperplane through all axes EXCEPT ith
 
@@ -107,9 +107,9 @@ namespace fly::system {
      * @param basis Matrix with columns equal to the basis vectors of the parallelotope.
      * @param pd True for each periodic axis.
      */
-    Triclinic(Mat<Position::scalar_t> const& basis, Arr<bool> const& pd)
+    Triclinic(Mat<double> const& basis, Arr<bool> const& pd)
         : m_basis{basis.triangularView<Eigen::Upper>()}, m_basis_inv{m_basis.inverse()}, m_periodic{pd} {
-      [[maybe_unused]] Position::scalar_t eps = 1e-5;
+      [[maybe_unused]] double eps = 1e-5;
 
       VERIFY(((basis - m_basis).array().abs() < eps).all(), "Basis must be an upper triangular matrix.");
       VERIFY((m_basis.array() >= 0).all(), "Basis elements must be positive");
@@ -121,9 +121,9 @@ namespace fly::system {
     /**
      * @brief Fetch the basis vectors of this cell.
      *
-     * @return  Mat<Position::scalar_t> A matrix with each column corresponding to a basis vector.
+     * @return  Mat<double> A matrix with each column corresponding to a basis vector.
      */
-    Mat<Position::scalar_t> basis() const noexcept { return m_basis; }
+    Mat<double> basis() const noexcept { return m_basis; }
 
     /**
      * @brief Query if the ``i``th axis is periodic.
@@ -142,14 +142,14 @@ namespace fly::system {
      * \endrst
      */
     template <typename E>
-    Position::matrix_t canon_image(Eigen::MatrixBase<E> const& x) const {
+    Vec<double> canon_image(Eigen::MatrixBase<E> const& x) const {
       // Convert to fractional coordinates
-      Position::matrix_t f = m_basis_inv * x;
+      Vec<double> f = m_basis_inv * x;
 
       ASSERT((m_periodic || (f.array() >= 0 && f.array() < 1)).all(), "Out of box A");
 
       // Do the canonizing in the fractional basis.
-      Position::matrix_t f_canon = f.array() - f.array().floor();
+      Vec<double> f_canon = f.array() - f.array().floor();
 
       return m_basis * f_canon;  // Transform back to real coordinates
     }
@@ -166,11 +166,11 @@ namespace fly::system {
      *
      * @param r_cut The cut-off radius for atomic interactions.
      */
-    TriGrid make_grid(Position::scalar_t r_cut) const { return {m_basis, r_cut}; }
+    TriGrid make_grid(double r_cut) const { return {m_basis, r_cut}; }
 
   private:
-    Mat<Position::scalar_t> m_basis = Mat<Position::scalar_t>::Zero();
-    Mat<Position::scalar_t> m_basis_inv = Mat<Position::scalar_t>::Zero();
+    Mat<double> m_basis = Mat<double>::Zero();
+    Mat<double> m_basis_inv = Mat<double>::Zero();
 
     Arr<bool> m_periodic = Arr<bool>::Zero();
   };

@@ -25,11 +25,11 @@ TEST_CASE("HyperGrid::cell_idx", "[system]") {
   //
   using namespace fly;
 
-  system::HyperGrid grid{Arr<Position::scalar_t>::Constant(10), 3};
+  system::HyperGrid grid{Arr<double>::Constant(10), 3};
 
-  int A = grid.cell_idx(Vec<Position::scalar_t>::Constant(0));
-  int B = grid.cell_idx(Vec<Position::scalar_t>::Constant(5));
-  int C = grid.cell_idx(Vec<Position::scalar_t>::Constant(9.5));
+  int A = grid.cell_idx(Vec<double>::Constant(0));
+  int B = grid.cell_idx(Vec<double>::Constant(5));
+  int C = grid.cell_idx(Vec<double>::Constant(9.5));
 
   if constexpr (spatial_dims == 3) {
     REQUIRE(A == 1 + 1 * 5 + 1 * 5 * 5);

@@ -23,13 +23,13 @@ TEST_CASE("Box::Box", "[system]") {
   using namespace fly;
 
   {  //
-    system::Box box(Mat<Position::scalar_t>::Identity(), Arr<bool>::Constant(true));
+    system::Box box(Mat<double>::Identity(), Arr<bool>::Constant(true));
 
     CHECK(box.holding<system::Orthorhombic>());
   }
 
   {  //
-    system::Box box(Mat<Position::scalar_t>::Ones().triangularView<Eigen::Upper>(), Arr<bool>::Constant(true));
+    system::Box box(Mat<double>::Ones().triangularView<Eigen::Upper>(), Arr<bool>::Constant(true));
 
     CHECK(box.holding<system::Triclinic>());
   }

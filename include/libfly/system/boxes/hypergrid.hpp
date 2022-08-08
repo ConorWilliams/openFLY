@@ -41,7 +41,7 @@ namespace fly::system {
      * @param extents The size of the box along each axis.
      * @param r_cut The cut-off radius for atomic interactions.
      */
-    HyperGrid(Arr<Position::scalar_t> const& extents, Position::scalar_t r_cut) : m_r_cut(r_cut) {
+    HyperGrid(Arr<double> const& extents, double r_cut) : m_r_cut(r_cut) {
       // Sanity checks
       VERIFY(r_cut > 0, "r_cut is negative");
       VERIFY((extents > r_cut).all(), "r_cut is too big");
@@ -55,7 +55,7 @@ namespace fly::system {
     /**
      * @brief Fetch the cut-off radius for atomic interactions.
      */
-    Position::scalar_t r_cut() const noexcept { return m_r_cut; }
+    double r_cut() const noexcept { return m_r_cut; }
 
     /**
      * @brief Get the total number of cells in the HyperGrid along each axis.
@@ -77,13 +77,13 @@ namespace fly::system {
     }
 
   private:
-    Position::scalar_t m_r_cut = 0;
+    double m_r_cut = 0;
 
     Arr<int> m_shape = Arr<int>::Zero();
     Arr<int> m_prod_shape = Arr<int>::Zero();
 
-    Arr<Position::scalar_t> m_cell = Arr<Position::scalar_t>::Zero();
-    Arr<Position::scalar_t> m_inv_cell = Arr<Position::scalar_t>::Zero();
+    Arr<double> m_cell = Arr<double>::Zero();
+    Arr<double> m_inv_cell = Arr<double>::Zero();
 
     /**
      * @brief Cast a position to its grid indexes and clamp on interval [0, m_shape -1].

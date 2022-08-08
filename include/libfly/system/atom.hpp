@@ -180,7 +180,7 @@ namespace fly {
     /**
      * @brief Tag type for dimer axis (xyz).
      */
-    struct Axis : system::MemTag<Position::scalar_t, spatial_dims> {};
+    struct Axis : system::MemTag<double, spatial_dims> {};
 
     /**
      * @brief Axis literal.
@@ -190,7 +190,7 @@ namespace fly {
     /**
      * @brief Tag type for gradient of the potential.
      */
-    struct Gradient : system::MemTag<Position::scalar_t, spatial_dims> {};
+    struct Gradient : system::MemTag<double, spatial_dims> {};
 
     /**
      * @brief Gradient literal.
@@ -200,7 +200,7 @@ namespace fly {
     /**
      * @brief Tag type for velocity.
      */
-    struct Velocity : system::MemTag<Position::scalar_t, spatial_dims> {};
+    struct Velocity : system::MemTag<double, spatial_dims> {};
 
     /**
      * @brief Velocity literal.

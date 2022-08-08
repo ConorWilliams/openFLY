@@ -47,11 +47,11 @@ namespace fly::system {
      * @tparam S Direction along axis which to generate image.
      * @param x Position of the atom who's image we are computing.
      * @param ax Index of axis along which to generate image.
-     * @return std::optional<Position::matrix_t> If the atom's image is beyond the cut-off (``r_cut``) for atomic interactions then
+     * @return std::optional<Vec<double>> If the atom's image is beyond the cut-off (``r_cut``) for atomic interactions then
      * the image's position otherwise ``std::nullopt``.
      */
     template <Sign S>
-    std::optional<Position::matrix_t> gen_image(Position::matrix_t x, int ax) {
+    std::optional<Vec<double>> gen_image(Vec<double> x, int ax) {
       //
       static_assert(S == Sign::plus || S == Sign::minus, "Unreachable");
 
@@ -73,7 +73,7 @@ namespace fly::system {
   private:
     friend class Orthorhombic;
 
-    Arr<Position::scalar_t> m_extents;
+    Arr<double> m_extents;
 
     /**
      * @brief Construct a new OrthoGrid object.
@@ -81,7 +81,7 @@ namespace fly::system {
      * @param extents The size of the box along each axis.
      * @param r_cut The cut-off radius for atomic interactions.
      */
-    OrthoGrid(Arr<Position::scalar_t> const& extents, Position::scalar_t r_cut) : HyperGrid(extents, r_cut), m_extents(extents) {}
+    OrthoGrid(Arr<double> const& extents, double r_cut) : HyperGrid(extents, r_cut), m_extents(extents) {}
   };
 
   /**
@@ -95,17 +95,17 @@ namespace fly::system {
      * @param ex Length of simulation box along each axis.
      * @param pd True for each periodic axis.
      */
-    Orthorhombic(Arr<Position::scalar_t> const& ex, Arr<bool> const& pd) : m_extents{ex}, m_periodic{pd}, m_inv_extents(1.0 / ex) {
+    Orthorhombic(Arr<double> const& ex, Arr<bool> const& pd) : m_extents{ex}, m_periodic{pd}, m_inv_extents(1.0 / ex) {
       VERIFY((m_extents > 0).all(), "Orthorhombic extents are negative");
     }
 
     /**
      * @brief Fetch the basis vectors of this cell.
      *
-     * @return Eigen::DiagonalMatrix<Position::scalar_t, spatial_dims> A matrix with each column corresponding to a basis vector.
+     * @return Eigen::DiagonalMatrix<double, spatial_dims> A matrix with each column corresponding to a basis vector.
      */
-    Eigen::DiagonalMatrix<Position::scalar_t, spatial_dims> basis() const noexcept {
-      return Eigen::DiagonalMatrix<Position::scalar_t, spatial_dims>{m_extents.matrix()};
+    Eigen::DiagonalMatrix<double, spatial_dims> basis() const noexcept {
+      return Eigen::DiagonalMatrix<double, spatial_dims>{m_extents.matrix()};
     }
 
     /**
@@ -127,10 +127,10 @@ namespace fly::system {
      * \endrst
      */
     template <typename E>
-    Position::matrix_t canon_image(Eigen::MatrixBase<E> const& x) const {
+    Vec<double> canon_image(Eigen::MatrixBase<E> const& x) const {
       // Non-periodic atoms are within the simulation box extents so x[i] * inv_extents less than 1 and x[i]
       // remains unaffected, hence no non-periodic switch/select.
-      ASSERT((m_periodic || (x.array() >= Arr<Position::scalar_t>::Zero() && x.array() < m_extents)).all(), "Out of box");
+      ASSERT((m_periodic || (x.array() >= Arr<double>::Zero() && x.array() < m_extents)).all(), "Out of box");
       return x.array() - m_extents * (x.array() * m_inv_extents).floor();
     }
 
@@ -144,9 +144,9 @@ namespace fly::system {
      * @deprecated No triclinic generalization.
      */
     template <typename A, typename B>
-    [[deprecated("No triclinic generalization")]] Position::matrix_t min_image(Eigen::MatrixBase<A> const& a,
-                                                                               Eigen::MatrixBase<B> const& b) const noexcept {
-      Arr<Position::scalar_t> dr = b - a;
+    [[deprecated("No triclinic generalization")]] Vec<double> min_image(Eigen::MatrixBase<A> const& a,
+                                                                        Eigen::MatrixBase<B> const& b) const noexcept {
+      Arr<double> dr = b - a;
       return m_periodic.select(dr - m_extents * (dr * m_inv_extents + 0.5).floor(), dr);
     }
 
@@ -162,12 +162,12 @@ namespace fly::system {
      *
      * @param r_cut The cut-off radius for atomic interactions.
      */
-    OrthoGrid make_grid(Position::scalar_t r_cut) const { return {m_extents, r_cut}; }
+    OrthoGrid make_grid(double r_cut) const { return {m_extents, r_cut}; }
 
   private:
-    Arr<Position::scalar_t> m_extents = Arr<Position::scalar_t>::Zero();
+    Arr<double> m_extents = Arr<double>::Zero();
     Arr<bool> m_periodic = Arr<bool>::Zero();
-    Arr<Position::scalar_t> m_inv_extents = Arr<Position::scalar_t>::Zero();
+    Arr<double> m_inv_extents = Arr<double>::Zero();
   };
 
 }  // namespace fly::system

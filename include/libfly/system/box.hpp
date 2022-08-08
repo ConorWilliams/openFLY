@@ -58,9 +58,9 @@
 namespace fly::system {
 
   namespace detail {
-    inline std::variant<Orthorhombic, Triclinic> build_varient(Mat<Position::scalar_t> const& ex, Arr<bool> const& pd) {
+    inline std::variant<Orthorhombic, Triclinic> build_varient(Mat<double> const& ex, Arr<bool> const& pd) {
       //
-      Mat<Position::scalar_t> skew = ex;
+      Mat<double> skew = ex;
 
       for (int i = 0; i < spatial_dims; i++) {
         skew(i, i) = 0;
@@ -89,13 +89,13 @@ namespace fly::system {
      * @param basis Matrix with columns equal to the basis vectors of the box (parallelotope).
      * @param periodic True for each periodic axis.
      */
-    Box(Mat<Position::scalar_t> const& basis, Arr<bool> const& periodic) : m_sys(detail::build_varient(basis, periodic)) {}
+    Box(Mat<double> const& basis, Arr<bool> const& periodic) : m_sys(detail::build_varient(basis, periodic)) {}
 
     /**
      * \copydoc Triclinic::basis
      */
-    Mat<Position::scalar_t> basis() const {
-      return std::visit([](auto const& m_box) -> Mat<Position::scalar_t> { return m_box.basis(); }, m_sys);
+    Mat<double> basis() const {
+      return std::visit([](auto const& m_box) -> Mat<double> { return m_box.basis(); }, m_sys);
     }
 
     /**
@@ -109,8 +109,8 @@ namespace fly::system {
      * \copydoc Triclinic::canon_image
      */
     template <typename E>
-    Position::matrix_t canon_image(Eigen::MatrixBase<E> const& x) const {
-      return std::visit([&x](auto const& m_box) -> Position::matrix_t { return m_box.canon_image(x); }, m_sys);
+    Vec<double> canon_image(Eigen::MatrixBase<E> const& x) const {
+      return std::visit([&x](auto const& m_box) -> Vec<double> { return m_box.canon_image(x); }, m_sys);
     }
 
     /**
@@ -120,7 +120,7 @@ namespace fly::system {
      *
      * @param r_cut The cut-off radius for atomic interactions.
      */
-    std::variant<OrthoGrid, TriGrid> make_grid(Position::scalar_t r_cut) const {
+    std::variant<OrthoGrid, TriGrid> make_grid(double r_cut) const {
       return std::visit([r_cut](auto const& m_box) -> std::variant<OrthoGrid, TriGrid> { return m_box.make_grid(r_cut); }, m_sys);
     }
 

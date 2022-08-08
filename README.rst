@@ -13,7 +13,11 @@
    </p>
 
    <p align="center">
-      <a href="https://github.com/ConorWilliams/openFLY/actions/workflows/ci.yml">
-         <img src="https://github.com/ConorWilliams/openFLY/actions/workflows/ci.yml/badge.svg">
-      </a>
+        <a href="https://github.com/ConorWilliams/openFLY/actions/workflows/ci.yml">
+            <img src="https://github.com/ConorWilliams/openFLY/actions/workflows/ci.yml/badge.svg">
+        </a>
+
+        <a href="https://github.com/ConorWilliams/openFLY/actions/workflows/pages/pages-build-deployment">
+            <img src="https://github.com/ConorWilliams/openFLY/actions/workflows/pages/pages-build-deployment/badge.svg">
+        </a>
    </p>

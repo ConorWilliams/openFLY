@@ -52,6 +52,17 @@ TEST_CASE("hyperplane_normal", "[utility]") {
   }
 }
 
+TEST_CASE("product_scan", "[utility]") {
+  //
+  using namespace fly;
+
+  using T = Arr<int>;
+
+  CHECK((product_scan(T{1, 1, 1}) == T{1, 1, 1}).all());
+  CHECK((product_scan(T{10, 9, 0}) == T{1, 10, 90}).all());
+  CHECK((product_scan(T{3, 2, 3}) == T{1, 3, 6}).all());
+}
+
 TEST_CASE("ipow", "[utility]") {
   //
   CHECK(fly::ipow<0>(10) == 1);

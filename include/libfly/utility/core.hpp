@@ -151,6 +151,35 @@ namespace fly {
   }
 
   /**
+   * @brief Compute the shifted prefix product of an array.
+   *
+   * \rst
+   *
+   * If the inputs are :math:`x_i` the outputs are:
+   *
+   * .. math::
+   *
+   *    y_1 & = 1 \\
+   *    y_2 & = 1 \times x_1 \\
+   *    y_3 & = 1 \times x_1 \times x_2 \\
+   *        & \vdots \\
+   *    y_n & = 1 \times x_1\times x_{2} \times \dots \times x_{n-1}
+   *
+   * This is a common precursor operation when computing cell indices.
+   *
+   * \endrst
+   *
+   */
+  template <typename T, int N>
+  Eigen::Array<T, N, 1> product_scan(Eigen::Array<T, N, 1> x) {
+    T prod = 1;
+    for (int i = 0; i < x.size(); i++) {
+      prod *= std::exchange(x[i], prod);
+    }
+    return x;
+  }
+
+  /**
    * @brief Generalised dot-product between two \c Eigen::Array objects.
    *
    * \rst

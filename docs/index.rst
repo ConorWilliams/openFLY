@@ -29,7 +29,7 @@ This documentation is organized into three parts:
 
 3. The :ref:`Library API reference` which serves as information for developers to learn more about openFLY’s internals and as reference for programmers using libFLY.
 
-If you are referencing openFLY in a publication please cite the following paper(s):
+If you are referencing openFLY in a publication please cite the following paper:
 
 .. code:: BibTeX
 

@@ -22,9 +22,9 @@
 #include "libfly/utility/core.hpp"
 
 /**
- * \file orthorhombic.hpp
+ * \file triclinic.hpp
  *
- * @brief Specialised simulation box for orthorhombic supercells.
+ * @brief Specialised simulation box for Triclinic supercells.
  */
 
 namespace fly::system {
@@ -64,9 +64,9 @@ namespace fly::system {
 
         // Want normal in same direction as edge.
         if (auto n = hyperplane_normal(points); gdot(n, m_basis.col(i)) < 0) {
-          m_hyper_normals.col(i) = -n;
+          //   m_hyper_normals.col(i) = -n;
         } else {
-          m_hyper_normals.col(i) = n;
+          //   m_hyper_normals.col(i) = n;
         }
       }
     }
@@ -107,13 +107,85 @@ namespace fly::system {
       return m_basis * f_canon;  // Transform back to real coordinates
     }
 
+    /**
+     * @brief Comparison operator, no surprises.
+     */
+    friend bool operator==(Triclinic const& a, Triclinic const& b) noexcept {
+      return a.m_basis == b.m_basis && (a.m_periodic == b.m_periodic).all();
+    }
+
+    /**
+     * @brief Make a Grid object.
+     *
+     * @param r_cut The cut-off radius for atomic interactions.
+     */
+    Grid make_grid(Position::scalar_t r_cut) const;  // Implementation after Grid at EoF
+
   private:
     Mat<Position::scalar_t> m_basis = Mat<Position::scalar_t>::Zero();
     Mat<Position::scalar_t> m_basis_inv = Mat<Position::scalar_t>::Zero();
 
-    Mat<Position::scalar_t> m_hyper_normals = Mat<Position::scalar_t>::Zero();
-
     Arr<bool> m_periodic = Arr<bool>::Zero();
   };
+
+  //   /**
+  //    * @brief Maps position vector -> ND integer-tuples -> 1D index.
+  //    *
+  //    * Grid is constructable using the Triclinic::make_grid factory.
+  //    */
+  //   class Triclinic::Grid {
+  //   public:
+  //     /**
+  //      * @brief Get the total number of cells in the Grid along each axis.
+  //      */
+  //     Arr<int> shape() const noexcept { return m_shape; }
+
+  //   private:
+  //     friend class Triclinic;
+
+  //     Arr<Position::scalar_t> m_extents = Arr<Position::scalar_t>::Zero();
+
+  //     Position::scalar_t m_r_cut = 0;
+
+  //     Mat<Position::scalar_t> m_hyper_normals = Mat<Position::scalar_t>::Zero();
+
+  //     Arr<int> m_shape = Arr<int>::Zero();
+  //     Arr<int> m_prod_shape = Arr<int>::Zero();
+
+  //     // Arr<Position::scalar_t> m_cell = Arr<Position::scalar_t>::Zero();
+  //     // Arr<Position::scalar_t> m_inv_cell = Arr<Position::scalar_t>::Zero();
+
+  //     // Private constructor
+  //     Grid(Triclinic const& box, Position::scalar_t r_cut) : m_extents(box.m_basis), m_r_cut(r_cut) {
+  //       // Sanity checks
+  //       VERIFY(r_cut > 0, "r_cut is negative");
+  //       VERIFY((extents > r_cut).all(), "r_cut is too big");
+  //       //
+  //       m_shape = 2 + (extents / r_cut).cast<int>();
+  //       m_cell = extents / (extents / r_cut).floor();
+  //       m_inv_cell = 1.0 / m_cell;
+
+  //       // Cumulative product of m_shape
+
+  //       m_prod_shape = Arr<int>::Ones();
+
+  //       for (int i = 1; i < spatial_dims; i++) {
+  //         m_prod_shape[i] = m_prod_shape[i - 1] * m_shape[i - 1];
+  //       }
+  //     }
+
+  //     /**
+  //      * @brief Cast a position to its grid indexes and clamp on interval [0, m_shape -1].
+  //      */
+  //     template <typename E>
+  //     Arr<int> clamp_to_grid_idxs(Eigen::MatrixBase<E> const& x) const noexcept {
+  //       return (x.array() * m_inv_cell).template cast<int>().cwiseMax(0).cwiseMin(m_shape - 1);
+  //     }
+
+  //     /**
+  //      * @brief Get the 1D index from the nD index.
+  //      */
+  //     int to_1D(Arr<int> const& indexes) const noexcept { return (indexes * m_prod_shape).sum(); }
+  //   };
 
 }  // namespace fly::system

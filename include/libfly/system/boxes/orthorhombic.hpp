@@ -198,14 +198,7 @@ namespace fly::system {
       m_shape = 2 + (extents / r_cut).cast<int>();
       m_cell = extents / (extents / r_cut).floor();
       m_inv_cell = 1.0 / m_cell;
-
-      // Cumulative product of m_shape
-
-      m_prod_shape = Arr<int>::Ones();
-
-      for (int i = 1; i < spatial_dims; i++) {
-        m_prod_shape[i] = m_prod_shape[i - 1] * m_shape[i - 1];
-      }
+      m_prod_shape = product_scan(m_shape);
     }
 
     /**

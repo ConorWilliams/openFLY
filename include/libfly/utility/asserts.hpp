@@ -16,7 +16,7 @@
 
 #include <string_view>
 
-#include "libfly/utility/current_function.hpp"
+#include "libfly/external/current_function.hpp"
 
 /**
  * \file asserts.hpp
@@ -37,11 +37,11 @@ namespace fly::detail {
 /**
  * @brief Use like std \c assert(expr) but with an error message, not disabled by \c NDEBUG.
  */
-#define VERIFY(expr, msg)                                                                \
-  do {                                                                                   \
-    if (!(expr)) {                                                                       \
-      fly::detail::assert_handler(#expr, msg, __FILE__, __LINE__, FLY_CURRENT_FUNCTION); \
-    }                                                                                    \
+#define VERIFY(expr, msg)                                                                  \
+  do {                                                                                     \
+    if (!(expr)) {                                                                         \
+      fly::detail::assert_handler(#expr, msg, __FILE__, __LINE__, BOOST_CURRENT_FUNCTION); \
+    }                                                                                      \
   } while (false)
 
 #ifndef NDEBUG

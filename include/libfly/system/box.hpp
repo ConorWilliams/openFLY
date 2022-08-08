@@ -14,11 +14,11 @@
 
 // You should have received a copy of the GNU General Public License along with openFLY. If not, see <https://www.gnu.org/licenses/>.
 
-#include <array>
-#include <cstddef>
-#include <nonstd/span.hpp>
-#include <vector>
+#include <variant>
 
+#include "libfly/system/atom.hpp"
+#include "libfly/system/boxes/orthorhombic.hpp"
+#include "libfly/system/boxes/triclinic.hpp"
 #include "libfly/utility/core.hpp"
 
 /**
@@ -41,8 +41,8 @@
  *     \vdots &  & & \ddots
  *     \end{bmatrix}
  *
- * with each column corresponding to a basis vector and all non-zero entries positive. This constrains some of the rotational degrees
- * of freedom of the parallelotope.
+ * with each column corresponding to a basis vector and all non-zero entries positive and all diagonal elements non-zero. This
+ * constrains some of the rotational degrees of freedom of the parallelotope and ensures the existence of an inverse.
  *
  * The *canonical* cell/box/simulation-space is the volume of space inside the parallelotope with edges formed from these basis
  * vectors rooted at the origin. Along periodic axes atoms are allowed to have projected coordinates outside the canonical cell
@@ -55,7 +55,88 @@
  * \endrst
  */
 
-namespace fly::system {}  // namespace fly::system
+namespace fly::system {
+
+  namespace detail {
+    inline std::variant<Orthorhombic, Triclinic> build_varient(Mat<Position::scalar_t> const& ex, Arr<bool> const& pd) {
+      //
+      Mat<Position::scalar_t> skew = ex;
+
+      for (int i = 0; i < spatial_dims; i++) {
+        skew(i, i) = 0;
+      }
+
+      if (gnorm(skew) < 0.0001) {
+        return Orthorhombic(ex.diagonal(), pd);
+      } else {
+        return Triclinic(ex, pd);
+      }
+    }
+  }  // namespace detail
+
+  /**
+   * @brief Generalised orthogonal simulation box.
+   *
+   * Essentially a ``std::variant`` of all supported crystal systems.
+   */
+  class Box {
+  public:
+    /**
+     * @brief Construct a new Box box object.
+     *
+     * Automatically select the optimal underlying crystal system.
+     *
+     * @param basis Matrix with columns equal to the basis vectors of the box (parallelotope).
+     * @param periodic True for each periodic axis.
+     */
+    Box(Mat<Position::scalar_t> const& basis, Arr<bool> const& periodic) : m_sys(detail::build_varient(basis, periodic)) {}
+
+    /**
+     * \copydoc Triclinic::basis
+     */
+    Mat<Position::scalar_t> basis() const {
+      return std::visit([](auto const& m_box) -> Mat<Position::scalar_t> { return m_box.basis(); }, m_sys);
+    }
+
+    /**
+     * \copydoc Triclinic::periodic
+     */
+    bool periodic(int i) const {
+      return std::visit([i](auto const& m_box) -> bool { return m_box.periodic(i); }, m_sys);
+    }
+
+    /**
+     * \copydoc Triclinic::canon_image
+     */
+    template <typename E>
+    Position::matrix_t canon_image(Eigen::MatrixBase<E> const& x) const {
+      return std::visit([&x](auto const& m_box) -> Position::matrix_t { return m_box.canon_image(x); }, m_sys);
+    }
+
+    /**
+     * @brief Make an ``std::variant`` of grid objects.
+     *
+     * Grids have a common API, unwrap with ``std::visit``.
+     *
+     * @param r_cut The cut-off radius for atomic interactions.
+     */
+    std::variant<OrthoGrid, TriGrid> make_grid(Position::scalar_t r_cut) const {
+      return std::visit([r_cut](auto const& m_box) -> std::variant<OrthoGrid, TriGrid> { return m_box.make_grid(r_cut); }, m_sys);
+    }
+
+    /**
+     * @brief Check if Box is currently using ``T`` as its crystal system.
+     */
+    template <typename T>
+    bool holding() const noexcept {
+      return std::holds_alternative<T>(m_sys);
+    }
+
+  private:
+    std::variant<Orthorhombic, Triclinic> m_sys;
+  };
+
+}  // namespace fly::system
 
 //    * The canonical grid cell is the parallelepiped of space spanned by the extents of the canonical cell, canon_grid_pos() maps a
 //    * point into the canonical cell and then nudges it by one grid cell in the (1,1,1) direction. This leaves room for a layer of

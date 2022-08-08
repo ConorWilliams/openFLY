@@ -14,9 +14,6 @@
 
 #include "libfly/system/boxes/triclinic.hpp"
 
-#include <Eigen/src/Core/Diagonal.h>
-#include <Eigen/src/Core/DiagonalMatrix.h>
-
 #include <catch2/catch_test_macros.hpp>
 #include <ios>
 #include <iostream>

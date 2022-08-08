@@ -16,7 +16,6 @@
 
 #include <Eigen/Core>
 #include <cmath>
-#include <complex>
 #include <optional>
 
 #include "libfly/system/atom.hpp"
@@ -46,8 +45,9 @@ namespace fly::system {
     /**
      * \copydoc OrthoGrid::gen_image
      */
-    template <Sign S>
-    std::optional<Position::matrix_t> gen_image(Position::matrix_t x, int ax) {
+    template <Sign S, typename E>
+    std::optional<Position::matrix_t> gen_image(Eigen::MatrixBase<E> const& x, int ax) {
+      //
       if constexpr (S == Sign::plus) {
         // Shortest distance point to hyperplane
         auto dx = gdot(x, m_hyper.col(ax));
@@ -112,11 +112,9 @@ namespace fly::system {
       [[maybe_unused]] Position::scalar_t eps = 1e-5;
 
       VERIFY(((basis - m_basis).array().abs() < eps).all(), "Basis must be an upper triangular matrix.");
-
       VERIFY((m_basis.array() >= 0).all(), "Basis elements must be positive");
       VERIFY((m_basis.array().pow(2).colwise().sum().sqrt() > eps).all(), "Basis vectors too small");
       VERIFY((m_basis.diagonal().array() > eps).all(), "Diagonal elements must be non-zero");
-
       ASSERT(m_basis.determinant() > eps, "Should be invertible by above.");
     }
 

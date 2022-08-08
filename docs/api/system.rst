@@ -22,6 +22,11 @@ In theory libFLY could detect the most efficient crystal-system for any basis se
 Generalised box
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+.. doxygenclass:: fly::system::Box
+    :members:
+    :undoc-members:
+
+
 Atoms
 ----------------------
 

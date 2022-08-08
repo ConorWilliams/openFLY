@@ -18,6 +18,7 @@
 #include <optional>
 
 #include "libfly/system/atom.hpp"
+#include "libfly/system/boxes/hypergrid.hpp"
 #include "libfly/utility/core.hpp"
 
 /**
@@ -29,12 +30,65 @@
 namespace fly::system {
 
   /**
+   * @brief Maps position vector -> ND integer-tuples -> 1D index.
+   *
+   * OrthoGrid is constructable using the Orthorhombic::make_grid factory.
+   */
+  class OrthoGrid : public HyperGrid {
+  public:
+    /**
+     * @brief Generate the periodic image of an atom along a particular axis ``ax``.
+     *
+     * \rst
+     * .. warning::
+     *    Only supports atoms in the canonical cell.
+     * \endrst
+     *
+     * @tparam S Direction along axis which to generate image.
+     * @param x Position of the atom who's image we are computing.
+     * @param ax Index of axis along which to generate image.
+     * @return std::optional<Position::matrix_t> If the atom's image is beyond the cut-off (``r_cut``) for atomic interactions then
+     * the image's position otherwise ``std::nullopt``.
+     */
+    template <Sign S>
+    std::optional<Position::matrix_t> gen_image(Position::matrix_t x, int ax) {
+      //
+      static_assert(S == Sign::plus || S == Sign::minus, "Unreachable");
+
+      if constexpr (S == Sign::plus) {
+        if (x[ax] < HyperGrid::r_cut()) {
+          x[ax] += m_extents[ax];
+          return x;
+        }
+      } else {
+        if (x[ax] > m_extents[ax] - HyperGrid::r_cut()) {
+          x[ax] -= m_extents[ax];
+          return x;
+        }
+      }
+
+      return std::nullopt;
+    }
+
+  private:
+    friend class Orthorhombic;
+
+    Arr<Position::scalar_t> m_extents;
+
+    /**
+     * @brief Construct a new OrthoGrid object.
+     *
+     * @param extents The size of the box along each axis.
+     * @param r_cut The cut-off radius for atomic interactions.
+     */
+    OrthoGrid(Arr<Position::scalar_t> const& extents, Position::scalar_t r_cut) : HyperGrid(extents, r_cut), m_extents(extents) {}
+  };
+
+  /**
    * @brief Generalised orthogonal simulation box.
    */
   class Orthorhombic {
   public:
-    class Grid;
-
     /**
      * @brief Construct a new Orthorhombic box object.
      *
@@ -104,117 +158,16 @@ namespace fly::system {
     }
 
     /**
-     * @brief Make a Grid object.
+     * @brief Make an OrthoGrid object.
      *
      * @param r_cut The cut-off radius for atomic interactions.
      */
-    Grid make_grid(Position::scalar_t r_cut) const;  // Implementation after Grid at EoF
+    OrthoGrid make_grid(Position::scalar_t r_cut) const { return {m_extents, r_cut}; }
 
   private:
     Arr<Position::scalar_t> m_extents = Arr<Position::scalar_t>::Zero();
     Arr<bool> m_periodic = Arr<bool>::Zero();
     Arr<Position::scalar_t> m_inv_extents = Arr<Position::scalar_t>::Zero();
   };
-
-  /**
-   * @brief Maps position vector -> ND integer-tuples -> 1D index.
-   *
-   * Grid is constructable using the Orthorhombic::make_grid factory.
-   */
-  class Orthorhombic::Grid {
-  public:
-    /**
-     * @brief Get the total number of cells in the Grid along each axis.
-     */
-    Arr<int> shape() const noexcept { return m_shape; }
-
-    /**
-     * @brief Compute the cell index from an atoms canonical position.
-     *
-     * \rst
-     * .. warning::
-     *
-     *    Assumes atoms are in the canonical cell or in the surrounding one Grid-cell buffer i.e. ghost atoms.
-     * \endrst
-     */
-    template <typename E>
-    int cell_idx(Eigen::MatrixBase<E> const& x) const noexcept {
-      return to_1D(clamp_to_grid_idxs(x + m_cell.matrix()));
-    }
-
-    /**
-     * @brief Generate the image of an atom along a particular axis ``ax``.
-     *
-     * \rst
-     * .. warning::
-     *    Only supports atoms in the canonical cell.
-     * \endrst
-     *
-     * @tparam S Direction along axis which to generate image.
-     * @param x Position of the atom who's image we are computing.
-     * @param ax Index of axis along which to generate image.
-     * @return std::optional<Position::matrix_t> If the atom's image is beyond the cut-off (``r_cut``) for atomic interactions then
-     * the image's position otherwise ``std::nullopt``.
-     */
-    template <Sign S>
-    std::optional<Position::matrix_t> gen_image(Position::matrix_t x, int ax) {
-      //
-      static_assert(S == Sign::plus || S == Sign::minus, "Unreachable");
-
-      if constexpr (S == Sign::plus) {
-        if (x[ax] < m_r_cut) {
-          x[ax] += m_extents[ax];
-          return x;
-        }
-      } else {
-        if (x[ax] > m_extents[ax] - m_r_cut) {
-          x[ax] -= m_extents[ax];
-          return x;
-        }
-      }
-
-      return std::nullopt;
-    }
-
-  private:
-    friend class Orthorhombic;
-
-    Arr<Position::scalar_t> m_extents = Arr<Position::scalar_t>::Zero();
-
-    Position::scalar_t m_r_cut = 0;
-
-    Arr<int> m_shape = Arr<int>::Zero();
-    Arr<int> m_prod_shape = Arr<int>::Zero();
-
-    Arr<Position::scalar_t> m_cell = Arr<Position::scalar_t>::Zero();
-    Arr<Position::scalar_t> m_inv_cell = Arr<Position::scalar_t>::Zero();
-
-    // Private constructor
-    Grid(Arr<Position::scalar_t> const& extents, Position::scalar_t r_cut) : m_extents(extents), m_r_cut(r_cut) {
-      // Sanity checks
-      VERIFY(r_cut > 0, "r_cut is negative");
-      VERIFY((extents > r_cut).all(), "r_cut is too big");
-      //
-      m_shape = 2 + (extents / r_cut).cast<int>();
-      m_cell = extents / (extents / r_cut).floor();
-      m_inv_cell = 1.0 / m_cell;
-      m_prod_shape = product_scan(m_shape);
-    }
-
-    /**
-     * @brief Cast a position to its grid indexes and clamp on interval [0, m_shape -1].
-     */
-    template <typename E>
-    Arr<int> clamp_to_grid_idxs(Eigen::MatrixBase<E> const& x) const noexcept {
-      return (x.array() * m_inv_cell).template cast<int>().cwiseMax(0).cwiseMin(m_shape - 1);
-    }
-
-    /**
-     * @brief Get the 1D index from the nD index.
-     */
-    int to_1D(Arr<int> const& indexes) const noexcept { return (indexes * m_prod_shape).sum(); }
-  };
-
-  inline Orthorhombic::Grid Orthorhombic::make_grid(Position::scalar_t r_cut) const { return {m_extents, r_cut}; }
 
 }  // namespace fly::system

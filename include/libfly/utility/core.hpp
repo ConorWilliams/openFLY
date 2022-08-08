@@ -296,6 +296,8 @@ namespace fly {
    *
    * Only SFINE if callable is noexcept.
    *
+   * \tparam F The invocable's type, this **MUST** be deducted through CTAD by the deduction guide.
+   *
    * \rst
    *
    * Example:
@@ -309,9 +311,9 @@ namespace fly {
   class [[nodiscard]] Defer {
   public:
     /**
-     * @brief Construct a new Defer object
+     * @brief Construct a new Defer object.
      *
-     * @param f Forwarded into object and invoked by destructor.
+     * @param f Invocable forwarded into object and invoked by destructor.
      */
     Defer(F&& f) : m_f(std::forward<F>(f)) {}
 
@@ -320,6 +322,9 @@ namespace fly {
     Defer& operator=(const Defer&) = delete;
     Defer& operator=(Defer&&) = delete;
 
+    /**
+     * @brief Call the invocable.
+     */
     ~Defer() noexcept { std::invoke(std::forward<F>(m_f)); }
 
   private:

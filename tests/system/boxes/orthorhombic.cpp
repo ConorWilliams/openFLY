@@ -96,7 +96,7 @@ TEST_CASE("Orthorhombic::Grid::gen_image", "[system]") {
 
   system::Orthorhombic box{Arr<Position::scalar_t>::Constant(10), Arr<bool>::Constant(true)};
 
-  system::Orthorhombic::Grid grid = box.make_grid(3);
+  auto grid = box.make_grid(3);
 
   {
     std::optional im = grid.gen_image<Sign::plus>(Position::matrix_t::Constant(5), 0);

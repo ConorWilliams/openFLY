@@ -48,6 +48,21 @@ namespace fly::system {
      */
     template <Sign S>
     std::optional<Position::matrix_t> gen_image(Position::matrix_t x, int ax) {
+      if constexpr (S == Sign::plus) {
+        // Shortest distance point to hyperplane
+        auto dx = gdot(x, m_hyper.col(ax));
+        ASSERT(dx > 0, "sign error");
+        if (dx < HyperGrid::r_cut()) {
+          return x + m_basis.col(ax);
+        }
+      } else {
+        auto dx = gdot(m_basis.col(ax) - x, m_hyper.col(ax));
+        ASSERT(dx > 0, "sign error");
+        if (dx < HyperGrid::r_cut()) {
+          return x + m_basis.col(ax);
+        }
+      }
+
       return std::nullopt;
     }
 

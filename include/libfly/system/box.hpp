@@ -132,6 +132,11 @@ namespace fly::system {
       return std::holds_alternative<T>(m_sys);
     }
 
+    /**
+     * @brief Comparison operator, no surprises.
+     */
+    friend bool operator==(Box const& a, Box const& b) noexcept { return a.m_sys == b.m_sys; }
+
   private:
     std::variant<Orthorhombic, Triclinic> m_sys;
   };

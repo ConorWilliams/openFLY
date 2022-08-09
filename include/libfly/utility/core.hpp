@@ -14,6 +14,9 @@
 
 // You should have received a copy of the GNU General Public License along with openFLY. If not, see <https://www.gnu.org/licenses/>.
 
+#include <fmt/core.h>
+#include <fmt/format.h>
+
 #include <Eigen/Core>
 #include <Eigen/Dense>
 #include <algorithm>
@@ -21,6 +24,8 @@
 #include <cstddef>
 #include <functional>
 #include <limits>
+#include <stdexcept>
+#include <string>
 #include <type_traits>
 #include <utility>
 
@@ -194,14 +199,33 @@ namespace fly {
     auto constexpr T_min = std::numeric_limits<T>::min();
 
     if constexpr (detail::cmp_less(R_max, T_max)) {
-      ASSERT(detail::cmp_less_equal(x, R_max), "x is bigger than the maximum value of R");
+      ASSERT(detail::cmp_less_equal(x, R_max), fmt::format("Could not cast '{}' to desired type", x));
     }
 
     if constexpr (detail::cmp_greater(R_min, T_min)) {
-      ASSERT(detail::cmp_greater_equal(x, R_min), "x is smaller than the minimum value of R");
+      ASSERT(detail::cmp_greater_equal(x, R_min), fmt::format("Could not cast '{}' to desired type", x));
     }
 
     return static_cast<R>(x);
+  }
+
+  /**
+   * @brief libFLY's catchable error type.
+   */
+  struct RuntimeError : std::runtime_error {
+    using std::runtime_error::runtime_error;
+  };
+
+  /**
+   * @brief Utility to build a RuntimeError using `{fmt}` to build the error message.
+   *
+   * @param fmt Format string.
+   * @param args Arguments to forward to format string.
+   * @return RuntimeError containing the formatted error message.
+   */
+  template <typename... T, typename... Args>
+  RuntimeError error(fmt::format_string<T...> fmt, Args&&... args) {
+    return RuntimeError{fmt::format(fmt, std::forward<Args>(args)...)};
   }
 
   /**

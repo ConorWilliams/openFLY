@@ -49,11 +49,15 @@ Defines, variables, etc.
 
 .. doxygenvariable:: always_false
 
+Small functions
+~~~~~~~~~~~~~~~~~~~~~~
+
+.. doxygenfunction:: error
+
+.. doxygenfunction:: safe_cast
 
 Mathematical functions
 ~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. doxygenfunction:: safe_cast
 
 .. doxygenfunction:: near
 
@@ -72,6 +76,10 @@ Mathematical functions
 
 Classes
 ~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. doxygenstruct:: fly::RuntimeError
+    :members:
+    :undoc-members:
 
 
 .. doxygenclass:: fly::Defer

@@ -18,6 +18,6 @@
 
 namespace fly::io {
 
-  void test(){};
+  void test() {}
 
 }  // namespace fly::io

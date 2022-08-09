@@ -23,7 +23,7 @@
 /**
  * \file hypergrid.hpp
  *
- * @brief Utility for dividing hyperrectangles.
+ * @brief Generalised utilities for sub-dividing hyperrectangles.
  */
 
 namespace fly::system {

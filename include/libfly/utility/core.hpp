@@ -20,6 +20,7 @@
 #include <cmath>
 #include <cstddef>
 #include <functional>
+#include <limits>
 #include <type_traits>
 #include <utility>
 
@@ -141,6 +142,67 @@ namespace fly {
    */
   template <typename T>
   using remove_cref_t = std::remove_const_t<std::remove_reference_t<T>>;
+
+  namespace detail {
+    // C++20 functions see: https://en.cppreference.com/w/cpp/utility/intcmp
+
+    template <class T, class U>
+    constexpr bool cmp_less(T t, U u) noexcept {
+      using UT = std::make_unsigned_t<T>;
+      using UU = std::make_unsigned_t<U>;
+      if constexpr (std::is_signed_v<T> == std::is_signed_v<U>)
+        return t < u;
+      else if constexpr (std::is_signed_v<T>)
+        return t < 0 ? true : UT(t) < u;
+      else
+        return u < 0 ? false : t < UU(u);
+    }
+
+    template <class T, class U>
+    constexpr bool cmp_greater(T t, U u) noexcept {
+      return cmp_less(u, t);
+    }
+
+    template <class T, class U>
+    constexpr bool cmp_less_equal(T t, U u) noexcept {
+      return !cmp_greater(t, u);
+    }
+
+    template <class T, class U>
+    constexpr bool cmp_greater_equal(T t, U u) noexcept {
+      return !cmp_less(t, u);
+    }
+
+  }  // namespace detail
+
+  /**
+   * @brief Bounds checked integer cast in debug builds.
+   *
+   * Perform a `static_cast` from type `T` to `R` with bounds checking in debug builds.
+   *
+   * @tparam R Target type to cast to.
+   */
+  template <typename R, typename T, typename = std::enable_if_t<std::is_integral_v<R> && std::is_integral_v<T>>>
+  R safe_cast(T x) {
+    //
+    static_assert(std::numeric_limits<unsigned int>::min() == 0);
+
+    auto constexpr R_max = std::numeric_limits<R>::max();
+    auto constexpr R_min = std::numeric_limits<R>::min();
+
+    auto constexpr T_max = std::numeric_limits<T>::max();
+    auto constexpr T_min = std::numeric_limits<T>::min();
+
+    if constexpr (detail::cmp_less(R_max, T_max)) {
+      ASSERT(detail::cmp_less_equal(x, R_max), "x is bigger than the maximum value of R");
+    }
+
+    if constexpr (detail::cmp_greater(R_min, T_min)) {
+      ASSERT(detail::cmp_greater_equal(x, R_min), "x is smaller than the minimum value of R");
+    }
+
+    return static_cast<R>(x);
+  }
 
   /**
    * @brief Test if two floating point numbers are within 0.01% of each other.

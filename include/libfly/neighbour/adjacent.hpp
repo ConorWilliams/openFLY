@@ -19,6 +19,7 @@
 #include <nonstd/span.hpp>
 #include <vector>
 
+#include "libfly/utility/asserts.hpp"
 #include "libfly/utility/core.hpp"
 
 /**
@@ -41,7 +42,7 @@ namespace fly::neighbour {
       //
       ASSERT((shape > 0).all(), "Invalid shape!");
       //
-      m_adj_cells.resize(static_cast<std::size_t>(shape.prod()));
+      m_adj_cells.resize(safe_cast<std::size_t>(shape.prod()));
 
       // Cumulative product of m_shape.
       Arr<int> cumprod = product_scan(shape);
@@ -60,13 +61,15 @@ namespace fly::neighbour {
 
         int n = to_1D({centre...});
 
+        auto signed_n = safe_cast<std::size_t>(n);
+
         template_for(beg, end, [&](auto... offset) {
           if (int m = to_1D({offset...}); n != m) {
-            m_adj_cells[(std::size_t)n][slot++] = m;
+            m_adj_cells[signed_n][slot++] = m;
           }
         });
 
-        m_adj_cells[(std::size_t)n].count = slot;
+        m_adj_cells[signed_n].count = slot;
       });
     }
 
@@ -77,9 +80,9 @@ namespace fly::neighbour {
      * ``n``th cell.
      */
     nonstd::span<int const> operator[](int n) const {
-      auto sn = (std::size_t)n;
-      ASSERT(n >= 0 && sn < m_adj_cells.size(), "Invalid cell index!");
-      return {m_adj_cells[sn].data(), m_adj_cells[sn].count};
+      auto signed_n = safe_cast<std::size_t>(n);
+      ASSERT(signed_n < m_adj_cells.size(), "Invalid cell index!");
+      return {m_adj_cells[signed_n].data(), m_adj_cells[signed_n].count};
     }
 
   private:

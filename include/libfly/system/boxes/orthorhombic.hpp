@@ -42,6 +42,9 @@ namespace fly::system {
      * \rst
      * .. warning::
      *    Only supports atoms in the canonical cell.
+     *
+     * .. note::
+     *    Not a template for implementation reasons.
      * \endrst
      *
      * @tparam S Direction along axis which to generate image.

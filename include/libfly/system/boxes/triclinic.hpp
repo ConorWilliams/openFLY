@@ -104,6 +104,12 @@ namespace fly::system {
     /**
      * @brief Construct a new Triclinic box object.
      *
+     * \rst
+     * .. todo::
+     *
+     *    Introduce exceptions for some ASSERT/VERIFY places.
+     * \endrst
+     *
      * @param basis Matrix with columns equal to the basis vectors of the parallelotope.
      * @param pd True for each periodic axis.
      */

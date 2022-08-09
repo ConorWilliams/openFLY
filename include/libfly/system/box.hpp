@@ -94,7 +94,7 @@ namespace fly::system {
     /**
      * @brief Construct an empty box zeroing all memory.
      */
-    Box() : m_sys(Orthorhombic(Arr<double>::Zero(), Arr<bool>::Constant(false))){};
+    Box() : m_sys(Orthorhombic(Arr<double>::Ones(), Arr<bool>::Constant(false))){};
 
     /**
      * \copydoc Triclinic::basis

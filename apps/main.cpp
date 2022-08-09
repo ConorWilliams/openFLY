@@ -12,7 +12,7 @@ int main() {
 
   fly::io::FileGSD file("build/test.gsd", fly::io::read_write);
 
-  fly::system::Box box_read(2 * fly::Mat<double>::Identity(), fly::Arr<bool>::Constant(true));
+  fly::system::Box box_read;
 
   file.load(0, box_read);
 

@@ -17,9 +17,23 @@
 #include "libfly/utility/core.hpp"
 
 /**
- * \file adjacent.hpp
+ * \file gsd.hpp
  *
- * @brief Helper types for neighbour::List
+ * @brief GSD file io support.
+ *
+ * \rst
+ *
+ * LibFLY supports writing `HOOMD-blue's <https://github.com/glotzerlab/hoomd-blue>`_ `GSD <https://github.com/glotzerlab/gsd>`_ file
+ * format. This file format is widely supported, see the `GSD <https://gsd.readthedocs.io/>`_ documentation.
+ *
+ * \endrst
  */
 
-namespace fly::io {}  // namespace fly::io
+namespace fly::io {
+
+  /**
+   * @brief oops!
+   */
+  void test();
+
+}  // namespace fly::io

@@ -14,7 +14,7 @@ project(
     openFLY
     DESCRIPTION "The open off-lattice kniteic Monte Carlo simulation framework"
     HOMEPAGE_URL "https://github.com/ConorWilliams/openFLY"
-    LANGUAGES CXX
+    LANGUAGES CXX C
 )
 
 # This variable is set by project() in CMake 3.21+
@@ -33,12 +33,17 @@ message(STATUS "openFLY version: ${FLY_VERSION}")
 
 message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
 
-# Declare library
-file(GLOB_RECURSE FLY_SOURCES CONFIGURE_DEPENDS "${PROJECT_SOURCE_DIR}/src/*.cpp")
+# Get the sources
+file(GLOB_RECURSE FLY_SOURCES_C CONFIGURE_DEPENDS "${PROJECT_SOURCE_DIR}/src/*.c")
+file(GLOB_RECURSE FLY_SOURCES_CPP CONFIGURE_DEPENDS "${PROJECT_SOURCE_DIR}/src/*.cpp")
 
+set(FLY_SOURCES ${FLY_SOURCES_C} ${FLY_SOURCES_CPP})
+
+# Declare the lib
 add_library(libFLY OBJECT ${FLY_SOURCES})
 
 target_include_directories(libFLY PUBLIC "$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>")
+target_include_directories(libFLY PRIVATE "$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src>")
 
 target_compile_features(libFLY PUBLIC cxx_std_17)
 

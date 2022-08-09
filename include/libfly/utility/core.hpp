@@ -26,6 +26,7 @@
 #include <limits>
 #include <stdexcept>
 #include <string>
+#include <string_view>
 #include <type_traits>
 #include <utility>
 
@@ -227,6 +228,46 @@ namespace fly {
   RuntimeError error(fmt::format_string<T...> fmt, Args&&... args) {
     return RuntimeError{fmt::format(fmt, std::forward<Args>(args)...)};
   }
+
+  /**
+   * @brief Force constant evaluation in C++17
+   */
+  template <auto Value>
+  inline constexpr auto const_eval = Value;
+
+  namespace detail {
+
+    constexpr std::string_view file_name(std::string_view path) {
+      if (auto k = path.find_last_of("/\\"); k != std::string_view::npos) {
+        path.remove_prefix(k);
+      }
+      return path;
+    }
+
+  }  // namespace detail
+
+#ifndef NDEBUG
+
+/**
+ * @brief Use like std \c assert(expr) but with a formatted error message.
+ */
+#  define XASSERT(expr, string_literal, ...)                                                                         \
+    do {                                                                                                             \
+      if (constexpr std::string_view fname = fly::detail::file_name(__FILE__); !(expr)) {                            \
+        throw fly::error("ASSERT \"{}\" failed in ...{}:{} | " string_literal, #expr, fname, __LINE__, __VA_ARGS__); \
+      }                                                                                                              \
+    } while (false)
+
+#else
+
+/**
+ * @brief Use like std \c assert(expr) but with an error message.
+ */
+#  define XASSERT(...) \
+    do {               \
+    } while (false)
+
+#endif  // !NDEBUG
 
   /**
    * @brief Test if two floating point numbers are within 0.01% of each other.

@@ -1,15 +1,9 @@
-Hypergrid
-================================================
 
-File: ``libfly/system/boxes/hypergrid.hpp``
+Crystal systems
+============================
 
-.. doxygenclass:: fly::system::HyperGrid
-    :members:
-    :undoc-members:
-
-
-Orthorhombic system
-================================================
+Orthorhombic 
+~~~~~~~~~~~~~~~~~~~~~~
 
 File: ``libfly/system/boxes/orthorhombic.hpp``
 
@@ -24,16 +18,16 @@ File: ``libfly/system/boxes/orthorhombic.hpp``
     :undoc-members:
 
 
-Orthorhombic Grid
-----------------------
+Grid
+````````````````````````
 
 .. doxygenclass:: fly::system::OrthoGrid
     :members:
     :undoc-members:
 
 
-Triclinic system
-================================================
+Triclinic
+~~~~~~~~~~~~~~~~~~~~~~
 
 File: ``libfly/system/boxes/triclinic.hpp``
 
@@ -45,11 +39,24 @@ File: ``libfly/system/boxes/triclinic.hpp``
     :members:
     :undoc-members:
 
-Triclinic Grid
-----------------
+Grid
+````````````````````````
 
 .. doxygenclass:: fly::system::TriGrid
     :members:
     :undoc-members:
 
 
+Hypergrid
+================================================
+
+File: ``libfly/system/boxes/hypergrid.hpp``
+
+.. doxygenfile:: libfly/system/boxes/hypergrid.hpp
+    :sections: briefdescription detaileddescription
+    :no-link:
+
+
+.. doxygenclass:: fly::system::HyperGrid
+    :members:
+    :undoc-members:

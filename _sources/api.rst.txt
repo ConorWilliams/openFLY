@@ -5,11 +5,12 @@ Welcome to the libFLY API reference this serves as information for developers to
 
 .. toctree::
    :caption: Modules
-   :maxdepth: 3
+   :maxdepth: 2
 
 
    api/utility.rst
    api/system.rst
+   api/io.rst
    api/neighbour.rst
 
 

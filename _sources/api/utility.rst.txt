@@ -53,6 +53,8 @@ Defines, variables, etc.
 Mathematical functions
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
+.. doxygenfunction:: safe_cast
+
 .. doxygenfunction:: near
 
 .. doxygenfunction:: product_scan

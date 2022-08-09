@@ -3,10 +3,10 @@
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
-<link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="Neighbour" href="neighbour.html" /><link rel="prev" title="System" href="system.html" />
+<link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="IO" href="io.html" /><link rel="prev" title="System" href="system.html" />
 
     <link rel="shortcut icon" href="../_static/favicon.ico"/><meta name="generator" content="sphinx-5.1.1, furo 2022.06.21"/>
-        <title>Hypergrid - OpenFLY documentation</title>
+        <title>Crystal systems - OpenFLY documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?digest=40978830699223671f4072448e654b5958f38b89" />
     <link rel="stylesheet" type="text/css" href="../_static/tabs.css" />
@@ -137,7 +137,7 @@
           <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
         </button>
       </div>
-      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
         <div class="visually-hidden">Toggle table of contents sidebar</div>
         <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
       </label>
@@ -176,11 +176,11 @@
 <li class="toctree-l1 current has-children"><a class="reference internal" href="../api.html">Library API reference</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="utility.html">Utility</a></li>
 <li class="toctree-l2 current has-children"><a class="reference internal" href="system.html">System</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
-<li class="toctree-l3 current current-page"><a class="current reference internal" href="#">Hypergrid</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#orthorhombic-system">Orthorhombic system</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#triclinic-system">Triclinic system</a></li>
+<li class="toctree-l3 current current-page"><a class="current reference internal" href="#">Crystal systems</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#hypergrid">Hypergrid</a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="io.html">IO</a></li>
 <li class="toctree-l2"><a class="reference internal" href="neighbour.html">Neighbour</a></li>
 </ul>
 </li>
@@ -222,67 +222,16 @@
               <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
             </button>
           </div>
-          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
             <div class="visually-hidden">Toggle table of contents sidebar</div>
             <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
           </label>
         </div>
         <article role="main">
-          <section id="hypergrid">
-<h1>Hypergrid<a class="headerlink" href="#hypergrid" title="Permalink to this heading">#</a></h1>
-<p>File: <code class="docutils literal notranslate"><span class="pre">libfly/system/boxes/hypergrid.hpp</span></code></p>
-<dl class="cpp class">
-<dt class="sig sig-object cpp" id="_CPPv4N3fly6system9HyperGridE">
-<span id="_CPPv3N3fly6system9HyperGridE"></span><span id="_CPPv2N3fly6system9HyperGridE"></span><span id="fly::system::HyperGrid"></span><span class="target" id="classfly_1_1system_1_1HyperGrid"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">HyperGrid</span></span></span><a class="headerlink" href="#_CPPv4N3fly6system9HyperGridE" title="Permalink to this definition">#</a><br /></dt>
-<dd><p>Maps a position-vector -&gt; ND-integer-tuples -&gt; 1D-index. </p>
-<p>Dives a hyperrectangle into smaller hyperrectangle called cells. </p>
-<p>Subclassed by <a class="reference internal" href="#classfly_1_1system_1_1OrthoGrid"><span class="std std-ref">fly::system::OrthoGrid</span></a>, <a class="reference internal" href="#classfly_1_1system_1_1TriGrid"><span class="std std-ref">fly::system::TriGrid</span></a></p>
-<div class="breathe-sectiondef docutils container">
-<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4N3fly6system9HyperGrid9HyperGridERK3ArrIdEd">
-<span id="_CPPv3N3fly6system9HyperGrid9HyperGridERK3ArrIdEd"></span><span id="_CPPv2N3fly6system9HyperGrid9HyperGridERK3ArrIdEd"></span><span id="fly::system::HyperGrid::HyperGrid__Arr:double:CR.double"></span><span class="target" id="classfly_1_1system_1_1HyperGrid_1a9ab46da97b1e955441395b6bf9e5cbd8"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">HyperGrid</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="utility.html#_CPPv4I0EN3fly3ArrE" title="fly::Arr"><span class="n"><span class="pre">Arr</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">double</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">extents</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">r_cut</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3fly6system9HyperGrid9HyperGridERK3ArrIdEd" title="Permalink to this definition">#</a><br /></dt>
-<dd><p>Construct a new Grid object with cells at least <code class="docutils literal notranslate"><span class="pre">r_cut</span></code> along each axis. </p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>extents</strong> – The size of the box along each axis. </p></li>
-<li><p><strong>r_cut</strong> – The cut-off radius for atomic interactions. </p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4NK3fly6system9HyperGrid5r_cutEv">
-<span id="_CPPv3NK3fly6system9HyperGrid5r_cutEv"></span><span id="_CPPv2NK3fly6system9HyperGrid5r_cutEv"></span><span id="fly::system::HyperGrid::r_cutC"></span><span class="target" id="classfly_1_1system_1_1HyperGrid_1a1910b0264f87e07eda21cc2457a031b7"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">r_cut</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="k"><span class="pre">noexcept</span></span><a class="headerlink" href="#_CPPv4NK3fly6system9HyperGrid5r_cutEv" title="Permalink to this definition">#</a><br /></dt>
-<dd><p>Fetch the cut-off radius for atomic interactions. </p>
-</dd></dl>
-
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4NK3fly6system9HyperGrid5shapeEv">
-<span id="_CPPv3NK3fly6system9HyperGrid5shapeEv"></span><span id="_CPPv2NK3fly6system9HyperGrid5shapeEv"></span><span id="fly::system::HyperGrid::shapeC"></span><span class="target" id="classfly_1_1system_1_1HyperGrid_1a42f70898958d806db0883f86898b4e5b"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="utility.html#_CPPv4I0EN3fly3ArrE" title="fly::Arr"><span class="n"><span class="pre">Arr</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">int</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">shape</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="k"><span class="pre">noexcept</span></span><a class="headerlink" href="#_CPPv4NK3fly6system9HyperGrid5shapeEv" title="Permalink to this definition">#</a><br /></dt>
-<dd><p>Get the total number of cells in the <a class="reference internal" href="#classfly_1_1system_1_1HyperGrid"><span class="std std-ref">HyperGrid</span></a> along each axis. </p>
-</dd></dl>
-
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4I0ENK3fly6system9HyperGrid8cell_idxEiRKN5Eigen10MatrixBaseI1EEE">
-<span id="_CPPv3I0ENK3fly6system9HyperGrid8cell_idxERKN5Eigen10MatrixBaseI1EEE"></span><span id="_CPPv2I0ENK3fly6system9HyperGrid8cell_idxERKN5Eigen10MatrixBaseI1EEE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">E</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classfly_1_1system_1_1HyperGrid_1a4159276ab00df32cab63b3385b989f3f"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">cell_idx</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">Eigen</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">MatrixBase</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0ENK3fly6system9HyperGrid8cell_idxEiRKN5Eigen10MatrixBaseI1EEE" title="fly::system::HyperGrid::cell_idx::E"><span class="n"><span class="pre">E</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">x</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="k"><span class="pre">noexcept</span></span><a class="headerlink" href="#_CPPv4I0ENK3fly6system9HyperGrid8cell_idxEiRKN5Eigen10MatrixBaseI1EEE" title="Permalink to this definition">#</a><br /></dt>
-<dd><p>Compute the cell index from an atoms canonical position. </p>
-<p><p></p>
- </p>
-<div class="admonition warning">
-<p class="admonition-title">Warning</p>
-<p>Assumes atoms are in the extents of the HyperGrid or in the surrounding one-cell buffer i.e. ghost atoms.</p>
-</div>
-</dd></dl>
-
-</div>
-</dd></dl>
-
-</section>
-<section id="orthorhombic-system">
-<h1>Orthorhombic system<a class="headerlink" href="#orthorhombic-system" title="Permalink to this heading">#</a></h1>
+          <section id="crystal-systems">
+<h1>Crystal systems<a class="headerlink" href="#crystal-systems" title="Permalink to this heading">#</a></h1>
+<section id="orthorhombic">
+<h2>Orthorhombic<a class="headerlink" href="#orthorhombic" title="Permalink to this heading">#</a></h2>
 <p>File: <code class="docutils literal notranslate"><span class="pre">libfly/system/boxes/orthorhombic.hpp</span></code></p>
 <p>Specialised simulation box for orthorhombic supercells. </p>
 <dl class="cpp class">
@@ -372,8 +321,8 @@
 </div>
 </dd></dl>
 
-<section id="orthorhombic-grid">
-<h2>Orthorhombic Grid<a class="headerlink" href="#orthorhombic-grid" title="Permalink to this heading">#</a></h2>
+<section id="grid">
+<h3>Grid<a class="headerlink" href="#grid" title="Permalink to this heading">#</a></h3>
 <dl class="cpp class">
 <dt class="sig sig-object cpp" id="_CPPv4N3fly6system9OrthoGridE">
 <span id="_CPPv3N3fly6system9OrthoGridE"></span><span id="_CPPv2N3fly6system9OrthoGridE"></span><span id="fly::system::OrthoGrid"></span><span class="target" id="classfly_1_1system_1_1OrthoGrid"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">OrthoGrid</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><span class="n"><span class="pre">fly</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">system</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N3fly6system9HyperGridE" title="fly::system::HyperGrid"><span class="n"><span class="pre">HyperGrid</span></span></a><a class="headerlink" href="#_CPPv4N3fly6system9OrthoGridE" title="Permalink to this definition">#</a><br /></dt>
@@ -414,8 +363,8 @@
 
 </section>
 </section>
-<section id="triclinic-system">
-<h1>Triclinic system<a class="headerlink" href="#triclinic-system" title="Permalink to this heading">#</a></h1>
+<section id="triclinic">
+<h2>Triclinic<a class="headerlink" href="#triclinic" title="Permalink to this heading">#</a></h2>
 <p>File: <code class="docutils literal notranslate"><span class="pre">libfly/system/boxes/triclinic.hpp</span></code></p>
 <p>Specialised simulation box for Triclinic supercells. </p>
 <dl class="cpp class">
@@ -495,8 +444,8 @@
 </div>
 </dd></dl>
 
-<section id="triclinic-grid">
-<h2>Triclinic Grid<a class="headerlink" href="#triclinic-grid" title="Permalink to this heading">#</a></h2>
+<section id="id2">
+<h3>Grid<a class="headerlink" href="#id2" title="Permalink to this heading">#</a></h3>
 <dl class="cpp class">
 <dt class="sig sig-object cpp" id="_CPPv4N3fly6system7TriGridE">
 <span id="_CPPv3N3fly6system7TriGridE"></span><span id="_CPPv2N3fly6system7TriGridE"></span><span id="fly::system::TriGrid"></span><span class="target" id="classfly_1_1system_1_1TriGrid"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">TriGrid</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><span class="n"><span class="pre">fly</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">system</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N3fly6system9HyperGridE" title="fly::system::HyperGrid"><span class="n"><span class="pre">HyperGrid</span></span></a><a class="headerlink" href="#_CPPv4N3fly6system7TriGridE" title="Permalink to this definition">#</a><br /></dt>
@@ -538,18 +487,73 @@
 
 </section>
 </section>
+</section>
+<section id="hypergrid">
+<h1>Hypergrid<a class="headerlink" href="#hypergrid" title="Permalink to this heading">#</a></h1>
+<p>File: <code class="docutils literal notranslate"><span class="pre">libfly/system/boxes/hypergrid.hpp</span></code></p>
+<p>Generalised utilities for sub-dividing hyperrectangles. </p>
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv4N3fly6system9HyperGridE">
+<span id="_CPPv3N3fly6system9HyperGridE"></span><span id="_CPPv2N3fly6system9HyperGridE"></span><span id="fly::system::HyperGrid"></span><span class="target" id="classfly_1_1system_1_1HyperGrid"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">HyperGrid</span></span></span><a class="headerlink" href="#_CPPv4N3fly6system9HyperGridE" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Maps a position-vector -&gt; ND-integer-tuples -&gt; 1D-index. </p>
+<p>Dives a hyperrectangle into smaller hyperrectangle called cells. </p>
+<p>Subclassed by <a class="reference internal" href="#classfly_1_1system_1_1OrthoGrid"><span class="std std-ref">fly::system::OrthoGrid</span></a>, <a class="reference internal" href="#classfly_1_1system_1_1TriGrid"><span class="std std-ref">fly::system::TriGrid</span></a></p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3fly6system9HyperGrid9HyperGridERK3ArrIdEd">
+<span id="_CPPv3N3fly6system9HyperGrid9HyperGridERK3ArrIdEd"></span><span id="_CPPv2N3fly6system9HyperGrid9HyperGridERK3ArrIdEd"></span><span id="fly::system::HyperGrid::HyperGrid__Arr:double:CR.double"></span><span class="target" id="classfly_1_1system_1_1HyperGrid_1a9ab46da97b1e955441395b6bf9e5cbd8"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">HyperGrid</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="utility.html#_CPPv4I0EN3fly3ArrE" title="fly::Arr"><span class="n"><span class="pre">Arr</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">double</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">extents</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">r_cut</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3fly6system9HyperGrid9HyperGridERK3ArrIdEd" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Construct a new Grid object with cells at least <code class="docutils literal notranslate"><span class="pre">r_cut</span></code> along each axis. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>extents</strong> – The size of the box along each axis. </p></li>
+<li><p><strong>r_cut</strong> – The cut-off radius for atomic interactions. </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK3fly6system9HyperGrid5r_cutEv">
+<span id="_CPPv3NK3fly6system9HyperGrid5r_cutEv"></span><span id="_CPPv2NK3fly6system9HyperGrid5r_cutEv"></span><span id="fly::system::HyperGrid::r_cutC"></span><span class="target" id="classfly_1_1system_1_1HyperGrid_1a1910b0264f87e07eda21cc2457a031b7"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">r_cut</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="k"><span class="pre">noexcept</span></span><a class="headerlink" href="#_CPPv4NK3fly6system9HyperGrid5r_cutEv" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Fetch the cut-off radius for atomic interactions. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK3fly6system9HyperGrid5shapeEv">
+<span id="_CPPv3NK3fly6system9HyperGrid5shapeEv"></span><span id="_CPPv2NK3fly6system9HyperGrid5shapeEv"></span><span id="fly::system::HyperGrid::shapeC"></span><span class="target" id="classfly_1_1system_1_1HyperGrid_1a42f70898958d806db0883f86898b4e5b"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="utility.html#_CPPv4I0EN3fly3ArrE" title="fly::Arr"><span class="n"><span class="pre">Arr</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">int</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">shape</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="k"><span class="pre">noexcept</span></span><a class="headerlink" href="#_CPPv4NK3fly6system9HyperGrid5shapeEv" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Get the total number of cells in the <a class="reference internal" href="#classfly_1_1system_1_1HyperGrid"><span class="std std-ref">HyperGrid</span></a> along each axis. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0ENK3fly6system9HyperGrid8cell_idxEiRKN5Eigen10MatrixBaseI1EEE">
+<span id="_CPPv3I0ENK3fly6system9HyperGrid8cell_idxERKN5Eigen10MatrixBaseI1EEE"></span><span id="_CPPv2I0ENK3fly6system9HyperGrid8cell_idxERKN5Eigen10MatrixBaseI1EEE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">E</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classfly_1_1system_1_1HyperGrid_1a4159276ab00df32cab63b3385b989f3f"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">cell_idx</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">Eigen</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">MatrixBase</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0ENK3fly6system9HyperGrid8cell_idxEiRKN5Eigen10MatrixBaseI1EEE" title="fly::system::HyperGrid::cell_idx::E"><span class="n"><span class="pre">E</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">x</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="k"><span class="pre">noexcept</span></span><a class="headerlink" href="#_CPPv4I0ENK3fly6system9HyperGrid8cell_idxEiRKN5Eigen10MatrixBaseI1EEE" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Compute the cell index from an atoms canonical position. </p>
+<p><p></p>
+ </p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Assumes atoms are in the extents of the HyperGrid or in the surrounding one-cell buffer i.e. ghost atoms.</p>
+</div>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+</section>
 
         </article>
       </div>
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="neighbour.html">
+          <a class="next-page" href="io.html">
               <div class="page-info">
                 <div class="context">
                   <span>Next</span>
                 </div>
-                <div class="title">Neighbour</div>
+                <div class="title">IO</div>
               </div>
               <svg><use href="#svg-arrow-right"></use></svg>
             </a>
@@ -589,8 +593,35 @@
         
       </footer>
     </div>
-    <aside class="toc-drawer no-toc">
+    <aside class="toc-drawer">
       
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            Contents
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">Crystal systems</a><ul>
+<li><a class="reference internal" href="#orthorhombic">Orthorhombic</a><ul>
+<li><a class="reference internal" href="#grid">Grid</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#triclinic">Triclinic</a><ul>
+<li><a class="reference internal" href="#id2">Grid</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#hypergrid">Hypergrid</a></li>
+</ul>
+
+          </div>
+        </div>
+      </div>
       
       
     </aside>

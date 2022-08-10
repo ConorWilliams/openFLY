@@ -87,7 +87,7 @@ namespace fly::io {
      * @tparam Args
      */
     template <typename... Args>
-    void load(int i, Args &&...args) const {
+    void load(std::uint64_t i, Args &&...args) const {
       (static_cast<void>(load_impl(i, std::forward<Args>(args))), ...);
     }
 
@@ -96,7 +96,7 @@ namespace fly::io {
      *
      * @return int
      */
-    int n_frames() const noexcept;
+    std::uint64_t n_frames() const noexcept;
 
     /**
      * @brief Clear the current file.
@@ -114,7 +114,7 @@ namespace fly::io {
     std::unique_ptr<gsd_handle> m_handle;
 
     void dump_impl(system::Box const &);
-    void load_impl(int i, system::Box &) const;
+    void load_impl(std::uint64_t i, system::Box &) const;
 
     template <typename... T>
     void dump_impl(system::SoA<T...> const &soa) {
@@ -133,14 +133,14 @@ namespace fly::io {
 
     // dump a dynamic amount of the data in span in expecting rows of length M.
     void dump_span(char const *name, std::uint32_t M, nonstd::span<double const> data);
-    // load a dynamic amount of data from file into span in expecting rows of length M.
-    void load_span(int i, char const *name, std::uint32_t M, nonstd::span<double> data) const;
+    // load a dynamic amount of data from file into span in expecting rows of length M, use -1 for dynamic.
+    void load_span(std::uint64_t i, char const *name, int M, nonstd::span<double> data) const;
 
     void dump_span(char const *name, std::uint32_t M, nonstd::span<int const> data);
-    void load_span(int i, char const *name, std::uint32_t M, nonstd::span<int> data) const;
+    void load_span(std::uint64_t i, char const *name, int M, nonstd::span<int> data) const;
 
     void dump_span(char const *name, std::uint32_t M, nonstd::span<std::uint32_t const> data);
-    void load_span(int i, char const *name, std::uint32_t M, nonstd::span<std::uint32_t> data) const;
+    void load_span(std::uint64_t i, char const *name, int M, nonstd::span<std::uint32_t> data) const;
 
     // void load_impl(int i, system::Box &) const;
 

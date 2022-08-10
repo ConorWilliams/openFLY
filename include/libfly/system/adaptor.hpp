@@ -43,7 +43,7 @@ namespace fly::system::detail {
     explicit Adaptor(Adaptor<Mem&> other) : m_data(*other.m_data_ptr) {}
 
     // OwnsAll specific.
-    explicit Adaptor(int size) : m_data(size * Mem::size()) { ASSERT(size > 0, "Invalid size"); }
+    explicit Adaptor(Eigen::Index size) : m_data(size * Mem::size()) { ASSERT(size > 0, "Invalid size"); }
 
     Adaptor& operator=(Adaptor const&) = default;
 
@@ -64,7 +64,7 @@ namespace fly::system::detail {
      *
      * This is an owning Adaptor hence, model value const-semantics.
      */
-    constexpr typename Mem::matrix_ref_t operator()(Mem, int i) {
+    constexpr typename Mem::matrix_ref_t operator()(Mem, Eigen::Index i) {
       ASSERT(i >= 0 && i < m_data.size() / Mem::size(), "Index out of bounds");
 
       if constexpr (Mem::is_1x1) {
@@ -79,7 +79,7 @@ namespace fly::system::detail {
      *
      * This is an owning Adaptor hence, model value const-semantics
      */
-    constexpr typename Mem::matrix_cref_t operator()(Mem, int i) const {
+    constexpr typename Mem::matrix_cref_t operator()(Mem, Eigen::Index i) const {
       ASSERT(i >= 0 && i < m_data.size() / Mem::size(), "Index out of bounds");
 
       if constexpr (Mem::is_1x1) {
@@ -164,7 +164,7 @@ namespace fly::system::detail {
      *
      * This is not an owning Adaptor hence, model pointer const-semantics.
      */
-    constexpr typename Mem::matrix_ref_t operator()(Mem, int i) const {
+    constexpr typename Mem::matrix_ref_t operator()(Mem, Eigen::Index i) const {
       ASSERT(i >= 0 && i < m_data_ptr->size() / Mem::size(), "Index out of bounds");
 
       if constexpr (Mem::is_1x1) {
@@ -225,7 +225,7 @@ namespace fly::system::detail {
      *
      * This is not an owning Adaptor hence, model const-pointer const-semantics.
      */
-    constexpr typename Mem::matrix_cref_t operator()(Mem, int i) const {
+    constexpr typename Mem::matrix_cref_t operator()(Mem, Eigen::Index i) const {
       ASSERT(i >= 0 && i < m_data_ptr->size() / Mem::size(), "Index out of bounds");
 
       if constexpr (Mem::is_1x1) {

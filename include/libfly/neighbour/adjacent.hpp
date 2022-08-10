@@ -40,15 +40,14 @@ namespace fly::neighbour {
      */
     explicit AdjacentCells(Arr<int> const& shape) {
       //
-      ASSERT((shape > 0).all(), "Invalid shape!");
+
+      verify((shape > 0).all(), "Invalid shape: {}", shape);
+
       //
       m_adj_cells.resize(safe_cast<std::size_t>(shape.prod()));
 
-      // Cumulative product of m_shape.
-      Arr<int> cumprod = product_scan(shape);
-
       // ND -> 1D
-      auto to_1D = [=](Arr<int> const& x) { return (x * cumprod).sum(); };
+      auto to_1D = [cumprod = product_scan(shape)](Arr<int> const& x) { return (x * cumprod).sum(); };
 
       template_for(Arr<int>::Zero(), shape, [&](auto... centre) {
         //
@@ -79,10 +78,9 @@ namespace fly::neighbour {
      * @return nonstd::span<int const> A span containing the indexes of every cell adjacent to the ``n``th cell, does not include the
      * ``n``th cell.
      */
-    nonstd::span<int const> operator[](int n) const {
-      auto signed_n = safe_cast<std::size_t>(n);
-      ASSERT(signed_n < m_adj_cells.size(), "Invalid cell index!");
-      return {m_adj_cells[signed_n].data(), m_adj_cells[signed_n].count};
+    nonstd::span<int const> operator[](std::size_t n) const {
+      XASSERT(n < m_adj_cells.size(), "Invalid cell index {} is bigger than {}", n, m_adj_cells.size());
+      return {m_adj_cells[n].data(), m_adj_cells[n].count};
     }
 
   private:

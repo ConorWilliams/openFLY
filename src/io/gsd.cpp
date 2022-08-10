@@ -57,7 +57,7 @@ namespace fly::io {
 
   void FileGSD::clear() { call_gsd(m_fname, gsd_truncate, m_handle.get()); }
 
-  int FileGSD::n_frames() const noexcept { return safe_cast<int>(gsd_get_nframes(m_handle.get())); }
+  std::uint64_t FileGSD::n_frames() const noexcept { return gsd_get_nframes(m_handle.get()); }
 
   void FileGSD::commit_frame() { call_gsd(m_fname, gsd_end_frame, m_handle.get()); }
 
@@ -72,8 +72,8 @@ namespace fly::io {
     write_chunk(m_handle.get(), name, data.size() / M, M, data);
   }
 
-  void FileGSD::load_span(int i, char const *name, std::uint32_t M, nonstd::span<double> data) const {
-    read_chunk(i, m_handle.get(), name, -1, safe_cast<int>(M), data);
+  void FileGSD::load_span(std::uint64_t i, char const *name, int M, nonstd::span<double> data) const {
+    read_chunk(i, m_handle.get(), name, -1, M, data);
   }
 
   void FileGSD::dump_span(char const *name, std::uint32_t M, nonstd::span<int const> data) {
@@ -83,8 +83,8 @@ namespace fly::io {
     write_chunk(m_handle.get(), name, data.size() / M, M, data);
   }
 
-  void FileGSD::load_span(int i, char const *name, std::uint32_t M, nonstd::span<int> data) const {
-    read_chunk(i, m_handle.get(), name, -1, safe_cast<int>(M), data);
+  void FileGSD::load_span(std::uint64_t i, char const *name, int M, nonstd::span<int> data) const {
+    read_chunk(i, m_handle.get(), name, -1, M, data);
   }
 
   void FileGSD::dump_span(char const *name, std::uint32_t M, nonstd::span<std::uint32_t const> data) {
@@ -94,8 +94,8 @@ namespace fly::io {
     write_chunk(m_handle.get(), name, data.size() / M, M, data);
   }
 
-  void FileGSD::load_span(int i, char const *name, std::uint32_t M, nonstd::span<std::uint32_t> data) const {
-    read_chunk(i, m_handle.get(), name, -1, safe_cast<int>(M), data);
+  void FileGSD::load_span(std::uint64_t i, char const *name, int M, nonstd::span<std::uint32_t> data) const {
+    read_chunk(i, m_handle.get(), name, -1, M, data);
   }
 
   //   ////////////////////////////////////////////////////////////////////////////////////////////////
@@ -118,7 +118,7 @@ namespace fly::io {
     write_chunk<std::uint8_t>(m_handle.get(), "log/periodicity", 3, 1, periodicity);
   }
 
-  void FileGSD::load_impl(int i, system::Box &box) const {
+  void FileGSD::load_impl(std::uint64_t i, system::Box &box) const {
     //
 
     Mat<float> basis = Mat<float>::Zero();

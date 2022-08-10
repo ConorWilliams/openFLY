@@ -135,9 +135,9 @@ namespace fly::io {
 
   // Read a chunk expecting N by M into data, use -1 for unknown M or N.
   template <typename T, gsd_type Tag = get_type_id<T>>
-  void read_chunk(int frame, struct gsd_handle* handle, char const* name, int N, int M, nonstd::span<T> data) {
+  void read_chunk(uint64_t frame, struct gsd_handle* handle, char const* name, int N, int M, nonstd::span<T> data) {
     //
-    gsd_index_entry const* chunk = gsd_find_chunk(handle, safe_cast<uint64_t>(frame), name);
+    gsd_index_entry const* chunk = gsd_find_chunk(handle, frame, name);
 
     if (!chunk) {
       throw error("GSD: Could not find chunk with name '{}' at frame {}", name, frame);

@@ -134,7 +134,7 @@ namespace fly::system {
     /**
      * @brief Query if the ``i``th axis is periodic.
      */
-    bool periodic(int i) const noexcept { return m_periodic[i]; }
+    bool periodic(Eigen::Index i) const noexcept { return m_periodic[i]; }
 
     /**
      * @brief Maps an atom into the canonical cell.

@@ -115,7 +115,7 @@ namespace fly::system {
      * \endrst
      */
     template <bool OwnsAll = owns_all>
-    explicit SoA(int size, std::enable_if_t<OwnsAll>* = 0) : detail::Adaptor<Ms>(size)..., m_size(size) {}
+    explicit SoA(Eigen::Index size, std::enable_if_t<OwnsAll>* = 0) : detail::Adaptor<Ms>(size)..., m_size(size) {}
 
     /**
      * @brief Implicitly construct a new SoA object from SoA 'other' with different members.
@@ -193,7 +193,7 @@ namespace fly::system {
     /**
      * @brief Get the number of atoms in the SoA.
      */
-    int size() const noexcept { return m_size; }
+    Eigen::Index size() const noexcept { return m_size; }
 
     /**
      * @brief Resize the SoA.
@@ -212,7 +212,7 @@ namespace fly::system {
     }
 
   private:
-    int m_size = 0;
+    Eigen::Index m_size = 0;
 
     /* clang-format off */ template <typename...>  friend class SoA; /* clang-format on */
   };

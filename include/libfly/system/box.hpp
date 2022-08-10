@@ -106,7 +106,7 @@ namespace fly::system {
     /**
      * \copydoc Triclinic::periodic
      */
-    bool periodic(int i) const {
+    bool periodic(Eigen::Index i) const {
       return std::visit([i](auto const& m_box) -> bool { return m_box.periodic(i); }, m_sys);
     }
 

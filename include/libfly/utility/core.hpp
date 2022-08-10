@@ -16,6 +16,7 @@
 
 #include <fmt/core.h>
 #include <fmt/format.h>
+#include <fmt/ranges.h>
 
 #include <Eigen/Core>
 #include <Eigen/Dense>
@@ -69,7 +70,7 @@ namespace fly {
   };
 
   /**
-   * @brief Utility to build a RuntimeError using `{fmt}` to build the error message.
+   * @brief Utility to make a RuntimeError object using the `{fmt}` library to format the error message.
    *
    * @param fmt Format string.
    * @param args Arguments to forward to format string.
@@ -87,26 +88,30 @@ namespace fly {
   }
 
   /**
-   * @brief Force constant evaluation in C++17
+   * @brief Utility to check condition and throw RuntimeError if condition is false.
+   *
+   * Forwards ``fmt`` and ``args`` to flt::error.
    */
-  template <auto Value>
-  inline constexpr auto const_eval = Value;
+  template <typename... Args>
+  void verify(bool condition, fmt::format_string<Args...> fmt, Args&&... args) {
+    if (!condition) {
+      throw error(std::move(fmt), std::forward<Args>(args)...);
+    }
+  }
+
+#ifndef NDEBUG
 
   namespace detail {
-
     constexpr std::string_view file_name(std::string_view path) {
       if (auto k = path.find_last_of("/\\"); k != std::string_view::npos) {
         path.remove_prefix(k);
       }
       return path;
     }
-
   }  // namespace detail
 
-#ifndef NDEBUG
-
 /**
- * @brief Use like std \c assert(expr) but with a formatted error message.
+ * @brief Use like fly::verify but disabled if NDEBUG defined..
  */
 #  define XASSERT(expr, string_literal, ...)                                                                         \
     do {                                                                                                             \
@@ -140,9 +145,15 @@ namespace fly {
   static_assert(spatial_dims >= 2, "libFLY is not optimal for 1D simulations");
 
   /**
+   * @brief Force constant evaluation in C++17
+   */
+  template <auto Value>
+  inline constexpr auto const_eval = Value;
+
+  /**
    * @brief The maximum atomic number that any atom can have.
    */
-  inline constexpr int max_atomic_num = 111;
+  [[deprecated]] inline constexpr int max_atomic_num = 111;
 
   /**
    * @brief Shorthand for creating an \c Eigen::Vector of length \c spatial_dims
@@ -216,7 +227,6 @@ namespace fly {
 
   namespace detail {
     // C++20 functions see: https://en.cppreference.com/w/cpp/utility/intcmp
-
     template <class T, class U>
     constexpr bool cmp_less(T t, U u) noexcept {
       using UT = std::make_unsigned_t<T>;
@@ -265,11 +275,11 @@ namespace fly {
     auto constexpr T_min = std::numeric_limits<T>::min();
 
     if constexpr (detail::cmp_less(R_max, T_max)) {
-      XASSERT(detail::cmp_less_equal(x, R_max), "Could not cast '{}' to desired type R with R_max={}", x, R_max);
+      XASSERT(detail::cmp_less_equal(x, R_max), "Could not cast '{}' to type R with R_max={}", x, R_max);
     }
 
     if constexpr (detail::cmp_greater(R_min, T_min)) {
-      XASSERT(detail::cmp_greater_equal(x, R_min), "Could not cast '{}' to desired type R with R_min={}", x, R_min);
+      XASSERT(detail::cmp_greater_equal(x, R_min), "Could not cast '{}' to type R with R_min={}", x, R_min);
     }
 
     return static_cast<R>(x);
@@ -306,7 +316,7 @@ namespace fly {
   template <typename T, int N>
   Eigen::Array<T, N, 1> product_scan(Eigen::Array<T, N, 1> x) {
     T prod = 1;
-    for (int i = 0; i < x.size(); i++) {
+    for (Eigen::Index i = 0; i < x.size(); i++) {
       prod *= std::exchange(x[i], prod);
     }
     return x;

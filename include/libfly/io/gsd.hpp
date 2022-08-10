@@ -14,11 +14,14 @@
 
 // You should have received a copy of the GNU General Public License along with openFLY. If not, see <https://www.gnu.org/licenses/>.
 
+#include <cstdint>
 #include <memory>
+#include <nonstd/span.hpp>
 #include <string>
 #include <string_view>
 #include <utility>
 
+#include "libfly/system/SoA.hpp"
 #include "libfly/system/box.hpp"
 #include "libfly/utility/core.hpp"
 
@@ -110,8 +113,32 @@ namespace fly::io {
     std::unique_ptr<gsd_handle> m_handle;
 
     void dump_impl(system::Box const &);
-
     void load_impl(int i, system::Box &) const;
+
+    template <typename... T>
+    void dump_impl(system::SoA<T...> const &soa) {
+      (static_cast<void>(dump_span(remove_cref_t<T>::tag, remove_cref_t<T>::size(),
+                                   {
+                                       soa[remove_cref_t<T>{}].begin(),
+                                       soa[remove_cref_t<T>{}].end(),
+                                   })),
+       ...);
+    }
+
+    // ///////////////////////////////////////////
+
+    // dump a dynamic amount of the data in span in expecting rows of length M.
+    void dump_span(char const *name, std::uint32_t M, nonstd::span<double const> data);
+    // load a dynamic amount of data from file into span in expecting rows of length M.
+    void load_span(int i, char const *name, std::uint32_t M, nonstd::span<double> data) const;
+
+    void dump_span(char const *name, std::uint32_t M, nonstd::span<int const> data);
+    void load_span(int i, char const *name, std::uint32_t M, nonstd::span<int> data) const;
+
+    void dump_span(char const *name, std::uint32_t M, nonstd::span<std::uint32_t const> data);
+    void load_span(int i, char const *name, std::uint32_t M, nonstd::span<std::uint32_t> data) const;
+
+    // void load_impl(int i, system::Box &) const;
 
     void commit_frame();
   };

@@ -1,6 +1,9 @@
+#include <array>
 #include <iostream>
 
 #include "libfly/io/gsd.hpp"
+#include "libfly/system/SoA.hpp"
+#include "libfly/system/atom.hpp"
 #include "libfly/system/box.hpp"
 #include "libfly/system/boxes/orthorhombic.hpp"
 #include "libfly/utility/asserts.hpp"
@@ -9,26 +12,47 @@
 
 int main() {
   //
+  using namespace fly;
 
-  fly::io::FileGSD file("build/test.gsd", fly::io::read_write);
+  io::FileGSD file("build/test.gsd", io::create);
 
-  fly::system::Box box_read;
+  if (true) {
+    system::Box box(Mat<double>::Identity(), Arr<bool>::Constant(true));
 
-  file.load(0, box_read);
+    system::SoA<Position> atom(1);
 
-  file.clear();
+    atom(r_, 0)[0] = 0;
+    atom(r_, 0)[1] = 0;
+    atom(r_, 0)[2] = 0;
 
-  std::cout << "n " << file.n_frames() << std::endl;
+    file.dump(box, atom);
 
-  fly::system::Box box(fly::Mat<double>::Identity(), fly::Arr<bool>::Constant(true));
+  } else {
+  }
 
-  ASSERT(box_read == box, "same?");
+  //   fly::system::Box box_read;
 
-  ASSERT(box.holding<fly::system::Orthorhombic>(), "");
+  //   file.load(0, box_read);
 
-  fly::timeit("dump box 1", [&] { file.dump(box); });
+  //   file.clear();
 
-  std::cout << "n " << file.n_frames() << std::endl;
+  //   std::cout << "n " << file.n_frames() << std::endl;
+
+  //   ASSERT(box_read == box, "same?");
+
+  //   ASSERT(box.holding<fly::system::Orthorhombic>(), "");
+
+  //   fly::timeit("dump box 1", [&] { file.dump(box); });
+
+  //   fly::timeit("dump box 2", [&] { file.dump(box); });
+
+  //   std::cout << "n " << file.n_frames() << std::endl;
+
+  //   std::array<double, 3> tmp;
+
+  //   file.dump_span("", 2, tmp);
+
+  //   fly::safe_cast<unsigned int>(-1);
 
   return 0;
 }

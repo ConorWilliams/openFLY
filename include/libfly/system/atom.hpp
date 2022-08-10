@@ -172,7 +172,9 @@ namespace fly {
     /**
      * @brief Tag type for position (xyz).
      */
-    struct Position : system::MemTag<double, spatial_dims> {};
+    struct Position : system::MemTag<double, spatial_dims> {
+      static constexpr char const* tag = "particles/position";  ///< GSD chunk label.
+    };
 
     /**
      * @brief Position literal.

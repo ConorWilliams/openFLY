@@ -49,6 +49,8 @@ Defines, variables, etc.
 
 .. doxygenvariable:: always_false
 
+.. doxygenvariable:: const_eval
+
 Small functions
 ~~~~~~~~~~~~~~~~~~~~~~
 

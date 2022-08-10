@@ -143,11 +143,11 @@ namespace fly::io {
     }
 
     if (N >= 0 && safe_cast<uint64_t>(N) != chunk->N) {
-      throw error("GSD: Expected {} columns found {}", N, chunk->N);
+      throw error("GSD: Expected {} rows found {}", N, chunk->N);
     }
 
     if (M >= 0 && safe_cast<uint32_t>(M) != chunk->M) {
-      throw error("GSD: Expected {} rows found {}", M, chunk->M);
+      throw error("GSD: Expected {} columns found {}", M, chunk->M);
     }
 
     if (chunk->type != Tag) {

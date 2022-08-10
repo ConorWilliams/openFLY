@@ -68,18 +68,23 @@ namespace fly {
     using std::runtime_error::runtime_error;
   };
 
-
-    /**
-     * @brief Utility to build a RuntimeError using `{fmt}` to build the error message.
-     *
-     * @param fmt Format string.
-     * @param args Arguments to forward to format string.
-     * @return RuntimeError containing the formatted error message.
-     */
-    template <typename... Args>
-     std::runtime_error error(fmt::format_string<Args...> fmt, Args&&... args) {
-      return std::runtime_error{fmt::format(fmt, std::forward<Args>(args)...)};
+  /**
+   * @brief Utility to build a RuntimeError using `{fmt}` to build the error message.
+   *
+   * @param fmt Format string.
+   * @param args Arguments to forward to format string.
+   * @return RuntimeError containing the formatted error message.
+   */
+  template <typename... Args>
+  RuntimeError error(fmt::format_string<Args...> fmt, Args&&... args) {
+    try {
+      return RuntimeError{fmt::format(fmt, std::forward<Args>(args)...)};
+    } catch (fmt::format_error const& err) {
+      return RuntimeError{fmt::format("Failed to format '{}' with err: {}", fmt, err.what())};
+    } catch (...) {
+      return RuntimeError("Error during error handling");
     }
+  }
 
   /**
    * @brief Force constant evaluation in C++17

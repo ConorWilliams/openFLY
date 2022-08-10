@@ -67,7 +67,7 @@ namespace fly::io {
 
   void FileGSD::dump_span(char const *name, std::uint32_t M, nonstd::span<double const> data) {
     //  This is not a public facing function so we do not throw an error.
-    XASSERT(data.size() % M == 0, "{} not divisible by {}", data.size(), M);
+    XASSERT(data.size() % M == 0, "Chunk `{}`, {} not divisible by {}", name, data.size(), M);
 
     write_chunk(m_handle.get(), name, data.size() / M, M, data);
   }
@@ -78,7 +78,7 @@ namespace fly::io {
 
   void FileGSD::dump_span(char const *name, std::uint32_t M, nonstd::span<int const> data) {
     //  This is not a public facing function so we do not throw an error.
-    XASSERT(data.size() % M == 0, "{} not divisible by {}", data.size(), M);
+    XASSERT(data.size() % M == 0, "Chunk `{}`, {} not divisible by {}", name, data.size(), M);
 
     write_chunk(m_handle.get(), name, data.size() / M, M, data);
   }
@@ -89,7 +89,7 @@ namespace fly::io {
 
   void FileGSD::dump_span(char const *name, std::uint32_t M, nonstd::span<std::uint32_t const> data) {
     //  This is not a public facing function so we do not throw an error.
-    XASSERT(data.size() % M == 0, "{} not divisible by {}", data.size(), M);
+    XASSERT(data.size() % M == 0, "Chunk `{}`, {} not divisible by {}", name, data.size(), M);
 
     write_chunk(m_handle.get(), name, data.size() / M, M, data);
   }
@@ -104,20 +104,16 @@ namespace fly::io {
     //          |L_x    xy L_y   xz L_z|
     // basis =  |0         L_y   yz L_z|
     //          |0         0        L_z|
-    Mat<double> basis = box.basis();
+    Mat<float> basis = box.basis().cast<float>();
 
     // L_x, L_y, L_z , xy, xz, yz
     std::array<float, 6> const hoomd_basis = {
-        (float)basis(0, 0), (float)basis(1, 1), (float)basis(2, 2), (float)basis(0, 1), (float)basis(0, 2), (float)basis(1, 2),
+        basis(0, 0), basis(1, 1), basis(2, 2), basis(0, 1), basis(0, 2), basis(1, 2),
     };
 
     write_chunk<float>(m_handle.get(), "configuration/box", 6, 1, hoomd_basis);
 
-    std::array<std::uint8_t, 3> const periodicity = {
-        box.periodic(0),
-        box.periodic(1),
-        box.periodic(2),
-    };
+    std::array<std::uint8_t, 3> const periodicity = {box.periodic(0), box.periodic(1), box.periodic(2)};
 
     write_chunk<std::uint8_t>(m_handle.get(), "log/periodicity", 3, 1, periodicity);
   }
@@ -125,13 +121,13 @@ namespace fly::io {
   void FileGSD::load_impl(int i, system::Box &box) const {
     //
 
-    Mat<double> basis = Mat<double>::Zero();
+    Mat<float> basis = Mat<float>::Zero();
 
     {  // Load the configuration
 
-      std::array<double, 6> hoomd_basis;  // L_x, L_y, L_z , xy, xz, yz
+      std::array<float, 6> hoomd_basis;  // L_x, L_y, L_z , xy, xz, yz
 
-      read_chunk<double>(i, m_handle.get(), "configuration/box", 6, 1, hoomd_basis);
+      read_chunk<float>(i, m_handle.get(), "configuration/box", 6, 1, hoomd_basis);
 
       basis(0, 0) = hoomd_basis[0];
       basis(1, 1) = hoomd_basis[1];
@@ -155,7 +151,7 @@ namespace fly::io {
       periodicity[2] = pr[2];
     }
 
-    box = system::Box(basis, periodicity);
+    box = system::Box(basis.cast<double>(), periodicity);
   }
 
 }  // namespace fly::io

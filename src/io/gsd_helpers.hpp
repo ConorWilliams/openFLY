@@ -158,10 +158,10 @@ namespace fly::io {
     ASSERT(sizeof(T) == gsd_sizeof_type(Tag), "Platform error!");
 
     if (auto size = chunk->N * chunk->M; size != data.size()) {
-      throw error("Not enough space for {} element in span length {}", size, data.size());
+      throw error("Chunk {}, not enough space for {} element in span length {}", name, size, data.size());
     }
 
-    call_gsd("trying to read chunk", gsd_read_chunk, handle, data.data(), chunk);
+    call_gsd(name, gsd_read_chunk, handle, data.data(), chunk);
   }
 
 }  // namespace fly::io

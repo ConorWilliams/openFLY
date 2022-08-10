@@ -271,6 +271,64 @@ namespace fly {
      */
     inline constexpr Colour c_;
 
+    // /////////////
+
+    namespace anon::detail::anon {
+
+      // GSD Schema
+
+      struct TypeId : system::MemTag<std::uint32_t> {
+        static constexpr char const* tag = "particles/typeid";  ///< GSD chunk label.
+      };
+
+      struct Image : system::MemTag<std::int32_t, spatial_dims> {
+        static constexpr char const* tag = "particles/image";  ///< GSD chunk label.
+      };
+
+      struct Mass : system::MemTag<double> {
+        static constexpr char const* tag = "particles/mass";  ///< GSD chunk label.
+      };
+      struct Charge : system::MemTag<double> {
+        static constexpr char const* tag = "particles/charge";  ///< GSD chunk label.
+      };
+      struct Diameter : system::MemTag<double> {
+        static constexpr char const* tag = "particles/diameter";  ///< GSD chunk label.
+      };
+      struct MomentInertia : system::MemTag<double> {
+        static constexpr char const* tag = "particles/moment_inertia";  ///< GSD chunk label.
+      };
+
+      struct Position : system::MemTag<double, spatial_dims> {
+        static constexpr char const* tag = "particles/position";  ///< GSD chunk label.
+      };
+      struct Velocity : system::MemTag<double, spatial_dims> {
+        static constexpr char const* tag = "particles/velocity";  ///< GSD chunk label.
+      };
+
+      // Custom
+
+      struct Colour : system::MemTag<std::uint32_t> {
+        static constexpr char const* tag = "log/particles/colour";  ///< GSD chunk label.
+      };
+      struct Index : system::MemTag<std::uint32_t> {
+        static constexpr char const* tag = "log/particles/index";  ///< GSD chunk label.
+      };
+      struct Frozen : system::MemTag<std::uint32_t> {
+        static constexpr char const* tag = "log/particles/frozen";  ///< GSD chunk label.
+      };
+
+      struct Axis : system::MemTag<double, spatial_dims> {
+        static constexpr char const* tag = "log/particles/axis";  ///< GSD chunk label.
+      };
+      struct PotentialGradient : system::MemTag<double, spatial_dims> {
+        static constexpr char const* tag = "log/particles/potential_gradient";  ///< GSD chunk label.
+      };
+      struct Acceleration : system::MemTag<double, spatial_dims> {
+        static constexpr char const* tag = "log/particles/acceleration";  ///< GSD chunk label.
+      };
+
+    }  // namespace anon::detail::anon
+
   }  // namespace builtin_m
 
 }  // namespace fly

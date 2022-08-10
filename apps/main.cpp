@@ -1,3 +1,4 @@
+
 #include <array>
 #include <iostream>
 
@@ -19,40 +20,24 @@ int main() {
   if (true) {
     system::Box box(Mat<double>::Identity(), Arr<bool>::Constant(true));
 
-    system::SoA<Position> atom(1);
+    system::SoA<Position> atom(4);
 
-    atom(r_, 0)[0] = 0;
-    atom(r_, 0)[1] = 0;
-    atom(r_, 0)[2] = 0;
+    atom(r_, 0) = Vec<double>{0, 0, 0};
+    atom(r_, 1) = Vec<double>{1, 0, 0};
+    atom(r_, 2) = Vec<double>{0, 1, 0};
+    atom(r_, 3) = Vec<double>{0, 0, 1};
 
-    file.dump(box, atom);
+    for (int i = 0; i < 10; i++) {
+      timeit("dump all", [&] { file.dump(box, atom, atom); });
+
+      atom[r_](Eigen::lastN(3 * 3)) += 0.1;
+    }
+
+    // file.write(box, atom, r_, v_);
 
   } else {
+    //
   }
-
-  //   fly::system::Box box_read;
-
-  //   file.load(0, box_read);
-
-  //   file.clear();
-
-  //   std::cout << "n " << file.n_frames() << std::endl;
-
-  //   ASSERT(box_read == box, "same?");
-
-  //   ASSERT(box.holding<fly::system::Orthorhombic>(), "");
-
-  //   fly::timeit("dump box 1", [&] { file.dump(box); });
-
-  //   fly::timeit("dump box 2", [&] { file.dump(box); });
-
-  //   std::cout << "n " << file.n_frames() << std::endl;
-
-  //   std::array<double, 3> tmp;
-
-  //   file.dump_span("", 2, tmp);
-
-  //   fly::safe_cast<unsigned int>(-1);
 
   return 0;
 }

@@ -23,11 +23,15 @@ jobs:
 
       - name: Install vcpkg
         uses: friendlyanon/setup-vcpkg@v1
-        with: { committish: "66045de4dcc5da3d1029c02b606307f5951dcb22" }
+        with:
+          {
+            committish: "66045de4dcc5da3d1029c02b606307f5951dcb22",
+            cache-version: "${{ matrix.cpp }}",
+          }
 
       - name: Configure
         shell: pwsh
-        run: cmake --preset=ci-$("${{ matrix.os }}".split("-")[0]) -DCMAKE_CXX_STANDARD=${{ matrix.cpp }}
+        run: cmake "-DCMAKE_CXX_STANDARD=${{ matrix.cpp }}" "--preset=ci-$("${{ matrix.os }}".split("-")[0])"
 
       - name: Build
         run: cmake --build build --config Release -j 2

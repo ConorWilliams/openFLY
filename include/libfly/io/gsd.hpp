@@ -120,7 +120,7 @@ namespace fly::io {
       (static_cast<void>(dump_span(remove_cref_t<T>::tag, remove_cref_t<T>::size(),
                                    nonstd::span<typename remove_cref_t<T>::scalar_t const>{
                                        soa[remove_cref_t<T>{}].derived().data(),
-                                       soa.size(),
+                                       safe_cast<std::size_t>(soa.size()),
                                    })),
        ...);
     }

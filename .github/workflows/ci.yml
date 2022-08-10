@@ -13,6 +13,7 @@ jobs:
   test_big_3:
     strategy:
       matrix:
+        cpp: [17, 20]
         os: [macos-latest, ubuntu-latest]
 
     runs-on: ${{ matrix.os }}
@@ -26,7 +27,7 @@ jobs:
 
       - name: Configure
         shell: pwsh
-        run: cmake "--preset=ci-$("${{ matrix.os }}".split("-")[0])"
+        run: cmake "--preset=ci-$("${{ matrix.os }}".split("-")[0]) -DCMAKE_CXX_STANDARD=${{ matrix.cpp }}"
 
       - name: Build
         run: cmake --build build --config Release -j 2

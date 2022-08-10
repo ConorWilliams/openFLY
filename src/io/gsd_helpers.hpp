@@ -18,6 +18,7 @@
 #include <cstring>
 #include <functional>
 #include <nonstd/span.hpp>
+#include <stdexcept>
 #include <string_view>
 #include <type_traits>
 #include <utility>
@@ -126,10 +127,10 @@ namespace fly::io {
     ASSERT(sizeof(T) == gsd_sizeof_type(Tag), "Platform error!");
 
     if (auto size = N * M; size != data.size()) {
-      throw error("GSD: Trying to write {} bytes but expecting to write {}", data.size(), size);
+      throw error("GSD: Chunk '{}', trying to write {} T's but expecting to write {}", name, data.size(), size);
     }
 
-    call_gsd("trying to writing chunk", gsd_write_chunk, handle, name, Tag, N, M, 0, data.data());
+    call_gsd(name, gsd_write_chunk, handle, name, Tag, N, M, 0, data.data());
   }
 
   // Read a chunk expecting N by M into data, use -1 for unknown M or N.
@@ -143,15 +144,15 @@ namespace fly::io {
     }
 
     if (N >= 0 && safe_cast<uint64_t>(N) != chunk->N) {
-      throw error("GSD: Expected {} rows found {}", N, chunk->N);
+      throw error("GSD: Chunk '{}', expected {} rows found {}", name, N, chunk->N);
     }
 
     if (M >= 0 && safe_cast<uint32_t>(M) != chunk->M) {
-      throw error("GSD: Expected {} columns found {}", M, chunk->M);
+      throw error("GSD: Chunk '{}', expected {} columns found {}", name, M, chunk->M);
     }
 
     if (chunk->type != Tag) {
-      throw error("GSD: Expecting to read type {} but found type {}", Tag, chunk->type);
+      throw error("GSD: Chunk '{}', expecting to read type {} but found type {}", name, Tag, chunk->type);
     }
 
     ASSERT(sizeof(T) == gsd_sizeof_type(Tag), "Platform error!");

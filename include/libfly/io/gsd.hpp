@@ -118,9 +118,9 @@ namespace fly::io {
     template <typename... T>
     void dump_impl(system::SoA<T...> const &soa) {
       (static_cast<void>(dump_span(remove_cref_t<T>::tag, remove_cref_t<T>::size(),
-                                   {
-                                       soa[remove_cref_t<T>{}].begin(),
-                                       soa[remove_cref_t<T>{}].end(),
+                                   nonstd::span<typename remove_cref_t<T>::scalar_t const>{
+                                       soa[remove_cref_t<T>{}].derived().data(),
+                                       soa.size(),
                                    })),
        ...);
     }

@@ -13,11 +13,11 @@ OpenFLY 0.1.0-alpha
 
 Welcome to openFLY, the open-source on-the-fly kinetic Monte Carlo (KMC) framework.
 
-OpenFLY provides libraries and programs to run massively-parallel on-the-fly KMC simulations. 
+OpenFLY provides C++17/20 libraries and programs to build/run massively-parallel on-the-fly KMC simulations. It draws inspiration from the molecular dynamics packages `LAMMPS <https://www.lammps.org>`_ and KMC package `HOOMD-blue <https://github.com/joaander/hoomd-blue>`_
 
-OpenFLY was originally developed at the University of Cambridge's department of Materials Science & Metallurgy. It draws inspiration from the atomistic simulation packages `LAMMPS <https://www.lammps.org>`_ and  `HOOMD-blue <https://github.com/joaander/hoomd-blue>`_
+Development happens on `GitHub <https://github.com/ConorWilliams/openFLY>`_, where you can ask question and join in -- we accept pull requests! 
 
-OpenFLY is now developed on `GitHub <https://github.com/ConorWilliams/openFLY>`_, where you can ask question and join in the development. This documentation is built automatically and is for the latest development-version of the code. If needed, you can build a local copy of this site, for any version, by following the :ref:`guide <Building>`.
+This documentation is built automatically and is for the latest development-version of the code. If needed, you can build a local copy of this site, for any version, by following the :ref:`guide <Building>`.
 
 This documentation is organized into three parts: 
 

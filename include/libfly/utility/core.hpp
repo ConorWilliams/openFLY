@@ -18,8 +18,13 @@
 #include <fmt/format.h>
 #include <fmt/ranges.h>
 
+//
+
 #include <Eigen/Core>
 #include <Eigen/Dense>
+
+//
+
 #include <algorithm>
 #include <cmath>
 #include <cstddef>
@@ -30,8 +35,6 @@
 #include <string_view>
 #include <type_traits>
 #include <utility>
-
-#include "libfly/utility/asserts.hpp"  // API specifies we must include this
 
 /**
  * \file core.hpp
@@ -397,9 +400,11 @@ namespace fly {
 
     Eigen::FullPivLU<decltype(H)> lu(H);
 
-    ASSERT(lu.dimensionOfKernel() == 1, "Points are linearly dependant!");
+    if (auto kd = lu.dimensionOfKernel(); kd != 1) {
+      throw error("Points passed to hyperplane_normal are linearly dependant");
+    }
 
-    ASSERT(near(lu.kernel()(N, 0), 0.0), "Homogeneous coordinate of the kernel should be zero!");
+    XASSERT(near(lu.kernel()(N, 0), 0.0), "Homogeneous coordinate of the kernel = {} but should be zero!", lu.kernel()(N, 0));
 
     return lu.kernel().template topLeftCorner<N, 1>().normalized();
   }

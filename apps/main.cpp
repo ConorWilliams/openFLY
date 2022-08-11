@@ -1,4 +1,6 @@
 
+#include <fmt/core.h>
+
 #include <array>
 #include <iostream>
 
@@ -7,7 +9,6 @@
 #include "libfly/system/atom.hpp"
 #include "libfly/system/box.hpp"
 #include "libfly/system/boxes/orthorhombic.hpp"
-#include "libfly/utility/asserts.hpp"
 #include "libfly/utility/core.hpp"
 #include "libfly/utility/timeit.hpp"
 
@@ -19,6 +20,10 @@ int main() {
 
   if (true) {
     system::Box box(Mat<double>::Identity(), Arr<bool>::Constant(true));
+
+    // fmt::print("test {}", Mat<int>{});
+
+    box.canon_image(Vec<double>{10, 10, 10});
 
     system::SoA<Position> atom(4);
 

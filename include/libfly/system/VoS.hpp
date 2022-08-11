@@ -72,7 +72,7 @@ namespace fly::system {
      * @brief Bounds checked version of operator [].
      */
     decltype(auto) operator[](std::size_t i) {
-      ASSERT(i < size(), "Out of bounds");
+      XASSERT(i < size(), "Out of bounds: {} !< {}", i, size());
       return Vector::operator[](i);
     }
 
@@ -80,7 +80,7 @@ namespace fly::system {
      * @brief Bounds checked version of operator [] const.
      */
     decltype(auto) operator[](std::size_t i) const {
-      ASSERT(i < size(), "Out of bounds");
+      XASSERT(i < size(), "Out of bounds: {} !< {}", i, size());
       return Vector::operator[](i);
     }
 

@@ -29,7 +29,6 @@
 
 #include "external/gsd.h"
 #include "io/gsd_helpers.hpp"
-#include "libfly/utility/asserts.hpp"
 #include "libfly/utility/core.hpp"
 
 namespace fly::io {

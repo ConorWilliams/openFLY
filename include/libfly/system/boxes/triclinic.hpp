@@ -20,7 +20,6 @@
 
 #include "libfly/system/atom.hpp"
 #include "libfly/system/boxes/hypergrid.hpp"
-#include "libfly/utility/asserts.hpp"
 #include "libfly/utility/core.hpp"
 
 /**
@@ -51,13 +50,13 @@ namespace fly::system {
       if constexpr (S == Sign::plus) {
         // Shortest distance point to hyperplane
         auto dx = gdot(x, m_hyper.col(ax));
-        ASSERT(dx > 0, "sign error");
+        XASSERT(dx > 0, "Sign error: {}", dx);
         if (dx < HyperGrid::r_cut()) {
           return x + m_basis.col(ax);
         }
       } else {
         auto dx = gdot(m_basis.col(ax) - x, m_hyper.col(ax));
-        ASSERT(dx > 0, "sign error");
+        XASSERT(dx > 0, "Sign error: {}", dx);
         if (dx < HyperGrid::r_cut()) {
           return x - m_basis.col(ax);
         }
@@ -84,7 +83,7 @@ namespace fly::system {
         auto n = hyperplane_normal(points);
         auto w = gdot(n, m_basis.col(i));
 
-        VERIFY(std::abs(w) > r_cut, "Box too small for this r_cut");
+        verify(std::abs(w) > r_cut, "Box axis {}, width={} too small for this r_cut={}", i, w, r_cut);
 
         // Want normal in same direction as basis/edge.
         if (w < 0) {
@@ -117,11 +116,17 @@ namespace fly::system {
         : m_basis{basis.triangularView<Eigen::Upper>()}, m_basis_inv{m_basis.inverse()}, m_periodic{pd} {
       [[maybe_unused]] double eps = 1e-5;
 
-      VERIFY(((basis - m_basis).array().abs() < eps).all(), "Basis must be an upper triangular matrix.");
-      VERIFY((m_basis.array() >= 0).all(), "Basis elements must be positive");
-      VERIFY((m_basis.array().pow(2).colwise().sum().sqrt() > eps).all(), "Basis vectors too small");
-      VERIFY((m_basis.diagonal().array() > eps).all(), "Diagonal elements must be non-zero");
-      ASSERT(m_basis.determinant() > eps, "Should be invertible by above.");
+      verify(((basis - m_basis).array().abs() < eps).all(), "Basis must be an upper triangular matrix.");
+
+      verify((m_basis.array() >= 0).all(), "Basis elements must be positive");
+
+      if (Arr<double> bv = m_basis.array().pow(2).colwise().sum().sqrt(); (bv < eps).all()) {
+        throw error("Basis vectors, {}, too small", bv);
+      }
+
+      verify((m_basis.diagonal().array() > eps).all(), "Diagonal elements, {}, must be non-zero", m_basis.diagonal().array());
+
+      XASSERT(m_basis.determinant() > eps, "Basis should be invertible but det={}.", m_basis.determinant());
     }
 
     /**
@@ -152,7 +157,7 @@ namespace fly::system {
       // Convert to fractional coordinates
       Vec<double> f = m_basis_inv * x;
 
-      ASSERT((m_periodic || (f.array() >= 0 && f.array() < 1)).all(), "Out of box A");
+      XASSERT((m_periodic || (f.array() >= 0 && f.array() < 1)).all(), "Out of box: {}", x);
 
       // Do the canonizing in the fractional basis.
       Vec<double> f_canon = f.array() - f.array().floor();

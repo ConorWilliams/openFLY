@@ -124,7 +124,7 @@ namespace fly::io {
   template <typename T, gsd_type Tag = get_type_id<T>>
   void write_chunk(struct gsd_handle* handle, char const* name, uint64_t N, uint32_t M, nonstd::span<T const> data) {
     //
-    ASSERT(sizeof(T) == gsd_sizeof_type(Tag), "Platform error!");
+    XASSERT(sizeof(T) == gsd_sizeof_type(Tag), "Platform error!", 0);
 
     if (auto size = N * M; size != data.size()) {
       throw error("GSD: Chunk '{}', trying to write {} T's but expecting to write {}", name, data.size(), size);
@@ -155,7 +155,7 @@ namespace fly::io {
       throw error("GSD: Chunk '{}', expecting to read type {} but found type {}", name, Tag, chunk->type);
     }
 
-    ASSERT(sizeof(T) == gsd_sizeof_type(Tag), "Platform error!");
+    XASSERT(sizeof(T) == gsd_sizeof_type(Tag), "Platform error!", 0);
 
     if (auto size = chunk->N * chunk->M; size != data.size()) {
       throw error("Chunk {}, not enough space for {} element in span length {}", name, size, data.size());

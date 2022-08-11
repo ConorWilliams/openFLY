@@ -99,7 +99,7 @@ namespace fly::system {
      * @param pd True for each periodic axis.
      */
     Orthorhombic(Arr<double> const& ex, Arr<bool> const& pd) : m_extents{ex}, m_periodic{pd}, m_inv_extents(1.0 / ex) {
-      VERIFY((m_extents > 0).all(), "Orthorhombic extents are negative");
+      verify((m_extents > 0).all(), "Orthorhombic extents={} are negative", m_extents);
     }
 
     /**
@@ -133,7 +133,8 @@ namespace fly::system {
     Vec<double> canon_image(Eigen::MatrixBase<E> const& x) const {
       // Non-periodic atoms are within the simulation box extents so x[i] * inv_extents less than 1 and x[i]
       // remains unaffected, hence no non-periodic switch/select.
-      ASSERT((m_periodic || (x.array() >= Arr<double>::Zero() && x.array() < m_extents)).all(), "Out of box");
+      XASSERT((m_periodic || (x.array() >= Arr<double>::Zero() && x.array() < m_extents)).all(), "{} is not inside box {}", x,
+              m_extents);
       return x.array() - m_extents * (x.array() * m_inv_extents).floor();
     }
 

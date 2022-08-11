@@ -43,8 +43,9 @@ namespace fly::system {
      */
     HyperGrid(Arr<double> const& extents, double r_cut) : m_r_cut(r_cut) {
       // Sanity checks
-      VERIFY(r_cut > 0, "r_cut is negative");
-      VERIFY((extents > r_cut).all(), "r_cut is too big");
+      verify(r_cut > 0, "r_cut={} is negative", r_cut);
+      verify((extents > r_cut).all(), "r_cut={} is too big for {}", r_cut, extents);
+
       //
       m_shape = 2 + (extents / r_cut).cast<int>();
       m_cell = extents / (extents / r_cut).floor();

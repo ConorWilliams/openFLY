@@ -6,7 +6,7 @@ Prerequisites
 
 OpenFLY requires:
 
-* A C++17 compatible compiler that **supports openMP**
+* A C++17/20 compatible compiler that supports `**openMP 4.5** <https://www.openmp.org/specifications/>`_
 * cmake 3.14+
 * git
 * MPI installation

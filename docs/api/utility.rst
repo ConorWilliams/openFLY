@@ -18,14 +18,23 @@ File: ``core.hpp``
 .. doxygenfile:: core.hpp
     :sections: briefdescription detaileddescription
 
-Macros
-~~~~~~~~~
-
-.. doxygendefine:: ASSERT
-
-.. doxygendefine:: VERIFY    
+Configuration macros
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. doxygendefine:: FLY_SPATIAL_DIMS
+
+Error handling
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. doxygenstruct:: fly::RuntimeError
+    :members:
+    :undoc-members:
+
+.. doxygenfunction:: error
+
+.. doxygenfunction:: verify
+
+.. doxygendefine:: ASSERT
 
 
 Defines, variables, etc.
@@ -33,15 +42,13 @@ Defines, variables, etc.
 
 .. doxygenvariable:: spatial_dims
 
-.. doxygenvariable:: max_atomic_num
-
 .. doxygenenum:: Sign
 
 .. doxygentypedef:: Vec
 
-.. doxygentypedef:: Arr
-
 .. doxygentypedef:: Mat
+
+.. doxygentypedef:: Arr
 
 .. doxygentypedef:: first_t
 
@@ -49,12 +56,9 @@ Defines, variables, etc.
 
 .. doxygenvariable:: always_false
 
-.. doxygenvariable:: const_eval
 
 Small functions
 ~~~~~~~~~~~~~~~~~~~~~~
-
-.. doxygenfunction:: error
 
 .. doxygenfunction:: safe_cast
 
@@ -79,22 +83,14 @@ Mathematical functions
 Classes
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. doxygenstruct:: fly::RuntimeError
-    :members:
-    :undoc-members:
-
-
 .. doxygenclass:: fly::Defer
     :members:
     :undoc-members:
 
 Timing 
-------------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~
 
 File ``timeit.hpp``
-
-.. doxygenfile:: timeit.hpp
-    :sections: briefdescription detaileddescription
 
 .. doxygenfunction:: timeit
 

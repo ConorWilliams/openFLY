@@ -14,6 +14,7 @@
 
 // You should have received a copy of the GNU General Public License along with openFLY. If not, see <https://www.gnu.org/licenses/>.
 
+#include <fmt/chrono.h>
 #include <fmt/core.h>
 #include <fmt/format.h>
 #include <fmt/ranges.h>
@@ -26,6 +27,7 @@
 //
 
 #include <algorithm>
+#include <chrono>
 #include <cmath>
 #include <cstddef>
 #include <functional>
@@ -65,6 +67,8 @@
 
 namespace fly {
 
+  // ------------------- Error Handling ---------------- //
+
   /**
    * @brief libFLY's catchable error type.
    */
@@ -93,7 +97,7 @@ namespace fly {
   /**
    * @brief Utility to check condition and throw RuntimeError if condition is false.
    *
-   * Forwards ``fmt`` and ``args`` to flt::error.
+   * Forwards ``fmt`` and ``args`` to fly::error().
    */
   template <typename... Args>
   void verify(bool condition, fmt::format_string<Args...> fmt, Args&&... args) {
@@ -116,7 +120,7 @@ namespace fly {
 /**
  * @brief Use like fly::verify but disabled if NDEBUG defined..
  */
-#  define XASSERT(expr, string_literal, ...)                                                                         \
+#  define ASSERT(expr, string_literal, ...)                                                                          \
     do {                                                                                                             \
       if (constexpr std::string_view fname = fly::detail::file_name(__FILE__); !(expr)) {                            \
         throw fly::error("ASSERT \"{}\" failed in ...{}:{} | " string_literal, #expr, fname, __LINE__, __VA_ARGS__); \
@@ -128,11 +132,13 @@ namespace fly {
 /**
  * @brief Use like std \c assert(expr) but with an error message.
  */
-#  define XASSERT(...) \
-    do {               \
+#  define ASSERT(...) \
+    do {              \
     } while (false)
 
 #endif  // !NDEBUG
+
+  // ------------------- Defines, variables, etc. ---------------- //
 
   /**
    * @brief The number of spatial dimensions.
@@ -148,23 +154,14 @@ namespace fly {
   static_assert(spatial_dims >= 2, "libFLY is not optimal for 1D simulations");
 
   /**
-   * @brief Force constant evaluation in C++17
+   * @brief Shorthand for creating an \c Eigen::Vector of doubles length \c spatial_dims
    */
-  template <auto Value>
-  inline constexpr auto const_eval = Value;
+  using Vec = Eigen::Vector<double, spatial_dims>;
 
   /**
-   * @brief The maximum atomic number that any atom can have.
+   * @brief Shorthand for creating an \c spatial_dims x \c spatial_dims \c Eigen::Matrix of doubles.
    */
-  [[deprecated]] inline constexpr int max_atomic_num = 111;
-
-  /**
-   * @brief Shorthand for creating an \c Eigen::Vector of length \c spatial_dims
-   *
-   * @tparam T The scalar type of the \c Eigen::Vector
-   */
-  template <typename T>
-  using Vec = Eigen::Vector<T, spatial_dims>;
+  using Mat = Eigen::Matrix<double, spatial_dims, spatial_dims>;
 
   /**
    * @brief Shorthand for creating an \c spatial_dims x 1 \c Eigen::Array.
@@ -173,14 +170,6 @@ namespace fly {
    */
   template <typename T>
   using Arr = Eigen::Array<T, spatial_dims, 1>;
-
-  /**
-   * @brief Shorthand for creating an \c spatial_dims x \c spatial_dims \c Eigen::Matrix.
-   *
-   * @tparam T The scalar type of the \c Eigen::Matrix
-   */
-  template <typename T>
-  using Mat = Eigen::Matrix<T, spatial_dims, spatial_dims>;
 
   /**
    * @brief Strongly typed +/- sign.
@@ -228,6 +217,8 @@ namespace fly {
   template <typename T>
   using remove_cref_t = std::remove_const_t<std::remove_reference_t<T>>;
 
+  // ------------------- Small functions ---------------- //
+
   namespace detail {
     // C++20 functions see: https://en.cppreference.com/w/cpp/utility/intcmp
     template <class T, class U>
@@ -264,6 +255,8 @@ namespace fly {
    *
    * Perform a `static_cast` from type `T` to `R` with bounds checking in debug builds.
    *
+   * Only SFINE enabled for integral types.
+   *
    * @tparam R Target type to cast to.
    */
   template <typename R, typename T, typename = std::enable_if_t<std::is_integral_v<R> && std::is_integral_v<T>>>
@@ -278,18 +271,22 @@ namespace fly {
     auto constexpr T_min = std::numeric_limits<T>::min();
 
     if constexpr (detail::cmp_less(R_max, T_max)) {
-      XASSERT(detail::cmp_less_equal(x, R_max), "Could not cast '{}' to type R with R_max={}", x, R_max);
+      ASSERT(detail::cmp_less_equal(x, R_max), "Could not cast '{}' to type R with R_max={}", x, R_max);
     }
 
     if constexpr (detail::cmp_greater(R_min, T_min)) {
-      XASSERT(detail::cmp_greater_equal(x, R_min), "Could not cast '{}' to type R with R_min={}", x, R_min);
+      ASSERT(detail::cmp_greater_equal(x, R_min), "Could not cast '{}' to type R with R_min={}", x, R_min);
     }
 
     return static_cast<R>(x);
   }
 
+  // ------------------- Math functions ---------------- //
+
   /**
    * @brief Test if two floating point numbers are within 0.01% of each other.
+   *
+   * Only SFINE enabled if T is floating point.
    */
   template <typename T, typename = std::enable_if_t<std::is_floating_point_v<T>>>
   constexpr bool near(T a, T b) {
@@ -323,6 +320,36 @@ namespace fly {
       prod *= std::exchange(x[i], prod);
     }
     return x;
+  }
+
+  /**
+   * @brief Compute integer powers of arithmetic types at compile time.
+   *
+   * Only SFINE enabled if base is an arithmetic type.
+   *
+   * \rst
+   *
+   * Computes:
+   *
+   * .. math::
+   *
+   *    \text{x}^{\text{Exp}}
+   *
+   * \endrst
+   */
+  template <std::size_t Exp, typename T>
+  constexpr std::enable_if_t<std::is_arithmetic_v<T>, T> ipow(T x) {
+    if constexpr (Exp == 0) {
+      return T(1);
+    }
+    if constexpr (Exp == 1) {
+      return x;
+    }
+    if constexpr (Exp % 2 == 0) {
+      return ipow<Exp / 2>(x) * ipow<Exp / 2>(x);
+    } else {
+      return ipow<Exp - 1>(x) * x;
+    }
   }
 
   /**
@@ -384,6 +411,8 @@ namespace fly {
    *
    * \rst
    *
+   * Only SFINE enabled for fixed-size square matrices.
+   *
    * See: `StackExchange <https://math.stackexchange.com/questions/2301110/fastest-way-to-find-equation-of-hyperplane>`_
    *
    * \endrst
@@ -404,45 +433,17 @@ namespace fly {
       throw error("Points passed to hyperplane_normal are linearly dependant");
     }
 
-    XASSERT(near(lu.kernel()(N, 0), 0.0), "Homogeneous coordinate of the kernel = {} but should be zero!", lu.kernel()(N, 0));
+    ASSERT(near(lu.kernel()(N, 0), 0.0), "Homogeneous coordinate of the kernel = {} but should be zero!", lu.kernel()(N, 0));
 
     return lu.kernel().template topLeftCorner<N, 1>().normalized();
   }
 
-  /**
-   * @brief Compute integer powers of arithmetic types at compile time.
-   *
-   * Only SFINE if base is an arithmetic type.
-   *
-   * \rst
-   *
-   * Computes:
-   *
-   * .. math::
-   *
-   *    \text{x}^{\text{Exp}}
-   *
-   * \endrst
-   */
-  template <std::size_t Exp, typename T>
-  constexpr std::enable_if_t<std::is_arithmetic_v<T>, T> ipow(T x) {
-    if constexpr (Exp == 0) {
-      return T(1);
-    }
-    if constexpr (Exp == 1) {
-      return x;
-    }
-    if constexpr (Exp % 2 == 0) {
-      return ipow<Exp / 2>(x) * ipow<Exp / 2>(x);
-    } else {
-      return ipow<Exp - 1>(x) * x;
-    }
-  }
+  // ------------------- Classes ---------------- //
 
   /**
    * @brief Basic implementation of a Golang like defer.
    *
-   * Only SFINE if callable is noexcept.
+   * Only SFINE enabled if callable is noexcept.
    *
    * \tparam F The invocable's type, this **MUST** be deducted through CTAD by the deduction guide.
    *
@@ -484,5 +485,52 @@ namespace fly {
    */
   template <typename F>
   Defer(F&&) -> Defer<F>;
+
+  // ------------------- Timing ---------------- //
+
+  /**
+   * @brief Transparent function wrapper that measures the execution time of a function.
+   *
+   * The execution time is printed to stdout. Garantees RVO.
+   *
+   * @param name Name of function being called, also printed to stdout.
+   * @param f Function call.
+   * @param args Arguments to call \c f with.
+   * @return std::invoke_result_t<F&&, Args&&...> The result of calling \c f with \c args... .
+   */
+  template <typename F, typename... Args>
+  std::invoke_result_t<F&&, Args&&...> timeit(std::string_view name, F&& f, Args&&... args) {
+    //
+    auto start = std::chrono::steady_clock::now();
+
+    Defer _ = [&]() noexcept {
+      //
+      using namespace std::chrono;
+
+      auto elapsed = steady_clock::now() - start;
+
+      auto sec = duration_cast<seconds>(elapsed);
+
+      elapsed -= sec;
+
+      auto mil = duration_cast<milliseconds>(elapsed);
+
+      elapsed -= mil;
+
+      auto mic = duration_cast<microseconds>(elapsed);
+
+      elapsed -= mic;
+
+      auto nan = duration_cast<nanoseconds>(elapsed);
+
+      fmt::print("Timing \"{}\" {:>4} {:>5} {:>5} {:>5}\n", name, sec, mil, mic, nan);
+    };
+
+    if constexpr (std::is_void_v<std::invoke_result_t<F&&, Args&&...>>) {
+      std::invoke(std::forward<F>(f), std::forward<Args>(args)...);
+    } else {
+      return std::invoke(std::forward<F>(f), std::forward<Args>(args)...);
+    }
+  }
 
 }  // namespace fly

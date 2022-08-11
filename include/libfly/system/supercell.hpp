@@ -24,7 +24,7 @@
 /**
  * \file supercell.hpp
  *
- * @brief Classes to represent entire systems of atoms.
+ * @brief Classes to represent systems of atoms.
  */
 
 namespace fly::system {
@@ -72,7 +72,7 @@ namespace fly::system {
      *
      * \rst
      * .. warning::
-     *    All the new types properties are uninitialised.
+     *    All the new properties are uninitialised.
      * \endrst
      */
     explicit TypeMap(Eigen::Index num_types) : SOA(num_types) {}
@@ -81,7 +81,7 @@ namespace fly::system {
      * @brief Construct a new TypeMap by slicing a different kind of TypeMap.
      */
     template <typename... T, typename = std::enable_if_t<!detail::same_properties<TypeMap, T...>::value>>
-    explicit TypeMap(TypeMap<T...> map) : SOA(static_cast<SoA<Type, T...>&&>(map)) {}
+    explicit TypeMap(TypeMap<T...> map) : SOA(static_cast<SoA<Type, T...>>(std::move(map))) {}
 
     /**
      * @brief Fetch the number of types stored in the TypeMap
@@ -112,15 +112,15 @@ namespace fly::system {
    * @brief LibFLY's representation of a system of atoms
    *
    * The Supercell is libFLY's amalgamation of all the data required for a simulation. It **is a** SoA containing all the atoms in the
-   * system **has a** ``Box`` and a ``TypeMap``. A Supercell always has ``Position`` and ``TypeID`` members for each atom and accepts
-   * the rest as template arguments.
+   * system **has a** ``Box`` and a ``TypeMap``. A Supercell always has the ``TypeID`` property for each atom and accepts the rest as
+   * template arguments.
    *
    * @tparam Mems Tags derived from ``MemTag``, to describe each member.
    */
   template <typename Map, typename... Mems>
-  class Supercell : public SoA<TypeID, Position, Mems...> {
+  class Supercell : public SoA<TypeID, Mems...> {
   private:
-    using SOA = SoA<TypeID, Position, Mems...>;
+    using SOA = SoA<TypeID, Mems...>;
 
     static_assert(SOA::owns_all, "Supercells must own all their data");
 
@@ -158,7 +158,7 @@ namespace fly::system {
   /**
    * @brief Utility to construct a new Supercell to store `num_atoms` atoms.
    *
-   * Use partial function template argument deduction to deduce Supercell template parameters.
+   * Uses partial function-template argument deduction to deduce Supercell's template parameters.
    */
   template <typename... T, typename... U>
   Supercell<TypeMap<U...>, T...> make_supercell(Box const& box, TypeMap<U...> const& map, Eigen::Index num_atoms) {

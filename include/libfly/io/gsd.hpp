@@ -16,6 +16,7 @@
 
 #include <array>
 #include <cstdint>
+#include <functional>
 #include <memory>
 #include <nonstd/span.hpp>
 #include <string>
@@ -50,7 +51,7 @@ namespace fly::io {
    * @brief Flags for file permissions
    */
   enum Flags {
-    read,        ///< Open with read only permissions.
+    read_only,   ///< Open with read only permissions.
     read_write,  ///< Open with read and write permissions.
     create       ///< Open with read and write permissions, overwrite existing files.
   };
@@ -60,6 +61,11 @@ namespace fly::io {
    *
    */
   class FileGSD {
+  private:
+    struct noop {
+      constexpr void operator()() const noexcept {}
+    };
+
   public:
     /**
      * @brief Construct a new File G S D object
@@ -67,34 +73,10 @@ namespace fly::io {
      * @param fname
      * @param flag
      */
-    explicit FileGSD(std::string_view fname, Flags flag = read);
+    explicit FileGSD(std::string_view fname, Flags flag = read_only);
 
     /**
-     * @brief yes
-     *
-     * @tparam Args
-     * @param args
-     */
-    template <typename... Args>
-    void dump(Args const &...args) {
-      (static_cast<void>(dump_impl(args)), ...);
-      commit_frame();
-    }
-
-    /**
-     * @brief no
-     *
-     * @tparam Args
-     */
-    template <typename... Args>
-    void load(std::uint64_t i, Args &&...args) const {
-      (static_cast<void>(load_impl(i, std::forward<Args>(args))), ...);
-    }
-
-    /**
-     * @brief plop
-     *
-     * @return int
+     * @brief Get the number of frames in the GSD file.
      */
     std::uint64_t n_frames() const noexcept;
 
@@ -107,44 +89,80 @@ namespace fly::io {
      */
     void clear();
 
+    /**
+     * @brief Commit the current writes to disk
+     *
+     * @tparam F An optional nullery invokable to call before committing the writes.
+     */
+    template <typename F = noop>
+    void commit(F &&f = {}) {
+      std::invoke(std::forward<F>(f));
+      end_frame();
+    }
+
+    /**
+     * @brief Write a Box to the current frame.
+     *
+     * \rst
+     * .. warning::
+     *     Due to the GSD schema specification the basis vector must be stored as single precision floats so writing is a lossy
+     *     operation.
+     * \endrst
+     *
+     */
+    void write(system::Box const &box);
+
+    /**
+     * @brief Read a Box stored at frame ``i`` and write it to ``out``;
+     */
+    void read(std::uint64_t i, system::Box &out) const;
+
+    // ////////////////////////////////////////////////////////////
+
     ~FileGSD() noexcept;
 
   private:
     std::string m_fname;
     std::unique_ptr<gsd_handle> m_handle;
 
-    void dump_impl(system::Box const &);
-    void load_impl(std::uint64_t i, system::Box &) const;
+    // template <typename... T>
+    // void dump_impl(system::SoA<T...> const &soa) {
+    //   //  ¯\_(ツ)_/¯
+    //   (static_cast<void>(dump_span(remove_cref_t<T>::tag, remove_cref_t<T>::size(),
+    //                                nonstd::span<typename remove_cref_t<T>::scalar_t const>{
+    //                                    soa[remove_cref_t<T>{}].derived().data(),
+    //                                    safe_cast<std::size_t>(soa.size()) * remove_cref_t<T>::size(),
+    //                                })),
+    //    ...);
 
-    template <typename... T>
-    void dump_impl(system::SoA<T...> const &soa) {
-      //  ¯\_(ツ)_/¯
-      (static_cast<void>(dump_span(remove_cref_t<T>::tag, remove_cref_t<T>::size(),
-                                   nonstd::span<typename remove_cref_t<T>::scalar_t const>{
-                                       soa[remove_cref_t<T>{}].derived().data(),
-                                       safe_cast<std::size_t>(soa.size()) * remove_cref_t<T>::size(),
-                                   })),
-       ...);
-
-      dump_span("particles/N", 1, std::array{safe_cast<std::uint32_t>(soa.size())});
-    }
+    //   dump_span("particles/N", 1, std::array{safe_cast<std::uint32_t>(soa.size())});
+    // }
 
     // ///////////////////////////////////////////
 
-    // dump a dynamic amount of the data in span in expecting rows of length M.
-    void dump_span(char const *name, std::uint32_t M, nonstd::span<double const> data);
-    // load a dynamic amount of data from file into span in expecting rows of length M, use -1 for dynamic.
-    void load_span(std::uint64_t i, char const *name, int M, nonstd::span<double> data) const;
+    void end_frame();
 
-    void dump_span(char const *name, std::uint32_t M, nonstd::span<int const> data);
-    void load_span(std::uint64_t i, char const *name, int M, nonstd::span<int> data) const;
+/**
+ * @brief Define a [dump/load]_span for type ``type``.
+ */
+#define dump_load(TYPE_NAME)                                                             \
+  void dump_span(char const *name, std::uint32_t M, nonstd::span<TYPE_NAME const> data); \
+  void load_span(std::uint64_t i, char const *name, int M, nonstd::span<TYPE_NAME> data) const
 
-    void dump_span(char const *name, std::uint32_t M, nonstd::span<std::uint32_t const> data);
-    void load_span(std::uint64_t i, char const *name, int M, nonstd::span<std::uint32_t> data) const;
+    dump_load(std::uint8_t);
+    dump_load(std::uint16_t);
+    dump_load(std::uint32_t);
+    dump_load(std::uint64_t);
 
-    // void load_impl(int i, system::Box &) const;
+    dump_load(std::int8_t);
+    dump_load(std::int16_t);
+    dump_load(std::int32_t);
+    dump_load(std::int64_t);
 
-    void commit_frame();
+    dump_load(float);
+    dump_load(double);
+
+#undef dump_load
   };
 
 }  // namespace fly::io

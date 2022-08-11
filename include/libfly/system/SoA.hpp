@@ -47,16 +47,16 @@ namespace fly::system {
   }  // namespace detail
 
   /**
-   * @brief A container for atoms that stores each member in its own array.
+   * @brief A container for atoms that stores each property in its own array.
    *
    * The default container type used in the libfly; an ``SoA`` models an array of ``Atom`` types
-   * but decomposes the atom type and stores each member in a separate array. This enables efficient
-   * cache use. Like ``Atom``, the members of the "atom" are described through a series of template parameters
-   * which should inherit from ``MemTag``. The members of each atom can be accessed by the index of the
+   * but decomposes the atom type and stores each property in a separate array. This enables efficient
+   * cache use. Like ``Atom``, the properties  of the "atom" are described through a series of template parameters
+   * which should inherit from ``MemTag``. The properties  of each atom can be accessed by the index of the
    * atom or as an ``Eigen::Array`` to enable collective operations.
    *
-   * SoA also supports slicing and reference members which transform that member into a view, this enables SoA to act as a concrete
-   * type in interfaces whilst allowing implicit conversions from any comptable SoA.
+   * SoA also supports slicing and reference properties  which transform that property into a view, this enables SoA to act as a
+   * concrete type in interfaces whilst allowing implicit conversions from any comptable SoA.
    *
    * \rst
    *
@@ -73,12 +73,12 @@ namespace fly::system {
   class SoA : private detail::Adaptor<Ms>... {
   public:
     /**
-     * @brief True if this SoA is a pure view i.e. all its members are reference types.
+     * @brief True if this SoA is a pure view i.e. all its properties  are reference types.
      */
     static constexpr bool owns_none = (std::is_reference_v<Ms> && ...);
 
     /**
-     * @brief True if this SoA is purely owning i.e. non of its members are reference types.
+     * @brief True if this SoA is purely owning i.e. non of its properties  are reference types.
      */
     static constexpr bool owns_all = (!std::is_reference_v<Ms> && ...);
 
@@ -118,7 +118,7 @@ namespace fly::system {
     explicit SoA(Eigen::Index size, std::enable_if_t<OwnsAll>* = 0) : detail::Adaptor<Ms>(size)..., m_size(size) {}
 
     /**
-     * @brief Implicitly construct a new SoA object from SoA 'other' with different members.
+     * @brief Implicitly construct a new SoA object from SoA 'other' with different properties .
      *
      * Only SFINE enabled if this SoA owns non of its arrays.
      *
@@ -130,7 +130,7 @@ namespace fly::system {
     }
 
     /**
-     * @brief Explicitly construct a new SoA object from SoA 'other' with different members.
+     * @brief Explicitly construct a new SoA object from SoA 'other' with different properties .
      *
      * SFINE enabled if this SoA owns some of its arrays.
      *
@@ -164,14 +164,14 @@ namespace fly::system {
     SoA& operator=(SoA&&) = default;
 
     /**
-     * @brief Assign to a SoA with with different members.
+     * @brief Assign to a SoA with with different properties .
      *
      * \rst
      *
      * .. _`note on assignment to references`:
      *
      * .. note::
-     *    Assignement to reference members follows pointer-semantics:
+     *    Assignement to reference properties  follows pointer-semantics:
      *
      *    .. include:: ../../examples/system/SoA_assign.cpp
      *       :code:

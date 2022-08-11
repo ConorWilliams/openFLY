@@ -42,7 +42,7 @@ namespace fly::io {
     auto version = gsd_make_version(1, 4);
 
     switch (flag) {
-      case read:
+      case read_only:
         call_gsd(m_fname, gsd_open, m_handle.get(), m_fname.c_str(), GSD_OPEN_READONLY);
         break;
       case read_write:
@@ -58,48 +58,40 @@ namespace fly::io {
 
   std::uint64_t FileGSD::n_frames() const noexcept { return gsd_get_nframes(m_handle.get()); }
 
-  void FileGSD::commit_frame() { call_gsd(m_fname, gsd_end_frame, m_handle.get()); }
+  void FileGSD::end_frame() { call_gsd(m_fname, gsd_end_frame, m_handle.get()); }
 
   FileGSD::~FileGSD() noexcept { call_gsd(m_fname, gsd_close, m_handle.get()); }
 
   //   ////////////////////////////////////////////////////////////////////////////////////////////////
 
-  void FileGSD::dump_span(char const *name, std::uint32_t M, nonstd::span<double const> data) {
-    //  This is not a public facing function so we do not throw an error.
-    ASSERT(data.size() % M == 0, "Chunk `{}`, {} not divisible by {}", name, data.size(), M);
-
-    write_chunk(m_handle.get(), name, data.size() / M, M, data);
+#define dump_load(TYPE_NAME)                                                                              \
+  void FileGSD::dump_span(char const *name, std::uint32_t M, nonstd::span<TYPE_NAME const> data) {        \
+    ASSERT(data.size() % M == 0, "Chunk `{}`, {} not divisible by {}", name, data.size(), M);             \
+    write_chunk(m_handle.get(), name, data.size() / M, M, data);                                          \
+  }                                                                                                       \
+                                                                                                          \
+  void FileGSD::load_span(std::uint64_t i, char const *name, int M, nonstd::span<TYPE_NAME> data) const { \
+    read_chunk(i, m_handle.get(), name, -1, M, data);                                                     \
   }
 
-  void FileGSD::load_span(std::uint64_t i, char const *name, int M, nonstd::span<double> data) const {
-    read_chunk(i, m_handle.get(), name, -1, M, data);
-  }
+  dump_load(std::uint8_t);
+  dump_load(std::uint16_t);
+  dump_load(std::uint32_t);
+  dump_load(std::uint64_t);
 
-  void FileGSD::dump_span(char const *name, std::uint32_t M, nonstd::span<int const> data) {
-    //  This is not a public facing function so we do not throw an error.
-    ASSERT(data.size() % M == 0, "Chunk `{}`, {} not divisible by {}", name, data.size(), M);
+  dump_load(std::int8_t);
+  dump_load(std::int16_t);
+  dump_load(std::int32_t);
+  dump_load(std::int64_t);
 
-    write_chunk(m_handle.get(), name, data.size() / M, M, data);
-  }
+  dump_load(float);
+  dump_load(double);
 
-  void FileGSD::load_span(std::uint64_t i, char const *name, int M, nonstd::span<int> data) const {
-    read_chunk(i, m_handle.get(), name, -1, M, data);
-  }
-
-  void FileGSD::dump_span(char const *name, std::uint32_t M, nonstd::span<std::uint32_t const> data) {
-    //  This is not a public facing function so we do not throw an error.
-    ASSERT(data.size() % M == 0, "Chunk `{}`, {} not divisible by {}", name, data.size(), M);
-
-    write_chunk(m_handle.get(), name, data.size() / M, M, data);
-  }
-
-  void FileGSD::load_span(std::uint64_t i, char const *name, int M, nonstd::span<std::uint32_t> data) const {
-    read_chunk(i, m_handle.get(), name, -1, M, data);
-  }
+#undef dump_load
 
   //   ////////////////////////////////////////////////////////////////////////////////////////////////
 
-  void FileGSD::dump_impl(system::Box const &box) {
+  void FileGSD::write(system::Box const &box) {
     //          |L_x    xy L_y   xz L_z|
     // basis =  |0         L_y   yz L_z|
     //          |0         0        L_z|
@@ -117,7 +109,7 @@ namespace fly::io {
     write_chunk<std::uint8_t>(m_handle.get(), "log/periodicity", 3, 1, periodicity);
   }
 
-  void FileGSD::load_impl(std::uint64_t i, system::Box &box) const {
+  void FileGSD::read(std::uint64_t i, system::Box &box) const {
     //
 
     Eigen::Matrix<float, 3, 3> basis = Eigen::Matrix<float, 3, 3>::Zero();

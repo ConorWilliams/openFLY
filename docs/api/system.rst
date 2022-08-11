@@ -99,6 +99,8 @@ File: ``libfly/system/supercell.hpp``
     :members:
     :undoc-members:
 
+.. doxygenfunction:: fly::system::make_supercell
+
 Mapping type IDs to properties
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

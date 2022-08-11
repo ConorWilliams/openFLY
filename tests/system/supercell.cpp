@@ -42,7 +42,7 @@ TEST_CASE("TypeMap + Supercell", "[system]") {
 
   system::Box box(Mat::Identity(), {true, false, true});
 
-  auto cell = system::make_supercell(box, map, 10);
+  auto cell = system::make_supercell<Position>(box, map, 10);
 
   cell[r_] = 9;
 

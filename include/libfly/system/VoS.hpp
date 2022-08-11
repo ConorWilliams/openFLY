@@ -34,7 +34,7 @@ namespace fly::system {
   /**
    * @brief A container that models a std::vector of atoms.
    *
-   * The members of the "atom" are described through a series of template parameters which should
+   * The properties  of the "atom" are described through a series of template parameters which should
    * inherit from ``MemTag``
    *
    * \rst
@@ -54,7 +54,7 @@ namespace fly::system {
   template <typename... Mems>
   class VoS : private std::vector<Atom<Mems...>> {
   private:
-    static_assert(sizeof...(Mems) > 0, "Need at least one member in an VoS");
+    static_assert(sizeof...(Mems) > 0, "Need at least one property in an VoS");
 
     using Vector = std::vector<Atom<Mems...>>;
 

@@ -63,7 +63,7 @@ namespace fly::system::detail {
     }
 
     /**
-     * @brief Fetch a view of the ``i``th member stored in the array, tagged dispatch on ``Mem``.
+     * @brief Fetch a view of the ``i``th property stored in the array, tagged dispatch on ``Mem``.
      *
      * This is an owning Adaptor hence, model value const-semantics.
      */
@@ -79,7 +79,7 @@ namespace fly::system::detail {
     }
 
     /**
-     * @brief Fetch a view of the ``i``th member stored in the array, tagged dispatch on Mem.
+     * @brief Fetch a view of the ``i``th property stored in the array, tagged dispatch on Mem.
      *
      * This is an owning Adaptor hence, model value const-semantics
      */
@@ -145,7 +145,7 @@ namespace fly::system::detail {
 
     Adaptor(Adaptor const&) = default;
 
-    // If constructing from am owning Adaptor then take address of their m_data member, no explicit for construction of a view.
+    // If constructing from am owning Adaptor then take address of their m_data property, no explicit for construction of a view.
     Adaptor(Adaptor<Mem>& other) : m_data_ptr(&other.m_data) {}
 
     // Cannot construct from a const view.
@@ -165,7 +165,7 @@ namespace fly::system::detail {
     }
 
     /**
-     * @brief Fetch a view of the ``i``th member stored in the array, tagged dispatch on Mem.
+     * @brief Fetch a view of the ``i``th property stored in the array, tagged dispatch on Mem.
      *
      * This is not an owning Adaptor hence, model pointer const-semantics.
      */
@@ -211,7 +211,7 @@ namespace fly::system::detail {
     // If constructing from a non const view then just copy the pointer, no explicit for construction of a view.
     Adaptor(Adaptor<Mem&> other) : m_data_ptr(other.m_data_ptr) {}
 
-    // If constructing from am owning Adaptor then take address of their m_data member, no explicit for construction of a view.
+    // If constructing from am owning Adaptor then take address of their m_data property, no explicit for construction of a view.
     Adaptor(Adaptor<Mem> const& other) : m_data_ptr(&other.m_data) {}
 
     Adaptor& operator=(Adaptor const&) = default;
@@ -229,7 +229,7 @@ namespace fly::system::detail {
     }
 
     /**
-     * @brief Fetch a view of the ``i``th member stored in the array, tagged dispatch on Mem.
+     * @brief Fetch a view of the ``i``th property stored in the array, tagged dispatch on Mem.
      *
      * This is not an owning Adaptor hence, model const-pointer const-semantics.
      */
@@ -263,12 +263,12 @@ namespace fly::system::detail {
 
   template <typename Mem>
   struct Adaptor<Mem&&> {
-    static_assert(always_false<Mem>, "Rvalue reference to member is illegal.");
+    static_assert(always_false<Mem>, "Rvalue reference to property is illegal.");
   };
 
   template <typename Mem>
   struct Adaptor<Mem const&&> {
-    static_assert(always_false<Mem>, "Rvalue reference to member is illegal.");
+    static_assert(always_false<Mem>, "Rvalue reference to property is illegal.");
   };
 
 }  // namespace fly::system::detail

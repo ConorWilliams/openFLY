@@ -3,7 +3,7 @@
 #include "libfly/system/atom.hpp"  //< MemTag
 
 void SoA_assign() {
-  // Define a member to represent position that is a vector of 3 doubles.
+  // Define a property to represent position that is a vector of 3 doubles.
   struct xyz : fly::system::MemTag<double, 3> {};
 
   fly::system::SoA<xyz> a(10);

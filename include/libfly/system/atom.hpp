@@ -32,34 +32,34 @@
 namespace fly::system {
 
   /**
-   * @brief A base type to derive from for defining members of an Atom type.
+   * @brief A base type to derive from for defining properties of an Atom type.
    *
    * Members must be matrices of arithmetic types or default constructible 1x1 matricies.
    *
    * 1x1 matricies are unwrapped into scalars.
    *
-   * A selection of canonical members, deriving from this type, are provided in the namespace ``builtin_m``.
+   * A selection of canonical properties , deriving from this type, are provided in the namespace ``builtin_m``.
    *
-   * @tparam Scalar This member represents a matrix of Scalar elements.
-   * @tparam Rows Number of rows in this member.
-   * @tparam Cols Number of colums in this member.
-   * @tparam Rep The Eigen3 template, Eigen::[matrix||array], to use for this member.
+   * @tparam Scalar This property represents a matrix of Scalar elements.
+   * @tparam Rows Number of rows in this property
+   * @tparam Cols Number of colums in this property
+   * @tparam Rep The Eigen3 template, Eigen::[matrix||array], to use for this property
    */
   template <typename Scalar, int Rows = 1, int Cols = 1, template <typename, auto...> typename Rep = Eigen::Matrix>
   struct MemTag {
-    /** @brief True if this member represents a 1x1 matrix. */
+    /** @brief True if this property represents a 1x1 matrix. */
     static constexpr bool is_1x1 = Rows == 1 && Cols == 1;
 
-    static_assert(std::is_arithmetic_v<Scalar> || (Rows == 1 && Cols == 1), "Non-scalar members must be arithmetic.");
+    static_assert(std::is_arithmetic_v<Scalar> || (Rows == 1 && Cols == 1), "Non-scalar properties must be arithmetic.");
 
-    static_assert(std::is_default_constructible_v<Scalar>, "Scalar members must be default constructable.");
+    static_assert(std::is_default_constructible_v<Scalar>, "Scalar properties must be default constructable.");
 
-    static_assert(Rows > 0 && Cols > 0, "Invalid member extents.");
+    static_assert(Rows > 0 && Cols > 0, "Invalid property extents.");
 
-    /** @brief This member represents a matrix of elements of scalar_t. */
+    /** @brief This property represents a matrix of elements of scalar_t. */
     using scalar_t = Scalar;
 
-    /** @brief The matrix type that this member represents (1x1 matrices are unwrapped to scalars). */
+    /** @brief The matrix type that this property represents (1x1 matrices are unwrapped to scalars). */
     using matrix_t = std::conditional_t<is_1x1, Scalar, Rep<Scalar, Rows, Cols>>;
     /** @brief A reference-like type to a matrix_t. */
     using matrix_ref_t = std::conditional_t<is_1x1, Scalar&, Eigen::Map<matrix_t>>;
@@ -121,7 +121,7 @@ namespace fly::system {
    * @brief The libfly representation of an atom.
    *
    * Libfly uses this type to build atoms to allow integration with libfly's containers.
-   * An Atom behaves as a struct of its members, which are accessed through ``operator[]``.
+   * An Atom behaves as a structure of its properties , which are accessed through ``operator[]``.
    *
    * \rst
    *
@@ -164,7 +164,7 @@ namespace fly::system {
 namespace fly {
 
   /**
-   * @brief An inline namespace providing a selection of canonical members for Atom.
+   * @brief An inline namespace providing a selection of canonical properties  for Atom.
    */
   inline namespace builtin_m {
 

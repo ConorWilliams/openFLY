@@ -58,6 +58,16 @@ namespace fly::system {
 
   public:
     /**
+     * @brief Defaulted copy constructor.
+     */
+    TypeMap(TypeMap const&) = default;
+
+    /**
+     * @brief Defaulted move constructor.
+     */
+    TypeMap(TypeMap&&) = default;
+
+    /**
      * @brief Construct a TypeMap to hold ``num_types`` types.
      *
      * \rst
@@ -72,16 +82,6 @@ namespace fly::system {
      */
     template <typename... T, typename = std::enable_if_t<!detail::same_properties<TypeMap, T...>::value>>
     explicit TypeMap(TypeMap<T...> map) : SOA(static_cast<SoA<Type, T...>&&>(map)) {}
-
-    /**
-     * @brief Construct a new Type Map object
-     */
-    TypeMap(TypeMap const&) = default;
-
-    /**
-     * @brief Construct a new Type Map object
-     */
-    TypeMap(TypeMap&&) = default;
 
     /**
      * @brief Fetch the number of types stored in the TypeMap
@@ -117,7 +117,7 @@ namespace fly::system {
    *
    * @tparam Mems Tags derived from ``MemTag``, to describe each member.
    */
-  template <typename Map = TypeMap<>, typename... Mems>
+  template <typename Map, typename... Mems>
   class Supercell : public SoA<TypeID, Position, Mems...> {
   private:
     using SOA = SoA<TypeID, Position, Mems...>;
@@ -128,10 +128,10 @@ namespace fly::system {
     /**
      * @brief Construct a new Supercell object to store `num_atoms` atoms.
      */
-    explicit Supercell(Box const& box, Map const& map, Eigen::Index num_atoms) : SOA(num_atoms), m_map(map), m_box(box) {}
+    Supercell(Box const& box, Map const& map, Eigen::Index num_atoms) : SOA(num_atoms), m_box(box), m_map(map) {}
 
     /**
-     * @brief Simulation box getter.
+     * @brief Simulation box const-getter.
      */
     Box const& box() const { return m_box; }
 
@@ -141,13 +141,28 @@ namespace fly::system {
     Box& box() { return m_box; }
 
     /**
-     * @brief TypeMap getter, read-only.
+     * @brief TypeMap const-getter.
      */
     Map const& map() const { return m_map; }
+
+    /**
+     * @brief TypeMap getter.
+     */
+    Map& map() { return m_map; }
 
   private:
     Box m_box;
     Map m_map;
   };
+
+  /**
+   * @brief Utility to construct a new Supercell to store `num_atoms` atoms.
+   *
+   * Use partial function template argument deduction to deduce Supercell template parameters.
+   */
+  template <typename... T, typename... U>
+  Supercell<TypeMap<U...>, T...> make_supercell(Box const& box, TypeMap<U...> const& map, Eigen::Index num_atoms) {
+    return {box, map, num_atoms};
+  }
 
 }  // namespace fly::system

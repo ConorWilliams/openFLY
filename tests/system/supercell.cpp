@@ -17,9 +17,10 @@
 #include <catch2/catch_test_macros.hpp>
 
 #include "libfly/system/atom.hpp"
+#include "libfly/system/box.hpp"
 #include "libfly/utility/core.hpp"
 
-TEST_CASE("TypeMap", "[system]") {
+TEST_CASE("TypeMap + Supercell", "[system]") {
   using namespace fly;
 
   system::TypeMap<Mass, Position> map{4};
@@ -30,8 +31,20 @@ TEST_CASE("TypeMap", "[system]") {
 
   map.set(r_, 0, {0, 1, 0});
 
+  //   Slicing
+
   system::TypeMap<Position> pmap(map);
 
   CHECK(pmap.get(tp_, 0) == "Fe");
   CHECK(pmap.get(r_, 0) == Vec{0, 1, 0});
+
+  // Supercell
+
+  system::Box box(Mat::Identity(), {true, false, true});
+
+  auto cell = system::make_supercell(box, map, 10);
+
+  cell[r_] = 9;
+
+  CHECK(cell.map().get(tp_, 0) == "Fe");
 }

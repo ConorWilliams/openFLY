@@ -45,18 +45,18 @@ namespace fly::system {
      * \copydoc OrthoGrid::gen_image
      */
     template <Sign S, typename E>
-    std::optional<Vec<double>> gen_image(Eigen::MatrixBase<E> const& x, int ax) {
+    std::optional<Vec> gen_image(Eigen::MatrixBase<E> const& x, int ax) {
       //
       if constexpr (S == Sign::plus) {
         // Shortest distance point to hyperplane
         auto dx = gdot(x, m_hyper.col(ax));
-        XASSERT(dx > 0, "Sign error: {}", dx);
+        ASSERT(dx > 0, "Sign error: {}", dx);
         if (dx < HyperGrid::r_cut()) {
           return x + m_basis.col(ax);
         }
       } else {
         auto dx = gdot(m_basis.col(ax) - x, m_hyper.col(ax));
-        XASSERT(dx > 0, "Sign error: {}", dx);
+        ASSERT(dx > 0, "Sign error: {}", dx);
         if (dx < HyperGrid::r_cut()) {
           return x - m_basis.col(ax);
         }
@@ -68,15 +68,15 @@ namespace fly::system {
   private:
     friend class Triclinic;
 
-    Mat<double> m_basis = Mat<double>::Zero();
-    Mat<double> m_hyper = Mat<double>::Zero();
+    Mat m_basis = Mat::Zero();
+    Mat m_hyper = Mat::Zero();
 
     // Private constructor
-    TriGrid(Mat<double> const& bs, double r_cut) : HyperGrid(bs.colwise().sum(), r_cut), m_basis(bs) {
+    TriGrid(Mat const& bs, double r_cut) : HyperGrid(bs.colwise().sum(), r_cut), m_basis(bs) {
       // Compute hyperplane normals and hyper plane spacing.
       for (int i = 0; i < spatial_dims; i++) {
         //
-        Mat<double> points = m_basis;
+        Mat points = m_basis;
 
         points.col(i).array() = 0;  // ith hyperplane through all axes EXCEPT ith
 
@@ -112,7 +112,7 @@ namespace fly::system {
      * @param basis Matrix with columns equal to the basis vectors of the parallelotope.
      * @param pd True for each periodic axis.
      */
-    Triclinic(Mat<double> const& basis, Arr<bool> const& pd)
+    Triclinic(Mat const& basis, Arr<bool> const& pd)
         : m_basis{basis.triangularView<Eigen::Upper>()}, m_basis_inv{m_basis.inverse()}, m_periodic{pd} {
       [[maybe_unused]] double eps = 1e-5;
 
@@ -126,15 +126,15 @@ namespace fly::system {
 
       verify((m_basis.diagonal().array() > eps).all(), "Diagonal elements, {}, must be non-zero", m_basis.diagonal().array());
 
-      XASSERT(m_basis.determinant() > eps, "Basis should be invertible but det={}.", m_basis.determinant());
+      ASSERT(m_basis.determinant() > eps, "Basis should be invertible but det={}.", m_basis.determinant());
     }
 
     /**
      * @brief Fetch the basis vectors of this cell.
      *
-     * @return  Mat<double> A matrix with each column corresponding to a basis vector.
+     * @return  Mat A matrix with each column corresponding to a basis vector.
      */
-    Mat<double> basis() const noexcept { return m_basis; }
+    Mat basis() const noexcept { return m_basis; }
 
     /**
      * @brief Query if the ``i``th axis is periodic.
@@ -153,14 +153,14 @@ namespace fly::system {
      * \endrst
      */
     template <typename E>
-    Vec<double> canon_image(Eigen::MatrixBase<E> const& x) const {
+    Vec canon_image(Eigen::MatrixBase<E> const& x) const {
       // Convert to fractional coordinates
-      Vec<double> f = m_basis_inv * x;
+      Vec f = m_basis_inv * x;
 
-      XASSERT((m_periodic || (f.array() >= 0 && f.array() < 1)).all(), "Out of box: {}", x);
+      ASSERT((m_periodic || (f.array() >= 0 && f.array() < 1)).all(), "Out of box: {}", x);
 
       // Do the canonizing in the fractional basis.
-      Vec<double> f_canon = f.array() - f.array().floor();
+      Vec f_canon = f.array() - f.array().floor();
 
       return m_basis * f_canon;  // Transform back to real coordinates
     }
@@ -180,8 +180,8 @@ namespace fly::system {
     TriGrid make_grid(double r_cut) const { return {m_basis, r_cut}; }
 
   private:
-    Mat<double> m_basis = Mat<double>::Zero();
-    Mat<double> m_basis_inv = Mat<double>::Zero();
+    Mat m_basis = Mat::Zero();
+    Mat m_basis_inv = Mat::Zero();
 
     Arr<bool> m_periodic = Arr<bool>::Zero();
   };

@@ -30,9 +30,9 @@ TEST_CASE("Triclinic::canon_image", "[system]") {
   std::uniform_real_distribution<double> dis(0, 1);
 
   // Random numbers on interval 0 to 1
-  auto vrand = [&] { return Vec<double>::NullaryExpr([&]() { return dis(gen); }); };
+  auto vrand = [&] { return Vec::NullaryExpr([&]() { return dis(gen); }); };
 
-  using M = Mat<double>;
+  using M = Mat;
 
   for (std::size_t i = 0; i < 1'000; i++) {
     //
@@ -48,16 +48,16 @@ TEST_CASE("Triclinic::canon_image", "[system]") {
     fly::system::Triclinic box{basis, periodic};
 
     // // Random points inside simbox
-    Vec<double> a = basis * vrand();
-    Vec<double> b = basis * vrand();
+    Vec a = basis * vrand();
+    Vec b = basis * vrand();
 
-    Vec<double> integer_randoms = (10 * vrand()).array().floor();
+    Vec integer_randoms = (10 * vrand()).array().floor();
 
     Eigen::DiagonalMatrix<double, spatial_dims, spatial_dims> diag(integer_randoms);
 
     M offsets = basis * diag;
 
-    Vec<double> b_prime = b;
+    Vec b_prime = b;
 
     for (int j = 0; j < 3; j++) {
       if (periodic[j]) {
@@ -65,7 +65,7 @@ TEST_CASE("Triclinic::canon_image", "[system]") {
       }
     }
 
-    Vec<double> b_undo = box.canon_image(b_prime);
+    Vec b_undo = box.canon_image(b_prime);
 
     // // Check in same position
     REQUIRE(std::abs(gnorm(b_undo - a) - fly::gnorm(a - b)) < 0.001);
@@ -75,20 +75,20 @@ TEST_CASE("Triclinic::canon_image", "[system]") {
 TEST_CASE("TriGrid::gen_image", "[system]") {
   using namespace fly;
 
-  Mat<double> basis = Mat<double>::Constant(10).triangularView<Eigen::Upper>();
+  Mat basis = Mat::Constant(10).triangularView<Eigen::Upper>();
 
   system::Triclinic box{basis, Arr<bool>::Constant(true)};
 
   auto grid = box.make_grid(3);
 
   {
-    std::optional im = grid.gen_image<Sign::plus>(basis * Vec<double>::Constant(0.5), 0);
+    std::optional im = grid.gen_image<Sign::plus>(basis * Vec::Constant(0.5), 0);
 
     REQUIRE(!im);
   }
 
   {
-    Vec<double> origin = basis * Vec<double>::Constant(0.1);
+    Vec origin = basis * Vec::Constant(0.1);
 
     for (int i = 0; i < spatial_dims; i++) {
       REQUIRE(!grid.gen_image<Sign::minus>(origin, i));
@@ -97,14 +97,14 @@ TEST_CASE("TriGrid::gen_image", "[system]") {
 
       REQUIRE(im);
 
-      Vec<double> correct = origin + basis.col(i);
+      Vec correct = origin + basis.col(i);
 
       REQUIRE(gnorm(correct - *im) < 0.001);
     }
   }
 
   {
-    Vec<double> origin = basis * Vec<double>::Constant(0.9);
+    Vec origin = basis * Vec::Constant(0.9);
 
     for (int i = 0; i < spatial_dims; i++) {
       REQUIRE(!grid.gen_image<Sign::plus>(origin, i));
@@ -113,7 +113,7 @@ TEST_CASE("TriGrid::gen_image", "[system]") {
 
       REQUIRE(im);
 
-      Vec<double> correct = origin - basis.col(i);
+      Vec correct = origin - basis.col(i);
 
       REQUIRE(gnorm(correct - *im) < 0.001);
     }

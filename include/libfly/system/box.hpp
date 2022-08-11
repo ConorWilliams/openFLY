@@ -58,9 +58,9 @@
 namespace fly::system {
 
   namespace detail {
-    inline std::variant<Orthorhombic, Triclinic> build_varient(Mat<double> const& ex, Arr<bool> const& pd) {
+    inline std::variant<Orthorhombic, Triclinic> build_varient(Mat const& ex, Arr<bool> const& pd) {
       //
-      Mat<double> skew = ex;
+      Mat skew = ex;
 
       for (int i = 0; i < spatial_dims; i++) {
         skew(i, i) = 0;
@@ -89,7 +89,7 @@ namespace fly::system {
      * @param basis Matrix with columns equal to the basis vectors of the box (parallelotope).
      * @param periodic True for each periodic axis.
      */
-    Box(Mat<double> const& basis, Arr<bool> const& periodic) : m_sys(detail::build_varient(basis, periodic)) {}
+    Box(Mat const& basis, Arr<bool> const& periodic) : m_sys(detail::build_varient(basis, periodic)) {}
 
     /**
      * @brief Construct an empty box zeroing all memory.
@@ -99,8 +99,8 @@ namespace fly::system {
     /**
      * \copydoc Triclinic::basis
      */
-    Mat<double> basis() const {
-      return std::visit([](auto const& m_box) -> Mat<double> { return m_box.basis(); }, m_sys);
+    Mat basis() const {
+      return std::visit([](auto const& m_box) -> Mat { return m_box.basis(); }, m_sys);
     }
 
     /**
@@ -114,8 +114,8 @@ namespace fly::system {
      * \copydoc Triclinic::canon_image
      */
     template <typename E>
-    Vec<double> canon_image(Eigen::MatrixBase<E> const& x) const {
-      return std::visit([&x](auto const& m_box) -> Vec<double> { return m_box.canon_image(x); }, m_sys);
+    Vec canon_image(Eigen::MatrixBase<E> const& x) const {
+      return std::visit([&x](auto const& m_box) -> Vec { return m_box.canon_image(x); }, m_sys);
     }
 
     /**

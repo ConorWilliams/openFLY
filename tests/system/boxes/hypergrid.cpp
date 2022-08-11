@@ -27,9 +27,9 @@ TEST_CASE("HyperGrid::cell_idx", "[system]") {
 
   system::HyperGrid grid{Arr<double>::Constant(10), 3};
 
-  int A = grid.cell_idx(Vec<double>::Constant(0));
-  int B = grid.cell_idx(Vec<double>::Constant(5));
-  int C = grid.cell_idx(Vec<double>::Constant(9.5));
+  int A = grid.cell_idx(Vec::Constant(0));
+  int B = grid.cell_idx(Vec::Constant(5));
+  int C = grid.cell_idx(Vec::Constant(9.5));
 
   if constexpr (spatial_dims == 3) {
     REQUIRE(A == 1 + 1 * 5 + 1 * 5 * 5);

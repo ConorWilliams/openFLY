@@ -69,7 +69,7 @@ namespace fly::system::detail {
      */
     constexpr typename Mem::matrix_ref_t operator()(Mem, Eigen::Index i) {
       //
-      XASSERT(i >= 0 && i < m_data.size() / Mem::size(), "Index {} is !< {}", i, m_data.size() / Mem::size());
+      ASSERT(i >= 0 && i < m_data.size() / Mem::size(), "Index {} is !< {}", i, m_data.size() / Mem::size());
 
       if constexpr (Mem::is_1x1) {
         return m_data[i];
@@ -85,7 +85,7 @@ namespace fly::system::detail {
      */
     constexpr typename Mem::matrix_cref_t operator()(Mem, Eigen::Index i) const {
       //
-      XASSERT(i >= 0 && i < m_data.size() / Mem::size(), "Index {} is !< {}", i, m_data.size() / Mem::size());
+      ASSERT(i >= 0 && i < m_data.size() / Mem::size(), "Index {} is !< {}", i, m_data.size() / Mem::size());
 
       if constexpr (Mem::is_1x1) {
         return m_data[i];
@@ -171,7 +171,7 @@ namespace fly::system::detail {
      */
     constexpr typename Mem::matrix_ref_t operator()(Mem, Eigen::Index i) const {
       //
-      XASSERT(i >= 0 && i < m_data_ptr->size() / Mem::size(), "Index {} is !< {}", i, m_data_ptr->size() / Mem::size());
+      ASSERT(i >= 0 && i < m_data_ptr->size() / Mem::size(), "Index {} is !< {}", i, m_data_ptr->size() / Mem::size());
 
       if constexpr (Mem::is_1x1) {
         return (*m_data_ptr)[i];
@@ -187,7 +187,7 @@ namespace fly::system::detail {
      */
     constexpr typename Mem::array_ref_t operator[](Mem) const {
       //
-      XASSERT(m_data_ptr, "Dereferencing an empty view adaptor.", 0);
+      ASSERT(m_data_ptr, "Dereferencing an empty view adaptor.", 0);
 
       return *m_data_ptr;
     }
@@ -235,7 +235,7 @@ namespace fly::system::detail {
      */
     constexpr typename Mem::matrix_cref_t operator()(Mem, Eigen::Index i) const {
       //
-      XASSERT(i >= 0 && i < m_data_ptr->size() / Mem::size(), "Index {} is !< {}", i, m_data_ptr->size() / Mem::size());
+      ASSERT(i >= 0 && i < m_data_ptr->size() / Mem::size(), "Index {} is !< {}", i, m_data_ptr->size() / Mem::size());
 
       if constexpr (Mem::is_1x1) {
         return (*m_data_ptr)[i];
@@ -250,7 +250,7 @@ namespace fly::system::detail {
      * This is not an owning Adaptor hence, model const-pointer const-semantics.
      */
     constexpr typename Mem::array_cref_t operator[](Mem) const {
-      XASSERT(m_data_ptr, "Dereferencing an empty view adaptor.", 0);
+      ASSERT(m_data_ptr, "Dereferencing an empty view adaptor.", 0);
       return *m_data_ptr;
     }
 

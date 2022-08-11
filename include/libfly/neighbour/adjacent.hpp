@@ -78,7 +78,7 @@ namespace fly::neighbour {
      * ``n``th cell.
      */
     nonstd::span<int const> operator[](std::size_t n) const {
-      XASSERT(n < m_adj_cells.size(), "Invalid cell index {} is bigger than {}", n, m_adj_cells.size());
+      ASSERT(n < m_adj_cells.size(), "Invalid cell index {} is bigger than {}", n, m_adj_cells.size());
       return {m_adj_cells[n].data(), m_adj_cells[n].count};
     }
 

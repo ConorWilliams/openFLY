@@ -50,11 +50,11 @@ namespace fly::system {
      * @tparam S Direction along axis which to generate image.
      * @param x Position of the atom who's image we are computing.
      * @param ax Index of axis along which to generate image.
-     * @return std::optional<Vec<double>> If the atom's image is beyond the cut-off (``r_cut``) for atomic interactions then
+     * @return std::optional<Vec> If the atom's image is beyond the cut-off (``r_cut``) for atomic interactions then
      * the image's position otherwise ``std::nullopt``.
      */
     template <Sign S>
-    std::optional<Vec<double>> gen_image(Vec<double> x, int ax) {
+    std::optional<Vec> gen_image(Vec x, int ax) {
       //
       static_assert(S == Sign::plus || S == Sign::minus, "Unreachable");
 
@@ -130,11 +130,11 @@ namespace fly::system {
      * \endrst
      */
     template <typename E>
-    Vec<double> canon_image(Eigen::MatrixBase<E> const& x) const {
+    Vec canon_image(Eigen::MatrixBase<E> const& x) const {
       // Non-periodic atoms are within the simulation box extents so x[i] * inv_extents less than 1 and x[i]
       // remains unaffected, hence no non-periodic switch/select.
-      XASSERT((m_periodic || (x.array() >= Arr<double>::Zero() && x.array() < m_extents)).all(), "{} is not inside box {}", x,
-              m_extents);
+      ASSERT((m_periodic || (x.array() >= Arr<double>::Zero() && x.array() < m_extents)).all(), "{} is not inside box {}", x,
+             m_extents);
       return x.array() - m_extents * (x.array() * m_inv_extents).floor();
     }
 
@@ -148,8 +148,8 @@ namespace fly::system {
      * @deprecated No triclinic generalization.
      */
     template <typename A, typename B>
-    [[deprecated("No triclinic generalization")]] Vec<double> min_image(Eigen::MatrixBase<A> const& a,
-                                                                        Eigen::MatrixBase<B> const& b) const noexcept {
+    [[deprecated("No triclinic generalization")]] Vec min_image(Eigen::MatrixBase<A> const& a,
+                                                                Eigen::MatrixBase<B> const& b) const noexcept {
       Arr<double> dr = b - a;
       return m_periodic.select(dr - m_extents * (dr * m_inv_extents + 0.5).floor(), dr);
     }

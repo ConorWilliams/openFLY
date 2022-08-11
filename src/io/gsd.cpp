@@ -66,7 +66,7 @@ namespace fly::io {
 
   void FileGSD::dump_span(char const *name, std::uint32_t M, nonstd::span<double const> data) {
     //  This is not a public facing function so we do not throw an error.
-    XASSERT(data.size() % M == 0, "Chunk `{}`, {} not divisible by {}", name, data.size(), M);
+    ASSERT(data.size() % M == 0, "Chunk `{}`, {} not divisible by {}", name, data.size(), M);
 
     write_chunk(m_handle.get(), name, data.size() / M, M, data);
   }
@@ -77,7 +77,7 @@ namespace fly::io {
 
   void FileGSD::dump_span(char const *name, std::uint32_t M, nonstd::span<int const> data) {
     //  This is not a public facing function so we do not throw an error.
-    XASSERT(data.size() % M == 0, "Chunk `{}`, {} not divisible by {}", name, data.size(), M);
+    ASSERT(data.size() % M == 0, "Chunk `{}`, {} not divisible by {}", name, data.size(), M);
 
     write_chunk(m_handle.get(), name, data.size() / M, M, data);
   }
@@ -88,7 +88,7 @@ namespace fly::io {
 
   void FileGSD::dump_span(char const *name, std::uint32_t M, nonstd::span<std::uint32_t const> data) {
     //  This is not a public facing function so we do not throw an error.
-    XASSERT(data.size() % M == 0, "Chunk `{}`, {} not divisible by {}", name, data.size(), M);
+    ASSERT(data.size() % M == 0, "Chunk `{}`, {} not divisible by {}", name, data.size(), M);
 
     write_chunk(m_handle.get(), name, data.size() / M, M, data);
   }
@@ -103,7 +103,7 @@ namespace fly::io {
     //          |L_x    xy L_y   xz L_z|
     // basis =  |0         L_y   yz L_z|
     //          |0         0        L_z|
-    Mat<float> basis = box.basis().cast<float>();
+    Eigen::Matrix<float, 3, 3> basis = box.basis().cast<float>();
 
     // L_x, L_y, L_z , xy, xz, yz
     std::array<float, 6> const hoomd_basis = {
@@ -120,7 +120,7 @@ namespace fly::io {
   void FileGSD::load_impl(std::uint64_t i, system::Box &box) const {
     //
 
-    Mat<float> basis = Mat<float>::Zero();
+    Eigen::Matrix<float, 3, 3> basis = Eigen::Matrix<float, 3, 3>::Zero();
 
     {  // Load the configuration
 

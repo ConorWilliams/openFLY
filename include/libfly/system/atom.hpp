@@ -165,26 +165,153 @@ namespace fly {
 
   /**
    * @brief An inline namespace providing a selection of canonical members for Atom.
-   *
-   *
    */
   inline namespace builtin_m {
+
+    // GSD Schema
+
     /**
-     * @brief Tag type for position (xyz).
+     * @brief Tag type for atom's id.
+     *
+     * Each atom has a type (mixture of atomic number and other discrete factor e.g. shape, frozen, etc.) which is a discrete number
+     * between 0 and N - 1 with N the number of types.
+     */
+    struct TypeId : system::MemTag<std::uint32_t> {
+      static constexpr char const* tag = "particles/typeid";  ///< GSD chunk label.
+    };
+
+    /**
+     * @brief Tag type for atom's image count, i.e. how many times atom has wrapped.
+     *
+     * Not used by libFLY, for consistency with HOOMD schema.
+     */
+    struct Image : system::MemTag<std::int32_t, spatial_dims> {
+      static constexpr char const* tag = "particles/image";  ///< GSD chunk label.
+    };
+
+    /**
+     * @brief Tag type for atom's mass.
+     */
+    struct Mass : system::MemTag<double> {
+      static constexpr char const* tag = "particles/mass";  ///< GSD chunk label.
+    };
+
+    /**
+     * @brief Tag type for atom's charge.
+     */
+    struct Charge : system::MemTag<double> {
+      static constexpr char const* tag = "particles/charge";  ///< GSD chunk label.
+    };
+
+    /**
+     * @brief Tag type for atom's effective diameter.
+     */
+    struct Diameter : system::MemTag<double> {
+      static constexpr char const* tag = "particles/diameter";  ///< GSD chunk label.
+    };
+
+    /**
+     * @brief Tag type for atom's moment of inertia in an atoms body frame.
+     */
+    struct MomentInertia : system::MemTag<double> {
+      static constexpr char const* tag = "particles/moment_inertia";  ///< GSD chunk label.
+    };
+
+    /**
+     * @brief Tag type for atom's position in real space.
      */
     struct Position : system::MemTag<double, spatial_dims> {
       static constexpr char const* tag = "particles/position";  ///< GSD chunk label.
     };
 
     /**
+     * @brief Tag type for atom's velocity in real space.
+     */
+    struct Velocity : system::MemTag<double, spatial_dims> {
+      static constexpr char const* tag = "particles/velocity";  ///< GSD chunk label.
+    };
+
+    // Custom
+
+    /**
+     * @brief Tag type for atom's index i.e. position in some array.
+     */
+    struct Index : system::MemTag<std::uint32_t> {
+      static constexpr char const* tag = "log/particles/index";  ///< GSD chunk label.
+    };
+
+    /**
+     * @brief Tag type for atom's status as a frozen atom.
+     *
+     * Note this cannot be written to a GSD file as it a boolean.
+     */
+    struct Frozen : system::MemTag<bool> {};
+
+    /**
+     * @brief Tag type for atom's contribution to a dimer axis.
+     */
+    struct Axis : system::MemTag<double, spatial_dims> {
+      static constexpr char const* tag = "log/particles/axis";  ///< GSD chunk label.
+    };
+
+    /**
+     * @brief Tag type for atom's potential gradient acting on an atom.
+     */
+    struct PotentialGradient : system::MemTag<double, spatial_dims> {
+      static constexpr char const* tag = "log/particles/potential_gradient";  ///< GSD chunk label.
+    };
+
+    /**
+     * @brief Tag type for atom's acceleration.
+     */
+    struct Acceleration : system::MemTag<double, spatial_dims> {
+      static constexpr char const* tag = "log/particles/acceleration";  ///< GSD chunk label.
+    };
+
+    /**
+     * @brief TypeId literal.
+     */
+    inline constexpr TypeId id_;
+    /**
+     * @brief Image literal.
+     */
+    inline constexpr Image img_;
+    /**
+     * @brief Mass literal.
+     */
+    inline constexpr Mass m_;
+    /**
+     * @brief Charge literal.
+     */
+    inline constexpr Charge q_;
+
+    /**
+     * @brief Diameter literal.
+     */
+    inline constexpr Diameter d_;
+    /**
+     * @brief MomentInertia literal.
+     */
+    inline constexpr MomentInertia I_;
+    /**
      * @brief Position literal.
      */
     inline constexpr Position r_;
 
     /**
-     * @brief Tag type for dimer axis (xyz).
+     * @brief Velocity literal.
      */
-    struct Axis : system::MemTag<double, spatial_dims> {};
+    inline constexpr Velocity v_;
+
+    /**
+     * @brief Index literal.
+     */
+    inline constexpr Index i_;
+
+    /**
+     * @brief Frozen literal.
+     */
+    inline constexpr Frozen fzn_;
 
     /**
      * @brief Axis literal.
@@ -192,142 +319,14 @@ namespace fly {
     inline constexpr Axis ax_;
 
     /**
-     * @brief Tag type for gradient of the potential.
+     * @brief PotentialGradient literal.
      */
-    struct Gradient : system::MemTag<double, spatial_dims> {};
+    inline constexpr PotentialGradient g_;
 
     /**
-     * @brief Gradient literal.
+     * @brief Acceleration literal.
      */
-    inline constexpr Gradient grad_;
-
-    /**
-     * @brief Tag type for velocity.
-     */
-    struct Velocity : system::MemTag<double, spatial_dims> {};
-
-    /**
-     * @brief Velocity literal.
-     */
-    inline constexpr Gradient v_;
-
-    /**
-     * @brief Tag type for atomic number.
-     */
-    struct AtomicNum : system::MemTag<int> {};
-
-    /**
-     * @brief AtomicNum literal.
-     */
-    inline constexpr AtomicNum z_;
-
-    /**
-     * @brief Tag type for atomic mass.
-     */
-    struct Mass : system::MemTag<int> {};
-
-    /**
-     * @brief Mass literal.
-     */
-    inline constexpr Mass mass_;
-
-    /**
-     * @brief Tag type for index.
-     */
-    struct Index : system::MemTag<int> {};
-
-    /**
-     * @brief Index literal.
-     */
-    inline constexpr Index ix_;
-
-    /**
-     * @brief Tag type for atomic symbol.
-     */
-    struct Symbol : system::MemTag<std::string_view> {};
-
-    /**
-     * @brief Symbol literal.
-     */
-    inline constexpr Symbol sy_;
-
-    /**
-     * @brief Tag type for frozen atoms.
-     */
-    struct Frozen : system::MemTag<bool> {};
-
-    /**
-     * @brief Frozen literal.
-     */
-    inline constexpr Frozen fz_;
-
-    /**
-     * @brief Tag type for atom colour (generalisation of atomic number)
-     */
-    struct Colour : system::MemTag<int> {};
-
-    /**
-     * @brief Colour literal.
-     */
-    inline constexpr Colour c_;
-
-    // /////////////
-
-    namespace anon::detail::anon {
-
-      // GSD Schema
-
-      struct TypeId : system::MemTag<std::uint32_t> {
-        static constexpr char const* tag = "particles/typeid";  ///< GSD chunk label.
-      };
-
-      struct Image : system::MemTag<std::int32_t, spatial_dims> {
-        static constexpr char const* tag = "particles/image";  ///< GSD chunk label.
-      };
-
-      struct Mass : system::MemTag<double> {
-        static constexpr char const* tag = "particles/mass";  ///< GSD chunk label.
-      };
-      struct Charge : system::MemTag<double> {
-        static constexpr char const* tag = "particles/charge";  ///< GSD chunk label.
-      };
-      struct Diameter : system::MemTag<double> {
-        static constexpr char const* tag = "particles/diameter";  ///< GSD chunk label.
-      };
-      struct MomentInertia : system::MemTag<double> {
-        static constexpr char const* tag = "particles/moment_inertia";  ///< GSD chunk label.
-      };
-
-      struct Position : system::MemTag<double, spatial_dims> {
-        static constexpr char const* tag = "particles/position";  ///< GSD chunk label.
-      };
-      struct Velocity : system::MemTag<double, spatial_dims> {
-        static constexpr char const* tag = "particles/velocity";  ///< GSD chunk label.
-      };
-
-      // Custom
-
-      struct Colour : system::MemTag<std::uint32_t> {
-        static constexpr char const* tag = "log/particles/colour";  ///< GSD chunk label.
-      };
-      struct Index : system::MemTag<std::uint32_t> {
-        static constexpr char const* tag = "log/particles/index";  ///< GSD chunk label.
-      };
-      struct Frozen : system::MemTag<std::uint32_t> {
-        static constexpr char const* tag = "log/particles/frozen";  ///< GSD chunk label.
-      };
-
-      struct Axis : system::MemTag<double, spatial_dims> {
-        static constexpr char const* tag = "log/particles/axis";  ///< GSD chunk label.
-      };
-      struct PotentialGradient : system::MemTag<double, spatial_dims> {
-        static constexpr char const* tag = "log/particles/potential_gradient";  ///< GSD chunk label.
-      };
-      struct Acceleration : system::MemTag<double, spatial_dims> {
-        static constexpr char const* tag = "log/particles/acceleration";  ///< GSD chunk label.
-      };
-
-    }  // namespace anon::detail::anon
+    inline constexpr Acceleration a_;
 
   }  // namespace builtin_m
 

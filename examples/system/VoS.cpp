@@ -1,11 +1,11 @@
 
 #include "libfly/system/VoS.hpp"
 
-#include "libfly/system/atom.hpp"  //< MemTag, atom
+#include "libfly/system/atom.hpp"  //< Property, atom
 
 void example_VoS() {
   // Define a property to represent position that is a vector of 3 doubles.
-  struct xyz : fly::system::MemTag<double, 3> {};
+  struct xyz : fly::system::Property<double, 3> {};
 
   fly::system::VoS<xyz> atoms;  // Empty VoS
 

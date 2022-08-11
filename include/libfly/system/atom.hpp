@@ -46,7 +46,7 @@ namespace fly::system {
    * @tparam Rep The Eigen3 template, Eigen::[matrix||array], to use for this property
    */
   template <typename Scalar, int Rows = 1, int Cols = 1, template <typename, auto...> typename Rep = Eigen::Matrix>
-  struct MemTag {
+  struct Property {
     /** @brief True if this property represents a 1x1 matrix. */
     static constexpr bool is_1x1 = Rows == 1 && Cols == 1;
 
@@ -132,7 +132,7 @@ namespace fly::system {
    *
    * \endrst
    *
-   * @tparam T a series of empty types, derived from ``MemTag``, to describe each member.
+   * @tparam T a series of empty types, derived from ``Property``, to describe each member.
    */
   template <typename... T>
   struct Atom : detail::AtomMem<T>... {
@@ -175,7 +175,7 @@ namespace fly {
      *
      * Types are abstract labels assigned to atoms, if two atoms have the same type they are completely interchangeable in every way.
      */
-    struct Type : system::MemTag<std::string> {
+    struct Type : system::Property<std::string> {
       static constexpr char const* tag = "particles/types";  ///< GSD chunk label.
     };
 
@@ -185,7 +185,7 @@ namespace fly {
      * Each atom has a Type, an atoms TypeID is a number between 0 and N - 1 with N the number of types in the simulation. A TypeMap
      * object performs the transformation from TypeId -> Type.
      */
-    struct TypeID : system::MemTag<std::uint32_t> {
+    struct TypeID : system::Property<std::uint32_t> {
       static constexpr char const* tag = "particles/typeid";  ///< GSD chunk label.
     };
 
@@ -194,49 +194,49 @@ namespace fly {
      *
      * Not used by libFLY, for consistency with HOOMD schema.
      */
-    struct Image : system::MemTag<std::int32_t, spatial_dims> {
+    struct Image : system::Property<std::int32_t, spatial_dims> {
       static constexpr char const* tag = "particles/image";  ///< GSD chunk label.
     };
 
     /**
      * @brief Tag type for atom's mass.
      */
-    struct Mass : system::MemTag<double> {
+    struct Mass : system::Property<double> {
       static constexpr char const* tag = "particles/mass";  ///< GSD chunk label.
     };
 
     /**
      * @brief Tag type for atom's charge.
      */
-    struct Charge : system::MemTag<double> {
+    struct Charge : system::Property<double> {
       static constexpr char const* tag = "particles/charge";  ///< GSD chunk label.
     };
 
     /**
      * @brief Tag type for atom's effective diameter.
      */
-    struct Diameter : system::MemTag<double> {
+    struct Diameter : system::Property<double> {
       static constexpr char const* tag = "particles/diameter";  ///< GSD chunk label.
     };
 
     /**
      * @brief Tag type for atom's moment of inertia in an atoms body frame.
      */
-    struct MomentInertia : system::MemTag<double> {
+    struct MomentInertia : system::Property<double> {
       static constexpr char const* tag = "particles/moment_inertia";  ///< GSD chunk label.
     };
 
     /**
      * @brief Tag type for atom's position in real space.
      */
-    struct Position : system::MemTag<double, spatial_dims> {
+    struct Position : system::Property<double, spatial_dims> {
       static constexpr char const* tag = "particles/position";  ///< GSD chunk label.
     };
 
     /**
      * @brief Tag type for atom's velocity in real space.
      */
-    struct Velocity : system::MemTag<double, spatial_dims> {
+    struct Velocity : system::Property<double, spatial_dims> {
       static constexpr char const* tag = "particles/velocity";  ///< GSD chunk label.
     };
 
@@ -245,7 +245,7 @@ namespace fly {
     /**
      * @brief Tag type for atom's index i.e. position in some array.
      */
-    struct Index : system::MemTag<std::uint32_t> {
+    struct Index : system::Property<std::uint32_t> {
       static constexpr char const* tag = "log/particles/index";  ///< GSD chunk label.
     };
 
@@ -254,26 +254,26 @@ namespace fly {
      *
      * Note this cannot be written to a GSD file as it a boolean.
      */
-    struct Frozen : system::MemTag<bool> {};
+    struct Frozen : system::Property<bool> {};
 
     /**
      * @brief Tag type for atom's contribution to a dimer axis.
      */
-    struct Axis : system::MemTag<double, spatial_dims> {
+    struct Axis : system::Property<double, spatial_dims> {
       static constexpr char const* tag = "log/particles/axis";  ///< GSD chunk label.
     };
 
     /**
      * @brief Tag type for atom's potential gradient acting on an atom.
      */
-    struct PotentialGradient : system::MemTag<double, spatial_dims> {
+    struct PotentialGradient : system::Property<double, spatial_dims> {
       static constexpr char const* tag = "log/particles/potential_gradient";  ///< GSD chunk label.
     };
 
     /**
      * @brief Tag type for atom's acceleration.
      */
-    struct Acceleration : system::MemTag<double, spatial_dims> {
+    struct Acceleration : system::Property<double, spatial_dims> {
       static constexpr char const* tag = "log/particles/acceleration";  ///< GSD chunk label.
     };
 

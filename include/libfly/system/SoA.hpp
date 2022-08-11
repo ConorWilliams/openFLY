@@ -52,7 +52,7 @@ namespace fly::system {
    * The default container type used in the libfly; an ``SoA`` models an array of ``Atom`` types
    * but decomposes the atom type and stores each property in a separate array. This enables efficient
    * cache use. Like ``Atom``, the properties  of the "atom" are described through a series of template parameters
-   * which should inherit from ``MemTag``. The properties  of each atom can be accessed by the index of the
+   * which should inherit from ``Property``. The properties  of each atom can be accessed by the index of the
    * atom or as an ``Eigen::Array`` to enable collective operations.
    *
    * SoA also supports slicing and reference properties  which transform that property into a view, this enables SoA to act as a
@@ -67,7 +67,7 @@ namespace fly::system {
    *
    * \endrst
    *
-   * @tparam Ms a series of empty types, derived from ``MemTag``, to describe each member.
+   * @tparam Ms a series of empty types, derived from ``Property``, to describe each member.
    */
   template <typename... Ms>
   class SoA : private detail::Adaptor<Ms>... {

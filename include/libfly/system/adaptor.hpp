@@ -27,7 +27,7 @@
 
 namespace fly::system::detail {
 
-  template <typename Mem>
+  template <typename T>
   struct Adaptor {
   public:
     Adaptor() = default;
@@ -37,13 +37,13 @@ namespace fly::system::detail {
     Adaptor(Adaptor const&) = default;
 
     // If constructing from a const view then deference their pointer. Pass views by value.
-    explicit Adaptor(Adaptor<Mem const&> other) : m_data(*other.m_data_ptr) {}
+    explicit Adaptor(Adaptor<T const&> other) : m_data(*other.m_data_ptr) {}
 
     // If constructing from a view then deference their pointer. Pass views by value.
-    explicit Adaptor(Adaptor<Mem&> other) : m_data(*other.m_data_ptr) {}
+    explicit Adaptor(Adaptor<T&> other) : m_data(*other.m_data_ptr) {}
 
     // OwnsAll specific.
-    explicit Adaptor(Eigen::Index size) : m_data(size * Mem::size()) {
+    explicit Adaptor(Eigen::Index size) : m_data(size * T::size()) {
       //
       verify(size > 0, "Invalid size {}", size);
     }
@@ -52,67 +52,67 @@ namespace fly::system::detail {
 
     Adaptor& operator=(Adaptor&&) = default;
 
-    Adaptor& operator=(Adaptor<Mem const&> other) {
+    Adaptor& operator=(Adaptor<T const&> other) {
       m_data = *other.m_data_ptr;
       return *this;
     }
 
-    Adaptor& operator=(Adaptor<Mem&> other) {
+    Adaptor& operator=(Adaptor<T&> other) {
       m_data = *other.m_data_ptr;
       return *this;
     }
 
     /**
-     * @brief Fetch a view of the ``i``th property stored in the array, tagged dispatch on ``Mem``.
+     * @brief Fetch a view of the ``i``th property stored in the array, tagged dispatch on ``T``.
      *
      * This is an owning Adaptor hence, model value const-semantics.
      */
-    constexpr typename Mem::matrix_ref_t operator()(Mem, Eigen::Index i) {
+    constexpr typename T::matrix_ref_t operator()(T, Eigen::Index i) {
       //
-      ASSERT(i >= 0 && i < m_data.size() / Mem::size(), "Index {} is !< {}", i, m_data.size() / Mem::size());
+      ASSERT(i >= 0 && i < m_data.size() / T::size(), "Index {} is !< {}", i, m_data.size() / T::size());
 
-      if constexpr (Mem::is_1x1) {
+      if constexpr (T::is_1x1) {
         return m_data[i];
       } else {
-        return typename Mem::matrix_ref_t{m_data.data() + i * Mem::size()};
+        return typename T::matrix_ref_t{m_data.data() + i * T::size()};
       }
     }
 
     /**
-     * @brief Fetch a view of the ``i``th property stored in the array, tagged dispatch on Mem.
+     * @brief Fetch a view of the ``i``th property stored in the array, tagged dispatch on T.
      *
      * This is an owning Adaptor hence, model value const-semantics
      */
-    constexpr typename Mem::matrix_cref_t operator()(Mem, Eigen::Index i) const {
+    constexpr typename T::matrix_cref_t operator()(T, Eigen::Index i) const {
       //
-      ASSERT(i >= 0 && i < m_data.size() / Mem::size(), "Index {} is !< {}", i, m_data.size() / Mem::size());
+      ASSERT(i >= 0 && i < m_data.size() / T::size(), "Index {} is !< {}", i, m_data.size() / T::size());
 
-      if constexpr (Mem::is_1x1) {
+      if constexpr (T::is_1x1) {
         return m_data[i];
       } else {
-        return typename Mem::matrix_cref_t{m_data.data() + i * Mem::size()};
+        return typename T::matrix_cref_t{m_data.data() + i * T::size()};
       }
     }
 
     /**
-     * @brief Fetch a view of the array, tagged dispatch on Mem.
+     * @brief Fetch a view of the array, tagged dispatch on T.
      *
      * This is an owning Adaptor hence, model value const-semantics
      */
-    constexpr typename Mem::array_ref_t operator[](Mem) noexcept { return m_data; }
+    constexpr typename T::array_ref_t operator[](T) noexcept { return m_data; }
 
     /**
-     * @brief Fetch a view of the array, tagged dispatch on Mem.
+     * @brief Fetch a view of the array, tagged dispatch on T.
      *
      * This is an owning Adaptor hence, model value const-semantics
      */
-    constexpr typename Mem::array_cref_t operator[](Mem) const noexcept { return m_data; }
+    constexpr typename T::array_cref_t operator[](T) const noexcept { return m_data; }
 
   private:
-    typename Mem::array_t m_data;  ///< Owns its own array.
+    typename T::array_t m_data;  ///< Owns its own array.
 
-    friend struct Adaptor<Mem&>;
-    friend struct Adaptor<Mem const&>;
+    friend struct Adaptor<T&>;
+    friend struct Adaptor<T const&>;
 
     /**
      * Possibilities
@@ -136,8 +136,8 @@ namespace fly::system::detail {
      */
   };
 
-  template <typename Mem>
-  struct Adaptor<Mem&> {
+  template <typename T>
+  struct Adaptor<T&> {
   public:
     Adaptor() = default;
 
@@ -146,46 +146,46 @@ namespace fly::system::detail {
     Adaptor(Adaptor const&) = default;
 
     // If constructing from am owning Adaptor then take address of their m_data property, no explicit for construction of a view.
-    Adaptor(Adaptor<Mem>& other) : m_data_ptr(&other.m_data) {}
+    Adaptor(Adaptor<T>& other) : m_data_ptr(&other.m_data) {}
 
     // Cannot construct from a const view.
-    Adaptor(Adaptor<Mem const&> other) = delete;
+    Adaptor(Adaptor<T const&> other) = delete;
 
     Adaptor& operator=(Adaptor const&) = default;
 
     Adaptor& operator=(Adaptor&&) = default;
 
     // Cannot assign to a const view
-    Adaptor& operator=(Adaptor<Mem const&> other) = delete;
+    Adaptor& operator=(Adaptor<T const&> other) = delete;
 
     // Can only assign to a reference to an owning view
-    Adaptor& operator=(Adaptor<Mem>& other) {
+    Adaptor& operator=(Adaptor<T>& other) {
       m_data_ptr = &other.m_data;
       return *this;
     }
 
     /**
-     * @brief Fetch a view of the ``i``th property stored in the array, tagged dispatch on Mem.
+     * @brief Fetch a view of the ``i``th property stored in the array, tagged dispatch on T.
      *
      * This is not an owning Adaptor hence, model pointer const-semantics.
      */
-    constexpr typename Mem::matrix_ref_t operator()(Mem, Eigen::Index i) const {
+    constexpr typename T::matrix_ref_t operator()(T, Eigen::Index i) const {
       //
-      ASSERT(i >= 0 && i < m_data_ptr->size() / Mem::size(), "Index {} is !< {}", i, m_data_ptr->size() / Mem::size());
+      ASSERT(i >= 0 && i < m_data_ptr->size() / T::size(), "Index {} is !< {}", i, m_data_ptr->size() / T::size());
 
-      if constexpr (Mem::is_1x1) {
+      if constexpr (T::is_1x1) {
         return (*m_data_ptr)[i];
       } else {
-        return typename Mem::matrix_ref_t{m_data_ptr->m_data() + i * Mem::size()};
+        return typename T::matrix_ref_t{m_data_ptr->m_data() + i * T::size()};
       }
     }
 
     /**
-     * @brief Fetch a view of the array, tagged dispatch on Mem.
+     * @brief Fetch a view of the array, tagged dispatch on T.
      *
      * This is not an owning Adaptor hence, model pointer const-semantics.
      */
-    constexpr typename Mem::array_ref_t operator[](Mem) const {
+    constexpr typename T::array_ref_t operator[](T) const {
       //
       ASSERT(m_data_ptr, "Dereferencing an empty view adaptor.", 0);
 
@@ -193,14 +193,14 @@ namespace fly::system::detail {
     }
 
   private:
-    Eigen::ArrayBase<typename Mem::array_t>* m_data_ptr = nullptr;  ///< Pointer to the viewed array.
+    Eigen::ArrayBase<typename T::array_t>* m_data_ptr = nullptr;  ///< Pointer to the viewed array.
 
-    friend struct Adaptor<Mem>;
-    friend struct Adaptor<Mem const&>;
+    friend struct Adaptor<T>;
+    friend struct Adaptor<T const&>;
   };
 
-  template <typename Mem>
-  struct Adaptor<Mem const&> {
+  template <typename T>
+  struct Adaptor<T const&> {
   public:
     Adaptor() = default;
 
@@ -209,66 +209,66 @@ namespace fly::system::detail {
     Adaptor(Adaptor const&) = default;
 
     // If constructing from a non const view then just copy the pointer, no explicit for construction of a view.
-    Adaptor(Adaptor<Mem&> other) : m_data_ptr(other.m_data_ptr) {}
+    Adaptor(Adaptor<T&> other) : m_data_ptr(other.m_data_ptr) {}
 
     // If constructing from am owning Adaptor then take address of their m_data property, no explicit for construction of a view.
-    Adaptor(Adaptor<Mem> const& other) : m_data_ptr(&other.m_data) {}
+    Adaptor(Adaptor<T> const& other) : m_data_ptr(&other.m_data) {}
 
     Adaptor& operator=(Adaptor const&) = default;
 
     Adaptor& operator=(Adaptor&&) = default;
 
-    Adaptor& operator=(Adaptor<Mem&> other) {
+    Adaptor& operator=(Adaptor<T&> other) {
       m_data_ptr = other.m_data_ptr;
       return *this;
     }
     // Can only assign to a reference to an owning view
-    Adaptor& operator=(Adaptor<Mem> const& other) {
+    Adaptor& operator=(Adaptor<T> const& other) {
       m_data_ptr = &other.m_data;
       return *this;
     }
 
     /**
-     * @brief Fetch a view of the ``i``th property stored in the array, tagged dispatch on Mem.
+     * @brief Fetch a view of the ``i``th property stored in the array, tagged dispatch on T.
      *
      * This is not an owning Adaptor hence, model const-pointer const-semantics.
      */
-    constexpr typename Mem::matrix_cref_t operator()(Mem, Eigen::Index i) const {
+    constexpr typename T::matrix_cref_t operator()(T, Eigen::Index i) const {
       //
-      ASSERT(i >= 0 && i < m_data_ptr->size() / Mem::size(), "Index {} is !< {}", i, m_data_ptr->size() / Mem::size());
+      ASSERT(i >= 0 && i < m_data_ptr->size() / T::size(), "Index {} is !< {}", i, m_data_ptr->size() / T::size());
 
-      if constexpr (Mem::is_1x1) {
+      if constexpr (T::is_1x1) {
         return (*m_data_ptr)[i];
       } else {
-        return typename Mem::matrix_cref_t{m_data_ptr->m_data() + i * Mem::size()};
+        return typename T::matrix_cref_t{m_data_ptr->m_data() + i * T::size()};
       }
     }
 
     /**
-     * @brief Fetch a view of the array, tagged dispatch on Mem.
+     * @brief Fetch a view of the array, tagged dispatch on T.
      *
      * This is not an owning Adaptor hence, model const-pointer const-semantics.
      */
-    constexpr typename Mem::array_cref_t operator[](Mem) const {
+    constexpr typename T::array_cref_t operator[](T) const {
       ASSERT(m_data_ptr, "Dereferencing an empty view adaptor.", 0);
       return *m_data_ptr;
     }
 
   private:
-    Eigen::ArrayBase<typename Mem::array_t> const* m_data_ptr = nullptr;  ///< Pointer to the viewed array.
+    Eigen::ArrayBase<typename T::array_t> const* m_data_ptr = nullptr;  ///< Pointer to the viewed array.
 
-    friend struct Adaptor<Mem>;
-    friend struct Adaptor<Mem&>;
+    friend struct Adaptor<T>;
+    friend struct Adaptor<T&>;
   };
 
-  template <typename Mem>
-  struct Adaptor<Mem&&> {
-    static_assert(always_false<Mem>, "Rvalue reference to property is illegal.");
+  template <typename T>
+  struct Adaptor<T&&> {
+    static_assert(always_false<T>, "Rvalue reference to property is illegal.");
   };
 
-  template <typename Mem>
-  struct Adaptor<Mem const&&> {
-    static_assert(always_false<Mem>, "Rvalue reference to property is illegal.");
+  template <typename T>
+  struct Adaptor<T const&&> {
+    static_assert(always_false<T>, "Rvalue reference to property is illegal.");
   };
 
 }  // namespace fly::system::detail

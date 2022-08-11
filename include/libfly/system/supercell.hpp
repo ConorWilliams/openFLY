@@ -47,7 +47,7 @@ namespace fly::system {
    *
    * This is used for properties that are the same for many atoms e.g. atomic numbers.
    *
-   * @tparam T Tags derived from ``MemTag``, to describe each property.
+   * @tparam T Tags derived from ``Property``, to describe each property.
    */
   template <typename... T>
   class TypeMap : private SoA<Type, T...> {
@@ -115,7 +115,7 @@ namespace fly::system {
    * system **has a** ``Box`` and a ``TypeMap``. A Supercell always has the ``TypeID`` property for each atom and accepts the rest as
    * template arguments.
    *
-   * @tparam T Tags derived from ``MemTag``, to describe each member.
+   * @tparam T Tags derived from ``Property``, to describe each member.
    */
   template <typename Map, typename... T>
   class Supercell : public SoA<TypeID, T...> {

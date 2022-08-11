@@ -1,16 +1,16 @@
 
 #include "libfly/system/SoA.hpp"
 
-#include "libfly/system/atom.hpp"  //< MemTag
+#include "libfly/system/atom.hpp"  //< Property
 
 // Define a property to represent spin that is a scalar of type bool.
-struct spin : fly::system::MemTag<bool> {};
+struct spin : fly::system::Property<bool> {};
 
 // Define a property to represent position that is a vector of 3 doubles.
-struct xyz : fly::system::MemTag<double, 3> {};
+struct xyz : fly::system::Property<double, 3> {};
 
 // Define a property to represent the inertia tensor that is a 3x3 matrix of doubles.
-struct I : fly::system::MemTag<double, 3, 3> {};
+struct I : fly::system::Property<double, 3, 3> {};
 
 // Use reference property -> pass by value.
 void zero_xyz(fly::system::SoA<xyz &> view_xyz) {

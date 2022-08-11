@@ -35,7 +35,7 @@ namespace fly::system {
    * @brief A container that models a std::vector of atoms.
    *
    * The properties  of the "atom" are described through a series of template parameters which should
-   * inherit from ``MemTag``
+   * inherit from ``Property``
    *
    * \rst
    *
@@ -49,7 +49,7 @@ namespace fly::system {
    *
    * \endrst
    *
-   * @tparam T a series of empty types, derived from ``MemTag``, to describe each member.
+   * @tparam T a series of empty types, derived from ``Property``, to describe each member.
    */
   template <typename... T>
   class VoS : private std::vector<Atom<T...>> {

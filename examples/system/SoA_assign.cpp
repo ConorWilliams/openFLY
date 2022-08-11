@@ -1,10 +1,10 @@
 
 #include "libfly/system/SoA.hpp"
-#include "libfly/system/atom.hpp"  //< MemTag
+#include "libfly/system/atom.hpp"  //< Property
 
 void SoA_assign() {
   // Define a property to represent position that is a vector of 3 doubles.
-  struct xyz : fly::system::MemTag<double, 3> {};
+  struct xyz : fly::system::Property<double, 3> {};
 
   fly::system::SoA<xyz> a(10);
   fly::system::SoA<xyz> b(10);

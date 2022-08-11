@@ -171,12 +171,21 @@ namespace fly {
     // GSD Schema
 
     /**
+     * @brief Tag type for atom's type.
+     *
+     * Types are abstract labels assigned to atoms, if two atoms have the same type they are completely interchangeable in every way.
+     */
+    struct Type : system::MemTag<std::string> {
+      static constexpr char const* tag = "particles/types";  ///< GSD chunk label.
+    };
+
+    /**
      * @brief Tag type for atom's id.
      *
-     * Each atom has a type (mixture of atomic number and other discrete factor e.g. shape, frozen, etc.) which is a discrete number
-     * between 0 and N - 1 with N the number of types.
+     * Each atom has a Type, an atoms TypeID is a number between 0 and N - 1 with N the number of types in the simulation. A TypeMap
+     * object performs the transformation from TypeId -> Type.
      */
-    struct TypeId : system::MemTag<std::uint32_t> {
+    struct TypeID : system::MemTag<std::uint32_t> {
       static constexpr char const* tag = "particles/typeid";  ///< GSD chunk label.
     };
 
@@ -269,17 +278,25 @@ namespace fly {
     };
 
     /**
-     * @brief TypeId literal.
+     * @brief Type literal.
      */
-    inline constexpr TypeId id_;
+    inline constexpr Type tp_;
+
+    /**
+     * @brief TypeID literal.
+     */
+    inline constexpr TypeID id_;
+
     /**
      * @brief Image literal.
      */
     inline constexpr Image img_;
+
     /**
      * @brief Mass literal.
      */
     inline constexpr Mass m_;
+
     /**
      * @brief Charge literal.
      */

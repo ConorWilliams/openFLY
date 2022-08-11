@@ -57,8 +57,8 @@ Built-in members
 .. doxygennamespace:: fly::builtin_m
   
 
-Generic data structures for Atoms
------------------------------------
+Array-like data structures
+----------------------------------------
 
 The building block of many of the types in libFLY.
 
@@ -85,5 +85,27 @@ File: ``libfly/system/VoS.hpp``
 .. doxygenclass:: fly::system::VoS
     :members:
     :undoc-members:
+
+
+Supercells
+---------------------------
+
+File: ``libfly/system/supercell.hpp``
+
+.. doxygenfile:: libfly/system/supercell.hpp
+    :sections: briefdescription detaileddescription
+
+.. doxygenclass:: fly::system::Supercell
+    :members:
+    :undoc-members:
+
+Mapping type IDs to properties
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. doxygenclass:: fly::system::TypeMap
+    :members:
+    :undoc-members:
+
+
 
 

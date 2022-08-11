@@ -43,10 +43,10 @@ Atom class
     :undoc-members:
 
 
-MemTag
-~~~~~~
+Properties
+~~~~~~~~~~~~
 
-.. doxygenstruct:: fly::system::MemTag
+.. doxygenstruct:: fly::system::Property
     :members:
     :undoc-members:
 

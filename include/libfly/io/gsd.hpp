@@ -113,9 +113,35 @@ namespace fly::io {
     void write(system::Box const &box);
 
     /**
-     * @brief Read a Box stored at frame ``i`` and write it to ``out``;
+     * @brief Read a Box stored at frame ``i`` and write it to ``out``.
      */
     void read(std::uint64_t i, system::Box &out) const;
+
+    /**
+     * @brief Write a tagged property to the current frame.
+     *
+     * @tparam T Property tag of property to write.
+     */
+    template <typename T, typename... U>
+    void write(T, system::SoA<U...> const &in) {
+      dump_span(T::tag, T::size(),
+                nonstd::span<typename T::scalar_t const>{
+                    in[T{}].derived().data(),
+                    safe_cast<std::size_t>(in.size()) * T::size(),
+                });
+    }
+
+    /**
+     * @brief Read a tagged Property from the ``i``th frame and write it to ``out``.
+     */
+    template <typename T, typename... U>
+    void read(std::uint64_t i, T, system::SoA<U...> &out) {
+      load_span(i, T::tag, T::size(),
+                nonstd::span<typename T::scalar_t>{
+                    out[T{}].derived().data(),
+                    safe_cast<std::size_t>(out.size()) * T::size(),
+                });
+    }
 
     // ////////////////////////////////////////////////////////////
 

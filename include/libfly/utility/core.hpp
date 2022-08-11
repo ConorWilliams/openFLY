@@ -260,7 +260,7 @@ namespace fly {
    * @tparam R Target type to cast to.
    */
   template <typename R, typename T, typename = std::enable_if_t<std::is_integral_v<R> && std::is_integral_v<T>>>
-  R safe_cast(T x) {
+  constexpr R safe_cast(T x) {
     //
     static_assert(std::numeric_limits<unsigned int>::min() == 0);
 
@@ -366,7 +366,7 @@ namespace fly {
    * \endrst
    */
   template <typename E1, typename E2>
-  auto gdot(E1 const& a, E2 const& b) {
+  constexpr auto gdot(E1 const& a, E2 const& b) {
     return (a.array() * b.array()).sum();
   }
 
@@ -384,7 +384,7 @@ namespace fly {
    * \endrst
    */
   template <typename E>
-  auto gnorm_sq(E const& r) {
+  constexpr auto gnorm_sq(E const& r) {
     return (r.array() * r.array()).sum();
   }
 
@@ -402,7 +402,7 @@ namespace fly {
    * \endrst
    */
   template <typename E>
-  auto gnorm(E&& expr) {
+  constexpr auto gnorm(E&& expr) {
     return std::sqrt(gnorm_sq(std::forward<E>(expr)));
   }
 
@@ -464,7 +464,7 @@ namespace fly {
      *
      * @param f Invocable forwarded into object and invoked by destructor.
      */
-    Defer(F&& f) : m_f(std::forward<F>(f)) {}
+    constexpr Defer(F&& f) : m_f(std::forward<F>(f)) {}
 
     Defer(const Defer&) = delete;
     Defer(Defer&& other) = delete;

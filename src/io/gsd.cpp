@@ -64,33 +64,6 @@ namespace fly::io {
 
   //   ////////////////////////////////////////////////////////////////////////////////////////////////
 
-#define dump_load(TYPE_NAME)                                                                              \
-  void FileGSD::dump_span(char const *name, std::uint32_t M, nonstd::span<TYPE_NAME const> data) {        \
-    ASSERT(data.size() % M == 0, "Chunk `{}`, {} not divisible by {}", name, data.size(), M);             \
-    write_chunk(m_handle.get(), name, data.size() / M, M, data);                                          \
-  }                                                                                                       \
-                                                                                                          \
-  void FileGSD::load_span(std::uint64_t i, char const *name, int M, nonstd::span<TYPE_NAME> data) const { \
-    read_chunk(i, m_handle.get(), name, -1, M, data);                                                     \
-  }
-
-  dump_load(std::uint8_t);
-  dump_load(std::uint16_t);
-  dump_load(std::uint32_t);
-  dump_load(std::uint64_t);
-
-  dump_load(std::int8_t);
-  dump_load(std::int16_t);
-  dump_load(std::int32_t);
-  dump_load(std::int64_t);
-
-  dump_load(float);
-  dump_load(double);
-
-#undef dump_load
-
-  //   ////////////////////////////////////////////////////////////////////////////////////////////////
-
   void FileGSD::write(system::Box const &box) {
     //          |L_x    xy L_y   xz L_z|
     // basis =  |0         L_y   yz L_z|
@@ -144,5 +117,32 @@ namespace fly::io {
 
     box = system::Box(basis.cast<double>(), periodicity);
   }
+
+  //   ////////////////////////////////////////////////////////////////////////////////////////////////
+
+#define dump_load(TYPE_NAME)                                                                              \
+  void FileGSD::dump_span(char const *name, std::uint32_t M, nonstd::span<TYPE_NAME const> data) {        \
+    ASSERT(data.size() % M == 0, "Chunk `{}`, {} not divisible by {}", name, data.size(), M);             \
+    write_chunk(m_handle.get(), name, data.size() / M, M, data);                                          \
+  }                                                                                                       \
+                                                                                                          \
+  void FileGSD::load_span(std::uint64_t i, char const *name, int M, nonstd::span<TYPE_NAME> data) const { \
+    read_chunk(i, m_handle.get(), name, -1, M, data);                                                     \
+  }
+
+  dump_load(std::uint8_t);
+  dump_load(std::uint16_t);
+  dump_load(std::uint32_t);
+  dump_load(std::uint64_t);
+
+  dump_load(std::int8_t);
+  dump_load(std::int16_t);
+  dump_load(std::int32_t);
+  dump_load(std::int64_t);
+
+  dump_load(float);
+  dump_load(double);
+
+#undef dump_load
 
 }  // namespace fly::io

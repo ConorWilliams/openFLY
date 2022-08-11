@@ -49,14 +49,14 @@ namespace fly::system {
    *
    * \endrst
    *
-   * @tparam Mems a series of empty types, derived from ``MemTag``, to describe each member.
+   * @tparam T a series of empty types, derived from ``MemTag``, to describe each member.
    */
-  template <typename... Mems>
-  class VoS : private std::vector<Atom<Mems...>> {
+  template <typename... T>
+  class VoS : private std::vector<Atom<T...>> {
   private:
-    static_assert(sizeof...(Mems) > 0, "Need at least one property in an VoS");
+    static_assert(sizeof...(T) > 0, "Need at least one property in an VoS");
 
-    using Vector = std::vector<Atom<Mems...>>;
+    using Vector = std::vector<Atom<T...>>;
 
   public:
     // Expose subset of underlying vector API
@@ -87,12 +87,12 @@ namespace fly::system {
     /**
      * @brief Provides an emplace_back with explicit ``matrix_t`` parameters.
      */
-    decltype(auto) emplace_back(typename Mems::matrix_t const &...args) { return Vector::emplace_back(args...); }
+    decltype(auto) emplace_back(typename T::matrix_t const &...args) { return Vector::emplace_back(args...); }
 
     /**
      * @brief Provides an emplace_back with explicit ``matrix_t`` parameters.
      */
-    decltype(auto) emplace_back(typename Mems::matrix_t &&...args) { return Vector::emplace_back(std::move(args)...); }
+    decltype(auto) emplace_back(typename T::matrix_t &&...args) { return Vector::emplace_back(std::move(args)...); }
   };
 
 }  // namespace fly::system

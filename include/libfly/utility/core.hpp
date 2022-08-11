@@ -191,8 +191,8 @@ namespace fly {
   /**
    * @brief Extracts the first type from a parameter pack.
    */
-  template <typename... Ts>
-  using first_t = typename detail::First<Ts...>::type;
+  template <typename... T>
+  using first_t = typename detail::First<T...>::type;
 
   /**
    * @brief Non-deducable \c false for use in \c static_assert.

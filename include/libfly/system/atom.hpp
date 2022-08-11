@@ -132,10 +132,10 @@ namespace fly::system {
    *
    * \endrst
    *
-   * @tparam Mems a series of empty types, derived from ``MemTag``, to describe each member.
+   * @tparam T a series of empty types, derived from ``MemTag``, to describe each member.
    */
-  template <typename... Mems>
-  struct Atom : detail::AtomMem<Mems>... {
+  template <typename... T>
+  struct Atom : detail::AtomMem<T>... {
     /**
      * @brief Copy construct a new Atom object
      */
@@ -149,14 +149,14 @@ namespace fly::system {
     /**
      * @brief Construct a new Atom object, initializing each member.
      */
-    explicit Atom(typename Mems::matrix_t const&... args) : detail::AtomMem<Mems>(args)... {}
+    explicit Atom(typename T::matrix_t const&... args) : detail::AtomMem<T>(args)... {}
 
     /**
      * @brief Construct a new Atom object, initializing each member.
      */
-    explicit Atom(typename Mems::matrix_t&&... args) : detail::AtomMem<Mems>(args)... {}
+    explicit Atom(typename T::matrix_t&&... args) : detail::AtomMem<T>(args)... {}
 
-    using detail::AtomMem<Mems>::operator[]...;
+    using detail::AtomMem<T>::operator[]...;
   };
 
 }  // namespace fly::system

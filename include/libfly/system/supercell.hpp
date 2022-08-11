@@ -47,12 +47,12 @@ namespace fly::system {
    *
    * This is used for properties that are the same for many atoms e.g. atomic numbers.
    *
-   * @tparam Mems Tags derived from ``MemTag``, to describe each property.
+   * @tparam T Tags derived from ``MemTag``, to describe each property.
    */
-  template <typename... Mems>
-  class TypeMap : private SoA<Type, Mems...> {
+  template <typename... T>
+  class TypeMap : private SoA<Type, T...> {
   private:
-    using SOA = SoA<Type, Mems...>;
+    using SOA = SoA<Type, T...>;
 
     static_assert(SOA::owns_all, "TypeMap must own all its data,");
 
@@ -80,8 +80,8 @@ namespace fly::system {
     /**
      * @brief Construct a new TypeMap by slicing a different kind of TypeMap.
      */
-    template <typename... T, typename = std::enable_if_t<!detail::same_properties<TypeMap, T...>::value>>
-    explicit TypeMap(TypeMap<T...> map) : SOA(static_cast<SoA<Type, T...>>(std::move(map))) {}
+    template <typename... U, typename = std::enable_if_t<!detail::same_properties<TypeMap, U...>::value>>
+    explicit TypeMap(TypeMap<U...> map) : SOA(static_cast<SoA<Type, U...>>(std::move(map))) {}
 
     /**
      * @brief Fetch the number of types stored in the TypeMap
@@ -91,17 +91,17 @@ namespace fly::system {
     /**
      * @brief Get a property corresponding to the id ``id``.
      */
-    template <typename T>
-    decltype(auto) get(T, std::uint32_t id) const {
-      return SOA::operator()(T{}, safe_cast<Eigen::Index>(id));
+    template <typename U>
+    decltype(auto) get(U, std::uint32_t id) const {
+      return SOA::operator()(U{}, safe_cast<Eigen::Index>(id));
     }
 
     /**
      * @brief Set a property corresponding to the id ``id``.
      */
-    template <typename T, typename U = typename remove_cref_t<T>::matrix_t>
-    void set(T, std::uint32_t id, U&& value) {
-      SOA::operator()(T{}, safe_cast<Eigen::Index>(id)) = std::forward<U>(value);
+    template <typename U, typename V = typename remove_cref_t<U>::matrix_t>
+    void set(U, std::uint32_t id, V&& value) {
+      SOA::operator()(U{}, safe_cast<Eigen::Index>(id)) = std::forward<V>(value);
     }
 
   private:
@@ -115,12 +115,12 @@ namespace fly::system {
    * system **has a** ``Box`` and a ``TypeMap``. A Supercell always has the ``TypeID`` property for each atom and accepts the rest as
    * template arguments.
    *
-   * @tparam Mems Tags derived from ``MemTag``, to describe each member.
+   * @tparam T Tags derived from ``MemTag``, to describe each member.
    */
-  template <typename Map, typename... Mems>
-  class Supercell : public SoA<TypeID, Mems...> {
+  template <typename Map, typename... T>
+  class Supercell : public SoA<TypeID, T...> {
   private:
-    using SOA = SoA<TypeID, Mems...>;
+    using SOA = SoA<TypeID, T...>;
 
     static_assert(SOA::owns_all, "Supercells must own all their data");
 

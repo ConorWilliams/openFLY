@@ -125,19 +125,6 @@ namespace fly::io {
     std::string m_fname;
     std::unique_ptr<gsd_handle> m_handle;
 
-    // template <typename... T>
-    // void dump_impl(system::SoA<T...> const &soa) {
-    //   //  ¯\_(ツ)_/¯
-    //   (static_cast<void>(dump_span(remove_cref_t<T>::tag, remove_cref_t<T>::size(),
-    //                                nonstd::span<typename remove_cref_t<T>::scalar_t const>{
-    //                                    soa[remove_cref_t<T>{}].derived().data(),
-    //                                    safe_cast<std::size_t>(soa.size()) * remove_cref_t<T>::size(),
-    //                                })),
-    //    ...);
-
-    //   dump_span("particles/N", 1, std::array{safe_cast<std::uint32_t>(soa.size())});
-    // }
-
     // ///////////////////////////////////////////
 
     void end_frame();

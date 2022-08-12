@@ -8,6 +8,7 @@
 #include "libfly/system/atom.hpp"
 #include "libfly/system/box.hpp"
 #include "libfly/system/boxes/orthorhombic.hpp"
+#include "libfly/system/property.hpp"
 #include "libfly/utility/core.hpp"
 
 int main() {

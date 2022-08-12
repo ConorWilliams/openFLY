@@ -16,7 +16,6 @@
 
 #include <variant>
 
-#include "libfly/system/atom.hpp"
 #include "libfly/system/boxes/orthorhombic.hpp"
 #include "libfly/system/boxes/triclinic.hpp"
 #include "libfly/utility/core.hpp"
@@ -30,7 +29,7 @@
  *
  * Atoms in libFLY exist within a simulation space (or box) and this space is often periodic. Periodic boxes must tessellate in
  * N-dimensional space hence, libFLY's boxes are parallelotopes. The parallelotopes is described by a series of *basis* vectors. These
- * are assembled into a matrix of the form:
+ * are assembled into an upper-triangular matrix of the form:
  *
  * .. math::
  *
@@ -41,10 +40,10 @@
  *     \vdots &  & & \ddots
  *     \end{bmatrix}
  *
- * with each column corresponding to a basis vector and all non-zero entries positive and all diagonal elements non-zero. This
+ * with each column corresponding to a basis vector, all non-zero entries positive and all diagonal elements non-zero. This
  * constrains some of the rotational degrees of freedom of the parallelotope and ensures the existence of an inverse.
  *
- * The *canonical* cell/box/simulation-space is the volume of space inside the parallelotope with edges formed from these basis
+ * The *canonical* cell/box/simulation-space is the volume of space inside the parallelotope with edges formed from the basis
  * vectors rooted at the origin. Along periodic axes atoms are allowed to have projected coordinates outside the canonical cell
  * however, along non-periodic axes atoms must be inside the canonical cell.
  *
@@ -75,9 +74,9 @@ namespace fly::system {
   }  // namespace detail
 
   /**
-   * @brief Generalised orthogonal simulation box.
+   * @brief Generalised simulation box.
    *
-   * Essentially a ``std::variant`` of all supported crystal systems.
+   * Essentially a ``std::variant`` of all supported crystal-systems /boxes.
    */
   class Box {
   public:
@@ -92,7 +91,7 @@ namespace fly::system {
     Box(Mat const& basis, Arr<bool> const& periodic) : m_sys(detail::build_varient(basis, periodic)) {}
 
     /**
-     * @brief Construct an empty box zeroing all memory.
+     * @brief Construct an empty (Orthorhombic) box zeroing all memory.
      */
     Box() : m_sys(Orthorhombic(Arr<double>::Ones(), Arr<bool>::Constant(false))){};
 

@@ -24,8 +24,6 @@
 
 /**
  * \file SoA.hpp
- *
- * @brief Structure of Arrays implementation.
  */
 
 namespace fly::system {

@@ -17,7 +17,6 @@
 #include <Eigen/Core>
 #include <optional>
 
-#include "libfly/system/atom.hpp"
 #include "libfly/utility/core.hpp"
 
 /**

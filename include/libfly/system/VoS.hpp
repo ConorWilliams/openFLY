@@ -21,12 +21,11 @@
 #include <vector>
 
 #include "libfly/system/atom.hpp"
+#include "libfly/system/property.hpp"
 #include "libfly/utility/core.hpp"
 
 /**
  * \file VoS.hpp
- *
- * @brief Array of Structures implementation.
  */
 
 namespace fly::system {

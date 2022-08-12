@@ -18,7 +18,6 @@
 #include <cmath>
 #include <optional>
 
-#include "libfly/system/atom.hpp"
 #include "libfly/system/boxes/hypergrid.hpp"
 #include "libfly/utility/core.hpp"
 

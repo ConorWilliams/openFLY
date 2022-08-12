@@ -24,33 +24,39 @@ TEST_CASE("FileGSD", "[io]") {
   //
   using namespace fly;
 
+    system::Box box(Mat::Identity(), Arr<bool>::Constant(true));
+
+    system::TypeMap<Index> map(2);
+
+    map.set(0, "Fe", 6);
+    map.set(1, "H", 1);
+
+    system::Supercell cell = system::make_supercell<Position>(box, map, 4);
+
+    cell(r_, 0) = Vec{0, 0, 0};
+
+    cell(r_, 1) = Vec{1, 0, 0};
+    cell(r_, 2) = Vec{0, 1, 0};
+    cell(r_, 3) = Vec{0, 0, 1};
+
+    cell(id_, 0) = 0;
+
+    cell(id_, 1) = 1;
+    cell(id_, 2) = 1;
+    cell(id_, 3) = 1;
+
+
   {  // Write
 
-    // io::FileGSD file("FileGSD_test.gsd", io::create);
+    io::FileGSD file("FileGSD_test.gsd", io::create);
 
-    // system::Box box(Mat::Identity(), Arr<bool>::Constant(true));
+    file.commit([&] {
+      file.write(cell.box());
+      file.write(cell.map());
 
-    // system::TypeMap<Index> map(2);
-
-    // map.set(0, "Fe", 6);
-    // map.set(1, "H", 1);
-
-    // CHECK(map.get(0, tp_) == "Fe");
-    // // CHECK(map.get(0, d_) == 6);
-
-    // CHECK(map.get(1, tp_) == "H");
-    // // CHECK(map.get(1, d_) == 1);
-
-    // system::SoA<Position> atom(4);
-
-    // atom(r_, 0) = Vec{0, 0, 0};
-    // atom(r_, 1) = Vec{1, 0, 0};
-    // atom(r_, 2) = Vec{0, 1, 0};
-    // atom(r_, 3) = Vec{0, 0, 1};
-
-    // file.commit([&] {
-    //   file.write(box);
-    //   file.write() file.write(r_, atom);
-    // });
+      file.write(id_, cell);
+      file.write(r_, cell);
+    });
+    
   }
 }

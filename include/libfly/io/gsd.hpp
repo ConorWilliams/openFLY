@@ -114,12 +114,7 @@ namespace fly::io {
      */
     auto write(system::Box const &box) -> void;
 
-    /**
-     * @brief Read a Box stored at frame ``i`` and write it to ``out``.
-     */
-    auto read(std::uint64_t i, system::Box &out) const -> void;
-
-    /**
+        /**
      * @brief Write a tagged property to the current frame.
      */
     template <typename T, typename... U>
@@ -130,6 +125,28 @@ namespace fly::io {
                     safe_cast<std::size_t>(in.size()) * T::size(),
                 });
     }
+
+
+    /**
+     * @brief Write a TypeMap to the current frame.
+     */
+    template <typename... U>
+    auto write(system::TypeMap<U...> const &map) -> void {
+      (write(U{}, static_cast<typename system::TypeMap<U...>::SOA const &>(map)), ...);
+    }
+
+
+
+
+
+
+
+    /**
+     * @brief Read a Box stored at frame ``i`` and write it to ``out``.
+     */
+    auto read(std::uint64_t i, system::Box &out) const -> void;
+
+
 
     /**
      * @brief Read a tagged Property from the ``i``th frame and write it to ``out``.
@@ -143,18 +160,11 @@ namespace fly::io {
                 });
     }
 
-    /**
-     * @brief Write a TypeMap to the current frame.
-     */
-    template <typename T, typename... U>
-    auto write(system::TypeMap<U...> const &map) -> void {
-      (write(U{}, static_cast<typename system::TypeMap<U...>::SOA const &>(map)), ...);
-    }
 
     /**
      * @brief  Read a tagged Property from the ``i``th frame and write it to a TypeMap.
      */
-    template <typename T, typename... U>
+    template <typename... U>
     auto read(std::uint64_t i, system::TypeMap<U...> &map) -> void {
       (read(i, U{}, static_cast<typename system::TypeMap<U...>::SOA &>(map)), ...);
     }

@@ -21,9 +21,15 @@
 #include "libfly/system/SoA.hpp"
 #include "libfly/system/property.hpp"
 #include "libfly/utility/core.hpp"
+
 /**
  * \file typemap.hpp
  */
+
+namespace fly::io
+{
+    class FileGSD; // Forward declaration for friendship.
+}
 
 namespace fly::system {
 
@@ -187,7 +193,7 @@ namespace fly::system {
     friend class TypeMap;
 
     // Friend for IO.
-    friend class FileGSD;
+    friend class ::fly::io::FileGSD;
   };
 
 }  // namespace fly::system

@@ -35,4 +35,8 @@ TEST_CASE("TypeMap", "[system]") {
 
   map.set(1, tp_, "Woooop");
   CHECK(map.get(1, tp_) == "Woooop");
+
+  map.set(0, "Fe", 2u);
+  CHECK(map.get(0, tp_) == "Fe");
+  CHECK(map.get(0, i_) == 2u);
 }

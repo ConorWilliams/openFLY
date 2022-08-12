@@ -15,6 +15,7 @@
 // You should have received a copy of the GNU General Public License along with openFLY. If not, see <https://www.gnu.org/licenses/>.
 
 #include <cstddef>
+#include <string_view>
 #include <type_traits>
 
 #include "libfly/system/SoA.hpp"
@@ -44,6 +45,11 @@ namespace fly::system {
    *
    * This is used for properties that are the same for many atoms e.g. atomic numbers, by default each TypeID must always have a Type
    * property.
+   *
+   * \rst
+   * .. note::
+   *    TypeMap has special handling for getting and setting ``Type``'s ``Type::matrix_t`` to string-like types for QoL.
+   * \endrst
    *
    * @tparam T Tags derived from ``Property``, to describe each property.
    */
@@ -84,26 +90,105 @@ namespace fly::system {
     /**
      * @brief Fetch the number of types stored in the TypeMap
      */
-    Eigen::Index num_types() const { return SOA::size(); }
+    auto num_types() const -> Eigen::Index { return SOA::size(); }
 
     /**
-     * @brief Get a property corresponding to the id ``id``.
+     * @brief Get a property form the map.
+     *
+     * @param id The TypeID of the type who's property you are getting.
+     * @param tag Tag to disambiguate property you would like.
      */
     template <typename U>
-    decltype(auto) get(U, std::uint32_t id) const {
+    auto get(std::uint32_t id, [[maybe_unused]] U tag) const -> decltype(auto) {
       return SOA::operator()(U{}, safe_cast<Eigen::Index>(id));
     }
 
     /**
-     * @brief Set a property corresponding to the id ``id``.
+     * @brief Overload of get() for ``Type`` that returns a string_view of the type name.
+     *
+     * \rst
+     *
+     * .. tip::
+     *    With ``truncate = true`` this overload has some runtime-cost to count the char's in the array.
+     *
+     *    If you would like to call the template overload to get a mapped Eigen::Array use explicit template syntax:
+     *
+     *    .. code:: cpp
+     *
+     *       TypeMap map(1);
+     *
+     *       // set the Type //
+     *
+     *       map.get<Type>(0, tp_)
+     *
+     * \endrst
+     *
+     * @param truncate If ``true`` truncate the returned string_view to the non-null portion.
+     * @param id The typeID of the type who's property you are getting.
      */
-    template <typename U, typename V = typename remove_cref_t<U>::matrix_t>
-    void set(U, std::uint32_t id, V&& value) {
+    auto get(std::uint32_t id, Type, bool truncate = true) const -> std::string_view {
+      if (truncate) {
+        return {SOA::operator()(Type{}, safe_cast<Eigen::Index>(id)).data()};
+      } else {
+        return {SOA::operator()(Type{}, safe_cast<Eigen::Index>(id)).data(), Type::size()};
+      }
+    }
+
+    /**
+     * @brief Set a property in the map.
+     *
+     * @param id The TypeID of the type who's property you are getting.
+     * @param tag Tag to disambiguate property you would like.
+     * @param value Value to write into the map.
+     */
+    template <typename U, typename V = typename U::matrix_t>
+    auto set(std::uint32_t id, [[maybe_unused]] U tag, V&& value)
+        -> std::enable_if_t<std::is_assignable_v<typename U::matrix_t&, V&&>> {
       SOA::operator()(U{}, safe_cast<Eigen::Index>(id)) = std::forward<V>(value);
     }
 
+    /**
+     * @brief Overload of set() for Type that accepts string_views.
+     *
+     * @param id The TypeID of the type who's property you are getting.
+     * @param tag Tag to disambiguate property you would like.
+     * @param value Value to write into the map.
+     */
+    auto set(std::uint32_t id, [[maybe_unused]] Type tag, std::string_view value) -> void {
+      //
+      if (!::fly::detail::cmp_less(value.size(), Type::size())) {
+        throw error("Type name length {} but must be < {}", value.size(), Type::size());
+      }
+
+      char* buf = (*this)(Type{}, safe_cast<Eigen::Index>(id)).data();
+
+      for (auto&& elem : value) {
+        *(buf++) = elem;
+      }
+
+      *buf = '\0';
+    }
+
+    /**
+     * @brief  Set all the properties of a typeID
+     *
+     * @param id The TypeID of the type who's property you are getting.
+     * @param type The value of the Type to write into the map.
+     * @param args The rest of values to write into the map.
+     */
+    template <typename U>
+    auto set(std::uint32_t id, U&& type, typename T::matrix_t const&... args) -> void {
+      (set(id, Type{}, std::forward<U>(type)));
+      (set(id, T{}, args), ...);
+    }
+
   private:
-    /* clang-format off */ template <typename...>  friend class TypeMap; /* clang-format on */
+    // Friend for converting constructor.
+    template <typename...>
+    friend class TypeMap;
+
+    // Friend for IO.
+    friend class FileGSD;
   };
 
 }  // namespace fly::system

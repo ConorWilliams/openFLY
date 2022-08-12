@@ -251,7 +251,7 @@ namespace fly {
   }  // namespace detail
 
   /**
-   * @brief Bounds checked integer cast in debug builds.
+   * @brief Cast integral types asserting that conversion is lossless.
    *
    * Perform a `static_cast` from type `T` to `R` with bounds checking in debug builds.
    *

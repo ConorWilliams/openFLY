@@ -239,7 +239,7 @@
 <p>Classes for describing the simulation space. </p>
 <p><p><p>Atoms in libFLY exist within a simulation space (or box) and this space is often periodic. Periodic boxes must tessellate in
 N-dimensional space hence, libFLY’s boxes are parallelotopes. The parallelotopes is described by a series of <em>basis</em> vectors. These
-are assembled into a matrix of the form:</p>
+are assembled into an upper-triangular matrix of the form:</p>
 <div class="math-wrapper docutils container">
 <div class="math notranslate nohighlight">
 \[\begin{split}\begin{bmatrix}
@@ -249,9 +249,9 @@ a_1 &amp; b_1 &amp; c_1 &amp; \cdots\\
 \vdots &amp;  &amp; &amp; \ddots
 \end{bmatrix}\end{split}\]</div>
 </div>
-<p>with each column corresponding to a basis vector and all non-zero entries positive and all diagonal elements non-zero. This
+<p>with each column corresponding to a basis vector, all non-zero entries positive and all diagonal elements non-zero. This
 constrains some of the rotational degrees of freedom of the parallelotope and ensures the existence of an inverse.</p>
-<p>The <em>canonical</em> cell/box/simulation-space is the volume of space inside the parallelotope with edges formed from these basis
+<p>The <em>canonical</em> cell/box/simulation-space is the volume of space inside the parallelotope with edges formed from the basis
 vectors rooted at the origin. Along periodic axes atoms are allowed to have projected coordinates outside the canonical cell
 however, along non-periodic axes atoms must be inside the canonical cell.</p>
 <p>LibFLY resolved periodicity using <em>ghost atoms</em>, these are the periodic images of <em>real atom</em>. To do this efficiently the canonical
@@ -259,30 +259,13 @@ box is split into a <em>grid</em> of smaller parallelotopes. These <em>grid cell
 distance.</p>
 </p>
  </p>
-<p>In theory libFLY could detect the most efficient crystal-system for any basis set and produce optimal code. Unfortunately, this is a lot of work hence, libFLY uses a smaller set - suitable for the majority of cases. If you would like to read more about these specialised boxes see:</p>
-<div class="toctree-wrapper compound">
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="crystal_systems.html">Crystal systems</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="crystal_systems.html#orthorhombic">Orthorhombic</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="crystal_systems.html#grid">Grid</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="crystal_systems.html#triclinic">Triclinic</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="crystal_systems.html#id2">Grid</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="crystal_systems.html#hypergrid">Hypergrid</a></li>
-</ul>
-</div>
 <section id="generalised-box">
 <h3>Generalised box<a class="headerlink" href="#generalised-box" title="Permalink to this heading">#</a></h3>
 <dl class="cpp class">
 <dt class="sig sig-object cpp" id="_CPPv4N3fly6system3BoxE">
 <span id="_CPPv3N3fly6system3BoxE"></span><span id="_CPPv2N3fly6system3BoxE"></span><span id="fly::system::Box"></span><span class="target" id="classfly_1_1system_1_1Box"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Box</span></span></span><a class="headerlink" href="#_CPPv4N3fly6system3BoxE" title="Permalink to this definition">#</a><br /></dt>
-<dd><p>Generalised orthogonal simulation box. </p>
-<p>Essentially a <code class="docutils literal notranslate"><span class="pre">std::variant</span></code> of all supported crystal systems. </p>
+<dd><p>Generalised simulation box. </p>
+<p>Essentially a <code class="docutils literal notranslate"><span class="pre">std::variant</span></code> of all supported crystal-systems /boxes. </p>
 <div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
 <dl class="cpp function">
@@ -303,7 +286,7 @@ distance.</p>
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4N3fly6system3Box3BoxEv">
 <span id="_CPPv3N3fly6system3Box3BoxEv"></span><span id="_CPPv2N3fly6system3Box3BoxEv"></span><span id="fly::system::Box::Box"></span><span class="target" id="classfly_1_1system_1_1Box_1a6081887d9cbeb030f973285907875a6e"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Box</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3fly6system3Box3BoxEv" title="Permalink to this definition">#</a><br /></dt>
-<dd><p>Construct an empty box zeroing all memory. </p>
+<dd><p>Construct an empty (<a class="reference internal" href="crystal_systems.html#classfly_1_1system_1_1Orthorhombic"><span class="std std-ref">Orthorhombic</span></a>) box zeroing all memory. </p>
 </dd></dl>
 
 <dl class="cpp function">
@@ -366,97 +349,46 @@ distance.</p>
 </dd></dl>
 
 </section>
+<section id="specialised-boxes">
+<h3>Specialised boxes<a class="headerlink" href="#specialised-boxes" title="Permalink to this heading">#</a></h3>
+<p>In theory libFLY could detect the most efficient crystal-system for any basis-set and produce optimal code. Unfortunately, this is a lot of work hence, libFLY uses a smaller set - suitable for the majority of cases. If you would like to read more about these specialised boxes see:</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="crystal_systems.html">Crystal systems</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="crystal_systems.html#orthorhombic">Orthorhombic</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="crystal_systems.html#grid">Grid</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="crystal_systems.html#triclinic">Triclinic</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="crystal_systems.html#id2">Grid</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="crystal_systems.html#hypergrid">Hypergrid</a></li>
+</ul>
+</div>
 </section>
-<section id="atoms">
-<h2>Atoms<a class="headerlink" href="#atoms" title="Permalink to this heading">#</a></h2>
-<p>File: <code class="docutils literal notranslate"><span class="pre">libfly/system/atom.hpp</span></code></p>
-<p>The basic building block for atoms in libFLY. </p>
-<section id="atom-class">
-<h3>Atom class<a class="headerlink" href="#atom-class" title="Permalink to this heading">#</a></h3>
-<dl class="cpp struct">
-<dt class="sig sig-object cpp" id="_CPPv4IDpEN3fly6system4AtomE">
-<span id="_CPPv3IDpEN3fly6system4AtomE"></span><span id="_CPPv2IDpEN3fly6system4AtomE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="structfly_1_1system_1_1Atom"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Atom</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><span class="n"><span class="pre">fly</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">system</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">detail</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">AtomMem</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4IDpEN3fly6system4AtomE" title="fly::system::Atom::T"><span class="n"><span class="pre">T</span></span></a><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4IDpEN3fly6system4AtomE" title="Permalink to this definition">#</a><br /></dt>
-<dd><p>The libfly representation of an atom. </p>
-<p>Libfly uses this type to build atoms to allow integration with libfly’s containers. An <a class="reference internal" href="#structfly_1_1system_1_1Atom"><span class="std std-ref">Atom</span></a> behaves as a structure of its properties , which are accessed through <code class="docutils literal notranslate"><span class="pre">operator[]</span></code>.</p>
-<p><p>Example:</p>
-<div class="code highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;libfly/system/atom.hpp&quot;</span><span class="cp"></span>
-
-<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;Eigen/src/Core/Matrix.h&gt;</span><span class="cp"></span>
-
-<span class="kt">void</span><span class="w"> </span><span class="nf">example_atom</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-<span class="w">  </span><span class="c1">// Define a property to represent spin that is a scalar of type bool.</span>
-<span class="w">  </span><span class="k">struct</span><span class="w"> </span><span class="nc">spin</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">fly</span><span class="o">::</span><span class="n">system</span><span class="o">::</span><span class="n">Property</span><span class="o">&lt;</span><span class="kt">bool</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{};</span><span class="w"></span>
-
-<span class="w">  </span><span class="c1">// Define a property to represent position that is a vector of 3 doubles.</span>
-<span class="w">  </span><span class="k">struct</span><span class="w"> </span><span class="nc">xyz</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">fly</span><span class="o">::</span><span class="n">system</span><span class="o">::</span><span class="n">Property</span><span class="o">&lt;</span><span class="kt">double</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{};</span><span class="w"></span>
-
-<span class="w">  </span><span class="c1">// Define a property to represent the inertia tensor that is a 3x3 matrix of doubles.</span>
-<span class="w">  </span><span class="k">struct</span><span class="w"> </span><span class="nc">I</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">fly</span><span class="o">::</span><span class="n">system</span><span class="o">::</span><span class="n">Property</span><span class="o">&lt;</span><span class="kt">double</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{};</span><span class="w"></span>
-
-<span class="w">  </span><span class="c1">// Create an atom</span>
-<span class="w">  </span><span class="n">fly</span><span class="o">::</span><span class="n">system</span><span class="o">::</span><span class="n">Atom</span><span class="o">&lt;</span><span class="n">spin</span><span class="p">,</span><span class="w"> </span><span class="n">xyz</span><span class="p">,</span><span class="w"> </span><span class="n">I</span><span class="o">&gt;</span><span class="w"> </span><span class="n">atom</span><span class="p">{</span><span class="w"></span>
-<span class="w">      </span><span class="nb">true</span><span class="p">,</span><span class="w"></span>
-<span class="w">      </span><span class="p">{</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">},</span><span class="w"></span>
-<span class="w">      </span><span class="n">I</span><span class="o">::</span><span class="n">matrix_t</span><span class="o">::</span><span class="n">Zero</span><span class="p">(),</span><span class="w">  </span><span class="c1">// I::matrix_t is Eigen::Matrix&lt;double, 3, 3&gt;</span>
-<span class="w">  </span><span class="p">};</span><span class="w"></span>
-
-<span class="w">  </span><span class="c1">//   Access and set the spin property</span>
-<span class="w">  </span><span class="n">atom</span><span class="p">[</span><span class="n">spin</span><span class="p">{}]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">false</span><span class="p">;</span><span class="w"></span>
-<span class="p">}</span><span class="w"></span>
-</pre></div>
-</div>
-</p>
-<dl class="field-list simple">
-<dt class="field-odd">Template Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>T</strong> – a series of empty types, derived from <code class="docutils literal notranslate"><a class="reference internal" href="#structfly_1_1system_1_1Property"><span class="std std-ref"><span class="pre">Property</span></span></a></code>, to describe each member. </p>
-</dd>
-</dl>
-<div class="breathe-sectiondef docutils container">
-<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4N3fly6system4Atom4AtomERR4Atom">
-<span id="_CPPv3N3fly6system4Atom4AtomERR4Atom"></span><span id="_CPPv2N3fly6system4Atom4AtomERR4Atom"></span><span id="fly::system::Atom::Atom__AtomRR"></span><span class="target" id="structfly_1_1system_1_1Atom_1aab39e1f6f086ca725453a0f4c9cad6be"></span><span class="sig-name descname"><span class="n"><span class="pre">Atom</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N3fly6system4Atom4AtomERR4Atom" title="fly::system::Atom::Atom"><span class="n"><span class="pre">Atom</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><a class="headerlink" href="#_CPPv4N3fly6system4Atom4AtomERR4Atom" title="Permalink to this definition">#</a><br /></dt>
-<dd><p>Copy construct a new <a class="reference internal" href="#structfly_1_1system_1_1Atom"><span class="std std-ref">Atom</span></a> object. </p>
-</dd></dl>
-
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4N3fly6system4Atom4AtomERK4Atom">
-<span id="_CPPv3N3fly6system4Atom4AtomERK4Atom"></span><span id="_CPPv2N3fly6system4Atom4AtomERK4Atom"></span><span id="fly::system::Atom::Atom__AtomCR"></span><span class="target" id="structfly_1_1system_1_1Atom_1ac57715e84acbce348066f7db7c92c557"></span><span class="sig-name descname"><span class="n"><span class="pre">Atom</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N3fly6system4Atom4AtomERK4Atom" title="fly::system::Atom::Atom"><span class="n"><span class="pre">Atom</span></span></a><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><a class="headerlink" href="#_CPPv4N3fly6system4Atom4AtomERK4Atom" title="Permalink to this definition">#</a><br /></dt>
-<dd><p>Move construct a new <a class="reference internal" href="#structfly_1_1system_1_1Atom"><span class="std std-ref">Atom</span></a> object. </p>
-</dd></dl>
-
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4N3fly6system4Atom4AtomEDpRKN1T8matrix_tE">
-<span id="_CPPv3N3fly6system4Atom4AtomEDpRKN1T8matrix_tE"></span><span id="_CPPv2N3fly6system4Atom4AtomEDpRKN1T8matrix_tE"></span><span id="fly::system::Atom::Atom__T::matrix_tCRDp"></span><span class="target" id="structfly_1_1system_1_1Atom_1a804d43c262f7412da7fa0f111f9e018d"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">explicit</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Atom</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4IDpEN3fly6system4AtomE" title="fly::system::Atom::T"><span class="n"><span class="pre">T</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">matrix_t</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">...</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">args</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3fly6system4Atom4AtomEDpRKN1T8matrix_tE" title="Permalink to this definition">#</a><br /></dt>
-<dd><p>Construct a new <a class="reference internal" href="#structfly_1_1system_1_1Atom"><span class="std std-ref">Atom</span></a> object, initializing each member. </p>
-</dd></dl>
-
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4N3fly6system4Atom4AtomEDpRRN1T8matrix_tE">
-<span id="_CPPv3N3fly6system4Atom4AtomEDpRRN1T8matrix_tE"></span><span id="_CPPv2N3fly6system4Atom4AtomEDpRRN1T8matrix_tE"></span><span id="fly::system::Atom::Atom__T::matrix_tRRDp"></span><span class="target" id="structfly_1_1system_1_1Atom_1a340bc843f9459a5c04ae4c978ebe1fb3"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">explicit</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Atom</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4IDpEN3fly6system4AtomE" title="fly::system::Atom::T"><span class="n"><span class="pre">T</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">matrix_t</span></span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">...</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">args</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3fly6system4Atom4AtomEDpRRN1T8matrix_tE" title="Permalink to this definition">#</a><br /></dt>
-<dd><p>Construct a new <a class="reference internal" href="#structfly_1_1system_1_1Atom"><span class="std std-ref">Atom</span></a> object, initializing each member. </p>
-</dd></dl>
-
-</div>
-</dd></dl>
-
 </section>
 <section id="properties">
-<h3>Properties<a class="headerlink" href="#properties" title="Permalink to this heading">#</a></h3>
+<h2>Properties<a class="headerlink" href="#properties" title="Permalink to this heading">#</a></h2>
+<p>File: <code class="docutils literal notranslate"><span class="pre">libfly/system/property.hpp</span></code></p>
+<p>The basic building block for atoms in libFLY. </p>
+<p>Properties in libFLY describe a per-atom quantity i.e. mass, position, etc. They take the form of fixed-size matrices and must always be derived from the Property class. The most fundamental property that every atom must have is a <a class="reference internal" href="#structfly_1_1builtin__properties_1_1TypeID"><span class="std std-ref">fly::TypeID</span></a>. Properties can either be associated per-atom using the <a class="reference internal" href="#structfly_1_1system_1_1Atom"><span class="std std-ref">fly::system::Atom</span></a>, <a class="reference internal" href="#classfly_1_1system_1_1VoS"><span class="std std-ref">fly::system::VoS</span></a> and <a class="reference internal" href="#classfly_1_1system_1_1SoA"><span class="std std-ref">fly::system::SoA</span></a> data-structures or per-type using the <a class="reference internal" href="#classfly_1_1system_1_1TypeMap"><span class="std std-ref">fly::system::TypeMap</span></a>. </p>
 <dl class="cpp struct">
 <dt class="sig sig-object cpp" id="_CPPv4I0_i_iI0_DpDaE0EN3fly6system8PropertyE">
 <span id="_CPPv3I0_i_iI0_DpDaE0EN3fly6system8PropertyE"></span><span id="_CPPv2I0_i_iI0_DpDaE0EN3fly6system8PropertyE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Scalar</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Rows</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">1</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Cols</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">1</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="kt"><span class="pre">auto</span></span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Rep</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="n"><span class="pre">Eigen</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">Matrix</span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="structfly_1_1system_1_1Property"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Property</span></span></span><a class="headerlink" href="#_CPPv4I0_i_iI0_DpDaE0EN3fly6system8PropertyE" title="Permalink to this definition">#</a><br /></dt>
-<dd><p>A base type to derive from for defining properties of an <a class="reference internal" href="#structfly_1_1system_1_1Atom"><span class="std std-ref">Atom</span></a> type. </p>
-<p>Members must be matrices of arithmetic types or default constructible 1x1 matricies.</p>
-<p>1x1 matricies are unwrapped into scalars.</p>
-<p>A selection of canonical properties , deriving from this type, are provided in the namespace <code class="docutils literal notranslate"><a class="reference internal" href="#namespacefly_1_1builtin__m"><span class="std std-ref"><span class="pre">builtin_m</span></span></a></code>.</p>
+<dd><p>A base type to derive from for defining properties. </p>
+<p>Properties may be fixed-size matrices/arrays of arithmetic types or scalar (1x1) default-constructible types.</p>
+<p>1x1 matrices are unwrapped into scalars.</p>
+<p>A selection of canonical properties , deriving from this type, are provided in the inline namespace <code class="docutils literal notranslate"><a class="reference internal" href="#namespacefly_1_1builtin__properties"><span class="std std-ref"><span class="pre">builtin_properties</span></span></a></code>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Template Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>Scalar</strong> – This property represents a matrix of Scalar elements. </p></li>
 <li><p><strong>Rows</strong> – Number of rows in this property </p></li>
 <li><p><strong>Cols</strong> – Number of colums in this property </p></li>
-<li><p><strong>Rep</strong> – The Eigen3 template, Eigen::[matrix||array], to use for this property </p></li>
+<li><p><strong>Rep</strong> – The Eigen3 template, Eigen::[matrix||array], to use for this property. </p></li>
 </ul>
 </dd>
 </dl>
@@ -483,7 +415,7 @@ distance.</p>
 <dl class="cpp type">
 <dt class="sig sig-object cpp" id="_CPPv4N3fly6system8Property13matrix_cref_tE">
 <span id="_CPPv3N3fly6system8Property13matrix_cref_tE"></span><span id="_CPPv2N3fly6system8Property13matrix_cref_tE"></span><span class="target" id="structfly_1_1system_1_1Property_1add8affe5946944be9937f0681a8b4bde"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">matrix_cref_t</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">conditional_t</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4N3fly6system8Property6is_1x1E" title="fly::system::Property::is_1x1"><span class="n"><span class="pre">is_1x1</span></span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0_i_iI0_DpDaE0EN3fly6system8PropertyE" title="fly::system::Property::Scalar"><span class="n"><span class="pre">Scalar</span></span></a><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="n"><span class="pre">Eigen</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">Map</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4N3fly6system8Property8matrix_tE" title="fly::system::Property::matrix_t"><span class="n"><span class="pre">matrix_t</span></span></a><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4N3fly6system8Property13matrix_cref_tE" title="Permalink to this definition">#</a><br /></dt>
-<dd><p>A const-reference-like type to a const matrix_t. </p>
+<dd><p>A const-reference-like type to a matrix_t. </p>
 </dd></dl>
 
 <dl class="cpp type">
@@ -537,213 +469,212 @@ distance.</p>
 </div>
 </dd></dl>
 
-</section>
-<section id="built-in-members">
-<h3>Built-in members<a class="headerlink" href="#built-in-members" title="Permalink to this heading">#</a></h3>
+<section id="built-in">
+<h3>Built-in<a class="headerlink" href="#built-in" title="Permalink to this heading">#</a></h3>
 <dl class="cpp type">
-<dt class="sig sig-object cpp" id="_CPPv4N3fly9builtin_mE">
-<span id="_CPPv3N3fly9builtin_mE"></span><span id="_CPPv2N3fly9builtin_mE"></span><span id="fly::builtin_m"></span><span class="target" id="namespacefly_1_1builtin__m"></span><span class="k"><span class="pre">namespace</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">builtin_m</span></span></span><a class="headerlink" href="#_CPPv4N3fly9builtin_mE" title="Permalink to this definition">#</a><br /></dt>
+<dt class="sig sig-object cpp" id="_CPPv4N3fly18builtin_propertiesE">
+<span id="_CPPv3N3fly18builtin_propertiesE"></span><span id="_CPPv2N3fly18builtin_propertiesE"></span><span id="fly::builtin_properties"></span><span class="target" id="namespacefly_1_1builtin__properties"></span><span class="k"><span class="pre">namespace</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">builtin_properties</span></span></span><a class="headerlink" href="#_CPPv4N3fly18builtin_propertiesE" title="Permalink to this definition">#</a><br /></dt>
 <dd><p>An inline namespace providing a selection of canonical properties for Atom. </p>
 <div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric" id="breathe-section-title-variables">Variables</p>
 <dl class="cpp var">
-<dt class="sig sig-object cpp" id="_CPPv4N3fly9builtin_m3tp_E">
-<span id="_CPPv3N3fly9builtin_m3tp_E"></span><span id="_CPPv2N3fly9builtin_m3tp_E"></span><span id="fly::builtin_m::tp___Type"></span><span class="target" id="namespacefly_1_1builtin__m_1af057f2f247fb0f93bf4b03226ec9189c"></span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N3fly9builtin_m4TypeE" title="fly::builtin_m::Type"><span class="n"><span class="pre">Type</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">tp_</span></span></span><a class="headerlink" href="#_CPPv4N3fly9builtin_m3tp_E" title="Permalink to this definition">#</a><br /></dt>
-<dd><p><a class="reference internal" href="#structfly_1_1builtin__m_1_1Type"><span class="std std-ref">Type</span></a> literal. </p>
+<dt class="sig sig-object cpp" id="_CPPv4N3fly18builtin_properties3tp_E">
+<span id="_CPPv3N3fly18builtin_properties3tp_E"></span><span id="_CPPv2N3fly18builtin_properties3tp_E"></span><span id="fly::builtin_properties::tp___Type"></span><span class="target" id="namespacefly_1_1builtin__properties_1af9c31e2ff1bf6598d14f373de432470b"></span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N3fly18builtin_properties4TypeE" title="fly::builtin_properties::Type"><span class="n"><span class="pre">Type</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">tp_</span></span></span><a class="headerlink" href="#_CPPv4N3fly18builtin_properties3tp_E" title="Permalink to this definition">#</a><br /></dt>
+<dd><p><a class="reference internal" href="#structfly_1_1builtin__properties_1_1Type"><span class="std std-ref">Type</span></a> literal. </p>
 </dd></dl>
 
 <dl class="cpp var">
-<dt class="sig sig-object cpp" id="_CPPv4N3fly9builtin_m3id_E">
-<span id="_CPPv3N3fly9builtin_m3id_E"></span><span id="_CPPv2N3fly9builtin_m3id_E"></span><span id="fly::builtin_m::id___TypeID"></span><span class="target" id="namespacefly_1_1builtin__m_1ab7b30d2c65a7dadfcb2131a6cf700697"></span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N3fly9builtin_m6TypeIDE" title="fly::builtin_m::TypeID"><span class="n"><span class="pre">TypeID</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">id_</span></span></span><a class="headerlink" href="#_CPPv4N3fly9builtin_m3id_E" title="Permalink to this definition">#</a><br /></dt>
-<dd><p><a class="reference internal" href="#structfly_1_1builtin__m_1_1TypeID"><span class="std std-ref">TypeID</span></a> literal. </p>
+<dt class="sig sig-object cpp" id="_CPPv4N3fly18builtin_properties3id_E">
+<span id="_CPPv3N3fly18builtin_properties3id_E"></span><span id="_CPPv2N3fly18builtin_properties3id_E"></span><span id="fly::builtin_properties::id___TypeID"></span><span class="target" id="namespacefly_1_1builtin__properties_1a2351c5743a0d0f41185c8cb9c47c35f1"></span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N3fly18builtin_properties6TypeIDE" title="fly::builtin_properties::TypeID"><span class="n"><span class="pre">TypeID</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">id_</span></span></span><a class="headerlink" href="#_CPPv4N3fly18builtin_properties3id_E" title="Permalink to this definition">#</a><br /></dt>
+<dd><p><a class="reference internal" href="#structfly_1_1builtin__properties_1_1TypeID"><span class="std std-ref">TypeID</span></a> literal. </p>
 </dd></dl>
 
 <dl class="cpp var">
-<dt class="sig sig-object cpp" id="_CPPv4N3fly9builtin_m4img_E">
-<span id="_CPPv3N3fly9builtin_m4img_E"></span><span id="_CPPv2N3fly9builtin_m4img_E"></span><span id="fly::builtin_m::img___Image"></span><span class="target" id="namespacefly_1_1builtin__m_1a61fc61210602a3522f2f4f9da7570d3c"></span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N3fly9builtin_m5ImageE" title="fly::builtin_m::Image"><span class="n"><span class="pre">Image</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">img_</span></span></span><a class="headerlink" href="#_CPPv4N3fly9builtin_m4img_E" title="Permalink to this definition">#</a><br /></dt>
-<dd><p><a class="reference internal" href="#structfly_1_1builtin__m_1_1Image"><span class="std std-ref">Image</span></a> literal. </p>
+<dt class="sig sig-object cpp" id="_CPPv4N3fly18builtin_properties4img_E">
+<span id="_CPPv3N3fly18builtin_properties4img_E"></span><span id="_CPPv2N3fly18builtin_properties4img_E"></span><span id="fly::builtin_properties::img___Image"></span><span class="target" id="namespacefly_1_1builtin__properties_1a3bbfb3f24f5af0baa99caa6a1635ffcb"></span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N3fly18builtin_properties5ImageE" title="fly::builtin_properties::Image"><span class="n"><span class="pre">Image</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">img_</span></span></span><a class="headerlink" href="#_CPPv4N3fly18builtin_properties4img_E" title="Permalink to this definition">#</a><br /></dt>
+<dd><p><a class="reference internal" href="#structfly_1_1builtin__properties_1_1Image"><span class="std std-ref">Image</span></a> literal. </p>
 </dd></dl>
 
 <dl class="cpp var">
-<dt class="sig sig-object cpp" id="_CPPv4N3fly9builtin_m2m_E">
-<span id="_CPPv3N3fly9builtin_m2m_E"></span><span id="_CPPv2N3fly9builtin_m2m_E"></span><span id="fly::builtin_m::m___Mass"></span><span class="target" id="namespacefly_1_1builtin__m_1a04401c847688bd2bbaea30f4a06777b3"></span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N3fly9builtin_m4MassE" title="fly::builtin_m::Mass"><span class="n"><span class="pre">Mass</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">m_</span></span></span><a class="headerlink" href="#_CPPv4N3fly9builtin_m2m_E" title="Permalink to this definition">#</a><br /></dt>
-<dd><p><a class="reference internal" href="#structfly_1_1builtin__m_1_1Mass"><span class="std std-ref">Mass</span></a> literal. </p>
+<dt class="sig sig-object cpp" id="_CPPv4N3fly18builtin_properties2m_E">
+<span id="_CPPv3N3fly18builtin_properties2m_E"></span><span id="_CPPv2N3fly18builtin_properties2m_E"></span><span id="fly::builtin_properties::m___Mass"></span><span class="target" id="namespacefly_1_1builtin__properties_1a03a69120c5da733ece7b2679d867afd8"></span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N3fly18builtin_properties4MassE" title="fly::builtin_properties::Mass"><span class="n"><span class="pre">Mass</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">m_</span></span></span><a class="headerlink" href="#_CPPv4N3fly18builtin_properties2m_E" title="Permalink to this definition">#</a><br /></dt>
+<dd><p><a class="reference internal" href="#structfly_1_1builtin__properties_1_1Mass"><span class="std std-ref">Mass</span></a> literal. </p>
 </dd></dl>
 
 <dl class="cpp var">
-<dt class="sig sig-object cpp" id="_CPPv4N3fly9builtin_m2q_E">
-<span id="_CPPv3N3fly9builtin_m2q_E"></span><span id="_CPPv2N3fly9builtin_m2q_E"></span><span id="fly::builtin_m::q___Charge"></span><span class="target" id="namespacefly_1_1builtin__m_1a7a77f02da02c6eb0155e66c66240a042"></span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N3fly9builtin_m6ChargeE" title="fly::builtin_m::Charge"><span class="n"><span class="pre">Charge</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">q_</span></span></span><a class="headerlink" href="#_CPPv4N3fly9builtin_m2q_E" title="Permalink to this definition">#</a><br /></dt>
-<dd><p><a class="reference internal" href="#structfly_1_1builtin__m_1_1Charge"><span class="std std-ref">Charge</span></a> literal. </p>
+<dt class="sig sig-object cpp" id="_CPPv4N3fly18builtin_properties2q_E">
+<span id="_CPPv3N3fly18builtin_properties2q_E"></span><span id="_CPPv2N3fly18builtin_properties2q_E"></span><span id="fly::builtin_properties::q___Charge"></span><span class="target" id="namespacefly_1_1builtin__properties_1a7b4755db38e33e8feed8e50f9baf8c6e"></span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N3fly18builtin_properties6ChargeE" title="fly::builtin_properties::Charge"><span class="n"><span class="pre">Charge</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">q_</span></span></span><a class="headerlink" href="#_CPPv4N3fly18builtin_properties2q_E" title="Permalink to this definition">#</a><br /></dt>
+<dd><p><a class="reference internal" href="#structfly_1_1builtin__properties_1_1Charge"><span class="std std-ref">Charge</span></a> literal. </p>
 </dd></dl>
 
 <dl class="cpp var">
-<dt class="sig sig-object cpp" id="_CPPv4N3fly9builtin_m2d_E">
-<span id="_CPPv3N3fly9builtin_m2d_E"></span><span id="_CPPv2N3fly9builtin_m2d_E"></span><span id="fly::builtin_m::d___Diameter"></span><span class="target" id="namespacefly_1_1builtin__m_1a7f81075ca3344d855bcca4e08237dfbd"></span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N3fly9builtin_m8DiameterE" title="fly::builtin_m::Diameter"><span class="n"><span class="pre">Diameter</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">d_</span></span></span><a class="headerlink" href="#_CPPv4N3fly9builtin_m2d_E" title="Permalink to this definition">#</a><br /></dt>
-<dd><p><a class="reference internal" href="#structfly_1_1builtin__m_1_1Diameter"><span class="std std-ref">Diameter</span></a> literal. </p>
+<dt class="sig sig-object cpp" id="_CPPv4N3fly18builtin_properties2d_E">
+<span id="_CPPv3N3fly18builtin_properties2d_E"></span><span id="_CPPv2N3fly18builtin_properties2d_E"></span><span id="fly::builtin_properties::d___Diameter"></span><span class="target" id="namespacefly_1_1builtin__properties_1a2cd1968c6e00973e3ca65550a1a4395f"></span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N3fly18builtin_properties8DiameterE" title="fly::builtin_properties::Diameter"><span class="n"><span class="pre">Diameter</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">d_</span></span></span><a class="headerlink" href="#_CPPv4N3fly18builtin_properties2d_E" title="Permalink to this definition">#</a><br /></dt>
+<dd><p><a class="reference internal" href="#structfly_1_1builtin__properties_1_1Diameter"><span class="std std-ref">Diameter</span></a> literal. </p>
 </dd></dl>
 
 <dl class="cpp var">
-<dt class="sig sig-object cpp" id="_CPPv4N3fly9builtin_m2I_E">
-<span id="_CPPv3N3fly9builtin_m2I_E"></span><span id="_CPPv2N3fly9builtin_m2I_E"></span><span id="fly::builtin_m::I___MomentInertia"></span><span class="target" id="namespacefly_1_1builtin__m_1a4649efdca4aa9b3d8061ab0b264f452c"></span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N3fly9builtin_m13MomentInertiaE" title="fly::builtin_m::MomentInertia"><span class="n"><span class="pre">MomentInertia</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">I_</span></span></span><a class="headerlink" href="#_CPPv4N3fly9builtin_m2I_E" title="Permalink to this definition">#</a><br /></dt>
-<dd><p><a class="reference internal" href="#structfly_1_1builtin__m_1_1MomentInertia"><span class="std std-ref">MomentInertia</span></a> literal. </p>
+<dt class="sig sig-object cpp" id="_CPPv4N3fly18builtin_properties2I_E">
+<span id="_CPPv3N3fly18builtin_properties2I_E"></span><span id="_CPPv2N3fly18builtin_properties2I_E"></span><span id="fly::builtin_properties::I___MomentInertia"></span><span class="target" id="namespacefly_1_1builtin__properties_1a8a10f8b6fa25180ee5021076cec96ade"></span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N3fly18builtin_properties13MomentInertiaE" title="fly::builtin_properties::MomentInertia"><span class="n"><span class="pre">MomentInertia</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">I_</span></span></span><a class="headerlink" href="#_CPPv4N3fly18builtin_properties2I_E" title="Permalink to this definition">#</a><br /></dt>
+<dd><p><a class="reference internal" href="#structfly_1_1builtin__properties_1_1MomentInertia"><span class="std std-ref">MomentInertia</span></a> literal. </p>
 </dd></dl>
 
 <dl class="cpp var">
-<dt class="sig sig-object cpp" id="_CPPv4N3fly9builtin_m2r_E">
-<span id="_CPPv3N3fly9builtin_m2r_E"></span><span id="_CPPv2N3fly9builtin_m2r_E"></span><span id="fly::builtin_m::r___Position"></span><span class="target" id="namespacefly_1_1builtin__m_1a5499bba33fce797d43b9d5476a54dc6b"></span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N3fly9builtin_m8PositionE" title="fly::builtin_m::Position"><span class="n"><span class="pre">Position</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">r_</span></span></span><a class="headerlink" href="#_CPPv4N3fly9builtin_m2r_E" title="Permalink to this definition">#</a><br /></dt>
-<dd><p><a class="reference internal" href="#structfly_1_1builtin__m_1_1Position"><span class="std std-ref">Position</span></a> literal. </p>
+<dt class="sig sig-object cpp" id="_CPPv4N3fly18builtin_properties2r_E">
+<span id="_CPPv3N3fly18builtin_properties2r_E"></span><span id="_CPPv2N3fly18builtin_properties2r_E"></span><span id="fly::builtin_properties::r___Position"></span><span class="target" id="namespacefly_1_1builtin__properties_1a2a11938123efe1c6d81a530d16c54959"></span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N3fly18builtin_properties8PositionE" title="fly::builtin_properties::Position"><span class="n"><span class="pre">Position</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">r_</span></span></span><a class="headerlink" href="#_CPPv4N3fly18builtin_properties2r_E" title="Permalink to this definition">#</a><br /></dt>
+<dd><p><a class="reference internal" href="#structfly_1_1builtin__properties_1_1Position"><span class="std std-ref">Position</span></a> literal. </p>
 </dd></dl>
 
 <dl class="cpp var">
-<dt class="sig sig-object cpp" id="_CPPv4N3fly9builtin_m2v_E">
-<span id="_CPPv3N3fly9builtin_m2v_E"></span><span id="_CPPv2N3fly9builtin_m2v_E"></span><span id="fly::builtin_m::v___Velocity"></span><span class="target" id="namespacefly_1_1builtin__m_1af148172200586c829fd45bbe256e2496"></span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N3fly9builtin_m8VelocityE" title="fly::builtin_m::Velocity"><span class="n"><span class="pre">Velocity</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">v_</span></span></span><a class="headerlink" href="#_CPPv4N3fly9builtin_m2v_E" title="Permalink to this definition">#</a><br /></dt>
-<dd><p><a class="reference internal" href="#structfly_1_1builtin__m_1_1Velocity"><span class="std std-ref">Velocity</span></a> literal. </p>
+<dt class="sig sig-object cpp" id="_CPPv4N3fly18builtin_properties2v_E">
+<span id="_CPPv3N3fly18builtin_properties2v_E"></span><span id="_CPPv2N3fly18builtin_properties2v_E"></span><span id="fly::builtin_properties::v___Velocity"></span><span class="target" id="namespacefly_1_1builtin__properties_1abdf99e990c9928f70842ce932fa31508"></span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N3fly18builtin_properties8VelocityE" title="fly::builtin_properties::Velocity"><span class="n"><span class="pre">Velocity</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">v_</span></span></span><a class="headerlink" href="#_CPPv4N3fly18builtin_properties2v_E" title="Permalink to this definition">#</a><br /></dt>
+<dd><p><a class="reference internal" href="#structfly_1_1builtin__properties_1_1Velocity"><span class="std std-ref">Velocity</span></a> literal. </p>
 </dd></dl>
 
 <dl class="cpp var">
-<dt class="sig sig-object cpp" id="_CPPv4N3fly9builtin_m2i_E">
-<span id="_CPPv3N3fly9builtin_m2i_E"></span><span id="_CPPv2N3fly9builtin_m2i_E"></span><span id="fly::builtin_m::i___Index"></span><span class="target" id="namespacefly_1_1builtin__m_1af9dcef8e5e4846736b93603d014f6620"></span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N3fly9builtin_m5IndexE" title="fly::builtin_m::Index"><span class="n"><span class="pre">Index</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">i_</span></span></span><a class="headerlink" href="#_CPPv4N3fly9builtin_m2i_E" title="Permalink to this definition">#</a><br /></dt>
-<dd><p><a class="reference internal" href="#structfly_1_1builtin__m_1_1Index"><span class="std std-ref">Index</span></a> literal. </p>
+<dt class="sig sig-object cpp" id="_CPPv4N3fly18builtin_properties2i_E">
+<span id="_CPPv3N3fly18builtin_properties2i_E"></span><span id="_CPPv2N3fly18builtin_properties2i_E"></span><span id="fly::builtin_properties::i___Index"></span><span class="target" id="namespacefly_1_1builtin__properties_1a8045c1020b62c1c97e73f2911b78f642"></span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N3fly18builtin_properties5IndexE" title="fly::builtin_properties::Index"><span class="n"><span class="pre">Index</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">i_</span></span></span><a class="headerlink" href="#_CPPv4N3fly18builtin_properties2i_E" title="Permalink to this definition">#</a><br /></dt>
+<dd><p><a class="reference internal" href="#structfly_1_1builtin__properties_1_1Index"><span class="std std-ref">Index</span></a> literal. </p>
 </dd></dl>
 
 <dl class="cpp var">
-<dt class="sig sig-object cpp" id="_CPPv4N3fly9builtin_m4fzn_E">
-<span id="_CPPv3N3fly9builtin_m4fzn_E"></span><span id="_CPPv2N3fly9builtin_m4fzn_E"></span><span id="fly::builtin_m::fzn___Frozen"></span><span class="target" id="namespacefly_1_1builtin__m_1a0c9363e94a4d33db2ba4d91a2673a413"></span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N3fly9builtin_m6FrozenE" title="fly::builtin_m::Frozen"><span class="n"><span class="pre">Frozen</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">fzn_</span></span></span><a class="headerlink" href="#_CPPv4N3fly9builtin_m4fzn_E" title="Permalink to this definition">#</a><br /></dt>
-<dd><p><a class="reference internal" href="#structfly_1_1builtin__m_1_1Frozen"><span class="std std-ref">Frozen</span></a> literal. </p>
+<dt class="sig sig-object cpp" id="_CPPv4N3fly18builtin_properties4fzn_E">
+<span id="_CPPv3N3fly18builtin_properties4fzn_E"></span><span id="_CPPv2N3fly18builtin_properties4fzn_E"></span><span id="fly::builtin_properties::fzn___Frozen"></span><span class="target" id="namespacefly_1_1builtin__properties_1a22d540573e9ef6d75e4f2f51442c36a4"></span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N3fly18builtin_properties6FrozenE" title="fly::builtin_properties::Frozen"><span class="n"><span class="pre">Frozen</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">fzn_</span></span></span><a class="headerlink" href="#_CPPv4N3fly18builtin_properties4fzn_E" title="Permalink to this definition">#</a><br /></dt>
+<dd><p><a class="reference internal" href="#structfly_1_1builtin__properties_1_1Frozen"><span class="std std-ref">Frozen</span></a> literal. </p>
 </dd></dl>
 
 <dl class="cpp var">
-<dt class="sig sig-object cpp" id="_CPPv4N3fly9builtin_m3ax_E">
-<span id="_CPPv3N3fly9builtin_m3ax_E"></span><span id="_CPPv2N3fly9builtin_m3ax_E"></span><span id="fly::builtin_m::ax___Axis"></span><span class="target" id="namespacefly_1_1builtin__m_1abb3d6bb1d3ed15586fff4530b08f7406"></span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N3fly9builtin_m4AxisE" title="fly::builtin_m::Axis"><span class="n"><span class="pre">Axis</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ax_</span></span></span><a class="headerlink" href="#_CPPv4N3fly9builtin_m3ax_E" title="Permalink to this definition">#</a><br /></dt>
-<dd><p><a class="reference internal" href="#structfly_1_1builtin__m_1_1Axis"><span class="std std-ref">Axis</span></a> literal. </p>
+<dt class="sig sig-object cpp" id="_CPPv4N3fly18builtin_properties3ax_E">
+<span id="_CPPv3N3fly18builtin_properties3ax_E"></span><span id="_CPPv2N3fly18builtin_properties3ax_E"></span><span id="fly::builtin_properties::ax___Axis"></span><span class="target" id="namespacefly_1_1builtin__properties_1a14f82e866c67b8eb77df36a8c29193e8"></span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N3fly18builtin_properties4AxisE" title="fly::builtin_properties::Axis"><span class="n"><span class="pre">Axis</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ax_</span></span></span><a class="headerlink" href="#_CPPv4N3fly18builtin_properties3ax_E" title="Permalink to this definition">#</a><br /></dt>
+<dd><p><a class="reference internal" href="#structfly_1_1builtin__properties_1_1Axis"><span class="std std-ref">Axis</span></a> literal. </p>
 </dd></dl>
 
 <dl class="cpp var">
-<dt class="sig sig-object cpp" id="_CPPv4N3fly9builtin_m2g_E">
-<span id="_CPPv3N3fly9builtin_m2g_E"></span><span id="_CPPv2N3fly9builtin_m2g_E"></span><span id="fly::builtin_m::g___PotentialGradient"></span><span class="target" id="namespacefly_1_1builtin__m_1ad1dbd059ca9c9357776283bc7805ba32"></span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N3fly9builtin_m17PotentialGradientE" title="fly::builtin_m::PotentialGradient"><span class="n"><span class="pre">PotentialGradient</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">g_</span></span></span><a class="headerlink" href="#_CPPv4N3fly9builtin_m2g_E" title="Permalink to this definition">#</a><br /></dt>
-<dd><p><a class="reference internal" href="#structfly_1_1builtin__m_1_1PotentialGradient"><span class="std std-ref">PotentialGradient</span></a> literal. </p>
+<dt class="sig sig-object cpp" id="_CPPv4N3fly18builtin_properties2g_E">
+<span id="_CPPv3N3fly18builtin_properties2g_E"></span><span id="_CPPv2N3fly18builtin_properties2g_E"></span><span id="fly::builtin_properties::g___PotentialGradient"></span><span class="target" id="namespacefly_1_1builtin__properties_1ac01465139c5e824a7364fb3248e4ff78"></span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N3fly18builtin_properties17PotentialGradientE" title="fly::builtin_properties::PotentialGradient"><span class="n"><span class="pre">PotentialGradient</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">g_</span></span></span><a class="headerlink" href="#_CPPv4N3fly18builtin_properties2g_E" title="Permalink to this definition">#</a><br /></dt>
+<dd><p><a class="reference internal" href="#structfly_1_1builtin__properties_1_1PotentialGradient"><span class="std std-ref">PotentialGradient</span></a> literal. </p>
 </dd></dl>
 
 <dl class="cpp var">
-<dt class="sig sig-object cpp" id="_CPPv4N3fly9builtin_m2a_E">
-<span id="_CPPv3N3fly9builtin_m2a_E"></span><span id="_CPPv2N3fly9builtin_m2a_E"></span><span id="fly::builtin_m::a___Acceleration"></span><span class="target" id="namespacefly_1_1builtin__m_1a7af46d5c4b45f66c6aa21498d00476b1"></span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N3fly9builtin_m12AccelerationE" title="fly::builtin_m::Acceleration"><span class="n"><span class="pre">Acceleration</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">a_</span></span></span><a class="headerlink" href="#_CPPv4N3fly9builtin_m2a_E" title="Permalink to this definition">#</a><br /></dt>
-<dd><p><a class="reference internal" href="#structfly_1_1builtin__m_1_1Acceleration"><span class="std std-ref">Acceleration</span></a> literal. </p>
+<dt class="sig sig-object cpp" id="_CPPv4N3fly18builtin_properties2a_E">
+<span id="_CPPv3N3fly18builtin_properties2a_E"></span><span id="_CPPv2N3fly18builtin_properties2a_E"></span><span id="fly::builtin_properties::a___Acceleration"></span><span class="target" id="namespacefly_1_1builtin__properties_1a677c3d31ec836aee83ba1918ea552e24"></span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N3fly18builtin_properties12AccelerationE" title="fly::builtin_properties::Acceleration"><span class="n"><span class="pre">Acceleration</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">a_</span></span></span><a class="headerlink" href="#_CPPv4N3fly18builtin_properties2a_E" title="Permalink to this definition">#</a><br /></dt>
+<dd><p><a class="reference internal" href="#structfly_1_1builtin__properties_1_1Acceleration"><span class="std std-ref">Acceleration</span></a> literal. </p>
 </dd></dl>
 
 </div>
 <dl class="cpp struct">
-<dt class="sig sig-object cpp" id="_CPPv4N3fly9builtin_m12AccelerationE">
-<span id="_CPPv3N3fly9builtin_m12AccelerationE"></span><span id="_CPPv2N3fly9builtin_m12AccelerationE"></span><span id="fly::builtin_m::Acceleration"></span><span class="target" id="structfly_1_1builtin__m_1_1Acceleration"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Acceleration</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><span class="n"><span class="pre">fly</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">system</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4I0_i_iI0_DpDaE0EN3fly6system8PropertyE" title="fly::system::Property"><span class="n"><span class="pre">Property</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">double</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="utility.html#_CPPv4N3fly12spatial_dimsE" title="fly::spatial_dims"><span class="n"><span class="pre">spatial_dims</span></span></a><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4N3fly9builtin_m12AccelerationE" title="Permalink to this definition">#</a><br /></dt>
+<dt class="sig sig-object cpp" id="_CPPv4N3fly18builtin_properties12AccelerationE">
+<span id="_CPPv3N3fly18builtin_properties12AccelerationE"></span><span id="_CPPv2N3fly18builtin_properties12AccelerationE"></span><span id="fly::builtin_properties::Acceleration"></span><span class="target" id="structfly_1_1builtin__properties_1_1Acceleration"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Acceleration</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><span class="n"><span class="pre">fly</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">system</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4I0_i_iI0_DpDaE0EN3fly6system8PropertyE" title="fly::system::Property"><span class="n"><span class="pre">Property</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">double</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="utility.html#_CPPv4N3fly12spatial_dimsE" title="fly::spatial_dims"><span class="n"><span class="pre">spatial_dims</span></span></a><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4N3fly18builtin_properties12AccelerationE" title="Permalink to this definition">#</a><br /></dt>
 <dd><div class="docutils container">
-<em>#include &lt;libfly/system/atom.hpp&gt;</em></div>
+<em>#include &lt;libfly/system/property.hpp&gt;</em></div>
 <p>Tag type for atom’s acceleration. </p>
 </dd></dl>
 
 <dl class="cpp struct">
-<dt class="sig sig-object cpp" id="_CPPv4N3fly9builtin_m4AxisE">
-<span id="_CPPv3N3fly9builtin_m4AxisE"></span><span id="_CPPv2N3fly9builtin_m4AxisE"></span><span id="fly::builtin_m::Axis"></span><span class="target" id="structfly_1_1builtin__m_1_1Axis"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Axis</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><span class="n"><span class="pre">fly</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">system</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4I0_i_iI0_DpDaE0EN3fly6system8PropertyE" title="fly::system::Property"><span class="n"><span class="pre">Property</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">double</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="utility.html#_CPPv4N3fly12spatial_dimsE" title="fly::spatial_dims"><span class="n"><span class="pre">spatial_dims</span></span></a><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4N3fly9builtin_m4AxisE" title="Permalink to this definition">#</a><br /></dt>
+<dt class="sig sig-object cpp" id="_CPPv4N3fly18builtin_properties4AxisE">
+<span id="_CPPv3N3fly18builtin_properties4AxisE"></span><span id="_CPPv2N3fly18builtin_properties4AxisE"></span><span id="fly::builtin_properties::Axis"></span><span class="target" id="structfly_1_1builtin__properties_1_1Axis"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Axis</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><span class="n"><span class="pre">fly</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">system</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4I0_i_iI0_DpDaE0EN3fly6system8PropertyE" title="fly::system::Property"><span class="n"><span class="pre">Property</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">double</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="utility.html#_CPPv4N3fly12spatial_dimsE" title="fly::spatial_dims"><span class="n"><span class="pre">spatial_dims</span></span></a><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4N3fly18builtin_properties4AxisE" title="Permalink to this definition">#</a><br /></dt>
 <dd><div class="docutils container">
-<em>#include &lt;libfly/system/atom.hpp&gt;</em></div>
+<em>#include &lt;libfly/system/property.hpp&gt;</em></div>
 <p>Tag type for atom’s contribution to a dimer axis. </p>
 </dd></dl>
 
 <dl class="cpp struct">
-<dt class="sig sig-object cpp" id="_CPPv4N3fly9builtin_m6ChargeE">
-<span id="_CPPv3N3fly9builtin_m6ChargeE"></span><span id="_CPPv2N3fly9builtin_m6ChargeE"></span><span id="fly::builtin_m::Charge"></span><span class="target" id="structfly_1_1builtin__m_1_1Charge"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Charge</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><span class="n"><span class="pre">fly</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">system</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4I0_i_iI0_DpDaE0EN3fly6system8PropertyE" title="fly::system::Property"><span class="n"><span class="pre">Property</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">double</span></span><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4N3fly9builtin_m6ChargeE" title="Permalink to this definition">#</a><br /></dt>
+<dt class="sig sig-object cpp" id="_CPPv4N3fly18builtin_properties6ChargeE">
+<span id="_CPPv3N3fly18builtin_properties6ChargeE"></span><span id="_CPPv2N3fly18builtin_properties6ChargeE"></span><span id="fly::builtin_properties::Charge"></span><span class="target" id="structfly_1_1builtin__properties_1_1Charge"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Charge</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><span class="n"><span class="pre">fly</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">system</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4I0_i_iI0_DpDaE0EN3fly6system8PropertyE" title="fly::system::Property"><span class="n"><span class="pre">Property</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">double</span></span><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4N3fly18builtin_properties6ChargeE" title="Permalink to this definition">#</a><br /></dt>
 <dd><div class="docutils container">
-<em>#include &lt;libfly/system/atom.hpp&gt;</em></div>
+<em>#include &lt;libfly/system/property.hpp&gt;</em></div>
 <p>Tag type for atom’s charge. </p>
 </dd></dl>
 
 <dl class="cpp struct">
-<dt class="sig sig-object cpp" id="_CPPv4N3fly9builtin_m8DiameterE">
-<span id="_CPPv3N3fly9builtin_m8DiameterE"></span><span id="_CPPv2N3fly9builtin_m8DiameterE"></span><span id="fly::builtin_m::Diameter"></span><span class="target" id="structfly_1_1builtin__m_1_1Diameter"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Diameter</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><span class="n"><span class="pre">fly</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">system</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4I0_i_iI0_DpDaE0EN3fly6system8PropertyE" title="fly::system::Property"><span class="n"><span class="pre">Property</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">double</span></span><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4N3fly9builtin_m8DiameterE" title="Permalink to this definition">#</a><br /></dt>
+<dt class="sig sig-object cpp" id="_CPPv4N3fly18builtin_properties8DiameterE">
+<span id="_CPPv3N3fly18builtin_properties8DiameterE"></span><span id="_CPPv2N3fly18builtin_properties8DiameterE"></span><span id="fly::builtin_properties::Diameter"></span><span class="target" id="structfly_1_1builtin__properties_1_1Diameter"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Diameter</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><span class="n"><span class="pre">fly</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">system</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4I0_i_iI0_DpDaE0EN3fly6system8PropertyE" title="fly::system::Property"><span class="n"><span class="pre">Property</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">double</span></span><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4N3fly18builtin_properties8DiameterE" title="Permalink to this definition">#</a><br /></dt>
 <dd><div class="docutils container">
-<em>#include &lt;libfly/system/atom.hpp&gt;</em></div>
+<em>#include &lt;libfly/system/property.hpp&gt;</em></div>
 <p>Tag type for atom’s effective diameter. </p>
 </dd></dl>
 
 <dl class="cpp struct">
-<dt class="sig sig-object cpp" id="_CPPv4N3fly9builtin_m6FrozenE">
-<span id="_CPPv3N3fly9builtin_m6FrozenE"></span><span id="_CPPv2N3fly9builtin_m6FrozenE"></span><span id="fly::builtin_m::Frozen"></span><span class="target" id="structfly_1_1builtin__m_1_1Frozen"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Frozen</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><span class="n"><span class="pre">fly</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">system</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4I0_i_iI0_DpDaE0EN3fly6system8PropertyE" title="fly::system::Property"><span class="n"><span class="pre">Property</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">bool</span></span><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4N3fly9builtin_m6FrozenE" title="Permalink to this definition">#</a><br /></dt>
+<dt class="sig sig-object cpp" id="_CPPv4N3fly18builtin_properties6FrozenE">
+<span id="_CPPv3N3fly18builtin_properties6FrozenE"></span><span id="_CPPv2N3fly18builtin_properties6FrozenE"></span><span id="fly::builtin_properties::Frozen"></span><span class="target" id="structfly_1_1builtin__properties_1_1Frozen"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Frozen</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><span class="n"><span class="pre">fly</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">system</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4I0_i_iI0_DpDaE0EN3fly6system8PropertyE" title="fly::system::Property"><span class="n"><span class="pre">Property</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">bool</span></span><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4N3fly18builtin_properties6FrozenE" title="Permalink to this definition">#</a><br /></dt>
 <dd><div class="docutils container">
-<em>#include &lt;libfly/system/atom.hpp&gt;</em></div>
+<em>#include &lt;libfly/system/property.hpp&gt;</em></div>
 <p>Tag type for atom’s status as a frozen atom. </p>
 <p>Note this cannot be written to a GSD file as it a boolean. </p>
 </dd></dl>
 
 <dl class="cpp struct">
-<dt class="sig sig-object cpp" id="_CPPv4N3fly9builtin_m5ImageE">
-<span id="_CPPv3N3fly9builtin_m5ImageE"></span><span id="_CPPv2N3fly9builtin_m5ImageE"></span><span id="fly::builtin_m::Image"></span><span class="target" id="structfly_1_1builtin__m_1_1Image"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Image</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><span class="n"><span class="pre">fly</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">system</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4I0_i_iI0_DpDaE0EN3fly6system8PropertyE" title="fly::system::Property"><span class="n"><span class="pre">Property</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">int32_t</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="utility.html#_CPPv4N3fly12spatial_dimsE" title="fly::spatial_dims"><span class="n"><span class="pre">spatial_dims</span></span></a><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4N3fly9builtin_m5ImageE" title="Permalink to this definition">#</a><br /></dt>
+<dt class="sig sig-object cpp" id="_CPPv4N3fly18builtin_properties5ImageE">
+<span id="_CPPv3N3fly18builtin_properties5ImageE"></span><span id="_CPPv2N3fly18builtin_properties5ImageE"></span><span id="fly::builtin_properties::Image"></span><span class="target" id="structfly_1_1builtin__properties_1_1Image"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Image</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><span class="n"><span class="pre">fly</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">system</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4I0_i_iI0_DpDaE0EN3fly6system8PropertyE" title="fly::system::Property"><span class="n"><span class="pre">Property</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">int32_t</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="utility.html#_CPPv4N3fly12spatial_dimsE" title="fly::spatial_dims"><span class="n"><span class="pre">spatial_dims</span></span></a><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4N3fly18builtin_properties5ImageE" title="Permalink to this definition">#</a><br /></dt>
 <dd><div class="docutils container">
-<em>#include &lt;libfly/system/atom.hpp&gt;</em></div>
+<em>#include &lt;libfly/system/property.hpp&gt;</em></div>
 <p>Tag type for atom’s image count, i.e. how many times atom has wrapped. </p>
 <p>Not used by libFLY, for consistency with HOOMD schema. </p>
 </dd></dl>
 
 <dl class="cpp struct">
-<dt class="sig sig-object cpp" id="_CPPv4N3fly9builtin_m5IndexE">
-<span id="_CPPv3N3fly9builtin_m5IndexE"></span><span id="_CPPv2N3fly9builtin_m5IndexE"></span><span id="fly::builtin_m::Index"></span><span class="target" id="structfly_1_1builtin__m_1_1Index"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Index</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><span class="n"><span class="pre">fly</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">system</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4I0_i_iI0_DpDaE0EN3fly6system8PropertyE" title="fly::system::Property"><span class="n"><span class="pre">Property</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">uint32_t</span></span><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4N3fly9builtin_m5IndexE" title="Permalink to this definition">#</a><br /></dt>
+<dt class="sig sig-object cpp" id="_CPPv4N3fly18builtin_properties5IndexE">
+<span id="_CPPv3N3fly18builtin_properties5IndexE"></span><span id="_CPPv2N3fly18builtin_properties5IndexE"></span><span id="fly::builtin_properties::Index"></span><span class="target" id="structfly_1_1builtin__properties_1_1Index"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Index</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><span class="n"><span class="pre">fly</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">system</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4I0_i_iI0_DpDaE0EN3fly6system8PropertyE" title="fly::system::Property"><span class="n"><span class="pre">Property</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">uint32_t</span></span><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4N3fly18builtin_properties5IndexE" title="Permalink to this definition">#</a><br /></dt>
 <dd><div class="docutils container">
-<em>#include &lt;libfly/system/atom.hpp&gt;</em></div>
+<em>#include &lt;libfly/system/property.hpp&gt;</em></div>
 <p>Tag type for atom’s index i.e. position in some array. </p>
 </dd></dl>
 
 <dl class="cpp struct">
-<dt class="sig sig-object cpp" id="_CPPv4N3fly9builtin_m4MassE">
-<span id="_CPPv3N3fly9builtin_m4MassE"></span><span id="_CPPv2N3fly9builtin_m4MassE"></span><span id="fly::builtin_m::Mass"></span><span class="target" id="structfly_1_1builtin__m_1_1Mass"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Mass</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><span class="n"><span class="pre">fly</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">system</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4I0_i_iI0_DpDaE0EN3fly6system8PropertyE" title="fly::system::Property"><span class="n"><span class="pre">Property</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">double</span></span><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4N3fly9builtin_m4MassE" title="Permalink to this definition">#</a><br /></dt>
+<dt class="sig sig-object cpp" id="_CPPv4N3fly18builtin_properties4MassE">
+<span id="_CPPv3N3fly18builtin_properties4MassE"></span><span id="_CPPv2N3fly18builtin_properties4MassE"></span><span id="fly::builtin_properties::Mass"></span><span class="target" id="structfly_1_1builtin__properties_1_1Mass"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Mass</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><span class="n"><span class="pre">fly</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">system</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4I0_i_iI0_DpDaE0EN3fly6system8PropertyE" title="fly::system::Property"><span class="n"><span class="pre">Property</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">double</span></span><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4N3fly18builtin_properties4MassE" title="Permalink to this definition">#</a><br /></dt>
 <dd><div class="docutils container">
-<em>#include &lt;libfly/system/atom.hpp&gt;</em></div>
+<em>#include &lt;libfly/system/property.hpp&gt;</em></div>
 <p>Tag type for atom’s mass. </p>
 </dd></dl>
 
 <dl class="cpp struct">
-<dt class="sig sig-object cpp" id="_CPPv4N3fly9builtin_m13MomentInertiaE">
-<span id="_CPPv3N3fly9builtin_m13MomentInertiaE"></span><span id="_CPPv2N3fly9builtin_m13MomentInertiaE"></span><span id="fly::builtin_m::MomentInertia"></span><span class="target" id="structfly_1_1builtin__m_1_1MomentInertia"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">MomentInertia</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><span class="n"><span class="pre">fly</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">system</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4I0_i_iI0_DpDaE0EN3fly6system8PropertyE" title="fly::system::Property"><span class="n"><span class="pre">Property</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">double</span></span><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4N3fly9builtin_m13MomentInertiaE" title="Permalink to this definition">#</a><br /></dt>
+<dt class="sig sig-object cpp" id="_CPPv4N3fly18builtin_properties13MomentInertiaE">
+<span id="_CPPv3N3fly18builtin_properties13MomentInertiaE"></span><span id="_CPPv2N3fly18builtin_properties13MomentInertiaE"></span><span id="fly::builtin_properties::MomentInertia"></span><span class="target" id="structfly_1_1builtin__properties_1_1MomentInertia"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">MomentInertia</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><span class="n"><span class="pre">fly</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">system</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4I0_i_iI0_DpDaE0EN3fly6system8PropertyE" title="fly::system::Property"><span class="n"><span class="pre">Property</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">double</span></span><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4N3fly18builtin_properties13MomentInertiaE" title="Permalink to this definition">#</a><br /></dt>
 <dd><div class="docutils container">
-<em>#include &lt;libfly/system/atom.hpp&gt;</em></div>
+<em>#include &lt;libfly/system/property.hpp&gt;</em></div>
 <p>Tag type for atom’s moment of inertia in an atoms body frame. </p>
 </dd></dl>
 
 <dl class="cpp struct">
-<dt class="sig sig-object cpp" id="_CPPv4N3fly9builtin_m8PositionE">
-<span id="_CPPv3N3fly9builtin_m8PositionE"></span><span id="_CPPv2N3fly9builtin_m8PositionE"></span><span id="fly::builtin_m::Position"></span><span class="target" id="structfly_1_1builtin__m_1_1Position"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Position</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><span class="n"><span class="pre">fly</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">system</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4I0_i_iI0_DpDaE0EN3fly6system8PropertyE" title="fly::system::Property"><span class="n"><span class="pre">Property</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">double</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="utility.html#_CPPv4N3fly12spatial_dimsE" title="fly::spatial_dims"><span class="n"><span class="pre">spatial_dims</span></span></a><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4N3fly9builtin_m8PositionE" title="Permalink to this definition">#</a><br /></dt>
+<dt class="sig sig-object cpp" id="_CPPv4N3fly18builtin_properties8PositionE">
+<span id="_CPPv3N3fly18builtin_properties8PositionE"></span><span id="_CPPv2N3fly18builtin_properties8PositionE"></span><span id="fly::builtin_properties::Position"></span><span class="target" id="structfly_1_1builtin__properties_1_1Position"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Position</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><span class="n"><span class="pre">fly</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">system</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4I0_i_iI0_DpDaE0EN3fly6system8PropertyE" title="fly::system::Property"><span class="n"><span class="pre">Property</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">double</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="utility.html#_CPPv4N3fly12spatial_dimsE" title="fly::spatial_dims"><span class="n"><span class="pre">spatial_dims</span></span></a><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4N3fly18builtin_properties8PositionE" title="Permalink to this definition">#</a><br /></dt>
 <dd><div class="docutils container">
-<em>#include &lt;libfly/system/atom.hpp&gt;</em></div>
+<em>#include &lt;libfly/system/property.hpp&gt;</em></div>
 <p>Tag type for atom’s position in real space. </p>
 </dd></dl>
 
 <dl class="cpp struct">
-<dt class="sig sig-object cpp" id="_CPPv4N3fly9builtin_m17PotentialGradientE">
-<span id="_CPPv3N3fly9builtin_m17PotentialGradientE"></span><span id="_CPPv2N3fly9builtin_m17PotentialGradientE"></span><span id="fly::builtin_m::PotentialGradient"></span><span class="target" id="structfly_1_1builtin__m_1_1PotentialGradient"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">PotentialGradient</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><span class="n"><span class="pre">fly</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">system</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4I0_i_iI0_DpDaE0EN3fly6system8PropertyE" title="fly::system::Property"><span class="n"><span class="pre">Property</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">double</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="utility.html#_CPPv4N3fly12spatial_dimsE" title="fly::spatial_dims"><span class="n"><span class="pre">spatial_dims</span></span></a><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4N3fly9builtin_m17PotentialGradientE" title="Permalink to this definition">#</a><br /></dt>
+<dt class="sig sig-object cpp" id="_CPPv4N3fly18builtin_properties17PotentialGradientE">
+<span id="_CPPv3N3fly18builtin_properties17PotentialGradientE"></span><span id="_CPPv2N3fly18builtin_properties17PotentialGradientE"></span><span id="fly::builtin_properties::PotentialGradient"></span><span class="target" id="structfly_1_1builtin__properties_1_1PotentialGradient"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">PotentialGradient</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><span class="n"><span class="pre">fly</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">system</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4I0_i_iI0_DpDaE0EN3fly6system8PropertyE" title="fly::system::Property"><span class="n"><span class="pre">Property</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">double</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="utility.html#_CPPv4N3fly12spatial_dimsE" title="fly::spatial_dims"><span class="n"><span class="pre">spatial_dims</span></span></a><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4N3fly18builtin_properties17PotentialGradientE" title="Permalink to this definition">#</a><br /></dt>
 <dd><div class="docutils container">
-<em>#include &lt;libfly/system/atom.hpp&gt;</em></div>
+<em>#include &lt;libfly/system/property.hpp&gt;</em></div>
 <p>Tag type for atom’s potential gradient acting on an atom. </p>
 </dd></dl>
 
 <dl class="cpp struct">
-<dt class="sig sig-object cpp" id="_CPPv4N3fly9builtin_m4TypeE">
-<span id="_CPPv3N3fly9builtin_m4TypeE"></span><span id="_CPPv2N3fly9builtin_m4TypeE"></span><span id="fly::builtin_m::Type"></span><span class="target" id="structfly_1_1builtin__m_1_1Type"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Type</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><span class="n"><span class="pre">fly</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">system</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4I0_i_iI0_DpDaE0EN3fly6system8PropertyE" title="fly::system::Property"><span class="n"><span class="pre">Property</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4N3fly9builtin_m4TypeE" title="Permalink to this definition">#</a><br /></dt>
+<dt class="sig sig-object cpp" id="_CPPv4N3fly18builtin_properties4TypeE">
+<span id="_CPPv3N3fly18builtin_properties4TypeE"></span><span id="_CPPv2N3fly18builtin_properties4TypeE"></span><span id="fly::builtin_properties::Type"></span><span class="target" id="structfly_1_1builtin__properties_1_1Type"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Type</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><span class="n"><span class="pre">fly</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">system</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4I0_i_iI0_DpDaE0EN3fly6system8PropertyE" title="fly::system::Property"><span class="n"><span class="pre">Property</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4N3fly18builtin_properties4TypeE" title="Permalink to this definition">#</a><br /></dt>
 <dd><div class="docutils container">
-<em>#include &lt;libfly/system/atom.hpp&gt;</em></div>
+<em>#include &lt;libfly/system/property.hpp&gt;</em></div>
 <p>Tag type for atom’s type. </p>
 <p>Types are abstract labels assigned to atoms, if two atoms have the same type they are completely interchangeable in every way. </p>
 </dd></dl>
 
 <dl class="cpp struct">
-<dt class="sig sig-object cpp" id="_CPPv4N3fly9builtin_m6TypeIDE">
-<span id="_CPPv3N3fly9builtin_m6TypeIDE"></span><span id="_CPPv2N3fly9builtin_m6TypeIDE"></span><span id="fly::builtin_m::TypeID"></span><span class="target" id="structfly_1_1builtin__m_1_1TypeID"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">TypeID</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><span class="n"><span class="pre">fly</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">system</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4I0_i_iI0_DpDaE0EN3fly6system8PropertyE" title="fly::system::Property"><span class="n"><span class="pre">Property</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">uint32_t</span></span><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4N3fly9builtin_m6TypeIDE" title="Permalink to this definition">#</a><br /></dt>
+<dt class="sig sig-object cpp" id="_CPPv4N3fly18builtin_properties6TypeIDE">
+<span id="_CPPv3N3fly18builtin_properties6TypeIDE"></span><span id="_CPPv2N3fly18builtin_properties6TypeIDE"></span><span id="fly::builtin_properties::TypeID"></span><span class="target" id="structfly_1_1builtin__properties_1_1TypeID"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">TypeID</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><span class="n"><span class="pre">fly</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">system</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4I0_i_iI0_DpDaE0EN3fly6system8PropertyE" title="fly::system::Property"><span class="n"><span class="pre">Property</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">uint32_t</span></span><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4N3fly18builtin_properties6TypeIDE" title="Permalink to this definition">#</a><br /></dt>
 <dd><div class="docutils container">
-<em>#include &lt;libfly/system/atom.hpp&gt;</em></div>
+<em>#include &lt;libfly/system/property.hpp&gt;</em></div>
 <p>Tag type for atom’s id. </p>
-<p>Each atom has a <a class="reference internal" href="#structfly_1_1builtin__m_1_1Type"><span class="std std-ref">Type</span></a>, an atoms <a class="reference internal" href="#structfly_1_1builtin__m_1_1TypeID"><span class="std std-ref">TypeID</span></a> is a number between 0 and N - 1 with N the number of types in the simulation. A TypeMap object performs the transformation from TypeId -&gt; <a class="reference internal" href="#structfly_1_1builtin__m_1_1Type"><span class="std std-ref">Type</span></a>. </p>
+<p>Each atom has a <a class="reference internal" href="#structfly_1_1builtin__properties_1_1Type"><span class="std std-ref">Type</span></a>, an atoms <a class="reference internal" href="#structfly_1_1builtin__properties_1_1TypeID"><span class="std std-ref">TypeID</span></a> is a number between 0 and N - 1 with N the number of types in the simulation. A TypeMap object performs the transformation from TypeId -&gt; <a class="reference internal" href="#structfly_1_1builtin__properties_1_1Type"><span class="std std-ref">Type</span></a>. </p>
 </dd></dl>
 
 <dl class="cpp struct">
-<dt class="sig sig-object cpp" id="_CPPv4N3fly9builtin_m8VelocityE">
-<span id="_CPPv3N3fly9builtin_m8VelocityE"></span><span id="_CPPv2N3fly9builtin_m8VelocityE"></span><span id="fly::builtin_m::Velocity"></span><span class="target" id="structfly_1_1builtin__m_1_1Velocity"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Velocity</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><span class="n"><span class="pre">fly</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">system</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4I0_i_iI0_DpDaE0EN3fly6system8PropertyE" title="fly::system::Property"><span class="n"><span class="pre">Property</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">double</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="utility.html#_CPPv4N3fly12spatial_dimsE" title="fly::spatial_dims"><span class="n"><span class="pre">spatial_dims</span></span></a><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4N3fly9builtin_m8VelocityE" title="Permalink to this definition">#</a><br /></dt>
+<dt class="sig sig-object cpp" id="_CPPv4N3fly18builtin_properties8VelocityE">
+<span id="_CPPv3N3fly18builtin_properties8VelocityE"></span><span id="_CPPv2N3fly18builtin_properties8VelocityE"></span><span id="fly::builtin_properties::Velocity"></span><span class="target" id="structfly_1_1builtin__properties_1_1Velocity"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Velocity</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><span class="n"><span class="pre">fly</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">system</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4I0_i_iI0_DpDaE0EN3fly6system8PropertyE" title="fly::system::Property"><span class="n"><span class="pre">Property</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">double</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="utility.html#_CPPv4N3fly12spatial_dimsE" title="fly::spatial_dims"><span class="n"><span class="pre">spatial_dims</span></span></a><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4N3fly18builtin_properties8VelocityE" title="Permalink to this definition">#</a><br /></dt>
 <dd><div class="docutils container">
-<em>#include &lt;libfly/system/atom.hpp&gt;</em></div>
+<em>#include &lt;libfly/system/property.hpp&gt;</em></div>
 <p>Tag type for atom’s velocity in real space. </p>
 </dd></dl>
 
@@ -751,13 +682,153 @@ distance.</p>
 
 </section>
 </section>
-<section id="array-like-data-structures">
-<h2>Array-like data structures<a class="headerlink" href="#array-like-data-structures" title="Permalink to this heading">#</a></h2>
-<p>The building block of many of the types in libFLY.</p>
-<section id="soa">
-<h3>SoA<a class="headerlink" href="#soa" title="Permalink to this heading">#</a></h3>
+<section id="property-generic-data-structures">
+<h2>Property generic data-structures<a class="headerlink" href="#property-generic-data-structures" title="Permalink to this heading">#</a></h2>
+<section id="atom-class">
+<h3>Atom class<a class="headerlink" href="#atom-class" title="Permalink to this heading">#</a></h3>
+<p>File: <code class="docutils literal notranslate"><span class="pre">libfly/system/atom.hpp</span></code></p>
+<p>The basic building block for atoms in libFLY. </p>
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv4IDpEN3fly6system4AtomE">
+<span id="_CPPv3IDpEN3fly6system4AtomE"></span><span id="_CPPv2IDpEN3fly6system4AtomE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="structfly_1_1system_1_1Atom"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Atom</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><span class="n"><span class="pre">fly</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">system</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">detail</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">AtomMem</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4IDpEN3fly6system4AtomE" title="fly::system::Atom::T"><span class="n"><span class="pre">T</span></span></a><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4IDpEN3fly6system4AtomE" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>The libfly representation of an atom. </p>
+<p>Libfly uses this type to build atoms to allow integration with libFLY’s containers. An <a class="reference internal" href="#structfly_1_1system_1_1Atom"><span class="std std-ref">Atom</span></a> behaves as a structure of its properties , which are accessed through <code class="docutils literal notranslate"><span class="pre">operator[]</span></code>.</p>
+<p><p>Example:</p>
+<div class="code highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;libfly/system/atom.hpp&quot;</span><span class="cp"></span>
+
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;Eigen/src/Core/Matrix.h&gt;</span><span class="cp"></span>
+
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;libfly/system/property.hpp&quot;</span><span class="cp"></span>
+
+<span class="kt">void</span><span class="w"> </span><span class="nf">example_atom</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">  </span><span class="c1">// Define a property to represent spin that is a scalar of type bool.</span>
+<span class="w">  </span><span class="k">struct</span><span class="w"> </span><span class="nc">spin</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">fly</span><span class="o">::</span><span class="n">system</span><span class="o">::</span><span class="n">Property</span><span class="o">&lt;</span><span class="kt">bool</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{};</span><span class="w"></span>
+
+<span class="w">  </span><span class="c1">// Define a property to represent position that is a vector of 3 doubles.</span>
+<span class="w">  </span><span class="c1">// Note there is a built-in property for this (Position).</span>
+<span class="w">  </span><span class="k">struct</span><span class="w"> </span><span class="nc">xyz</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">fly</span><span class="o">::</span><span class="n">system</span><span class="o">::</span><span class="n">Property</span><span class="o">&lt;</span><span class="kt">double</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{};</span><span class="w"></span>
+
+<span class="w">  </span><span class="c1">// Define a property to represent the inertia tensor that is a 3x3 matrix of doubles.</span>
+<span class="w">  </span><span class="k">struct</span><span class="w"> </span><span class="nc">I</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">fly</span><span class="o">::</span><span class="n">system</span><span class="o">::</span><span class="n">Property</span><span class="o">&lt;</span><span class="kt">double</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{};</span><span class="w"></span>
+
+<span class="w">  </span><span class="c1">// Create an atom</span>
+<span class="w">  </span><span class="n">fly</span><span class="o">::</span><span class="n">system</span><span class="o">::</span><span class="n">Atom</span><span class="o">&lt;</span><span class="n">spin</span><span class="p">,</span><span class="w"> </span><span class="n">xyz</span><span class="p">,</span><span class="w"> </span><span class="n">I</span><span class="o">&gt;</span><span class="w"> </span><span class="n">atom</span><span class="p">{</span><span class="w"></span>
+<span class="w">      </span><span class="nb">true</span><span class="p">,</span><span class="w"></span>
+<span class="w">      </span><span class="p">{</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">},</span><span class="w"></span>
+<span class="w">      </span><span class="n">I</span><span class="o">::</span><span class="n">matrix_t</span><span class="o">::</span><span class="n">Zero</span><span class="p">(),</span><span class="w">  </span><span class="c1">// I::matrix_t is Eigen::Matrix&lt;double, 3, 3&gt;</span>
+<span class="w">  </span><span class="p">};</span><span class="w"></span>
+
+<span class="w">  </span><span class="c1">//   Access and set the spin property</span>
+<span class="w">  </span><span class="n">atom</span><span class="p">[</span><span class="n">spin</span><span class="p">{}]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">false</span><span class="p">;</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+</p>
+<dl class="field-list simple">
+<dt class="field-odd">Template Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>T</strong> – a series of empty types, derived from <code class="docutils literal notranslate"><a class="reference internal" href="#structfly_1_1system_1_1Property"><span class="std std-ref"><span class="pre">Property</span></span></a></code>, to describe each member. </p>
+</dd>
+</dl>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3fly6system4Atom4AtomERR4Atom">
+<span id="_CPPv3N3fly6system4Atom4AtomERR4Atom"></span><span id="_CPPv2N3fly6system4Atom4AtomERR4Atom"></span><span id="fly::system::Atom::Atom__AtomRR"></span><span class="target" id="structfly_1_1system_1_1Atom_1aacfca5dbc2a1bd8275c0d1ddfef40176"></span><span class="sig-name descname"><span class="n"><span class="pre">Atom</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N3fly6system4Atom4AtomERR4Atom" title="fly::system::Atom::Atom"><span class="n"><span class="pre">Atom</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">noexcept</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><a class="headerlink" href="#_CPPv4N3fly6system4Atom4AtomERR4Atom" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Copy construct a new <a class="reference internal" href="#structfly_1_1system_1_1Atom"><span class="std std-ref">Atom</span></a> object. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3fly6system4Atom4AtomERK4Atom">
+<span id="_CPPv3N3fly6system4Atom4AtomERK4Atom"></span><span id="_CPPv2N3fly6system4Atom4AtomERK4Atom"></span><span id="fly::system::Atom::Atom__AtomCR"></span><span class="target" id="structfly_1_1system_1_1Atom_1ac57715e84acbce348066f7db7c92c557"></span><span class="sig-name descname"><span class="n"><span class="pre">Atom</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N3fly6system4Atom4AtomERK4Atom" title="fly::system::Atom::Atom"><span class="n"><span class="pre">Atom</span></span></a><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><a class="headerlink" href="#_CPPv4N3fly6system4Atom4AtomERK4Atom" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Move construct a new <a class="reference internal" href="#structfly_1_1system_1_1Atom"><span class="std std-ref">Atom</span></a> object. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3fly6system4Atom4AtomEDpRKN1T8matrix_tE">
+<span id="_CPPv3N3fly6system4Atom4AtomEDpRKN1T8matrix_tE"></span><span id="_CPPv2N3fly6system4Atom4AtomEDpRKN1T8matrix_tE"></span><span id="fly::system::Atom::Atom__T::matrix_tCRDp"></span><span class="target" id="structfly_1_1system_1_1Atom_1a804d43c262f7412da7fa0f111f9e018d"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">explicit</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Atom</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4IDpEN3fly6system4AtomE" title="fly::system::Atom::T"><span class="n"><span class="pre">T</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">matrix_t</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">...</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">args</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3fly6system4Atom4AtomEDpRKN1T8matrix_tE" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Construct a new <a class="reference internal" href="#structfly_1_1system_1_1Atom"><span class="std std-ref">Atom</span></a> object, initializing each member. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3fly6system4Atom4AtomEDpRRN1T8matrix_tE">
+<span id="_CPPv3N3fly6system4Atom4AtomEDpRRN1T8matrix_tE"></span><span id="_CPPv2N3fly6system4Atom4AtomEDpRRN1T8matrix_tE"></span><span id="fly::system::Atom::Atom__T::matrix_tRRDp"></span><span class="target" id="structfly_1_1system_1_1Atom_1a340bc843f9459a5c04ae4c978ebe1fb3"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">explicit</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Atom</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4IDpEN3fly6system4AtomE" title="fly::system::Atom::T"><span class="n"><span class="pre">T</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">matrix_t</span></span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">...</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">args</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3fly6system4Atom4AtomEDpRRN1T8matrix_tE" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Construct a new <a class="reference internal" href="#structfly_1_1system_1_1Atom"><span class="std std-ref">Atom</span></a> object, initializing each member. </p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+</section>
+<section id="type-map">
+<h3>Type map<a class="headerlink" href="#type-map" title="Permalink to this heading">#</a></h3>
+<p>File: <code class="docutils literal notranslate"><span class="pre">libfly/system/typemap.hpp</span></code></p>
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv4IDpEN3fly6system7TypeMapE">
+<span id="_CPPv3IDpEN3fly6system7TypeMapE"></span><span id="_CPPv2IDpEN3fly6system7TypeMapE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classfly_1_1system_1_1TypeMap"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">TypeMap</span></span></span><a class="headerlink" href="#_CPPv4IDpEN3fly6system7TypeMapE" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Utility for mapping an atom’s <a class="reference internal" href="#structfly_1_1builtin__properties_1_1TypeID"><span class="std std-ref">TypeID</span></a> to a <a class="reference internal" href="#structfly_1_1builtin__properties_1_1Type"><span class="std std-ref">Type</span></a> and its properties. </p>
+<p>This is used for properties that are the same for many atoms e.g. atomic numbers, by default each <a class="reference internal" href="#structfly_1_1builtin__properties_1_1TypeID"><span class="std std-ref">TypeID</span></a> must always have a <a class="reference internal" href="#structfly_1_1builtin__properties_1_1Type"><span class="std std-ref">Type</span></a> property.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Template Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>T</strong> – Tags derived from <code class="docutils literal notranslate"><a class="reference internal" href="#structfly_1_1system_1_1Property"><span class="std std-ref"><span class="pre">Property</span></span></a></code>, to describe each property. </p>
+</dd>
+</dl>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3fly6system7TypeMap7TypeMapERK7TypeMap">
+<span id="_CPPv3N3fly6system7TypeMap7TypeMapERK7TypeMap"></span><span id="_CPPv2N3fly6system7TypeMap7TypeMapERK7TypeMap"></span><span id="fly::system::TypeMap::TypeMap__TypeMapCR"></span><span class="target" id="classfly_1_1system_1_1TypeMap_1a6666636e5c12d8ddf7dc9ce17c76ff9d"></span><span class="sig-name descname"><span class="n"><span class="pre">TypeMap</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N3fly6system7TypeMap7TypeMapERK7TypeMap" title="fly::system::TypeMap::TypeMap"><span class="n"><span class="pre">TypeMap</span></span></a><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><a class="headerlink" href="#_CPPv4N3fly6system7TypeMap7TypeMapERK7TypeMap" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Defaulted copy constructor. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3fly6system7TypeMap7TypeMapERR7TypeMap">
+<span id="_CPPv3N3fly6system7TypeMap7TypeMapERR7TypeMap"></span><span id="_CPPv2N3fly6system7TypeMap7TypeMapERR7TypeMap"></span><span id="fly::system::TypeMap::TypeMap__TypeMapRR"></span><span class="target" id="classfly_1_1system_1_1TypeMap_1a797b8465508f1fd1334bb39f01c8f36a"></span><span class="sig-name descname"><span class="n"><span class="pre">TypeMap</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N3fly6system7TypeMap7TypeMapERR7TypeMap" title="fly::system::TypeMap::TypeMap"><span class="n"><span class="pre">TypeMap</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">noexcept</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><a class="headerlink" href="#_CPPv4N3fly6system7TypeMap7TypeMapERR7TypeMap" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Defaulted move constructor. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3fly6system7TypeMap7TypeMapEN5Eigen5IndexE">
+<span id="_CPPv3N3fly6system7TypeMap7TypeMapEN5Eigen5IndexE"></span><span id="_CPPv2N3fly6system7TypeMap7TypeMapEN5Eigen5IndexE"></span><span id="fly::system::TypeMap::TypeMap__Eigen::Index"></span><span class="target" id="classfly_1_1system_1_1TypeMap_1af338c1d140e505f4f95f323e7b65bc4e"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">explicit</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">TypeMap</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">Eigen</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">Index</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">num_types</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3fly6system7TypeMap7TypeMapEN5Eigen5IndexE" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Construct a <a class="reference internal" href="#classfly_1_1system_1_1TypeMap"><span class="std std-ref">TypeMap</span></a> to hold <code class="docutils literal notranslate"><span class="pre">num_types</span></code> types. </p>
+<p><p></p>
+ </p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>All the new properties are uninitialised.</p>
+</div>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4IDp0EN3fly6system7TypeMap7TypeMapE7TypeMapIDp1UE">
+<span id="_CPPv3IDp0EN3fly6system7TypeMap7TypeMapE7TypeMapIDp1UE"></span><span id="_CPPv2IDp0EN3fly6system7TypeMap7TypeMapE7TypeMapIDp1UE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="sig-name descname"><span class="n"><span class="pre">U</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">enable_if_t</span></span><span class="p"><span class="pre">&lt;</span></span><span class="o"><span class="pre">!</span></span><span class="n"><span class="pre">detail</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">same_properties</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4IDp0EN3fly6system7TypeMap7TypeMapE7TypeMapIDp1UE" title="fly::system::TypeMap::TypeMap"><span class="n"><span class="pre">TypeMap</span></span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4IDp0EN3fly6system7TypeMap7TypeMapE7TypeMapIDp1UE" title="fly::system::TypeMap::TypeMap::U"><span class="n"><span class="pre">U</span></span></a><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classfly_1_1system_1_1TypeMap_1a27890bd17c9e00bf50603dc8e9344bbb"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">explicit</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">TypeMap</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4IDp0EN3fly6system7TypeMap7TypeMapE7TypeMapIDp1UE" title="fly::system::TypeMap::TypeMap"><span class="n"><span class="pre">TypeMap</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4IDp0EN3fly6system7TypeMap7TypeMapE7TypeMapIDp1UE" title="fly::system::TypeMap::TypeMap::U"><span class="n"><span class="pre">U</span></span></a><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">map</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4IDp0EN3fly6system7TypeMap7TypeMapE7TypeMapIDp1UE" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Construct a new <a class="reference internal" href="#classfly_1_1system_1_1TypeMap"><span class="std std-ref">TypeMap</span></a> by slicing a different kind of <a class="reference internal" href="#classfly_1_1system_1_1TypeMap"><span class="std std-ref">TypeMap</span></a>. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK3fly6system7TypeMap9num_typesEv">
+<span id="_CPPv3NK3fly6system7TypeMap9num_typesEv"></span><span id="_CPPv2NK3fly6system7TypeMap9num_typesEv"></span><span id="fly::system::TypeMap::num_typesC"></span><span class="target" id="classfly_1_1system_1_1TypeMap_1a51f8f51dac5352810dde83608056f404"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">Eigen</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">Index</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">num_types</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK3fly6system7TypeMap9num_typesEv" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Fetch the number of types stored in the <a class="reference internal" href="#classfly_1_1system_1_1TypeMap"><span class="std std-ref">TypeMap</span></a>. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0ENK3fly6system7TypeMap3getEDc1UNSt8uint32_tE">
+<span id="_CPPv3I0ENK3fly6system7TypeMap3getE1UNSt8uint32_tE"></span><span id="_CPPv2I0ENK3fly6system7TypeMap3getE1UNSt8uint32_tE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">U</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classfly_1_1system_1_1TypeMap_1a8c0fa4aa10110e20770d15ce03168930"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">decltype</span></span><span class="p"><span class="pre">(</span></span><span class="k"><span class="pre">auto</span></span><span class="p"><span class="pre">)</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">get</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0ENK3fly6system7TypeMap3getEDc1UNSt8uint32_tE" title="fly::system::TypeMap::get::U"><span class="n"><span class="pre">U</span></span></a>, <span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">id</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4I0ENK3fly6system7TypeMap3getEDc1UNSt8uint32_tE" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Get a property corresponding to the id <code class="docutils literal notranslate"><span class="pre">id</span></code>. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I00EN3fly6system7TypeMap3setEv1UNSt8uint32_tERR1V">
+<span id="_CPPv3I00EN3fly6system7TypeMap3setE1UNSt8uint32_tERR1V"></span><span id="_CPPv2I00EN3fly6system7TypeMap3setE1UNSt8uint32_tERR1V"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">U</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">V</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><a class="reference internal" href="utility.html#_CPPv4I0EN3fly13remove_cref_tE" title="fly::remove_cref_t"><span class="n"><span class="pre">remove_cref_t</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I00EN3fly6system7TypeMap3setEv1UNSt8uint32_tERR1V" title="fly::system::TypeMap::set::U"><span class="n"><span class="pre">U</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">matrix_t</span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classfly_1_1system_1_1TypeMap_1a7b4e376f1469fcb5bcf2533bf9d667e8"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">set</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I00EN3fly6system7TypeMap3setEv1UNSt8uint32_tERR1V" title="fly::system::TypeMap::set::U"><span class="n"><span class="pre">U</span></span></a>, <span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">id</span></span>, <a class="reference internal" href="#_CPPv4I00EN3fly6system7TypeMap3setEv1UNSt8uint32_tERR1V" title="fly::system::TypeMap::set::V"><span class="n"><span class="pre">V</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">value</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I00EN3fly6system7TypeMap3setEv1UNSt8uint32_tERR1V" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Set a property corresponding to the id <code class="docutils literal notranslate"><span class="pre">id</span></code>. </p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+</section>
+<section id="structure-of-arrays">
+<h3>Structure of arrays<a class="headerlink" href="#structure-of-arrays" title="Permalink to this heading">#</a></h3>
 <p>File: <code class="docutils literal notranslate"><span class="pre">libfly/system/SoA.hpp</span></code></p>
-<p>Structure of Arrays implementation. </p>
 <dl class="cpp class">
 <dt class="sig sig-object cpp" id="_CPPv4IDpEN3fly6system3SoAE">
 <span id="_CPPv3IDpEN3fly6system3SoAE"></span><span id="_CPPv2IDpEN3fly6system3SoAE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="sig-name descname"><span class="n"><span class="pre">Pr</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classfly_1_1system_1_1SoA"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SoA</span></span></span><a class="headerlink" href="#_CPPv4IDpEN3fly6system3SoAE" title="Permalink to this definition">#</a><br /></dt>
@@ -767,12 +838,13 @@ distance.</p>
 <p><p>Example:</p>
 <div class="code highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;libfly/system/SoA.hpp&quot;</span><span class="cp"></span>
 
-<span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;libfly/system/atom.hpp&quot;</span><span class="c1">  //&lt; Property</span><span class="cp"></span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;libfly/system/property.hpp&quot;</span><span class="cp"></span>
 
 <span class="c1">// Define a property to represent spin that is a scalar of type bool.</span>
 <span class="k">struct</span><span class="w"> </span><span class="nc">spin</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">fly</span><span class="o">::</span><span class="n">system</span><span class="o">::</span><span class="n">Property</span><span class="o">&lt;</span><span class="kt">bool</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{};</span><span class="w"></span>
 
 <span class="c1">// Define a property to represent position that is a vector of 3 doubles.</span>
+<span class="c1">// Note there is a built-in property for this (Position).</span>
 <span class="k">struct</span><span class="w"> </span><span class="nc">xyz</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">fly</span><span class="o">::</span><span class="n">system</span><span class="o">::</span><span class="n">Property</span><span class="o">&lt;</span><span class="kt">double</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{};</span><span class="w"></span>
 
 <span class="c1">// Define a property to represent the inertia tensor that is a 3x3 matrix of doubles.</span>
@@ -785,7 +857,7 @@ distance.</p>
 <span class="p">}</span><span class="w"></span>
 
 <span class="kt">void</span><span class="w"> </span><span class="nf">example_SoA</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-<span class="w">  </span><span class="c1">// SoA of 10 unintialized atoms.</span>
+<span class="w">  </span><span class="c1">// SoA of 10 uninitialized atoms.</span>
 <span class="w">  </span><span class="n">fly</span><span class="o">::</span><span class="n">system</span><span class="o">::</span><span class="n">SoA</span><span class="o">&lt;</span><span class="n">spin</span><span class="p">,</span><span class="w"> </span><span class="n">xyz</span><span class="p">,</span><span class="w"> </span><span class="n">I</span><span class="o">&gt;</span><span class="w"> </span><span class="n">atoms</span><span class="p">(</span><span class="mi">10</span><span class="p">);</span><span class="w"></span>
 
 <span class="w">  </span><span class="c1">// Set the spin of the fist atom.</span>
@@ -874,10 +946,11 @@ distance.</p>
 <p class="admonition-title">Note</p>
 <p>Assignement to reference properties  follows pointer-semantics:</p>
 <div class="code highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;libfly/system/SoA.hpp&quot;</span><span class="cp"></span>
-<span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;libfly/system/atom.hpp&quot;</span><span class="c1">  //&lt; Property</span><span class="cp"></span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;libfly/system/property.hpp&quot;</span><span class="cp"></span>
 
 <span class="kt">void</span><span class="w"> </span><span class="nf">SoA_assign</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
 <span class="w">  </span><span class="c1">// Define a property to represent position that is a vector of 3 doubles.</span>
+<span class="w">  </span><span class="c1">// Note there is a built-in property for this (Position).</span>
 <span class="w">  </span><span class="k">struct</span><span class="w"> </span><span class="nc">xyz</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">fly</span><span class="o">::</span><span class="n">system</span><span class="o">::</span><span class="n">Property</span><span class="o">&lt;</span><span class="kt">double</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{};</span><span class="w"></span>
 
 <span class="w">  </span><span class="n">fly</span><span class="o">::</span><span class="n">system</span><span class="o">::</span><span class="n">SoA</span><span class="o">&lt;</span><span class="n">xyz</span><span class="o">&gt;</span><span class="w"> </span><span class="n">a</span><span class="p">(</span><span class="mi">10</span><span class="p">);</span><span class="w"></span>
@@ -942,10 +1015,9 @@ distance.</p>
 </dd></dl>
 
 </section>
-<section id="vos">
-<h3>VoS<a class="headerlink" href="#vos" title="Permalink to this heading">#</a></h3>
+<section id="array-of-structures">
+<h3>Array of structures<a class="headerlink" href="#array-of-structures" title="Permalink to this heading">#</a></h3>
 <p>File: <code class="docutils literal notranslate"><span class="pre">libfly/system/VoS.hpp</span></code></p>
-<p>Array of Structures implementation. </p>
 <dl class="cpp class">
 <dt class="sig sig-object cpp" id="_CPPv4IDpEN3fly6system3VoSE">
 <span id="_CPPv3IDpEN3fly6system3VoSE"></span><span id="_CPPv2IDpEN3fly6system3VoSE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classfly_1_1system_1_1VoS"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">VoS</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">private</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4IDpEN3fly6system4AtomE" title="fly::system::Atom"><span class="n"><span class="pre">Atom</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4IDpEN3fly6system3VoSE" title="fly::system::VoS::T"><span class="n"><span class="pre">T</span></span></a><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4IDpEN3fly6system3VoSE" title="Permalink to this definition">#</a><br /></dt>
@@ -954,17 +1026,19 @@ distance.</p>
 <p><p>Example:</p>
 <div class="code highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;libfly/system/VoS.hpp&quot;</span><span class="cp"></span>
 
-<span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;libfly/system/atom.hpp&quot;</span><span class="c1">  //&lt; Property, atom</span><span class="cp"></span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;libfly/system/atom.hpp&quot;</span><span class="cp"></span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;libfly/system/property.hpp&quot;</span><span class="cp"></span>
 
 <span class="kt">void</span><span class="w"> </span><span class="nf">example_VoS</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
 <span class="w">  </span><span class="c1">// Define a property to represent position that is a vector of 3 doubles.</span>
+<span class="w">  </span><span class="c1">// Note there is a built-in property for this (Position).</span>
 <span class="w">  </span><span class="k">struct</span><span class="w"> </span><span class="nc">xyz</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">fly</span><span class="o">::</span><span class="n">system</span><span class="o">::</span><span class="n">Property</span><span class="o">&lt;</span><span class="kt">double</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{};</span><span class="w"></span>
 
 <span class="w">  </span><span class="n">fly</span><span class="o">::</span><span class="n">system</span><span class="o">::</span><span class="n">VoS</span><span class="o">&lt;</span><span class="n">xyz</span><span class="o">&gt;</span><span class="w"> </span><span class="n">atoms</span><span class="p">;</span><span class="w">  </span><span class="c1">// Empty VoS</span>
 
 <span class="w">  </span><span class="n">atoms</span><span class="p">.</span><span class="n">emplace_back</span><span class="p">({</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">});</span><span class="w">  </span><span class="c1">// Add an atom at position {1, 2, 3}</span>
 
-<span class="w">  </span><span class="n">fly</span><span class="o">::</span><span class="n">system</span><span class="o">::</span><span class="n">Atom</span><span class="o">&lt;</span><span class="n">xyz</span><span class="o">&gt;&amp;</span><span class="w"> </span><span class="n">first_atom</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">atoms</span><span class="p">[</span><span class="mi">0</span><span class="p">];</span><span class="w">  </span><span class="c1">// Referance to first atom.</span>
+<span class="w">  </span><span class="n">fly</span><span class="o">::</span><span class="n">system</span><span class="o">::</span><span class="n">Atom</span><span class="o">&lt;</span><span class="n">xyz</span><span class="o">&gt;&amp;</span><span class="w"> </span><span class="n">first_atom</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">atoms</span><span class="p">[</span><span class="mi">0</span><span class="p">];</span><span class="w">  </span><span class="c1">// Reference to first atom.</span>
 
 <span class="w">  </span><span class="n">atoms</span><span class="p">.</span><span class="n">push_back</span><span class="p">(</span><span class="n">first_atom</span><span class="p">);</span><span class="w">  </span><span class="c1">// Make a second atom a copy of the first.</span>
 <span class="p">}</span><span class="w"></span>
@@ -1014,12 +1088,11 @@ distance.</p>
 <section id="supercells">
 <h2>Supercells<a class="headerlink" href="#supercells" title="Permalink to this heading">#</a></h2>
 <p>File: <code class="docutils literal notranslate"><span class="pre">libfly/system/supercell.hpp</span></code></p>
-<p>Classes to represent systems of atoms. </p>
 <dl class="cpp class">
 <dt class="sig sig-object cpp" id="_CPPv4I0DpEN3fly6system9SupercellE">
 <span id="_CPPv3I0DpEN3fly6system9SupercellE"></span><span id="_CPPv2I0DpEN3fly6system9SupercellE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Map</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classfly_1_1system_1_1Supercell"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Supercell</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><span class="n"><span class="pre">fly</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">system</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4IDpEN3fly6system3SoAE" title="fly::system::SoA"><span class="n"><span class="pre">SoA</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">TypeID</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0DpEN3fly6system9SupercellE" title="fly::system::Supercell::T"><span class="n"><span class="pre">T</span></span></a><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4I0DpEN3fly6system9SupercellE" title="Permalink to this definition">#</a><br /></dt>
 <dd><p>LibFLY’s representation of a system of atoms. </p>
-<p>The <a class="reference internal" href="#classfly_1_1system_1_1Supercell"><span class="std std-ref">Supercell</span></a> is libFLY’s amalgamation of all the data required for a simulation. It <strong>is a</strong> <a class="reference internal" href="#classfly_1_1system_1_1SoA"><span class="std std-ref">SoA</span></a> containing all the atoms in the system <strong>has a</strong> <code class="docutils literal notranslate"><a class="reference internal" href="#classfly_1_1system_1_1Box"><span class="std std-ref"><span class="pre">Box</span></span></a></code> and a <code class="docutils literal notranslate"><a class="reference internal" href="#classfly_1_1system_1_1TypeMap"><span class="std std-ref"><span class="pre">TypeMap</span></span></a></code>. A <a class="reference internal" href="#classfly_1_1system_1_1Supercell"><span class="std std-ref">Supercell</span></a> always has the <code class="docutils literal notranslate"><a class="reference internal" href="#structfly_1_1builtin__m_1_1TypeID"><span class="std std-ref"><span class="pre">TypeID</span></span></a></code> property for each atom and accepts the rest as template arguments.</p>
+<p>The <a class="reference internal" href="#classfly_1_1system_1_1Supercell"><span class="std std-ref">Supercell</span></a> is libFLY’s amalgamation of all the data required for a simulation. It <strong>is a</strong> <a class="reference internal" href="#classfly_1_1system_1_1SoA"><span class="std std-ref">SoA</span></a> containing all the atoms in the system <strong>has a</strong> <code class="docutils literal notranslate"><a class="reference internal" href="#classfly_1_1system_1_1Box"><span class="std std-ref"><span class="pre">Box</span></span></a></code> and a <code class="docutils literal notranslate"><a class="reference internal" href="#classfly_1_1system_1_1TypeMap"><span class="std std-ref"><span class="pre">TypeMap</span></span></a></code>. A <a class="reference internal" href="#classfly_1_1system_1_1Supercell"><span class="std std-ref">Supercell</span></a> always has the <code class="docutils literal notranslate"><a class="reference internal" href="#structfly_1_1builtin__properties_1_1TypeID"><span class="std std-ref"><span class="pre">TypeID</span></span></a></code> property for each atom and accepts the rest as template arguments.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Template Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>T</strong> – Tags derived from <code class="docutils literal notranslate"><a class="reference internal" href="#structfly_1_1system_1_1Property"><span class="std std-ref"><span class="pre">Property</span></span></a></code>, to describe each member. </p>
@@ -1067,72 +1140,6 @@ distance.</p>
 <p>Uses partial function-template argument deduction to deduce <a class="reference internal" href="#classfly_1_1system_1_1Supercell"><span class="std std-ref">Supercell</span></a>’s template parameters. </p>
 </dd></dl>
 
-<section id="mapping-type-ids-to-properties">
-<h3>Mapping type IDs to properties<a class="headerlink" href="#mapping-type-ids-to-properties" title="Permalink to this heading">#</a></h3>
-<dl class="cpp class">
-<dt class="sig sig-object cpp" id="_CPPv4IDpEN3fly6system7TypeMapE">
-<span id="_CPPv3IDpEN3fly6system7TypeMapE"></span><span id="_CPPv2IDpEN3fly6system7TypeMapE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classfly_1_1system_1_1TypeMap"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">TypeMap</span></span></span><a class="headerlink" href="#_CPPv4IDpEN3fly6system7TypeMapE" title="Permalink to this definition">#</a><br /></dt>
-<dd><p>Utility for mapping an atoms <a class="reference internal" href="#structfly_1_1builtin__m_1_1TypeID"><span class="std std-ref">TypeID</span></a> to atomic properties. </p>
-<p>This is used for properties that are the same for many atoms e.g. atomic numbers.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Template Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>T</strong> – Tags derived from <code class="docutils literal notranslate"><a class="reference internal" href="#structfly_1_1system_1_1Property"><span class="std std-ref"><span class="pre">Property</span></span></a></code>, to describe each property. </p>
-</dd>
-</dl>
-<div class="breathe-sectiondef docutils container">
-<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4N3fly6system7TypeMap7TypeMapERK7TypeMap">
-<span id="_CPPv3N3fly6system7TypeMap7TypeMapERK7TypeMap"></span><span id="_CPPv2N3fly6system7TypeMap7TypeMapERK7TypeMap"></span><span id="fly::system::TypeMap::TypeMap__TypeMapCR"></span><span class="target" id="classfly_1_1system_1_1TypeMap_1a6666636e5c12d8ddf7dc9ce17c76ff9d"></span><span class="sig-name descname"><span class="n"><span class="pre">TypeMap</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N3fly6system7TypeMap7TypeMapERK7TypeMap" title="fly::system::TypeMap::TypeMap"><span class="n"><span class="pre">TypeMap</span></span></a><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><a class="headerlink" href="#_CPPv4N3fly6system7TypeMap7TypeMapERK7TypeMap" title="Permalink to this definition">#</a><br /></dt>
-<dd><p>Defaulted copy constructor. </p>
-</dd></dl>
-
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4N3fly6system7TypeMap7TypeMapERR7TypeMap">
-<span id="_CPPv3N3fly6system7TypeMap7TypeMapERR7TypeMap"></span><span id="_CPPv2N3fly6system7TypeMap7TypeMapERR7TypeMap"></span><span id="fly::system::TypeMap::TypeMap__TypeMapRR"></span><span class="target" id="classfly_1_1system_1_1TypeMap_1ae7de6f7e567056b17937574f6de59156"></span><span class="sig-name descname"><span class="n"><span class="pre">TypeMap</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N3fly6system7TypeMap7TypeMapERR7TypeMap" title="fly::system::TypeMap::TypeMap"><span class="n"><span class="pre">TypeMap</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><a class="headerlink" href="#_CPPv4N3fly6system7TypeMap7TypeMapERR7TypeMap" title="Permalink to this definition">#</a><br /></dt>
-<dd><p>Defaulted move constructor. </p>
-</dd></dl>
-
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4N3fly6system7TypeMap7TypeMapEN5Eigen5IndexE">
-<span id="_CPPv3N3fly6system7TypeMap7TypeMapEN5Eigen5IndexE"></span><span id="_CPPv2N3fly6system7TypeMap7TypeMapEN5Eigen5IndexE"></span><span id="fly::system::TypeMap::TypeMap__Eigen::Index"></span><span class="target" id="classfly_1_1system_1_1TypeMap_1af338c1d140e505f4f95f323e7b65bc4e"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">explicit</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">TypeMap</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">Eigen</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">Index</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">num_types</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3fly6system7TypeMap7TypeMapEN5Eigen5IndexE" title="Permalink to this definition">#</a><br /></dt>
-<dd><p>Construct a <a class="reference internal" href="#classfly_1_1system_1_1TypeMap"><span class="std std-ref">TypeMap</span></a> to hold <code class="docutils literal notranslate"><span class="pre">num_types</span></code> types. </p>
-<p><p></p>
- </p>
-<div class="admonition warning">
-<p class="admonition-title">Warning</p>
-<p>All the new properties are uninitialised.</p>
-</div>
-</dd></dl>
-
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4IDp0EN3fly6system7TypeMap7TypeMapE7TypeMapIDp1UE">
-<span id="_CPPv3IDp0EN3fly6system7TypeMap7TypeMapE7TypeMapIDp1UE"></span><span id="_CPPv2IDp0EN3fly6system7TypeMap7TypeMapE7TypeMapIDp1UE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="sig-name descname"><span class="n"><span class="pre">U</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">enable_if_t</span></span><span class="p"><span class="pre">&lt;</span></span><span class="o"><span class="pre">!</span></span><span class="n"><span class="pre">detail</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">same_properties</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4IDp0EN3fly6system7TypeMap7TypeMapE7TypeMapIDp1UE" title="fly::system::TypeMap::TypeMap"><span class="n"><span class="pre">TypeMap</span></span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4IDp0EN3fly6system7TypeMap7TypeMapE7TypeMapIDp1UE" title="fly::system::TypeMap::TypeMap::U"><span class="n"><span class="pre">U</span></span></a><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classfly_1_1system_1_1TypeMap_1a27890bd17c9e00bf50603dc8e9344bbb"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">explicit</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">TypeMap</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4IDp0EN3fly6system7TypeMap7TypeMapE7TypeMapIDp1UE" title="fly::system::TypeMap::TypeMap"><span class="n"><span class="pre">TypeMap</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4IDp0EN3fly6system7TypeMap7TypeMapE7TypeMapIDp1UE" title="fly::system::TypeMap::TypeMap::U"><span class="n"><span class="pre">U</span></span></a><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">map</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4IDp0EN3fly6system7TypeMap7TypeMapE7TypeMapIDp1UE" title="Permalink to this definition">#</a><br /></dt>
-<dd><p>Construct a new <a class="reference internal" href="#classfly_1_1system_1_1TypeMap"><span class="std std-ref">TypeMap</span></a> by slicing a different kind of <a class="reference internal" href="#classfly_1_1system_1_1TypeMap"><span class="std std-ref">TypeMap</span></a>. </p>
-</dd></dl>
-
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4NK3fly6system7TypeMap9num_typesEv">
-<span id="_CPPv3NK3fly6system7TypeMap9num_typesEv"></span><span id="_CPPv2NK3fly6system7TypeMap9num_typesEv"></span><span id="fly::system::TypeMap::num_typesC"></span><span class="target" id="classfly_1_1system_1_1TypeMap_1a51f8f51dac5352810dde83608056f404"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">Eigen</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">Index</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">num_types</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK3fly6system7TypeMap9num_typesEv" title="Permalink to this definition">#</a><br /></dt>
-<dd><p>Fetch the number of types stored in the <a class="reference internal" href="#classfly_1_1system_1_1TypeMap"><span class="std std-ref">TypeMap</span></a>. </p>
-</dd></dl>
-
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4I0ENK3fly6system7TypeMap3getEDc1UNSt8uint32_tE">
-<span id="_CPPv3I0ENK3fly6system7TypeMap3getE1UNSt8uint32_tE"></span><span id="_CPPv2I0ENK3fly6system7TypeMap3getE1UNSt8uint32_tE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">U</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classfly_1_1system_1_1TypeMap_1a8c0fa4aa10110e20770d15ce03168930"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">decltype</span></span><span class="p"><span class="pre">(</span></span><span class="k"><span class="pre">auto</span></span><span class="p"><span class="pre">)</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">get</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0ENK3fly6system7TypeMap3getEDc1UNSt8uint32_tE" title="fly::system::TypeMap::get::U"><span class="n"><span class="pre">U</span></span></a>, <span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">id</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4I0ENK3fly6system7TypeMap3getEDc1UNSt8uint32_tE" title="Permalink to this definition">#</a><br /></dt>
-<dd><p>Get a property corresponding to the id <code class="docutils literal notranslate"><span class="pre">id</span></code>. </p>
-</dd></dl>
-
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4I00EN3fly6system7TypeMap3setEv1UNSt8uint32_tERR1V">
-<span id="_CPPv3I00EN3fly6system7TypeMap3setE1UNSt8uint32_tERR1V"></span><span id="_CPPv2I00EN3fly6system7TypeMap3setE1UNSt8uint32_tERR1V"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">U</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">V</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><a class="reference internal" href="utility.html#_CPPv4I0EN3fly13remove_cref_tE" title="fly::remove_cref_t"><span class="n"><span class="pre">remove_cref_t</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I00EN3fly6system7TypeMap3setEv1UNSt8uint32_tERR1V" title="fly::system::TypeMap::set::U"><span class="n"><span class="pre">U</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">matrix_t</span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classfly_1_1system_1_1TypeMap_1a7b4e376f1469fcb5bcf2533bf9d667e8"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">set</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I00EN3fly6system7TypeMap3setEv1UNSt8uint32_tERR1V" title="fly::system::TypeMap::set::U"><span class="n"><span class="pre">U</span></span></a>, <span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">id</span></span>, <a class="reference internal" href="#_CPPv4I00EN3fly6system7TypeMap3setEv1UNSt8uint32_tERR1V" title="fly::system::TypeMap::set::V"><span class="n"><span class="pre">V</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">value</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I00EN3fly6system7TypeMap3setEv1UNSt8uint32_tERR1V" title="Permalink to this definition">#</a><br /></dt>
-<dd><p>Set a property corresponding to the id <code class="docutils literal notranslate"><span class="pre">id</span></code>. </p>
-</dd></dl>
-
-</div>
-</dd></dl>
-
-</section>
 </section>
 </section>
 
@@ -1201,23 +1208,21 @@ distance.</p>
 <li><a class="reference internal" href="#">System</a><ul>
 <li><a class="reference internal" href="#simulation-space">Simulation space</a><ul>
 <li><a class="reference internal" href="#generalised-box">Generalised box</a></li>
+<li><a class="reference internal" href="#specialised-boxes">Specialised boxes</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#atoms">Atoms</a><ul>
+<li><a class="reference internal" href="#properties">Properties</a><ul>
+<li><a class="reference internal" href="#built-in">Built-in</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#property-generic-data-structures">Property generic data-structures</a><ul>
 <li><a class="reference internal" href="#atom-class">Atom class</a></li>
-<li><a class="reference internal" href="#properties">Properties</a></li>
-<li><a class="reference internal" href="#built-in-members">Built-in members</a></li>
+<li><a class="reference internal" href="#type-map">Type map</a></li>
+<li><a class="reference internal" href="#structure-of-arrays">Structure of arrays</a></li>
+<li><a class="reference internal" href="#array-of-structures">Array of structures</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#array-like-data-structures">Array-like data structures</a><ul>
-<li><a class="reference internal" href="#soa">SoA</a></li>
-<li><a class="reference internal" href="#vos">VoS</a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#supercells">Supercells</a><ul>
-<li><a class="reference internal" href="#mapping-type-ids-to-properties">Mapping type IDs to properties</a></li>
-</ul>
-</li>
+<li><a class="reference internal" href="#supercells">Supercells</a></li>
 </ul>
 </li>
 </ul>

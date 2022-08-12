@@ -13,12 +13,6 @@ File: ``libfly/system/box.hpp``
 .. doxygenfile:: libfly/system/box.hpp
     :sections: briefdescription detaileddescription
 
-In theory libFLY could detect the most efficient crystal-system for any basis set and produce optimal code. Unfortunately, this is a lot of work hence, libFLY uses a smaller set - suitable for the majority of cases. If you would like to read more about these specialised boxes see:
-
-.. toctree::
-   
-   crystal_systems.rst
-
 Generalised box
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -26,43 +20,65 @@ Generalised box
     :members:
     :undoc-members:
 
+Specialised boxes
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Atoms
-----------------------
+In theory libFLY could detect the most efficient crystal-system for any basis-set and produce optimal code. Unfortunately, this is a lot of work hence, libFLY uses a smaller set - suitable for the majority of cases. If you would like to read more about these specialised boxes see:
+
+.. toctree::
+   
+   crystal_systems.rst
+
+
+Properties
+------------------------
+
+File: ``libfly/system/property.hpp``
+
+.. doxygenfile:: libfly/system/property.hpp
+    :sections: briefdescription detaileddescription
+
+
+.. doxygenstruct:: fly::system::Property
+    :members:
+    :undoc-members:
+
+Built-in 
+~~~~~~~~~~~~~~~~~~
+
+.. doxygennamespace:: fly::builtin_properties
+
+
+
+Property generic data-structures
+----------------------------------------
+
+Atom class
+~~~~~~~~~~
 
 File: ``libfly/system/atom.hpp``
 
 .. doxygenfile:: libfly/system/atom.hpp
     :sections: briefdescription detaileddescription
 
-Atom class
-~~~~~~~~~~
-
 .. doxygenstruct:: fly::system::Atom
     :members:
     :undoc-members:
 
+Type map
+~~~~~~~~~~
 
-Properties
-~~~~~~~~~~~~
+File: ``libfly/system/typemap.hpp``
 
-.. doxygenstruct:: fly::system::Property
+.. doxygenfile:: libfly/system/typemap.hpp
+    :sections: briefdescription detaileddescription
+
+.. doxygenclass:: fly::system::TypeMap
     :members:
     :undoc-members:
 
 
-Built-in members
-~~~~~~~~~~~~~~~~~~
-
-.. doxygennamespace:: fly::builtin_m
-  
-
-Array-like data structures
-----------------------------------------
-
-The building block of many of the types in libFLY.
-
-SoA
+Structure of arrays
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 File: ``libfly/system/SoA.hpp``
@@ -74,7 +90,7 @@ File: ``libfly/system/SoA.hpp``
     :members:
     :undoc-members:
 
-VoS 
+Array of structures
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 File: ``libfly/system/VoS.hpp``
@@ -101,12 +117,6 @@ File: ``libfly/system/supercell.hpp``
 
 .. doxygenfunction:: fly::system::make_supercell
 
-Mapping type IDs to properties
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. doxygenclass:: fly::system::TypeMap
-    :members:
-    :undoc-members:
 
 
 

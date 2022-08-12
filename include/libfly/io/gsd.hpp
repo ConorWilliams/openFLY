@@ -21,10 +21,12 @@
 #include <nonstd/span.hpp>
 #include <string>
 #include <string_view>
+#include <type_traits>
 #include <utility>
 
 #include "libfly/system/SoA.hpp"
 #include "libfly/system/box.hpp"
+#include "libfly/system/typemap.hpp"
 #include "libfly/utility/core.hpp"
 
 /**
@@ -78,7 +80,7 @@ namespace fly::io {
     /**
      * @brief Get the number of frames in the GSD file.
      */
-    std::uint64_t n_frames() const noexcept;
+    auto n_frames() const noexcept -> std::uint64_t;
 
     /**
      * @brief Clear the current file.
@@ -87,15 +89,15 @@ namespace fly::io {
      * application, schema, and schema version metadata will be kept. Clear does not close and reopen the file, so it is suitable
      * for writing restart files on Lustre file.
      */
-    void clear();
+    auto clear() -> void;
 
     /**
      * @brief Commit the current writes to disk
      *
-     * @tparam F An optional nullery invokable to call before committing the writes.
+     * @tparam F An optional nullery-invokable to call before committing the writes.
      */
     template <typename F = noop>
-    void commit(F &&f = {}) {
+    auto commit(F &&f = {}) -> void {
       std::invoke(std::forward<F>(f));
       end_frame();
     }
@@ -110,20 +112,18 @@ namespace fly::io {
      * \endrst
      *
      */
-    void write(system::Box const &box);
+    auto write(system::Box const &box) -> void;
 
     /**
      * @brief Read a Box stored at frame ``i`` and write it to ``out``.
      */
-    void read(std::uint64_t i, system::Box &out) const;
+    auto read(std::uint64_t i, system::Box &out) const -> void;
 
     /**
      * @brief Write a tagged property to the current frame.
-     *
-     * @tparam T Property tag of property to write.
      */
     template <typename T, typename... U>
-    void write(T, system::SoA<U...> const &in) {
+    auto write(T, system::SoA<U...> const &in) -> std::enable_if_t<std::is_arithmetic_v<typename T::scalar_t>> {
       dump_span(T::tag, T::size(),
                 nonstd::span<typename T::scalar_t const>{
                     in[T{}].derived().data(),
@@ -135,12 +135,28 @@ namespace fly::io {
      * @brief Read a tagged Property from the ``i``th frame and write it to ``out``.
      */
     template <typename T, typename... U>
-    void read(std::uint64_t i, T, system::SoA<U...> &out) {
+    auto read(std::uint64_t i, T, system::SoA<U...> &out) -> std::enable_if_t<std::is_arithmetic_v<typename T::scalar_t>> {
       load_span(i, T::tag, T::size(),
                 nonstd::span<typename T::scalar_t>{
                     out[T{}].derived().data(),
                     safe_cast<std::size_t>(out.size()) * T::size(),
                 });
+    }
+
+    /**
+     * @brief Write a TypeMap to the current frame.
+     */
+    template <typename T, typename... U>
+    auto write(system::TypeMap<U...> const &map) -> void {
+      (write(U{}, static_cast<typename system::TypeMap<U...>::SOA const &>(map)), ...);
+    }
+
+    /**
+     * @brief  Read a tagged Property from the ``i``th frame and write it to a TypeMap.
+     */
+    template <typename T, typename... U>
+    auto read(std::uint64_t i, system::TypeMap<U...> &map) -> void {
+      (read(i, U{}, static_cast<typename system::TypeMap<U...>::SOA &>(map)), ...);
     }
 
     // ////////////////////////////////////////////////////////////

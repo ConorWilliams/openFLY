@@ -25,18 +25,14 @@ TEST_CASE("TypeMap + Supercell", "[system]") {
 
   system::TypeMap<Mass, Position> map{4};
 
-  map.set(tp_, 0, "Fe");
-
-  CHECK(map.get(tp_, 0) == "Fe");
-
-  map.set(r_, 0, {0, 1, 0});
+  map.set(0, "Fe", 1.2, {0, 1, 0});
 
   //   Slicing
 
   system::TypeMap<Position> pmap(map);
 
-  CHECK(pmap.get(tp_, 0) == "Fe");
-  CHECK(pmap.get(r_, 0) == Vec{0, 1, 0});
+  CHECK(pmap.get(0, tp_) == "Fe");
+  CHECK(pmap.get(0, r_) == Vec{0, 1, 0});
 
   // Supercell
 
@@ -46,5 +42,5 @@ TEST_CASE("TypeMap + Supercell", "[system]") {
 
   cell[r_] = 9;
 
-  CHECK(cell.map().get(tp_, 0) == "Fe");
+  CHECK(cell.map().get(0, tp_) == "Fe");
 }

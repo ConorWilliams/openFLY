@@ -6,13 +6,17 @@
 
 // This file is part of openFLY.
 
-// OpenFLY is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License
-// as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+// OpenFLY is free software: you can redistribute it and/or modify it under the
+// terms of the GNU General Public License as published by the Free Software
+// Foundation, either version 3 of the License, or (at your option) any later
+// version.
 
-// OpenFLY is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
-// warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+// OpenFLY is distributed in the hope that it will be useful, but WITHOUT ANY
+// WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+// A PARTICULAR PURPOSE. See the GNU General Public License for more details.
 
-// You should have received a copy of the GNU General Public License along with openFLY. If not, see <https://www.gnu.org/licenses/>.
+// You should have received a copy of the GNU General Public License along with
+// openFLY. If not, see <https://www.gnu.org/licenses/>.
 
 #include <fmt/chrono.h>
 #include <fmt/core.h>
@@ -42,16 +46,23 @@
  * \file core.hpp
  *
  * @brief Miscellaneous utilities.
+ *
+ * \rst
+ * .. todo::
+ *    refactor to trailing return type syntax.
+ * \endrst
  */
 
 /**
- * @brief Specify the number of spatial dimensions at compile time, defaults to 3.
+ * @brief Specify the number of spatial dimensions at compile time, defaults
+ * to 3.
  *
  * \rst
  *
  * .. _`configure FLY_SPATIAL_DIMS`:
  *
- * To customize, at the compilation :ref:`configuration <Compiling openFLY>` step append:
+ * To customize, at the compilation :ref:`configuration <Compiling openFLY>`
+ * step append:
  *
  * .. code:: console
  *
@@ -77,17 +88,18 @@ namespace fly {
   };
 
   /**
-   * @brief Utility to make a RuntimeError object using the `{fmt}` library to format the error message.
+   * @brief Utility to make a RuntimeError object using the `{fmt}` library to
+   * format the error message.
    *
    * @param fmt Format string.
    * @param args Arguments to forward to format string.
    * @return RuntimeError containing the formatted error message.
    */
   template <typename... Args>
-  RuntimeError error(fmt::format_string<Args...> fmt, Args&&... args) {
+  RuntimeError error(fmt::format_string<Args...> fmt, Args &&...args) {
     try {
       return RuntimeError{fmt::format(fmt, std::forward<Args>(args)...)};
-    } catch (fmt::format_error const& err) {
+    } catch (fmt::format_error const &err) {
       return RuntimeError{fmt::format("Failed to format '{}' with err: {}", fmt, err.what())};
     } catch (...) {
       return RuntimeError("Error during error handling");
@@ -95,12 +107,13 @@ namespace fly {
   }
 
   /**
-   * @brief Utility to check condition and throw RuntimeError if condition is false.
+   * @brief Utility to check condition and throw RuntimeError if condition is
+   * false.
    *
    * Forwards ``fmt`` and ``args`` to fly::error().
    */
   template <typename... Args>
-  void verify(bool condition, fmt::format_string<Args...> fmt, Args&&... args) {
+  void verify(bool condition, fmt::format_string<Args...> fmt, Args &&...args) {
     if (!condition) {
       throw error(std::move(fmt), std::forward<Args>(args)...);
     }
@@ -145,7 +158,8 @@ namespace fly {
    *
    * \rst
    *
-   * Configurable using the :ref:`FLY_SPATIAL_DIMS <configure FLY_SPATIAL_DIMS>` macro.
+   * Configurable using the :ref:`FLY_SPATIAL_DIMS <configure FLY_SPATIAL_DIMS>`
+   * macro.
    *
    * \endrst
    */
@@ -154,12 +168,14 @@ namespace fly {
   static_assert(spatial_dims >= 2, "libFLY is not optimal for 1D simulations");
 
   /**
-   * @brief Shorthand for creating an \c Eigen::Vector of doubles length \c spatial_dims
+   * @brief Shorthand for creating an \c Eigen::Vector of doubles length \c
+   * spatial_dims
    */
   using Vec = Eigen::Vector<double, spatial_dims>;
 
   /**
-   * @brief Shorthand for creating an \c spatial_dims x \c spatial_dims \c Eigen::Matrix of doubles.
+   * @brief Shorthand for creating an \c spatial_dims x \c spatial_dims \c
+   * Eigen::Matrix of doubles.
    */
   using Mat = Eigen::Matrix<double, spatial_dims, spatial_dims>;
 
@@ -253,14 +269,15 @@ namespace fly {
   /**
    * @brief Cast integral types asserting that conversion is lossless.
    *
-   * Perform a `static_cast` from type `T` to `R` with bounds checking in debug builds.
+   * Perform a `static_cast` from type `T` to `R` with bounds checking in debug
+   * builds.
    *
    * Only SFINE enabled for integral types.
    *
    * @tparam R Target type to cast to.
    */
-  template <typename R, typename T, typename = std::enable_if_t<std::is_integral_v<R> && std::is_integral_v<T>>>
-  constexpr R safe_cast(T x) {
+  template <typename R, typename T>
+  constexpr auto safe_cast(T x) -> std::enable_if_t<std::is_integral_v<R> && std::is_integral_v<T>, R> {
     //
     static_assert(std::numeric_limits<unsigned int>::min() == 0);
 
@@ -288,8 +305,8 @@ namespace fly {
    *
    * Only SFINE enabled if T is floating point.
    */
-  template <typename T, typename = std::enable_if_t<std::is_floating_point_v<T>>>
-  constexpr bool near(T a, T b) {
+  template <typename T>
+  constexpr auto near(T a, T b) -> std::enable_if_t<std::is_floating_point_v<T>, bool> {
     return std::abs(a - b) <= 0.0001 * std::max(std::abs(a), std::abs(b));
   }
 
@@ -338,7 +355,7 @@ namespace fly {
    * \endrst
    */
   template <std::size_t Exp, typename T>
-  constexpr std::enable_if_t<std::is_arithmetic_v<T>, T> ipow(T x) {
+  constexpr auto ipow(T x) -> std::enable_if_t<std::is_arithmetic_v<T>, T> {
     if constexpr (Exp == 0) {
       return T(1);
     }
@@ -366,7 +383,7 @@ namespace fly {
    * \endrst
    */
   template <typename E1, typename E2>
-  constexpr auto gdot(E1 const& a, E2 const& b) {
+  constexpr auto gdot(E1 const &a, E2 const &b) {
     return (a.array() * b.array()).sum();
   }
 
@@ -384,7 +401,7 @@ namespace fly {
    * \endrst
    */
   template <typename E>
-  constexpr auto gnorm_sq(E const& r) {
+  constexpr auto gnorm_sq(E const &r) {
     return (r.array() * r.array()).sum();
   }
 
@@ -402,7 +419,7 @@ namespace fly {
    * \endrst
    */
   template <typename E>
-  constexpr auto gnorm(E&& expr) {
+  constexpr auto gnorm(E &&expr) {
     return std::sqrt(gnorm_sq(std::forward<E>(expr)));
   }
 
@@ -413,15 +430,17 @@ namespace fly {
    *
    * Only SFINE enabled for fixed-size square matrices.
    *
-   * See: `StackExchange <https://math.stackexchange.com/questions/2301110/fastest-way-to-find-equation-of-hyperplane>`_
+   * See: `StackExchange
+   * <https://math.stackexchange.com/questions/2301110/fastest-way-to-find-equation-of-hyperplane>`_
    *
    * \endrst
    *
    * @param P An NxN fixed-size matrix.
-   * @return Eigen::Vector<Scalar, N> The unit normal of the hyperplane passing through the column vectors of ``P``.
+   * @return Eigen::Vector<Scalar, N> The unit normal of the hyperplane passing
+   * through the column vectors of ``P``.
    */
   template <typename Scalar, int N>
-  std::enable_if_t<N != Eigen::Dynamic, Eigen::Vector<Scalar, N>> hyperplane_normal(Eigen::Matrix<Scalar, N, N> const& P) {
+  auto hyperplane_normal(Eigen::Matrix<Scalar, N, N> const &P) -> std::enable_if_t<N != Eigen::Dynamic, Eigen::Vector<Scalar, N>> {
     //
     Eigen::Matrix<Scalar, N, N + 1> H = Eigen::Matrix<Scalar, N, N + 1>::Ones();
 
@@ -445,7 +464,8 @@ namespace fly {
    *
    * Only SFINE enabled if callable is noexcept.
    *
-   * \tparam F The invocable's type, this **MUST** be deducted through CTAD by the deduction guide.
+   * \tparam F The invocable's type, this **MUST** be deducted through CTAD by the
+   * deduction guide.
    *
    * \rst
    *
@@ -456,7 +476,7 @@ namespace fly {
    *
    * \endrst
    */
-  template <class F, typename = std::enable_if_t<std::is_nothrow_invocable_v<F&&>>>
+  template <class F, typename = std::enable_if_t<std::is_nothrow_invocable_v<F &&>>>
   class [[nodiscard]] Defer {
   public:
     /**
@@ -464,12 +484,12 @@ namespace fly {
      *
      * @param f Invocable forwarded into object and invoked by destructor.
      */
-    constexpr Defer(F&& f) : m_f(std::forward<F>(f)) {}
+    constexpr Defer(F &&f) : m_f(std::forward<F>(f)) {}
 
-    Defer(const Defer&) = delete;
-    Defer(Defer&& other) = delete;
-    Defer& operator=(const Defer&) = delete;
-    Defer& operator=(Defer&&) = delete;
+    Defer(const Defer &) = delete;
+    Defer(Defer &&other) = delete;
+    Defer &operator=(const Defer &) = delete;
+    Defer &operator=(Defer &&) = delete;
 
     /**
      * @brief Call the invocable.
@@ -484,22 +504,24 @@ namespace fly {
    * @brief Forwarding deduction guide.
    */
   template <typename F>
-  Defer(F&&) -> Defer<F>;
+  Defer(F &&) -> Defer<F>;
 
   // ------------------- Timing ---------------- //
 
   /**
-   * @brief Transparent function wrapper that measures the execution time of a function.
+   * @brief Transparent function wrapper that measures the execution time of a
+   * function.
    *
    * The execution time is printed to stdout. Garantees RVO.
    *
    * @param name Name of function being called, also printed to stdout.
    * @param f Function call.
    * @param args Arguments to call \c f with.
-   * @return std::invoke_result_t<F&&, Args&&...> The result of calling \c f with \c args... .
+   * @return std::invoke_result_t<F&&, Args&&...> The result of calling \c f with
+   * \c args... .
    */
   template <typename F, typename... Args>
-  std::invoke_result_t<F&&, Args&&...> timeit(std::string_view name, F&& f, Args&&... args) {
+  std::invoke_result_t<F &&, Args &&...> timeit(std::string_view name, F &&f, Args &&...args) {
     //
     auto start = std::chrono::steady_clock::now();
 
@@ -526,7 +548,7 @@ namespace fly {
       fmt::print("Timing \"{}\" {:>4} {:>5} {:>5} {:>5}\n", name, sec, mil, mic, nan);
     };
 
-    if constexpr (std::is_void_v<std::invoke_result_t<F&&, Args&&...>>) {
+    if constexpr (std::is_void_v<std::invoke_result_t<F &&, Args &&...>>) {
       std::invoke(std::forward<F>(f), std::forward<Args>(args)...);
     } else {
       return std::invoke(std::forward<F>(f), std::forward<Args>(args)...);

@@ -100,7 +100,7 @@ namespace fly {
      *
      * Types are abstract labels assigned to atoms, if two atoms have the same type they are completely interchangeable in every way.
      */
-    struct Type : system::Property<char, 64, 1> {
+    struct Type : system::Property<char, 32, 1, Eigen::Array> {
       static constexpr char const* tag = "particles/types";  ///< GSD chunk label.
     };
 
@@ -271,23 +271,5 @@ namespace fly {
     inline constexpr Acceleration a_;
 
   }  // namespace builtin_properties
-
-  /**
-   * @brief utility to convert a string type into a Type::matrix_t
-   */
-  inline Type::matrix_t str2type(std::string_view name) {
-    //
-    if (!detail::cmp_less(name.size(), Type::size())) {
-      throw error("Type name length {} but must be < {}", name.size(), Type::size());
-    }
-
-    Type::matrix_t mat = Type::matrix_t::Constant('\0');
-
-    for (std::size_t i = 0; i < name.size(); i++) {
-      mat[safe_cast<Eigen::Index>(i)] = name[i];
-    }
-
-    return mat;
-  }
 
 }  // namespace fly

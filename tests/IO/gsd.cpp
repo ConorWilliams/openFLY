@@ -15,36 +15,45 @@
 #include "libfly/io/gsd.hpp"
 
 #include <catch2/catch_test_macros.hpp>
+#include <cstdint>
+#include <cstdlib>
+#include <string_view>
 
+#include "libfly/system/box.hpp"
 #include "libfly/system/property.hpp"
 #include "libfly/system/supercell.hpp"
 #include "libfly/system/typemap.hpp"
+#include "libfly/utility/core.hpp"
+
+//
+
+using namespace fly;
 
 TEST_CASE("FileGSD", "[io]") {
   //
-  using namespace fly;
 
-    system::Box box(Mat::Identity(), Arr<bool>::Constant(true));
+  system::Box box(Mat::Identity(), Arr<bool>::Constant(true));
 
-    system::TypeMap<Index> map(2);
+  system::TypeMap<Index> map(2);
 
-    map.set(0, "Fe", 6);
-    map.set(1, "H", 1);
+  map.set(0, "Fe", 6);
+  map.set(1, "H", 1);
 
-    system::Supercell cell = system::make_supercell<Position>(box, map, 4);
+  system::Supercell cell = system::make_supercell<Position>(box, map, 4);
 
-    cell(r_, 0) = Vec{0, 0, 0};
+  cell(r_, 0) = Vec{0, 0, 0};
 
-    cell(r_, 1) = Vec{1, 0, 0};
-    cell(r_, 2) = Vec{0, 1, 0};
-    cell(r_, 3) = Vec{0, 0, 1};
+  cell(r_, 1) = Vec{1, 0, 0};
+  cell(r_, 2) = Vec{0, 1, 0};
+  cell(r_, 3) = Vec{0, 0, 1};
 
-    cell(id_, 0) = 0;
+  cell(id_, 0) = 0;
 
-    cell(id_, 1) = 1;
-    cell(id_, 2) = 1;
-    cell(id_, 3) = 1;
+  cell(id_, 1) = 1;
+  cell(id_, 2) = 1;
+  cell(id_, 3) = 1;
 
+  Position::array_t initial = cell[r_];
 
   {  // Write
 
@@ -53,10 +62,50 @@ TEST_CASE("FileGSD", "[io]") {
     file.commit([&] {
       file.write(cell.box());
       file.write(cell.map());
-
+      file.write(safe_cast<std::uint32_t>(cell.size()));
       file.write(id_, cell);
+
       file.write(r_, cell);
     });
-    
+
+    cell[r_] += 1;
+
+    file.commit([&] {
+      file.write(safe_cast<std::uint32_t>(cell.size()));
+      file.write(r_, cell);
+    });
+  }
+
+  {  // Read
+    io::FileGSD file("FileGSD_test.gsd", io::read_only);
+
+    CHECK(file.n_frames() == 2);
+
+    system::TypeMap out_map = file.read_map<Index>(0);
+
+    CHECK(out_map.num_types() == map.num_types());
+
+    for (uint32_t i = 0; i < map.num_types(); i++) {
+      CHECK(out_map.get(i, Type{}) == map.get(i, Type{}));
+      CHECK(out_map.get(i, Index{}) == map.get(i, Index{}));
+    }
+
+    system::Box out_box = file.read_box(0);
+
+    Mat diff = out_box.basis() - box.basis();
+
+    CHECK(gnorm(diff) < 0.0001);
+
+    auto out_cell = system::make_supercell<Position>(out_box, out_map, file.read_num_atoms(0));
+
+    file.read_to(0, id_, out_cell);
+    file.read_to(0, r_, out_cell);
+
+    CHECK((out_cell[id_] == cell[id_]).all());
+    CHECK((out_cell[r_] == initial).all());
+
+    file.read_to(1, r_, out_cell);
+
+    CHECK((out_cell[r_] == out_cell[r_]).all());
   }
 }

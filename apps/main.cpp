@@ -44,9 +44,9 @@ int main() {
   } else {
     system::SoA<Position> atom(4);
 
-    timeit("Read", [&] { file.read(0, r_, atom); });
+    timeit("Read", [&] { file.read_to(0, r_, atom); });
 
-    file.read(0, r_, atom);
+    file.read_to(0, r_, atom);
 
     verify(atom(r_, 1) == Vec{1, 0, 0}, "Oops its {}", atom(r_, 1));
   }

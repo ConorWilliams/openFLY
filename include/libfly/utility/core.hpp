@@ -113,7 +113,7 @@ namespace fly {
    * Forwards ``fmt`` and ``args`` to fly::error().
    */
   template <typename... Args>
-  void verify(bool condition, fmt::format_string<Args...> fmt, Args &&...args) {
+  constexpr void verify(bool condition, fmt::format_string<Args...> fmt, Args &&...args) {
     if (!condition) {
       throw error(std::move(fmt), std::forward<Args>(args)...);
     }

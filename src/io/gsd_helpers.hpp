@@ -80,6 +80,10 @@ namespace fly::io {
     struct get_gsd_type<double> {
       static constexpr gsd_type value = GSD_TYPE_DOUBLE;
     };
+    template <>
+    struct get_gsd_type<char> {
+      static constexpr gsd_type value = std::numeric_limits<char>::is_signed ? GSD_TYPE_INT8 : GSD_TYPE_UINT8;
+    };
 
   }  // namespace detail
 
@@ -139,29 +143,34 @@ namespace fly::io {
     //
     gsd_index_entry const* chunk = gsd_find_chunk(handle, frame, name);
 
+    // Fallback to initial frame
     if (!chunk) {
-      throw error("GSD: Could not find chunk with name '{}' at frame {}", name, frame);
+      if (frame == 0) {
+        throw error("GSD: Could not find chunk with name '{}' at frame {}", name, frame);
+      } else {
+        read_chunk(0, handle, name, N, M, data);
+      }
+    } else {
+      if (N >= 0 && safe_cast<uint64_t>(N) != chunk->N) {
+        throw error("GSD: Chunk '{}' frame {}, expected {} rows found {}", name, frame, N, chunk->N);
+      }
+
+      if (M >= 0 && safe_cast<uint32_t>(M) != chunk->M) {
+        throw error("GSD: Chunk '{}' frame {}, expected {} columns found {}", name, frame, M, chunk->M);
+      }
+
+      if (chunk->type != Tag) {
+        throw error("GSD: Chunk '{}' frame {}, expecting to read type {} but found type {}", name, frame, Tag, chunk->type);
+      }
+
+      ASSERT(sizeof(T) == gsd_sizeof_type(Tag), "Platform error!", 0);
+
+      if (auto size = chunk->N * chunk->M; size != data.size()) {
+        throw error("Chunk {} frame {}, not enough space for {} element in span length {}", name, frame, size, data.size());
+      }
+
+      call_gsd(name, gsd_read_chunk, handle, data.data(), chunk);
     }
-
-    if (N >= 0 && safe_cast<uint64_t>(N) != chunk->N) {
-      throw error("GSD: Chunk '{}', expected {} rows found {}", name, N, chunk->N);
-    }
-
-    if (M >= 0 && safe_cast<uint32_t>(M) != chunk->M) {
-      throw error("GSD: Chunk '{}', expected {} columns found {}", name, M, chunk->M);
-    }
-
-    if (chunk->type != Tag) {
-      throw error("GSD: Chunk '{}', expecting to read type {} but found type {}", name, Tag, chunk->type);
-    }
-
-    ASSERT(sizeof(T) == gsd_sizeof_type(Tag), "Platform error!", 0);
-
-    if (auto size = chunk->N * chunk->M; size != data.size()) {
-      throw error("Chunk {}, not enough space for {} element in span length {}", name, size, data.size());
-    }
-
-    call_gsd(name, gsd_read_chunk, handle, data.data(), chunk);
   }
 
 }  // namespace fly::io

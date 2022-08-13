@@ -26,9 +26,8 @@
  * \file typemap.hpp
  */
 
-namespace fly::io
-{
-    class FileGSD; // Forward declaration for friendship.
+namespace fly::io {
+  class FileGSD;  // Forward declaration for friendship.
 }
 
 namespace fly::system {
@@ -182,8 +181,8 @@ namespace fly::system {
      * @param type The value of the Type to write into the map.
      * @param args The rest of values to write into the map.
      */
-    auto set(std::uint32_t id, std::string_view  type, typename T::matrix_t const&... args) -> void {
-      (set(id, Type{},type));
+    auto set(std::uint32_t id, std::string_view type, typename T::matrix_t const&... args) -> void {
+      (set(id, Type{}, type));
       ((set<T>(id, T{}, args)), ...);
     }
 

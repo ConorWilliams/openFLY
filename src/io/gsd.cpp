@@ -82,7 +82,7 @@ namespace fly::io {
     write_chunk<std::uint8_t>(m_handle.get(), "log/periodicity", 3, 1, periodicity);
   }
 
-  void FileGSD::read(std::uint64_t i, system::Box &box) const {
+  auto FileGSD::read_box(std::uint64_t i) const -> system::Box {
     //
 
     Eigen::Matrix<float, 3, 3> basis = Eigen::Matrix<float, 3, 3>::Zero();
@@ -115,7 +115,7 @@ namespace fly::io {
       periodicity[2] = pr[2];
     }
 
-    box = system::Box(basis.cast<double>(), periodicity);
+    return {basis.cast<double>(), periodicity};
   }
 
   //   ////////////////////////////////////////////////////////////////////////////////////////////////
@@ -142,6 +142,8 @@ namespace fly::io {
 
   dump_load(float);
   dump_load(double);
+
+  dump_load(char);
 
 #undef dump_load
 

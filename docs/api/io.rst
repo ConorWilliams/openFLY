@@ -5,7 +5,7 @@ Directory: ``libfly/io``
 
 The ``io`` folder contains a routines for reading and writing simulation snapshots. Everything is contained within the namespace ``fly::io``.
 
-Binary IO with using the GSD format
+GSD formatted binary IO
 ---------------------------------------
 
 File: ``libfly/io/gsd.hpp``

@@ -1,6 +1,44 @@
 Changelog
 ============================
 
+
+Unreleased
+-------------------------------
+
+Adjacent cells class
+
+Version 0.2.0
+--------------------------------
+
+The first released alpha version of openFLY! This is a minimal feature-set release with just the base classes that underpin openFLY as well as GSD IO.
+
+Added
+~~~~~~~~~
+
+- Binary IO using the GSD format.
+
+- Property base class.
+- TypeMap class.
+- Supercell class.
+- SoA class.
+- VoS class.
+- Atom class.
+- Box class and specialised crystal systems that it is built on.
+
+- The utility.hpp file containing many utilities.
+
+- New CI workflow now includes C++20 and Intel compilers, MSVC removed due to compiler bug.
+
+Changed
+~~~~~~~~~~
+
+GPL-2.0 -> GPL-3.0-or-later
+
+Removed
+~~~~~~~~~
+
+Hdoc is no longer used to build the documentation.
+
 Version 0.1.0-alpha
 ---------------------------
 

@@ -267,12 +267,6 @@
 </dd></dl>
 
 <dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4NK3fly6system12Orthorhombic8periodicEN5Eigen5IndexE">
-<span id="_CPPv3NK3fly6system12Orthorhombic8periodicEN5Eigen5IndexE"></span><span id="_CPPv2NK3fly6system12Orthorhombic8periodicEN5Eigen5IndexE"></span><span id="fly::system::Orthorhombic::periodic__Eigen::IndexC"></span><span class="target" id="classfly_1_1system_1_1Orthorhombic_1a71510093e1c016a176a28bf208b815ec"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">periodic</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">Eigen</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">Index</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">i</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="k"><span class="pre">noexcept</span></span><a class="headerlink" href="#_CPPv4NK3fly6system12Orthorhombic8periodicEN5Eigen5IndexE" title="Permalink to this definition">#</a><br /></dt>
-<dd><p>Query if the <code class="docutils literal notranslate"><span class="pre">i</span></code>th axis is periodic. </p>
-</dd></dl>
-
-<dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4I0ENK3fly6system12Orthorhombic11canon_imageE3VecRKN5Eigen10MatrixBaseI1EEE">
 <span id="_CPPv3I0ENK3fly6system12Orthorhombic11canon_imageERKN5Eigen10MatrixBaseI1EEE"></span><span id="_CPPv2I0ENK3fly6system12Orthorhombic11canon_imageERKN5Eigen10MatrixBaseI1EEE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">E</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classfly_1_1system_1_1Orthorhombic_1a647c3b312b7dca7741eca2700613e3cf"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="utility.html#_CPPv4N3fly3VecE" title="fly::Vec"><span class="n"><span class="pre">Vec</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">canon_image</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">Eigen</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">MatrixBase</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0ENK3fly6system12Orthorhombic11canon_imageE3VecRKN5Eigen10MatrixBaseI1EEE" title="fly::system::Orthorhombic::canon_image::E"><span class="n"><span class="pre">E</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">x</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4I0ENK3fly6system12Orthorhombic11canon_imageE3VecRKN5Eigen10MatrixBaseI1EEE" title="Permalink to this definition">#</a><br /></dt>
 <dd><p>Maps an atom into the canonical cell. </p>
@@ -282,6 +276,17 @@
 <p class="admonition-title">Warning</p>
 <p>Assumes atoms are within the extents of the non-periodic axes!</p>
 </div>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK3fly6system12Orthorhombic9make_gridEd">
+<span id="_CPPv3NK3fly6system12Orthorhombic9make_gridEd"></span><span id="_CPPv2NK3fly6system12Orthorhombic9make_gridEd"></span><span id="fly::system::Orthorhombic::make_grid__doubleC"></span><span class="target" id="classfly_1_1system_1_1Orthorhombic_1aa5470229c438eddc544c149767d7f4ee"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N3fly6system9OrthoGridE" title="fly::system::OrthoGrid"><span class="n"><span class="pre">OrthoGrid</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">make_grid</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">r_cut</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK3fly6system12Orthorhombic9make_gridEd" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Make an <a class="reference internal" href="#classfly_1_1system_1_1OrthoGrid"><span class="std std-ref">OrthoGrid</span></a> object. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>r_cut</strong> – The cut-off radius for atomic interactions. </p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="cpp function">
@@ -300,14 +305,9 @@
 </dd></dl>
 
 <dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4NK3fly6system12Orthorhombic9make_gridEd">
-<span id="_CPPv3NK3fly6system12Orthorhombic9make_gridEd"></span><span id="_CPPv2NK3fly6system12Orthorhombic9make_gridEd"></span><span id="fly::system::Orthorhombic::make_grid__doubleC"></span><span class="target" id="classfly_1_1system_1_1Orthorhombic_1aa5470229c438eddc544c149767d7f4ee"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N3fly6system9OrthoGridE" title="fly::system::OrthoGrid"><span class="n"><span class="pre">OrthoGrid</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">make_grid</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">r_cut</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK3fly6system12Orthorhombic9make_gridEd" title="Permalink to this definition">#</a><br /></dt>
-<dd><p>Make an <a class="reference internal" href="#classfly_1_1system_1_1OrthoGrid"><span class="std std-ref">OrthoGrid</span></a> object. </p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>r_cut</strong> – The cut-off radius for atomic interactions. </p>
-</dd>
-</dl>
+<dt class="sig sig-object cpp" id="_CPPv4NK3fly6system12Orthorhombic8periodicEN5Eigen5IndexE">
+<span id="_CPPv3NK3fly6system12Orthorhombic8periodicEN5Eigen5IndexE"></span><span id="_CPPv2NK3fly6system12Orthorhombic8periodicEN5Eigen5IndexE"></span><span id="fly::system::Orthorhombic::periodic__Eigen::IndexC"></span><span class="target" id="classfly_1_1system_1_1Orthorhombic_1a71510093e1c016a176a28bf208b815ec"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">periodic</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">Eigen</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">Index</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">i</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="k"><span class="pre">noexcept</span></span><a class="headerlink" href="#_CPPv4NK3fly6system12Orthorhombic8periodicEN5Eigen5IndexE" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Query if the <code class="docutils literal notranslate"><span class="pre">i</span></code>th axis is periodic. </p>
 </dd></dl>
 
 </div>
@@ -405,12 +405,6 @@
 </dd></dl>
 
 <dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4NK3fly6system9Triclinic8periodicEN5Eigen5IndexE">
-<span id="_CPPv3NK3fly6system9Triclinic8periodicEN5Eigen5IndexE"></span><span id="_CPPv2NK3fly6system9Triclinic8periodicEN5Eigen5IndexE"></span><span id="fly::system::Triclinic::periodic__Eigen::IndexC"></span><span class="target" id="classfly_1_1system_1_1Triclinic_1acc3cf605d4489523baaeb1d62d2990c1"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">periodic</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">Eigen</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">Index</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">i</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="k"><span class="pre">noexcept</span></span><a class="headerlink" href="#_CPPv4NK3fly6system9Triclinic8periodicEN5Eigen5IndexE" title="Permalink to this definition">#</a><br /></dt>
-<dd><p>Query if the <code class="docutils literal notranslate"><span class="pre">i</span></code>th axis is periodic. </p>
-</dd></dl>
-
-<dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4I0ENK3fly6system9Triclinic11canon_imageE3VecRKN5Eigen10MatrixBaseI1EEE">
 <span id="_CPPv3I0ENK3fly6system9Triclinic11canon_imageERKN5Eigen10MatrixBaseI1EEE"></span><span id="_CPPv2I0ENK3fly6system9Triclinic11canon_imageERKN5Eigen10MatrixBaseI1EEE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">E</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classfly_1_1system_1_1Triclinic_1adff2d87692131b911ea9fa4bc055ad79"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="utility.html#_CPPv4N3fly3VecE" title="fly::Vec"><span class="n"><span class="pre">Vec</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">canon_image</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">Eigen</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">MatrixBase</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0ENK3fly6system9Triclinic11canon_imageE3VecRKN5Eigen10MatrixBaseI1EEE" title="fly::system::Triclinic::canon_image::E"><span class="n"><span class="pre">E</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">x</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4I0ENK3fly6system9Triclinic11canon_imageE3VecRKN5Eigen10MatrixBaseI1EEE" title="Permalink to this definition">#</a><br /></dt>
 <dd><p>Maps an atom into the canonical cell. </p>
@@ -431,6 +425,12 @@
 <dd class="field-odd"><p><strong>r_cut</strong> – The cut-off radius for atomic interactions. </p>
 </dd>
 </dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK3fly6system9Triclinic8periodicEN5Eigen5IndexE">
+<span id="_CPPv3NK3fly6system9Triclinic8periodicEN5Eigen5IndexE"></span><span id="_CPPv2NK3fly6system9Triclinic8periodicEN5Eigen5IndexE"></span><span id="fly::system::Triclinic::periodic__Eigen::IndexC"></span><span class="target" id="classfly_1_1system_1_1Triclinic_1acc3cf605d4489523baaeb1d62d2990c1"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">periodic</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">Eigen</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">Index</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">i</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="k"><span class="pre">noexcept</span></span><a class="headerlink" href="#_CPPv4NK3fly6system9Triclinic8periodicEN5Eigen5IndexE" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Query if the <code class="docutils literal notranslate"><span class="pre">i</span></code>th axis is periodic. </p>
 </dd></dl>
 
 </div>
@@ -516,18 +516,6 @@
 </dd></dl>
 
 <dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4NK3fly6system9HyperGrid5r_cutEv">
-<span id="_CPPv3NK3fly6system9HyperGrid5r_cutEv"></span><span id="_CPPv2NK3fly6system9HyperGrid5r_cutEv"></span><span id="fly::system::HyperGrid::r_cutC"></span><span class="target" id="classfly_1_1system_1_1HyperGrid_1a1910b0264f87e07eda21cc2457a031b7"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">r_cut</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="k"><span class="pre">noexcept</span></span><a class="headerlink" href="#_CPPv4NK3fly6system9HyperGrid5r_cutEv" title="Permalink to this definition">#</a><br /></dt>
-<dd><p>Fetch the cut-off radius for atomic interactions. </p>
-</dd></dl>
-
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4NK3fly6system9HyperGrid5shapeEv">
-<span id="_CPPv3NK3fly6system9HyperGrid5shapeEv"></span><span id="_CPPv2NK3fly6system9HyperGrid5shapeEv"></span><span id="fly::system::HyperGrid::shapeC"></span><span class="target" id="classfly_1_1system_1_1HyperGrid_1a42f70898958d806db0883f86898b4e5b"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="utility.html#_CPPv4I0EN3fly3ArrE" title="fly::Arr"><span class="n"><span class="pre">Arr</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">int</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">shape</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="k"><span class="pre">noexcept</span></span><a class="headerlink" href="#_CPPv4NK3fly6system9HyperGrid5shapeEv" title="Permalink to this definition">#</a><br /></dt>
-<dd><p>Get the total number of cells in the <a class="reference internal" href="#classfly_1_1system_1_1HyperGrid"><span class="std std-ref">HyperGrid</span></a> along each axis. </p>
-</dd></dl>
-
-<dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4I0ENK3fly6system9HyperGrid8cell_idxEiRKN5Eigen10MatrixBaseI1EEE">
 <span id="_CPPv3I0ENK3fly6system9HyperGrid8cell_idxERKN5Eigen10MatrixBaseI1EEE"></span><span id="_CPPv2I0ENK3fly6system9HyperGrid8cell_idxERKN5Eigen10MatrixBaseI1EEE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">E</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classfly_1_1system_1_1HyperGrid_1a4159276ab00df32cab63b3385b989f3f"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">cell_idx</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">Eigen</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">MatrixBase</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0ENK3fly6system9HyperGrid8cell_idxEiRKN5Eigen10MatrixBaseI1EEE" title="fly::system::HyperGrid::cell_idx::E"><span class="n"><span class="pre">E</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">x</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="k"><span class="pre">noexcept</span></span><a class="headerlink" href="#_CPPv4I0ENK3fly6system9HyperGrid8cell_idxEiRKN5Eigen10MatrixBaseI1EEE" title="Permalink to this definition">#</a><br /></dt>
 <dd><p>Compute the cell index from an atoms canonical position. </p>
@@ -537,6 +525,18 @@
 <p class="admonition-title">Warning</p>
 <p>Assumes atoms are in the extents of the HyperGrid or in the surrounding one-cell buffer i.e. ghost atoms.</p>
 </div>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK3fly6system9HyperGrid5r_cutEv">
+<span id="_CPPv3NK3fly6system9HyperGrid5r_cutEv"></span><span id="_CPPv2NK3fly6system9HyperGrid5r_cutEv"></span><span id="fly::system::HyperGrid::r_cutC"></span><span class="target" id="classfly_1_1system_1_1HyperGrid_1a1910b0264f87e07eda21cc2457a031b7"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">r_cut</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="k"><span class="pre">noexcept</span></span><a class="headerlink" href="#_CPPv4NK3fly6system9HyperGrid5r_cutEv" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Fetch the cut-off radius for atomic interactions. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK3fly6system9HyperGrid5shapeEv">
+<span id="_CPPv3NK3fly6system9HyperGrid5shapeEv"></span><span id="_CPPv2NK3fly6system9HyperGrid5shapeEv"></span><span id="fly::system::HyperGrid::shapeC"></span><span class="target" id="classfly_1_1system_1_1HyperGrid_1a42f70898958d806db0883f86898b4e5b"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="utility.html#_CPPv4I0EN3fly3ArrE" title="fly::Arr"><span class="n"><span class="pre">Arr</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">int</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">shape</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="k"><span class="pre">noexcept</span></span><a class="headerlink" href="#_CPPv4NK3fly6system9HyperGrid5shapeEv" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Get the total number of cells in the <a class="reference internal" href="#classfly_1_1system_1_1HyperGrid"><span class="std std-ref">HyperGrid</span></a> along each axis. </p>
 </dd></dl>
 
 </div>

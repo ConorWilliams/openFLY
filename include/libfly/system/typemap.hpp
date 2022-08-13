@@ -27,7 +27,7 @@
  */
 
 namespace fly::io {
-  class FileGSD;  // Forward declaration for friendship.
+  class BinaryFile;  // Forward declaration for friendship.
 }
 
 namespace fly::system {
@@ -192,7 +192,7 @@ namespace fly::system {
     friend class TypeMap;
 
     // Friend for IO.
-    friend class ::fly::io::FileGSD;
+    friend class ::fly::io::BinaryFile;
   };
 
 }  // namespace fly::system

@@ -40,7 +40,14 @@
  * \rst
  *
  * LibFLY supports writing `HOOMD-blue's <https://github.com/glotzerlab/hoomd-blue>`_ `GSD <https://github.com/glotzerlab/gsd>`_ file
- * format. This file format is widely supported, see the `GSD documentation <https://gsd.readthedocs.io/>`_ .
+ * format. This file format is widely supported, see the `GSD documentation <https://gsd.readthedocs.io/>`_ for details. In summary GSD
+ * is a binary file with efficient random access to frames. GSD allows all particle properties to vary from one frame to the next.
+ *
+ * The GSD format models a hierarchical data structure, the outermost hierarchy is the **frame** which are index numerically. Each
+ * frame may contain one or more data **chunks**, chunks are indexed by strings and map to **values** - ``N`` by ``M`` arrays of data.
+ * Values are well defined for all fields at all frames. When a data chunk is present in frame ``i``, it defines the values for the
+ * frame. When it is not present, the data chunk of the same name at frame ``0`` defines the values for frame ``i``. When ``N`` is
+ * zero, an index entry may be written for a data chunk with no actual data written to the file for that chunk.
  *
  * \endrst
  */
@@ -55,7 +62,7 @@ namespace fly::io {
   namespace detail {
 
     // This type is a work around for OVITO, any chunk named "log/particles/*" is assumed to be a per-particle quantity and thus N must
-    // be equal to the particles/N. This causes problems when using a TypeMap to store properties that have tags of the form
+    // be equal to particles/N. This causes problems when using a TypeMap to store properties that have tags of the form
     // "log/particles/*".
     template <typename Tag>
     struct re_write_tag : Tag {
@@ -66,14 +73,12 @@ namespace fly::io {
         //
         std::array<char, N> array{'l', 'o', 'g', '/', 't', 'y', 'p', 'e', 'm', 'a', 'p', '/'};
 
-        if (std::string_view{Tag::tag}.size() < 4) {
-          throw "Tag is too short to rewrite";
-        }
-
         char const *p = Tag::tag;
 
-        if (p[0] == 'l' && p[1] == 'o' && p[2] == 'g' && p[3] == '/') {
-          p = p + 4;
+        if (std::string_view{Tag::tag}.size() >= 4) {
+          if (p[0] == 'l' && p[1] == 'o' && p[2] == 'g' && p[3] == '/') {
+            p = p + 4;
+          }
         }
 
         char *write = array.data() + 12;
@@ -81,6 +86,8 @@ namespace fly::io {
         while (*p) {
           *write++ = *p++;
         }
+
+        *write = '\0';
 
         return array;
       }
@@ -97,7 +104,7 @@ namespace fly::io {
   }  // namespace detail
 
   /**
-   * @brief Flags for file permissions
+   * @brief Flags for file permissions.
    */
   enum Flags {
     read_only,   ///< Open with read only permissions.
@@ -106,10 +113,9 @@ namespace fly::io {
   };
 
   /**
-   * @brief file
-   *
+   * @brief A handle to a GSD formatted binary file.
    */
-  class FileGSD {
+  class BinaryFile {
   private:
     // Pre C++20 workaround for decltype([]{})
     struct noop {
@@ -118,12 +124,12 @@ namespace fly::io {
 
   public:
     /**
-     * @brief Construct a new File G S D object
+     * @brief Open a GSD file.
      *
-     * @param fname
-     * @param flag
+     * @param fname The name of the file.
+     * @param flag Read/Write/Create permissions.
      */
-    explicit FileGSD(std::string_view fname, Flags flag = read_only);
+    explicit BinaryFile(std::string_view fname, Flags flag = read_only);
 
     /**
      * @brief Get the number of frames in the GSD file.
@@ -140,9 +146,18 @@ namespace fly::io {
     auto clear() -> void;
 
     /**
-     * @brief Commit the current writes to disk
+     * @brief Commit the current frame to disk.
      *
-     * @tparam F An optional nullery-invokable to call before committing the writes.
+     * \rst
+     *
+     * Example:
+     *
+     * .. include:: ../../examples/io/io.cpp
+     *    :code:
+     *
+     * \endrst
+     *
+     * @param f An optional nullery-invokable to call before committing the writes.
      */
     template <typename F = noop>
     auto commit(F &&f = {}) -> void {
@@ -159,24 +174,22 @@ namespace fly::io {
     auto write(std::uint32_t num_atoms) -> void { dump_one("particles/N", num_atoms); }
 
     /**
-     * @brief Write a Box to the current frame.
+     * @brief Write a fly::system::Box to the current frame.
      *
      * \rst
      * .. warning::
-     *     Due to the GSD schema specification the basis vector must be stored as single precision floats so writing is a lossy
-     *     operation.
+     *     This is a lossy operation as GSD schema requires the basis vector must be stored as single precision floats.
      * \endrst
-     *
      */
     auto write(system::Box const &box) -> void;
 
     /**
-     * @brief Write a TypeMap to the current frame.
+     * @brief Write a fly::system::TypeMap to the current frame.
      */
     template <typename... U>
     auto write(system::TypeMap<U...> const &map) -> void {
       //
-      dump_one("log/typemap/N", safe_cast<std::uint32_t>(map.size()));  // explicitly store for reconstruction.
+      dump_one("log/typemap/N", safe_cast<std::uint32_t>(map.num_types()));  // explicitly store for reconstruction.
 
       write(Type{}, static_cast<typename system::TypeMap<U...>::SOA const &>(map));
 
@@ -185,9 +198,12 @@ namespace fly::io {
 
     /**
      * @brief Write a tagged property of a fly::system::SoA to the current frame.
+     *
+     * @param tag Property of ``in`` you would like to write.
+     * @param in A fly::system::SoA containing the data to write to the file.
      */
     template <typename T, typename... U>
-    auto write(T, system::SoA<U...> const &in) -> std::enable_if_t<std::is_arithmetic_v<typename T::scalar_t>> {
+    auto write([[maybe_unused]] T tag, system::SoA<U...> const &in) -> std::enable_if_t<std::is_arithmetic_v<typename T::scalar_t>> {
       dump_span(T::tag, T::size(),
                 nonstd::span<typename T::scalar_t const>{
                     in[T{}].derived().data(),
@@ -197,21 +213,30 @@ namespace fly::io {
 
     /**
      * @brief Read the number of atoms stored at frame ``i`` and return it.
+     *
+     * @param i Index of frame to read from.
      */
     auto read_num_atoms(std::uint64_t i) -> std::uint32_t { return load_one<std::uint32_t>(i, "particles/N"); }
 
     // ///////////////////////////////////////////////
 
     /**
-     * @brief Read a Box stored at frame ``i`` and return it.
+     * @brief Read a fly::system::Box stored at frame ``i`` and return it.
+     *
+     * @param i Index of frame to read from.
      */
     auto read_box(std::uint64_t i) const -> system::Box;
 
     /**
-     * @brief Read a tagged Property from the ``i``th frame and write it to ``out``.
+     * @brief Read a property to a fly::system::SoA.
+     *
+     * @param i Index of frame to read from.
+     * @param tag Property of you would like to read.
+     * @param out A fly::system::SoA to write the read data to.
      */
     template <typename T, typename... U>
-    auto read_to(std::uint64_t i, T, system::SoA<U...> &out) -> std::enable_if_t<std::is_arithmetic_v<typename T::scalar_t>> {
+    auto read_to(std::uint64_t i, [[maybe_unused]] T tag, system::SoA<U...> &out)
+        -> std::enable_if_t<std::is_arithmetic_v<typename T::scalar_t>> {
       load_span(i, T::tag, T::size(),
                 nonstd::span<typename T::scalar_t>{
                     out[T{}].derived().data(),
@@ -220,7 +245,9 @@ namespace fly::io {
     }
 
     /**
-     * @brief  Read a tagged Property from the ``i``th frame and write it to a TypeMap.
+     * @brief Read a Box stored at frame ``i`` and return it.
+     *
+     * @param i Index of frame to read from.
      */
     template <typename... U>
     auto read_map(std::uint64_t i) -> system::TypeMap<U...> {
@@ -236,7 +263,7 @@ namespace fly::io {
 
     // ////////////////////////////////////////////////////////////
 
-    ~FileGSD() noexcept;
+    ~BinaryFile() noexcept;
 
   private:
     std::string m_fname;

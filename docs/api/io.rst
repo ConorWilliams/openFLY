@@ -13,8 +13,10 @@ File: ``libfly/io/gsd.hpp``
 .. doxygenfile:: libfly/io/gsd.hpp
     :sections: briefdescription detaileddescription
 
+.. doxygenenum:: fly::io::Flags
 
-.. doxygenclass:: fly::io::FileGSD
+
+.. doxygenclass:: fly::io::BinaryFile
     :members:
     :undoc-members:
 

@@ -15,7 +15,7 @@ int main() {
   //
   using namespace fly;
 
-  io::FileGSD file("build/test.gsd", io::read_write);
+  io::BinaryFile file("build/test.gsd", io::read_write);
 
   if (false) {
     //

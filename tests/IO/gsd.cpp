@@ -29,7 +29,7 @@
 
 using namespace fly;
 
-TEST_CASE("FileGSD", "[io]") {
+TEST_CASE("BinaryFile", "[io]") {
   //
 
   system::Box box(Mat::Identity(), Arr<bool>::Constant(true));
@@ -57,7 +57,7 @@ TEST_CASE("FileGSD", "[io]") {
 
   {  // Write
 
-    io::FileGSD file("FileGSD_test.gsd", io::create);
+    io::BinaryFile file("BinaryFile_test.gsd", io::create);
 
     file.commit([&] {
       file.write(cell.box());
@@ -77,7 +77,7 @@ TEST_CASE("FileGSD", "[io]") {
   }
 
   {  // Read
-    io::FileGSD file("FileGSD_test.gsd", io::read_only);
+    io::BinaryFile file("BinaryFile_test.gsd", io::read_only);
 
     CHECK(file.n_frames() == 2);
 

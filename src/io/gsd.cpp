@@ -33,7 +33,7 @@
 
 namespace fly::io {
 
-  FileGSD::FileGSD(std::string_view fname, Flags flag) : m_fname(fname), m_handle(std::make_unique<gsd_handle>()) {
+  BinaryFile::BinaryFile(std::string_view fname, Flags flag) : m_fname(fname), m_handle(std::make_unique<gsd_handle>()) {
     //
     if (spatial_dims != 3) {
       throw std::runtime_error("GSD files are currently only supported in 3D");
@@ -54,17 +54,17 @@ namespace fly::io {
     }
   }
 
-  void FileGSD::clear() { call_gsd(m_fname, gsd_truncate, m_handle.get()); }
+  void BinaryFile::clear() { call_gsd(m_fname, gsd_truncate, m_handle.get()); }
 
-  std::uint64_t FileGSD::n_frames() const noexcept { return gsd_get_nframes(m_handle.get()); }
+  std::uint64_t BinaryFile::n_frames() const noexcept { return gsd_get_nframes(m_handle.get()); }
 
-  void FileGSD::end_frame() { call_gsd(m_fname, gsd_end_frame, m_handle.get()); }
+  void BinaryFile::end_frame() { call_gsd(m_fname, gsd_end_frame, m_handle.get()); }
 
-  FileGSD::~FileGSD() noexcept { call_gsd(m_fname, gsd_close, m_handle.get()); }
+  BinaryFile::~BinaryFile() noexcept { call_gsd(m_fname, gsd_close, m_handle.get()); }
 
   //   ////////////////////////////////////////////////////////////////////////////////////////////////
 
-  void FileGSD::write(system::Box const &box) {
+  void BinaryFile::write(system::Box const &box) {
     //          |L_x    xy L_y   xz L_z|
     // basis =  |0         L_y   yz L_z|
     //          |0         0        L_z|
@@ -82,7 +82,7 @@ namespace fly::io {
     write_chunk<std::uint8_t>(m_handle.get(), "log/periodicity", 3, 1, periodicity);
   }
 
-  auto FileGSD::read_box(std::uint64_t i) const -> system::Box {
+  auto BinaryFile::read_box(std::uint64_t i) const -> system::Box {
     //
 
     Eigen::Matrix<float, 3, 3> basis = Eigen::Matrix<float, 3, 3>::Zero();
@@ -120,14 +120,14 @@ namespace fly::io {
 
   //   ////////////////////////////////////////////////////////////////////////////////////////////////
 
-#define dump_load(TYPE_NAME)                                                                              \
-  void FileGSD::dump_span(char const *name, std::uint32_t M, nonstd::span<TYPE_NAME const> data) {        \
-    ASSERT(data.size() % M == 0, "Chunk `{}`, {} not divisible by {}", name, data.size(), M);             \
-    write_chunk(m_handle.get(), name, data.size() / M, M, data);                                          \
-  }                                                                                                       \
-                                                                                                          \
-  void FileGSD::load_span(std::uint64_t i, char const *name, int M, nonstd::span<TYPE_NAME> data) const { \
-    read_chunk(i, m_handle.get(), name, -1, M, data);                                                     \
+#define dump_load(TYPE_NAME)                                                                                 \
+  void BinaryFile::dump_span(char const *name, std::uint32_t M, nonstd::span<TYPE_NAME const> data) {        \
+    ASSERT(data.size() % M == 0, "Chunk `{}`, {} not divisible by {}", name, data.size(), M);                \
+    write_chunk(m_handle.get(), name, data.size() / M, M, data);                                             \
+  }                                                                                                          \
+                                                                                                             \
+  void BinaryFile::load_span(std::uint64_t i, char const *name, int M, nonstd::span<TYPE_NAME> data) const { \
+    read_chunk(i, m_handle.get(), name, -1, M, data);                                                        \
   }
 
   dump_load(std::uint8_t);

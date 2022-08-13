@@ -28,7 +28,7 @@
  *
  * @brief The basic building block for atoms in libFLY.
  *
- * Properties in libFLY describe a per-atom quantity i.e. mass, position, etc. They take the form of fixed-size matrices and must
+ * Properties in libFLY describe an atomic quantity i.e. mass, position, etc. They take the form of fixed-size matrices and must
  * always be derived from the Property class. The most fundamental property that every atom must have is a fly::TypeID. Properties can
  * either be associated per-atom using the fly::system::Atom, fly::system::VoS and fly::system::SoA data-structures or per-type using
  * the fly::system::TypeMap.

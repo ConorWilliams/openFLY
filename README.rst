@@ -5,12 +5,14 @@
    </h1>
 
    <p align="center">
+        <a href="https://conorwilliams.github.io/openFLY/">Website</a>
+   </p>   
+
+   <p align="center">
       The framework for on-the-fly kinetic Monte Carlo simulations.
    </p>
 
-   <p align="center">
-        <a href="https://conorwilliams.github.io/openFLY/">Website</a>
-   </p>
+
 
    <p align="center">
         <a href="https://github.com/ConorWilliams/openFLY/actions/workflows/ci.yml">

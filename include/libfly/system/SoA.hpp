@@ -203,9 +203,9 @@ namespace fly::system {
      *
      */
     template <bool OwnsAll = owns_all>
-    void destructive_resize(int new_size, std::enable_if_t<OwnsAll>* = 0) {
+    std::enable_if_t<OwnsAll> destructive_resize(Eigen::Index new_size) {
       if (std::exchange(m_size, new_size) != new_size) {
-        (static_cast<void>(get(Pr{}).resize(new_size * Pr::size(), Eigen::NoChange)), ...);
+        *this = SoA(new_size);
       }
     }
 

@@ -10,3 +10,8 @@ updates:
     directory: "/docs/"
     schedule:
       interval: "daily"
+
+  - package-ecosystem: "gitsubmodule"
+    directory: "/"
+    schedule:
+      interval: "daily"

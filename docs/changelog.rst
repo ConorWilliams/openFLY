@@ -5,7 +5,8 @@ Changelog
 Unreleased
 -------------------------------
 
-Adjacent cells class
+- Adjacent cells class
+- vcpkg + gsd are now submodules so all dependencies are tracked by dependabot!
 
 Version 0.2.0
 --------------------------------

@@ -23,7 +23,7 @@
 #include <type_traits>
 #include <utility>
 
-#include "external/gsd.h"
+#include "gsd/gsd/gsd.h"
 #include "libfly/utility/core.hpp"
 
 /**

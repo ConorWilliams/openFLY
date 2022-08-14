@@ -37,13 +37,13 @@ message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
 file(GLOB_RECURSE FLY_SOURCES_C CONFIGURE_DEPENDS "${PROJECT_SOURCE_DIR}/src/*.c")
 file(GLOB_RECURSE FLY_SOURCES_CPP CONFIGURE_DEPENDS "${PROJECT_SOURCE_DIR}/src/*.cpp")
 
-set(FLY_SOURCES ${FLY_SOURCES_C} ${FLY_SOURCES_CPP})
-
 # Declare the lib
-add_library(libFLY OBJECT ${FLY_SOURCES})
+add_library(libFLY OBJECT${FLY_SOURCES_C} ${FLY_SOURCES_CPP} "${PROJECT_SOURCE_DIR}/external/gsd/gsd/gsd.c")
 
 target_include_directories(libFLY PUBLIC "$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>")
+
 target_include_directories(libFLY PRIVATE "$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src>")
+target_include_directories(libFLY PRIVATE "$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/external>")
 
 target_compile_features(libFLY PUBLIC cxx_std_17)
 
@@ -76,7 +76,7 @@ if(FLY_DEVELOPER_MODE)
     add_subdirectory(examples)
 endif()
 
-option(FLY_DOCS "Build documentation using ..." OFF)
+option(FLY_DOCS " Build documentation using ... " OFF)
 
 if(FLY_DOCS)
     add_subdirectory(docs)

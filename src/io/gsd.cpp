@@ -27,7 +27,6 @@
 #include <type_traits>
 #include <utility>
 
-#include "external/gsd.h"
 #include "io/gsd_helpers.hpp"
 #include "libfly/utility/core.hpp"
 

@@ -25,11 +25,7 @@ jobs:
 
       - name: Install vcpkg
         uses: friendlyanon/setup-vcpkg@v1
-        with:
-          {
-            committish: "66045de4dcc5da3d1029c02b606307f5951dcb22",
-            cache-version: "${{ matrix.cpp }}",
-          }
+        with: { path: "external/vcpkg", cache-version: "${{ matrix.cpp }}" }
 
       - name: Configure
         shell: pwsh
@@ -59,11 +55,7 @@ jobs:
 
       - name: Install vcpkg
         uses: friendlyanon/setup-vcpkg@v1
-        with:
-          {
-            committish: "66045de4dcc5da3d1029c02b606307f5951dcb22",
-            cache-version: "intel-${{ matrix.cpp }}",
-          }
+        with: { path: "external/vcpkg", cache-version: "${{ matrix.cpp }}" }
 
       - name: Intel Apt repository
         timeout-minutes: 1

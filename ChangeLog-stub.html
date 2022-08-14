@@ -207,7 +207,7 @@
         </a>
         <div class="content-icon-container">
           <div class="edit-this-page">
-  <a class="muted-link" href="https://github.com/ConorWilliams/openFLY/edit/main/docs/changelog.rst" title="Edit this page">
+  <a class="muted-link" href="https://github.com/ConorWilliams/openFLY/edit/main/docs/ChangeLog-stub.rst" title="Edit this page">
     <svg aria-hidden="true" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
       <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
       <path d="M4 20h4l10.5 -10.5a1.5 1.5 0 0 0 -4 -4l-10.5 10.5v4" />
@@ -233,34 +233,55 @@
 <h1>Changelog<a class="headerlink" href="#changelog" title="Permalink to this heading">#</a></h1>
 <section id="unreleased">
 <h2>Unreleased<a class="headerlink" href="#unreleased" title="Permalink to this heading">#</a></h2>
-<p>Adjacent cells class</p>
-</section>
-<section id="version-0-2-0">
-<h2>Version 0.2.0<a class="headerlink" href="#version-0-2-0" title="Permalink to this heading">#</a></h2>
-<p>The first released alpha version of openFLY! This is a minimal feature-set release with just the base classes that underpin openFLY as well as binary IO.</p>
 <section id="added">
 <h3>Added<a class="headerlink" href="#added" title="Permalink to this heading">#</a></h3>
 <ul class="simple">
-<li><p>Binary IO using the GSD format.</p></li>
-<li><p>Property base class.</p></li>
-<li><p>TypeMap class.</p></li>
-<li><p>Supercell class.</p></li>
-<li><p>SoA class.</p></li>
-<li><p>VoS class.</p></li>
-<li><p>Atom class.</p></li>
-<li><p>Box class and specialised crystal systems that it is built on.</p></li>
-<li><p>The utility.hpp file containing many utilities.</p></li>
-<li><p>New CI workflow now includes C++20 and Intel compilers, MSVC removed due to compiler bug.</p></li>
+<li><p>Adjacent cells class</p></li>
 </ul>
 </section>
 <section id="changed">
 <h3>Changed<a class="headerlink" href="#changed" title="Permalink to this heading">#</a></h3>
 <ul class="simple">
-<li><p>GPL-2.0 -&gt; GPL-3.0-or-later</p></li>
+<li><p>vcpkg + gsd are now submodules so all dependencies are tracked by dependabot!</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Property</span></code>’s <code class="docutils literal notranslate"><span class="pre">array_ref_t</span></code> is now an <code class="docutils literal notranslate"><span class="pre">Eigen::Map</span></code> to disallow resizing of <code class="docutils literal notranslate"><span class="pre">SoA</span></code>’s individual arrays.</p></li>
+</ul>
+</section>
+<section id="fixes">
+<h3>Fixes<a class="headerlink" href="#fixes" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p>SoA resize was broken</p></li>
 </ul>
 </section>
 <section id="removed">
 <h3>Removed<a class="headerlink" href="#removed" title="Permalink to this heading">#</a></h3>
+</section>
+</section>
+<section id="version-0-2-0">
+<h2>Version 0.2.0<a class="headerlink" href="#version-0-2-0" title="Permalink to this heading">#</a></h2>
+<p>The first released alpha version of openFLY! This is a minimal feature-set release with just the base classes that underpin openFLY as well as binary IO.</p>
+<section id="id1">
+<h3>Added<a class="headerlink" href="#id1" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p>Binary IO using the GSD format through the <code class="docutils literal notranslate"><span class="pre">FileGSD</span></code> class.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Property</span></code> base class template.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">TypeMap</span></code> class template.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Supercell</span></code> class template.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">SoA</span></code> class template.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">VoS</span></code> class template.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Atom</span></code> class template.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Box</span></code> class and specialised crystal systems that it is built on.</p></li>
+<li><p>The utility.hpp file containing many utilities.</p></li>
+<li><p>New CI workflow now includes C++20 and Intel compilers, MSVC removed due to compiler bug.</p></li>
+</ul>
+</section>
+<section id="id2">
+<h3>Changed<a class="headerlink" href="#id2" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p>GPL-2.0 -&gt; GPL-3.0-or-later</p></li>
+</ul>
+</section>
+<section id="id3">
+<h3>Removed<a class="headerlink" href="#id3" title="Permalink to this heading">#</a></h3>
 <ul class="simple">
 <li><p>Hdoc is no longer used to build the documentation.</p></li>
 </ul>
@@ -335,11 +356,17 @@
           <div class="toc-tree">
             <ul>
 <li><a class="reference internal" href="#">Changelog</a><ul>
-<li><a class="reference internal" href="#unreleased">Unreleased</a></li>
-<li><a class="reference internal" href="#version-0-2-0">Version 0.2.0</a><ul>
+<li><a class="reference internal" href="#unreleased">Unreleased</a><ul>
 <li><a class="reference internal" href="#added">Added</a></li>
 <li><a class="reference internal" href="#changed">Changed</a></li>
+<li><a class="reference internal" href="#fixes">Fixes</a></li>
 <li><a class="reference internal" href="#removed">Removed</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#version-0-2-0">Version 0.2.0</a><ul>
+<li><a class="reference internal" href="#id1">Added</a></li>
+<li><a class="reference internal" href="#id2">Changed</a></li>
+<li><a class="reference internal" href="#id3">Removed</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#version-0-1-0-alpha">Version 0.1.0-alpha</a></li>

@@ -166,12 +166,15 @@ namespace fly::io {
     }
 
     /**
-     * @brief Write the number of atoms ``num_atoms`` to the current frame.
+     * @brief Write a chunk to the current frame.
      *
-     * Despite this being seemingly redundant as every chunk in GSD stores how many records there are some visualisers (OVITO)
-     * still require "particles/N" to be set.
+     * @param name The chunk label (null terminated).
+     * @param value Value to write to the chunk.
      */
-    auto write(std::uint32_t num_atoms) -> void { dump_one("particles/N", num_atoms); }
+    template <typename T>
+    auto write(char const *name, T const &value) -> std::enable_if_t<std::is_arithmetic_v<T>> {
+      dump_span(name, 1, nonstd::span<std::uint32_t const>{&value, 1});
+    }
 
     /**
      * @brief Write a fly::system::Box to the current frame.
@@ -189,7 +192,7 @@ namespace fly::io {
     template <typename... U>
     auto write(system::TypeMap<U...> const &map) -> void {
       //
-      dump_one("log/typemap/N", safe_cast<std::uint32_t>(map.num_types()));  // explicitly store for reconstruction.
+      write("log/typemap/N", safe_cast<std::uint32_t>(map.num_types()));  // explicitly store for reconstruction.
 
       write(Type{}, static_cast<typename system::TypeMap<U...>::SOA const &>(map));
 
@@ -212,11 +215,17 @@ namespace fly::io {
     }
 
     /**
-     * @brief Read the number of atoms stored at frame ``i`` and return it.
+     * @brief Read and return a value stored in the file.
      *
      * @param i Index of frame to read from.
+     * @param name Name of the chunk to read from (null terminated).
      */
-    auto read_num_atoms(std::uint64_t i) -> std::uint32_t { return load_one<std::uint32_t>(i, "particles/N"); }
+    template <typename T>
+    auto read(std::uint64_t i, char const *name) -> std::enable_if_t<std::is_arithmetic_v<T>, T> {
+      std::array<T, 1> buf;
+      load_span(i, name, 1, buf);
+      return buf[0];
+    }
 
     // ///////////////////////////////////////////////
 
@@ -252,7 +261,7 @@ namespace fly::io {
     template <typename... U>
     auto read_map(std::uint64_t i) -> system::TypeMap<U...> {
       //
-      system::TypeMap<U...> map(load_one<std::uint32_t>(i, "log/typemap/N"));
+      system::TypeMap<U...> map(read<std::uint32_t>(i, "log/typemap/N"));
 
       read_to(i, Type{}, static_cast<typename system::TypeMap<U...>::SOA &>(map));
 
@@ -272,18 +281,6 @@ namespace fly::io {
     // ///////////////////////////////////////////
 
     void end_frame();
-
-    template <typename T>
-    void dump_one(char const *name, T const &value) {
-      dump_span(name, 1, nonstd::span<std::uint32_t const>{&value, 1});
-    }
-
-    template <typename T>
-    T load_one(std::uint64_t i, char const *name) {
-      std::array<T, 1> buf;
-      load_span(i, name, 1, buf);
-      return buf[0];
-    }
 
 /**
  * @brief Define a [dump/load]_span for type ``type``.

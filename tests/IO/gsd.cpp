@@ -62,7 +62,7 @@ TEST_CASE("BinaryFile", "[io]") {
     file.commit([&] {
       file.write(cell.box());
       file.write(cell.map());
-      file.write(safe_cast<std::uint32_t>(cell.size()));
+      file.write("particles/N", safe_cast<std::uint32_t>(cell.size()));
       file.write(id_, cell);
 
       file.write(r_, cell);
@@ -71,7 +71,7 @@ TEST_CASE("BinaryFile", "[io]") {
     cell[r_] += 1;
 
     file.commit([&] {
-      file.write(safe_cast<std::uint32_t>(cell.size()));
+      file.write("particles/N", safe_cast<std::uint32_t>(cell.size()));
       file.write(r_, cell);
     });
   }
@@ -96,7 +96,7 @@ TEST_CASE("BinaryFile", "[io]") {
 
     CHECK(gnorm(diff) < 0.0001);
 
-    auto out_cell = system::make_supercell<Position>(out_box, out_map, file.read_num_atoms(0));
+    auto out_cell = system::make_supercell<Position>(out_box, out_map, file.read<std::uint32_t>(0, "particles/N"));
 
     file.read_to(0, id_, out_cell);
     file.read_to(0, r_, out_cell);

@@ -46,7 +46,7 @@ To build openFLY in release mode with:
 
 .. tab:: Single-configuration generator i.e. make, ninja, etc.
 
-    First configure cmake:
+    First configure cmake (this will also fetch and build the vcpkg dependancies):
 
     .. code:: console
 
@@ -60,7 +60,7 @@ To build openFLY in release mode with:
 
 .. tab:: Multi-configuration generator, i.e. Visual Studio
 
-    First configure cmake:
+    First configure cmake (this will also fetch and build the vcpkg dependancies):
     
     .. code:: console
 

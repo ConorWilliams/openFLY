@@ -10,7 +10,7 @@ Adjacent cells class
 Version 0.2.0
 --------------------------------
 
-The first released alpha version of openFLY! This is a minimal feature-set release with just the base classes that underpin openFLY as well as GSD IO.
+The first released alpha version of openFLY! This is a minimal feature-set release with just the base classes that underpin openFLY as well as binary IO.
 
 Added
 ~~~~~~~~~
@@ -32,12 +32,12 @@ Added
 Changed
 ~~~~~~~~~~
 
-GPL-2.0 -> GPL-3.0-or-later
+- GPL-2.0 -> GPL-3.0-or-later
 
 Removed
 ~~~~~~~~~
 
-Hdoc is no longer used to build the documentation.
+- Hdoc is no longer used to build the documentation.
 
 Version 0.1.0-alpha
 ---------------------------

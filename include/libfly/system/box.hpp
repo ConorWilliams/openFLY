@@ -81,6 +81,11 @@ namespace fly::system {
   class Box {
   public:
     /**
+     * @brief The result of calling Box::make_grid()
+     */
+    using Grid = std::variant<OrthoGrid, TriGrid>;
+
+    /**
      * @brief Construct a new Box box object.
      *
      * Automatically select the optimal underlying crystal system.

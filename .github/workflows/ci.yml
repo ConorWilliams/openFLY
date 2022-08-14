@@ -46,6 +46,10 @@ jobs:
         run: ctest --output-on-failure -C Release -j 2
 
   test_intel:
+    strategy:
+      matrix:
+        cpp: [17, 20]
+
     runs-on: ubuntu-latest
 
     steps:
@@ -58,7 +62,7 @@ jobs:
         with:
           {
             committish: "66045de4dcc5da3d1029c02b606307f5951dcb22",
-            cache-version: 2,
+            cache-version: "intel-${{ matrix.cpp }}",
           }
 
       - name: Intel Apt repository
@@ -81,7 +85,7 @@ jobs:
 
       - name: Configure
         shell: pwsh
-        run: cmake --preset=ci-ubuntu -DCMAKE_CXX_COMPILER=icpx
+        run: cmake "-DCMAKE_CXX_STANDARD=${{ matrix.cpp }}" --preset=ci-ubuntu -DCMAKE_CXX_COMPILER=icpx
 
       - name: Build
         run: cmake --build build --config Release -j 2

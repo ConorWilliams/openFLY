@@ -239,44 +239,56 @@
 <li><p>cmake 3.14+</p></li>
 <li><p>git</p></li>
 <li><p>MPI installation</p></li>
-<li><p>doxygen 1.9+ [optional]</p></li>
-<li><p>python 3.6+ [optional]</p></li>
+<li><p>doxygen 1.9+ [optional, for documentation]</p></li>
+<li><p>python 3.6+ [optional, for documentation]</p></li>
 </ul>
-<p>Additionally openFLY has a number of dependencies (please refer to <a class="reference external" href="https://github.com/ConorWilliams/openFLY/blob/master/vcpkg.json">vcpkg.json</a> for a complete list). You can choose to download and install these manually but, the recommended method is to use <a class="reference external" href="https://github.com/microsoft/vcpkg">vcpkg</a> to manage them automatically.</p>
-<div class="admonition tip">
-<p class="admonition-title">Tip</p>
-<p>To get started with vcpkg in Unix, clone the repo:</p>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">git clone https://github.com/microsoft/vcpkg</span>
+<p>Additionally openFLY has a number of dependencies which are managed automatically through  <a class="reference external" href="https://github.com/microsoft/vcpkg">vcpkg</a> and git submodules.</p>
+</section>
+<section id="getting-the-source-code">
+<h2>Getting the source code<a class="headerlink" href="#getting-the-source-code" title="Permalink to this heading">#</a></h2>
+<p>First, download a copy of the source code using git:</p>
+<div class="tab-set docutils container">
+<input checked="True" class="tab-input" id="tab-set--0-input--1" name="tab-set--0" type="radio"><label class="tab-label" for="tab-set--0-input--1">https</label><div class="tab-content docutils container">
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">git clone --recursive https://github.com/ConorWilliams/openFLY.git</span>
 </pre></div>
 </div>
-<p>then bootstrap using the supplied script:</p>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">./vcpkg/bootstrap-vcpkg.sh</span>
+</div>
+<input class="tab-input" id="tab-set--0-input--2" name="tab-set--0" type="radio"><label class="tab-label" for="tab-set--0-input--2">ssh</label><div class="tab-content docutils container">
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">git clone --recursive git@github.com:ConorWilliams/openFLY.git</span>
 </pre></div>
 </div>
-<p>finally set the <code class="docutils literal notranslate"><span class="pre">VCPKG_ROOT</span></code> environmental variable:</p>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">export VCPKG_ROOT=&lt;path to vcpkg&gt;</span>
-</pre></div>
 </div>
-<p>For more detail see the official page: <a class="reference external" href="https://github.com/microsoft/vcpkg">https://github.com/microsoft/vcpkg</a>.</p>
+</div>
+<p>then <cite>cd</cite> into the newly created folder:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">cd openFLY</span>
+</pre></div>
 </div>
 </section>
 <section id="compiling-openfly">
 <h2>Compiling openFLY<a class="headerlink" href="#compiling-openfly" title="Permalink to this heading">#</a></h2>
-<p>To build openFLY in release mode with a single-configuration generator, like the Unix Makefiles one:</p>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">cmake -S . -B build -DCMAKE_BUILD_TYPE=Release</span>
-<span class="go">cmake --build build</span>
+<p>To build openFLY in release mode with:</p>
+<div class="tab-set docutils container">
+<input checked="True" class="tab-input" id="tab-set--1-input--1" name="tab-set--1" type="radio"><label class="tab-label" for="tab-set--1-input--1">Single-configuration generator i.e. make, ninja, etc.</label><div class="tab-content docutils container">
+<p>First configure cmake (this will also fetch and build the vcpkg dependancies):</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=./external/vcpkg/scripts/buildsystems/vcpkg.cmake</span>
 </pre></div>
 </div>
-<p>Similarly with a multi-configuration generator, like the Visual Studio ones:</p>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">cmake -S . -B build</span>
-<span class="go">cmake --build build --config Release</span>
+<p>Then compile the code:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">cmake --build build</span>
 </pre></div>
 </div>
-<p>If you are using vcpkg to manage your dependancies then you will need to append:</p>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">-DCMAKE_TOOLCHAIN_FILE=$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake</span>
+</div>
+<input class="tab-input" id="tab-set--1-input--2" name="tab-set--1" type="radio"><label class="tab-label" for="tab-set--1-input--2">Multi-configuration generator, i.e. Visual Studio</label><div class="tab-content docutils container">
+<p>First configure cmake (this will also fetch and build the vcpkg dependancies):</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">cmake -S . -B build -DCMAKE_TOOLCHAIN_FILE=./external/vcpkg/scripts/buildsystems/vcpkg.cmake</span>
 </pre></div>
 </div>
-<p>to the configure step.</p>
+<p>Then compile the code:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">cmake --build build --config Release</span>
+</pre></div>
+</div>
+</div>
+</div>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>MSVC by default is not standards compliant and you need to pass some flags to make it behave properly. See the <code class="docutils literal notranslate"><span class="pre">flags-windows</span></code> preset in the <a class="reference external" href="https://github.com/ConorWilliams/openFLY/blob/master/CMakePresets.json">CMakePresets.json</a>  file for the flags and with what variable to provide them to CMake during configuration.</p>
@@ -357,6 +369,7 @@
             <ul>
 <li><a class="reference internal" href="#">Building</a><ul>
 <li><a class="reference internal" href="#prerequisites">Prerequisites</a></li>
+<li><a class="reference internal" href="#getting-the-source-code">Getting the source code</a></li>
 <li><a class="reference internal" href="#compiling-openfly">Compiling openFLY</a></li>
 <li><a class="reference internal" href="#documentation">Documentation</a></li>
 </ul>

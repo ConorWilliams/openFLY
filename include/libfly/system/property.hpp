@@ -74,7 +74,7 @@ namespace fly::system {
     /** @brief The Eigen type used to store a dynamic collection of contiguous matrix_t. */
     using array_t = Eigen::Array<Scalar, Eigen::Dynamic, 1>;
     /** @brief A reference-like type to the underlying array_t. */
-    using array_ref_t = Eigen::ArrayBase<array_t>&;
+    using array_ref_t = Eigen::Map<array_t>;
     /** @brief A const-reference-like type to the underlying array_t. */
     using array_cref_t = Eigen::ArrayBase<array_t> const&;
 

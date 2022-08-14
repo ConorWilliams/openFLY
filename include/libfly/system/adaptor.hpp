@@ -99,7 +99,7 @@ namespace fly::system::detail {
      *
      * This is an owning Adaptor hence, model value const-semantics
      */
-    constexpr typename T::array_ref_t operator[](T) noexcept { return m_data; }
+    constexpr typename T::array_ref_t operator[](T) noexcept { return {m_data.data(), m_data.rows()}; }
 
     /**
      * @brief Fetch a view of the array, tagged dispatch on T.
@@ -189,11 +189,11 @@ namespace fly::system::detail {
       //
       ASSERT(m_data_ptr, "Dereferencing an empty view adaptor.", 0);
 
-      return *m_data_ptr;
+      return typename T::array_ref_t{m_data_ptr->data(), m_data_ptr->rows()};
     }
 
   private:
-    Eigen::ArrayBase<typename T::array_t>* m_data_ptr = nullptr;  ///< Pointer to the viewed array.
+    typename T::array_t* m_data_ptr = nullptr;  ///< Pointer to the viewed array.
 
     friend struct Adaptor<T>;
     friend struct Adaptor<T const&>;
@@ -255,7 +255,7 @@ namespace fly::system::detail {
     }
 
   private:
-    Eigen::ArrayBase<typename T::array_t> const* m_data_ptr = nullptr;  ///< Pointer to the viewed array.
+    typename T::array_t const* m_data_ptr = nullptr;  ///< Pointer to the viewed array.
 
     friend struct Adaptor<T>;
     friend struct Adaptor<T&>;

@@ -7,7 +7,7 @@ OpenFLY 0.2.0
    user.rst
    programmer.rst
    api.rst
-   changelog.rst
+   ChangeLog-stub.rst
    todo.rst
 
 

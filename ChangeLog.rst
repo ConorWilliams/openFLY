@@ -32,7 +32,7 @@ The first released alpha version of openFLY! This is a minimal feature-set relea
 Added
 ~~~~~~~~~
 
-- Binary IO using the GSD format through the ``FileGSD``class.
+- Binary IO using the GSD format through the ``FileGSD`` class.
 
 - ``Property`` base class template.
 - ``TypeMap`` class template.

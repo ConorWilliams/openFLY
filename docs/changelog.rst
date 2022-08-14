@@ -16,6 +16,11 @@ Changed
 - vcpkg + gsd are now submodules so all dependencies are tracked by dependabot!
 - ``Property``'s ``array_ref_t`` is now an ``Eigen::Map`` to disallow resizing of ``SoA``'s individual arrays.
 
+Fixes
+~~~~~~~~~~~~~~
+
+- SoA resize was broken
+
 Removed
 ~~~~~~~~~
 

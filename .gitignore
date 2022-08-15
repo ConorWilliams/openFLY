@@ -3,7 +3,8 @@
 /.vscode
 
 CMakeUserPresets.json
-
+BinaryFile_test.gsd
 compile_commands.json
+Testing
 
 /build

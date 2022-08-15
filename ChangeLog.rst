@@ -11,10 +11,10 @@ Added
 - ``AdjacentCells`` class
 - ``Vector`` class
 - ``Xoshiro`` class as the PRNG
+- ``Box`` has a new ``get()`` method to fetch the underlying ``std::variant`` 
 
 Changed
 ~~~~~~~~~~
-
 
 - ``Property``'s ``array_ref_t`` is now an ``Eigen::Map`` to disallow resizing of ``SoA``'s individual arrays.
 - ``SoA``'s ``destructive_resize`` now returns a boolean.
@@ -25,7 +25,6 @@ Fixes
 ~~~~~~~~~~~~~~
 - ``SoA``'s ``operator()`` was broken.
 - ``SoA``'s ``resize`` was broken.
-
 
 Removed
 ~~~~~~~~~

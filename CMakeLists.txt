@@ -50,9 +50,10 @@ target_compile_features(libFLY PUBLIC cxx_std_17)
 find_package(fmt REQUIRED)
 find_package(Eigen3 REQUIRED)
 find_package(span-lite REQUIRED)
+find_package(OpenMP REQUIRED)
 
 # target_link_libraries(libFLY PRIVATE )
-target_link_libraries(libFLY PUBLIC Eigen3::Eigen fmt::fmt nonstd::span-lite)
+target_link_libraries(libFLY PUBLIC Eigen3::Eigen fmt::fmt nonstd::span-lite OpenMP::OpenMP_CXX)
 
 # Declare executable
 add_executable(openFLY apps/main.cpp)

@@ -43,7 +43,7 @@ namespace fly::neighbour {
       verify((shape > 0).all(), "Invalid shape: {}", shape);
 
       //
-      m_adj_cells.resize(safe_cast<std::size_t>(shape.prod()));
+      m_adj_cells.resize(shape.prod());
 
       // ND -> 1D
       auto to_1D = [cumprod = product_scan(shape)](Arr<int> const& x) { return (x * cumprod).sum(); };
@@ -59,15 +59,13 @@ namespace fly::neighbour {
 
         int n = to_1D({centre...});
 
-        auto signed_n = safe_cast<std::size_t>(n);
-
         template_for(beg, end, [&](auto... offset) {
           if (int m = to_1D({offset...}); n != m) {
-            m_adj_cells[signed_n][slot++] = m;
+            m_adj_cells[n][slot++] = m;
           }
         });
 
-        m_adj_cells[signed_n].count = slot;
+        m_adj_cells[n].count = slot;
       });
     }
 
@@ -77,17 +75,14 @@ namespace fly::neighbour {
      * @return nonstd::span<int const> A span containing the indexes of every cell adjacent to the ``n``th cell, does not include the
      * ``n``th cell.
      */
-    nonstd::span<int const> operator[](std::size_t n) const {
-      ASSERT(n < m_adj_cells.size(), "Invalid cell index {} is bigger than {}", n, m_adj_cells.size());
-      return {m_adj_cells[n].data(), m_adj_cells[n].count};
-    }
+    nonstd::span<int const> operator[](Eigen::Index n) const { return {m_adj_cells[n].data(), m_adj_cells[n].count}; }
 
   private:
     struct adjbours : std::array<int, ipow<spatial_dims>(3) - 1> {
       std::size_t count = 0;
     };
 
-    std::vector<adjbours> m_adj_cells;
+    Vector<adjbours> m_adj_cells;
 
     /**
      * @brief Invoke ``f`` with every tuple of indexes between ``beg`` and ``end``.

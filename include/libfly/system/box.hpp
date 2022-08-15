@@ -96,11 +96,6 @@ namespace fly::system {
     Box(Mat const& basis, Arr<bool> const& periodic) : m_sys(detail::build_varient(basis, periodic)) {}
 
     /**
-     * @brief Construct an empty (Orthorhombic) box zeroing all memory.
-     */
-    Box() : m_sys(Orthorhombic(Arr<double>::Ones(), Arr<bool>::Constant(false))){};
-
-    /**
      * \copydoc Triclinic::basis
      */
     Mat basis() const {

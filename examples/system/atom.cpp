@@ -1,8 +1,6 @@
 
 #include "libfly/system/atom.hpp"
 
-#include <Eigen/src/Core/Matrix.h>
-
 #include "libfly/system/property.hpp"
 
 void example_atom() {

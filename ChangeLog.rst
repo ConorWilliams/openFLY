@@ -8,7 +8,8 @@ Unreleased
 Added
 ~~~~~~~~~
 
-- Adjacent cells class
+- ``AdjacentCells`` class
+- ``Vector`` class
 
 Changed
 ~~~~~~~~~~
@@ -25,6 +26,8 @@ Fixes
 
 Removed
 ~~~~~~~~~
+
+- ``Box`` default constructor
 
 Meta 
 ~~~~~~~~~~~~~~~~~~~~~~~~~

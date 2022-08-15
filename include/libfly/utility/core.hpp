@@ -41,6 +41,7 @@
 #include <string_view>
 #include <type_traits>
 #include <utility>
+#include <vector>
 
 /**
  * \file core.hpp
@@ -458,6 +459,76 @@ namespace fly {
   }
 
   // ------------------- Classes ---------------- //
+
+  /**
+   * @brief A wrapper around a ``std::vector``.
+   *
+   * Does bounds checking in debug and signed size_type.
+   */
+  template <typename T>
+  class Vector : private std::vector<T> {
+  private:
+    using Base = std::vector<T>;
+    using size_type = typename Base::size_type;
+
+  public:
+    /**
+     * @brief Replaces the contents with ``count`` copies of value ``value``.
+     *
+     * @param count The new size of the container.
+     * @param value The value to initialize elements of the container with.
+     */
+    auto assign(Eigen::Index count, T const &value) -> void {
+      verify(count >= 0, "Cannot assign {} values", count);
+      Base::assign(static_cast<size_type>(count, value));
+    }
+
+    /**
+     * @brief Returns a reference to the element at specified location ``pos``. Bounds checking in DEBUG builds.
+     *
+     * @param pos Position of the element to return.
+     */
+    auto operator[](Eigen::Index pos) -> T & {
+      ASSERT(pos >= 0 && pos < size(), "Position, {}, is OoB in Vector length {}", pos, size());
+      return Base::operator[](static_cast<std::size_t>(pos));
+    }
+
+    /**
+     * @brief Returns a reference to the element at specified location ``pos``. Bounds checking in DEBUG builds.
+     *
+     * @param pos Position of the element to return.
+     */
+    auto operator[](Eigen::Index pos) const -> T const & {
+      ASSERT(pos >= 0 && pos < size(), "Position, {}, is OoB in Vector length {}", pos, size());
+      return Base::operator[](static_cast<std::size_t>(pos));
+    }
+
+    using Base::begin;
+    using Base::end;
+
+    /**
+     * @brief Fetch the number of elements in the vector.
+     */
+    auto size() const -> Eigen::Index { return safe_cast<Eigen::Index>(Base::size()); }
+
+    /**
+     * @brief Clears the contents.
+     */
+    auto clear() { Base::clear(); }
+
+    /**
+     * @brief Resizes the container to contain count elements.
+     *
+     * If the current size is greater than count, the container is reduced to its first count elements. If the current size is less
+     * than count, additional default-inserted elements are appended.
+     *
+     * @param count New size of the container
+     */
+    auto resize(Eigen::Index count) -> void {
+      verify(count >= 0, "Cannot assign {} values", count);
+      Base::resize(static_cast<std::size_t>(count));
+    }
+  };
 
   /**
    * @brief Basic implementation of a Golang like defer.

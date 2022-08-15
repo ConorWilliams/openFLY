@@ -201,12 +201,15 @@ namespace fly::system {
      *    Destroys all the data in the SoA, new atoms are all uninitialized.
      * \endrst
      *
+     * \return ``true`` if resize occurred, ``false`` otherwise.
      */
     template <bool OwnsAll = owns_all>
-    std::enable_if_t<OwnsAll> destructive_resize(Eigen::Index new_size) {
+    auto destructive_resize(Eigen::Index new_size) -> std::enable_if_t<OwnsAll, bool> {
       if (std::exchange(m_size, new_size) != new_size) {
         *this = SoA(new_size);
+        return true;
       }
+      return false;
     }
 
   private:

@@ -13,16 +13,24 @@ Added
 Changed
 ~~~~~~~~~~
 
-- vcpkg + gsd are now submodules so all dependencies are tracked by dependabot!
+
 - ``Property``'s ``array_ref_t`` is now an ``Eigen::Map`` to disallow resizing of ``SoA``'s individual arrays.
+- ``SoA``'s ``destructive_resize`` now returns a boolean.
+- Crystal systems ``gen_image`` marked ``const``.
 
 Fixes
 ~~~~~~~~~~~~~~
-
-- SoA resize was broken
+- ``SoA``'s ``operator()`` was broken.
+- ``SoA``'s ``resize`` was broken.
 
 Removed
 ~~~~~~~~~
+
+Meta 
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+- vcpkg + gsd are now submodules so all dependencies are tracked by Dependabot!
+
 
 Version 0.2.0
 --------------------------------
@@ -53,6 +61,9 @@ Changed
 
 Removed
 ~~~~~~~~~
+
+Meta 
+~~~~~~~~~~~~~~~~~~~~~~~~~
 
 - Hdoc is no longer used to build the documentation.
 

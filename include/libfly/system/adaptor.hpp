@@ -176,7 +176,7 @@ namespace fly::system::detail {
       if constexpr (T::is_1x1) {
         return (*m_data_ptr)[i];
       } else {
-        return typename T::matrix_ref_t{m_data_ptr->m_data() + i * T::size()};
+        return typename T::matrix_ref_t{m_data_ptr->data() + i * T::size()};
       }
     }
 
@@ -240,7 +240,7 @@ namespace fly::system::detail {
       if constexpr (T::is_1x1) {
         return (*m_data_ptr)[i];
       } else {
-        return typename T::matrix_cref_t{m_data_ptr->m_data() + i * T::size()};
+        return typename T::matrix_cref_t{m_data_ptr->data() + i * T::size()};
       }
     }
 

@@ -41,10 +41,8 @@ namespace fly::system {
      *
      * \rst
      * .. warning::
-     *    Only supports atoms in the canonical cell.
+     *    Only supports atoms with a projection along axis in the canonical cell.
      *
-     * .. note::
-     *    Not a template for implementation reasons.
      * \endrst
      *
      * @tparam S Direction along axis which to generate image.
@@ -54,16 +52,18 @@ namespace fly::system {
      * the image's position otherwise ``std::nullopt``.
      */
     template <Sign S>
-    std::optional<Vec> gen_image(Vec x, int ax) {
+    std::optional<Vec> gen_image(Vec x, int ax) const {
       //
       static_assert(S == Sign::plus || S == Sign::minus, "Unreachable");
 
       if constexpr (S == Sign::plus) {
+        ASSERT(x[ax] > 0, "Atom {} outside canonical cell along axis {}", x, ax);
         if (x[ax] < HyperGrid::r_cut()) {
           x[ax] += m_extents[ax];
           return x;
         }
       } else {
+        ASSERT(x[ax] < m_extents[ax], "Atom {} outside canonical cell along axis {}", x, ax);
         if (x[ax] > m_extents[ax] - HyperGrid::r_cut()) {
           x[ax] -= m_extents[ax];
           return x;

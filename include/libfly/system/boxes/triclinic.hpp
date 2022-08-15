@@ -44,7 +44,7 @@ namespace fly::system {
      * \copydoc OrthoGrid::gen_image
      */
     template <Sign S, typename E>
-    std::optional<Vec> gen_image(Eigen::MatrixBase<E> const& x, int ax) {
+    std::optional<Vec> gen_image(Eigen::MatrixBase<E> const& x, int ax) const {
       //
       if constexpr (S == Sign::plus) {
         // Shortest distance point to hyperplane

@@ -38,22 +38,16 @@ namespace fly {
    * \endrst
    */
   class Xoshiro {
-  private:
-    /**
-     * @brief Utility function.
-     */
-    [[nodiscard]] static constexpr std::uint64_t rotl(std::uint64_t const x, int const k) noexcept {
-      return (x << k) | (x >> (64 - k));
-    }
-
   public:
+    using result_type = std::uint64_t;  ///< Required by named requirement: UniformRandomBitGenerator
+
     /**
      * @brief Construct and seed the PRNG.
      *
      * The state must be seeded so that it is not everywhere zero.
      */
-    explicit constexpr Xoshiro(std::array<std::uint64_t, 4> const& seed) : m_state{seed} {
-      if (seed == std::array<std::uint64_t, 4>{0, 0, 0, 0}) {
+    explicit constexpr Xoshiro(std::array<result_type, 4> const& seed) : m_state{seed} {
+      if (seed == std::array<result_type, 4>{0, 0, 0, 0}) {
         throw error("{} is a bad seed!", seed);
       }
     }
@@ -61,20 +55,20 @@ namespace fly {
     /**
      * @brief Get the minimum value of the generator.
      */
-    static constexpr auto min() noexcept -> std::uint64_t { return std::numeric_limits<std::uint64_t>::lowest(); }
+    static constexpr auto min() noexcept -> result_type { return std::numeric_limits<result_type>::lowest(); }
 
     /**
      * @brief Get the maximum value of the generator.
      */
-    static constexpr auto max() noexcept -> std::uint64_t { return std::numeric_limits<std::uint64_t>::max(); }
+    static constexpr auto max() noexcept -> result_type { return std::numeric_limits<result_type>::max(); }
 
     /**
      * @brief Generate a random bit sequence and advance the state of the generator.
      */
-    constexpr auto operator()() noexcept -> std::uint64_t {
-      std::uint64_t const result = rotl(m_state[1] * 5, 7) * 9;
+    constexpr auto operator()() noexcept -> result_type {
+      result_type const result = rotl(m_state[1] * 5, 7) * 9;
 
-      std::uint64_t const t = m_state[1] << 17;
+      result_type const t = m_state[1] << 17;
 
       m_state[2] ^= m_state[0];
       m_state[3] ^= m_state[1];
@@ -109,15 +103,20 @@ namespace fly {
     }
 
   private:
-    std::array<std::uint64_t, 4> m_state;
+    std::array<result_type, 4> m_state;
 
-    void jump_impl(std::array<std::uint64_t, 4> const& JUMP) noexcept {
+    /**
+     * @brief Utility function.
+     */
+    static constexpr result_type rotl(result_type const x, int const k) noexcept { return (x << k) | (x >> (64 - k)); }
+
+    constexpr void jump_impl(std::array<result_type, 4> const& JUMP) noexcept {
       //
-      std::array<std::uint64_t, 4> s = {0, 0, 0, 0};
+      std::array<result_type, 4> s = {0, 0, 0, 0};
 
-      for (std::uint64_t jump : JUMP) {
+      for (result_type jump : JUMP) {
         for (int b = 0; b < 64; ++b) {
-          if (jump & std::uint64_t{1} << b) {
+          if (jump & result_type{1} << b) {
             s[0] ^= m_state[0];
             s[1] ^= m_state[1];
             s[2] ^= m_state[2];

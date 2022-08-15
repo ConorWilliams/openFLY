@@ -170,7 +170,7 @@ namespace fly {
     /**
      * @brief Tag type for atom's index i.e. position in some array.
      */
-    struct Index : system::Property<std::uint32_t> {
+    struct Index : system::Property<Eigen::Index> {
       static constexpr char const* tag = "log/particles/index";  ///< GSD chunk label.
     };
 

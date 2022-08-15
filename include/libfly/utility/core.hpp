@@ -480,7 +480,7 @@ namespace fly {
      */
     auto assign(Eigen::Index count, T const &value) -> void {
       verify(count >= 0, "Cannot assign {} values", count);
-      Base::assign(static_cast<size_type>(count, value));
+      Base::assign(static_cast<size_type>(count), value);
     }
 
     /**
@@ -528,6 +528,8 @@ namespace fly {
       verify(count >= 0, "Cannot assign {} values", count);
       Base::resize(static_cast<std::size_t>(count));
     }
+
+    using Base::push_back;
   };
 
   /**

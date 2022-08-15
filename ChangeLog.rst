@@ -18,12 +18,14 @@ Changed
 
 - ``Property``'s ``array_ref_t`` is now an ``Eigen::Map`` to disallow resizing of ``SoA``'s individual arrays.
 - ``SoA``'s ``destructive_resize`` now returns a boolean.
+- Allow zero length ``SoA``s
 - Crystal systems ``gen_image`` marked ``const``.
 
 Fixes
 ~~~~~~~~~~~~~~
 - ``SoA``'s ``operator()`` was broken.
 - ``SoA``'s ``resize`` was broken.
+
 
 Removed
 ~~~~~~~~~

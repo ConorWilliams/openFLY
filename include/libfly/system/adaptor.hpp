@@ -45,7 +45,7 @@ namespace fly::system::detail {
     // OwnsAll specific.
     explicit Adaptor(Eigen::Index size) : m_data(size * T::size()) {
       //
-      verify(size > 0, "Invalid size {}", size);
+      verify(size >= 0, "Invalid size={} for a SoA.", size);
     }
 
     Adaptor& operator=(Adaptor const&) = default;

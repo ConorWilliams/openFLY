@@ -207,8 +207,6 @@ namespace fly::io {
      */
     template <typename T, typename... U>
     auto write([[maybe_unused]] T tag, system::SoA<U...> const &in) -> std::enable_if_t<std::is_arithmetic_v<typename T::scalar_t>> {
-      std::string i = typename T::scalar_t{};
-
       dump_span(T::tag, T::size(),
                 nonstd::span<typename T::scalar_t const>{
                     in[T{}].derived().data(),

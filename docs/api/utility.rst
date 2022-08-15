@@ -98,3 +98,18 @@ File ``timeit.hpp``
 
 .. doxygenfunction:: timeit
 
+
+Random numbers 
+----------------------
+
+File ``random.hpp``
+
+.. doxygenfile:: random.hpp
+    :sections: briefdescription detaileddescription
+
+
+.. doxygenclass:: fly::Xoshiro
+    :members:
+    :undoc-members:
+
+

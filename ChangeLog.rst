@@ -10,6 +10,7 @@ Added
 
 - ``AdjacentCells`` class
 - ``Vector`` class
+- ``Xoshiro`` class as the PRNG
 
 Changed
 ~~~~~~~~~~

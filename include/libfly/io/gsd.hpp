@@ -248,7 +248,7 @@ namespace fly::io {
         -> std::enable_if_t<std::is_arithmetic_v<typename T::scalar_t>> {
       load_span(i, T::tag, T::size(),
                 nonstd::span<typename T::scalar_t>{
-                    out[T{}].derived().data(),
+                    out[T{}].data(),
                     safe_cast<std::size_t>(out.size() * T::size()),
                 });
     }

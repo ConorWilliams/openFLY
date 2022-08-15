@@ -137,6 +137,11 @@ namespace fly::system {
     }
 
     /**
+     * @brief Get the variant underlying this box.
+     */
+    auto get() const noexcept -> std::variant<Orthorhombic, Triclinic> const& { return m_sys; }
+
+    /**
      * @brief Comparison operator, no surprises.
      */
     friend bool operator==(Box const& a, Box const& b) noexcept { return a.m_sys == b.m_sys; }

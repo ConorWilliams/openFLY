@@ -46,7 +46,7 @@ namespace fly::system {
 
   public:
     /**
-     * @brief Construct a new Supercell object to store `num_atoms` atoms.
+     * @brief Construct a new Supercell object to store ``num_atoms`` atoms.
      */
     Supercell(Box const& box, Map const& map, Eigen::Index num_atoms) : SOA(num_atoms), m_box(box), m_map(map) {}
 
@@ -81,7 +81,7 @@ namespace fly::system {
    * Uses partial function-template argument deduction to deduce Supercell's template parameters.
    */
   template <typename... T, typename... U>
-  Supercell<TypeMap<U...>, T...> make_supercell(Box const& box, TypeMap<U...> const& map, Eigen::Index num_atoms) {
+  auto make_supercell(Box const& box, TypeMap<U...> const& map, Eigen::Index num_atoms) -> Supercell<TypeMap<U...>, T...> {
     return {box, map, num_atoms};
   }
 

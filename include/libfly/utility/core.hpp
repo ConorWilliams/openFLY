@@ -41,6 +41,7 @@
 #include <string_view>
 #include <type_traits>
 #include <utility>
+#include <variant>
 #include <vector>
 
 /**
@@ -235,6 +236,18 @@ namespace fly {
   using remove_cref_t = std::remove_const_t<std::remove_reference_t<T>>;
 
   // ------------------- Small functions ---------------- //
+
+  /**
+   * @brief Utility to reverse argument order to ``std::visit``.
+   *
+   * @param v A variant to pass to the visitor.
+   * @param f A callable that accepts every possible alternative from every variant.
+   * @return decltype(auto) The result of calling ``std::visit(std::forward<F>(f), std::forward<V>(v))``
+   */
+  template <typename V, typename F>
+  auto visit(V &&v, F &&f) -> decltype(auto) {
+    return std::visit(std::forward<F>(f), std::forward<V>(v));
+  }
 
   namespace detail {
     // C++20 functions see: https://en.cppreference.com/w/cpp/utility/intcmp

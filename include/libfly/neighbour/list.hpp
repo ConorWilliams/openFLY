@@ -56,7 +56,7 @@ namespace fly::neighbour {
     List(system::Box const& box, double r_cut)
         : m_box(box),
           m_grid(box.make_grid(r_cut)),
-          m_cells(std::visit([](auto const& grid) -> Arr<int> { return grid.shape(); }, m_grid)) {}
+          m_cells(visit(m_grid, [](auto const& grid) -> Arr<int> { return grid.shape(); })) {}
 
     /**
      * @brief Build the internal neighbour lists in parallel with openMP.

@@ -62,7 +62,7 @@ namespace fly::io {
 
   BinaryFile::BinaryFile(std::string_view fname, Flags flag) : m_fname(fname), m_handle(std::make_unique<gsd_handle>()) {
     //
-    if (spatial_dims != 3) {
+    if constexpr (spatial_dims != 3) {
       throw std::runtime_error("GSD files are currently only supported in 3D");
     }
     //

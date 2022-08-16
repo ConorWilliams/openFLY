@@ -101,9 +101,9 @@ void test(system::Box const& box, system::SoA<Position const&> atoms, double r_c
   //
   neighbour::List neigh(box, r_cut);
 
-  //   timeit("rebuild", [&] { neigh.rebuild(atoms, num_threads); });
+  timeit("rebuild", [&] { neigh.rebuild(atoms, num_threads); });
 
-  neigh.rebuild(atoms, num_threads);
+  //   neigh.rebuild(atoms, num_threads);
 
   //   std::vector<std::vector<Neigh>> nl;
 
@@ -139,7 +139,7 @@ TEST_CASE("List fuzz-testing", "[neighbour]") {
 
   auto rand = [&dis, &gen]() { return dis(gen); };
 
-  for (int i = 0; i < 100; i++) {
+  for (int i = 0; i < 1; i++) {
     // Random simulation box
     fly::system::Box box = [&]() {
       //
@@ -160,7 +160,7 @@ TEST_CASE("List fuzz-testing", "[neighbour]") {
       return tmp;
     }();
 
-    system::SoA<Position> cell(idis(gen));
+    system::SoA<Position> cell(idis(gen) * 20);
 
     for (int j = 0; j < cell.size(); j++) {
       cell(r_, j) = box.basis() * fly::Vec::NullaryExpr(rand);
@@ -168,7 +168,7 @@ TEST_CASE("List fuzz-testing", "[neighbour]") {
 
     for (std::size_t j = 0; j < 10; j++) {
       test(box, cell, 0.25 + 0.2499 * dis(gen), 1);
-      test(box, cell, 0.25 + 0.2499 * dis(gen), omp_get_max_threads());
+      //   test(box, cell, 0.25 + 0.2499 * dis(gen), omp_get_max_threads());
     }
   }
 }

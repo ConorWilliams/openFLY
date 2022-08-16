@@ -55,17 +55,15 @@ namespace fly::neighbour {
       }
     }
     // Copy in atoms
-    std::visit(
-        [this, &atoms](auto const& box) {
-          for (Eigen::Index i = 0; i < atoms.size(); ++i) {
-            m_atoms(Position{}, i) = box.canon_image(atoms(r_, i));
-          }
-        },
-        m_box.get());
+    visit(m_box.get(), [this, &atoms](auto const& box) {
+      for (Eigen::Index i = 0; i < atoms.size(); ++i) {
+        m_atoms(Position{}, i) = box.canon_image(atoms(r_, i));
+      }
+    });
 
     make_ghosts();
 
-    int num_cells = std::visit([](auto const& grid) -> Arr<int> { return grid.shape(); }, m_grid).prod();
+    int num_cells = visit(m_grid, [](auto const& grid) -> Arr<int> { return grid.shape(); }).prod();
 
     ASSERT(num_cells > 0, "{} is not a valid number of cells", num_cells);
 
@@ -75,7 +73,7 @@ namespace fly::neighbour {
     // Build LCL.
     for (Eigen::Index i = 0; i < m_num_plus_ghosts; i++) {
       //
-      int i_cell = std::visit([this, i](auto const& grid) { return grid.cell_idx(this->m_atoms(r_, i)); }, m_grid);
+      int i_cell = visit(m_grid, [this, i](auto const& grid) { return grid.cell_idx(this->m_atoms(r_, i)); });
 
       m_atoms(Next{}, i) = std::exchange(m_head[i_cell], i);
     }
@@ -98,9 +96,9 @@ namespace fly::neighbour {
 
     m_neigh_lists[i].clear();
 
-    auto i_cell = std::visit([this, i](auto const& grid) { return grid.cell_idx(this->m_atoms(r_, i)); }, m_grid);
+    auto i_cell = visit(m_grid, [this, i](auto const& grid) { return grid.cell_idx(this->m_atoms(r_, i)); });
 
-    double r_cut = std::visit([](auto const& grid) { return grid.r_cut(); }, m_grid);
+    double r_cut = visit(m_grid, [](auto const& grid) { return grid.r_cut(); });
 
     {
       auto n = m_head[i_cell];
@@ -129,38 +127,36 @@ namespace fly::neighbour {
   }
 
   void List::make_ghosts() {
-    std::visit(
-        [this](auto const& grid) {
+    visit(m_grid, [this](auto const& grid) {
+      //
+      Eigen::Index next_slot = m_neigh_lists.size();
+
+      for (int ax = 0; ax < spatial_dims; ++ax) {
+        // Only make ghosts if axis is periodic
+        if (m_box.periodic(ax)) {
           //
-          Eigen::Index next_slot = m_neigh_lists.size();
+          Eigen::Index const end = next_slot;
 
-          for (int ax = 0; ax < spatial_dims; ++ax) {
-            // Only make ghosts if axis is periodic
-            if (m_box.periodic(ax)) {
-              //
-              Eigen::Index const end = next_slot;
+          for (Eigen::Index j = 0; j < end; ++j) {
+            //
+            std::array const images = {
+                grid.template gen_image<Sign::plus>(m_atoms(r_, j), ax),
+                grid.template gen_image<Sign::minus>(m_atoms(r_, j), ax),
+            };
 
-              for (Eigen::Index j = 0; j < end; ++j) {
-                //
-                std::array const images = {
-                    grid.template gen_image<Sign::plus>(m_atoms(r_, j), ax),
-                    grid.template gen_image<Sign::minus>(m_atoms(r_, j), ax),
-                };
-
-                for (auto&& elem : images) {
-                  if (elem) {
-                    Eigen::Index slot = next_slot++;
-                    ASSERT(slot < m_atoms.size(), "Not enough space for ghost number: {}", slot - m_atoms.size());
-                    m_atoms(r_, slot) = *elem;
-                    m_atoms(i_, slot) = m_atoms(i_, j);
-                  }
-                }
+            for (auto&& elem : images) {
+              if (elem) {
+                Eigen::Index slot = next_slot++;
+                ASSERT(slot < m_atoms.size(), "Not enough space for ghost number: {}", slot - m_atoms.size());
+                m_atoms(r_, slot) = *elem;
+                m_atoms(i_, slot) = m_atoms(i_, j);
               }
             }
           }
-          m_num_plus_ghosts = next_slot;
-        },
-        m_grid);
+        }
+      }
+      m_num_plus_ghosts = next_slot;
+    });
   }
 
 }  // namespace fly::neighbour

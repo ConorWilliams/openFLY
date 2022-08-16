@@ -12,6 +12,7 @@ Added
 - ``Vector`` class
 - ``Xoshiro`` class as the PRNG
 - ``Box`` has a new ``get()`` method to fetch the underlying ``std::variant`` 
+- ``visit`` utility function.
 
 Changed
 ~~~~~~~~~~

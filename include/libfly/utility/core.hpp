@@ -542,6 +542,7 @@ namespace fly {
       Base::resize(static_cast<std::size_t>(count));
     }
 
+    using Base::emplace_back;
     using Base::push_back;
   };
 

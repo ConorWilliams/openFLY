@@ -46,6 +46,10 @@ namespace fly::system {
 
       explicit AtomMem(typename Tag::matrix_t const& data) : m_data(data) {}
 
+      AtomMem& operator=(AtomMem const&) = default;
+
+      AtomMem& operator=(AtomMem&&) = default;
+
       template <typename T>
       explicit AtomMem(T&& x) : m_data(std::forward<T>(x)) {}
 
@@ -79,14 +83,24 @@ namespace fly::system {
   template <typename... T>
   struct Atom : detail::AtomMem<T>... {
     /**
-     * @brief Copy construct a new Atom object
+     * @brief Copy construct a new Atom object.
      */
     Atom(Atom&&) noexcept = default;
 
     /**
-     * @brief Move construct a new Atom object
+     * @brief Move construct a new Atom object.
      */
     Atom(Atom const&) = default;
+
+    /**
+     * @brief Default assignment operator.
+     */
+    Atom& operator=(Atom const&) = default;
+
+    /**
+     * @brief Default move-assignment operator.
+     */
+    Atom& operator=(Atom&&) = default;
 
     /**
      * @brief Construct a new Atom object, initializing each member.

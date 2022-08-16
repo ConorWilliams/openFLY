@@ -18,7 +18,6 @@
 #include <cstddef>
 #include <type_traits>
 #include <utility>
-#include <vector>
 
 #include "libfly/system/atom.hpp"
 #include "libfly/system/property.hpp"
@@ -51,47 +50,24 @@ namespace fly::system {
    * @tparam T a series of empty types, derived from ``Property``, to describe each member.
    */
   template <typename... T>
-  class VoS : private std::vector<Atom<T...>> {
+  class VoS : public Vector<Atom<T...>> {
   private:
     static_assert(sizeof...(T) > 0, "Need at least one property in an VoS");
 
-    using Vector = std::vector<Atom<T...>>;
+    using vector = Vector<Atom<T...>>;
 
   public:
-    // Expose subset of underlying vector API
-    using Vector::begin;
-    using Vector::clear;
-    using Vector::emplace_back;
-    using Vector::end;
-    using Vector::push_back;
-    using Vector::size;
-    using Vector::Vector;
-
-    /**
-     * @brief Bounds checked version of operator [].
-     */
-    decltype(auto) operator[](std::size_t i) {
-      ASSERT(i < size(), "Out of bounds: {} !< {}", i, size());
-      return Vector::operator[](i);
-    }
-
-    /**
-     * @brief Bounds checked version of operator [] const.
-     */
-    decltype(auto) operator[](std::size_t i) const {
-      ASSERT(i < size(), "Out of bounds: {} !< {}", i, size());
-      return Vector::operator[](i);
-    }
+    using vector::emplace_back;
 
     /**
      * @brief Provides an emplace_back with explicit ``matrix_t`` parameters.
      */
-    decltype(auto) emplace_back(typename T::matrix_t const &...args) { return Vector::emplace_back(args...); }
+    decltype(auto) emplace_back(typename T::matrix_t const &...args) { return vector::emplace_back(args...); }
 
     /**
      * @brief Provides an emplace_back with explicit ``matrix_t`` parameters.
      */
-    decltype(auto) emplace_back(typename T::matrix_t &&...args) { return Vector::emplace_back(std::move(args)...); }
+    decltype(auto) emplace_back(typename T::matrix_t &&...args) { return vector::emplace_back(std::move(args)...); }
   };
 
 }  // namespace fly::system

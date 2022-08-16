@@ -312,6 +312,44 @@ namespace fly {
     return static_cast<R>(x);
   }
 
+  namespace detail {
+    template <int N = 0, typename F, typename... Args, typename T>
+    void template_for_impl(Arr<T> const &beg, Arr<T> const &end, F const &f, Args... args) {
+      if constexpr (N == spatial_dims) {
+        f(args...);
+      } else {
+        for (T i = beg[spatial_dims - 1 - N]; i < end[spatial_dims - 1 - N]; i++) {
+          template_for_impl<N + 1>(beg, end, f, i, args...);
+        }
+      }
+    }
+  }  // namespace detail
+
+  /**
+   * @brief Invoke ``f`` with every tuple of indexes between ``beg`` and ``end``.
+   *
+   * \rst
+   *
+   * Effectively expands to:
+   *
+   * .. code::
+   *
+   *    for(T n = beg[spatial_dims]; n < end[spatial_dims]; n++){
+   *        // ... //
+   *        for(T j = beg[1]; j < end[1]; j++){
+   *            for(T i = beg[0]; i < end[0]; i++){
+   *                f(i, j,..., n);
+   *            }
+   *        }
+   *    }
+   *
+   * \endrst
+   */
+  template <typename T, typename F>
+  void template_for(Arr<T> const &beg, Arr<T> const &end, F const &f) {
+    detail::template_for_impl(beg, end, f);
+  }
+
   // ------------------- Math functions ---------------- //
 
   /**
@@ -463,12 +501,14 @@ namespace fly {
     Eigen::FullPivLU<decltype(H)> lu(H);
 
     if (auto kd = lu.dimensionOfKernel(); kd != 1) {
-      throw error("Points passed to hyperplane_normal are linearly dependant");
+      throw error("Dimension is kernel={}", kd);
     }
 
-    ASSERT(near(lu.kernel()(N, 0), 0.0), "Homogeneous coordinate of the kernel = {} but should be zero!", lu.kernel()(N, 0));
+    Eigen::Matrix<Scalar, N + 1, 1> ker = lu.kernel();
 
-    return lu.kernel().template topLeftCorner<N, 1>().normalized();
+    ASSERT(near(ker[N], 0.0), "Homogeneous coordinate of the kernel = {} but should be zero!", ker[N]);
+
+    return ker.template head<N>().normalized();
   }
 
   // ------------------- Classes ---------------- //
@@ -485,6 +525,20 @@ namespace fly {
     using size_type = typename Base::size_type;
 
   public:
+    /**
+     * @brief Construct a new empty Vector.
+     */
+    Vector() = default;
+
+    /**
+     * @brief Construct a new Vector object containing ``size`` default initialised elements.
+     *
+     * @param size The size of the new container.
+     */
+    explicit Vector(Eigen::Index size) : Base(safe_cast<std::size_t>(size)) {
+      verify(size >= 0, "{} is not a valid size for a Vector", size);
+    }
+
     /**
      * @brief Replaces the contents with ``count`` copies of value ``value``.
      *

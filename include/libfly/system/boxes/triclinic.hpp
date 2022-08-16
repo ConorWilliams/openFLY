@@ -16,6 +16,7 @@
 
 #include <Eigen/Core>
 #include <cmath>
+#include <limits>
 #include <optional>
 
 #include "libfly/system/boxes/hypergrid.hpp"
@@ -64,11 +65,25 @@ namespace fly::system {
       return std::nullopt;
     }
 
+    /**
+     * @brief Get the minimum width along any dimension.
+     */
+    double min_width() const noexcept {
+      //
+      double min = std::numeric_limits<double>::max();
+
+      for (int i = 0; i < spatial_dims; i++) {
+        min = std::min(min, gdot(m_basis.col(i), m_hyper.col(i)));
+      }
+
+      return min;
+    }
+
   private:
     friend class Triclinic;
 
-    Mat m_basis = Mat::Zero();
-    Mat m_hyper = Mat::Zero();
+    Mat m_basis = Mat::Zero();  ///< Columns are basis vectors.
+    Mat m_hyper = Mat::Zero();  ///< Columns are hyper plane normals.
 
     // Private constructor
     TriGrid(Mat const& bs, double r_cut) : HyperGrid(bs.colwise().sum(), r_cut), m_basis(bs) {
@@ -82,7 +97,7 @@ namespace fly::system {
         auto n = hyperplane_normal(points);
         auto w = gdot(n, m_basis.col(i));
 
-        verify(std::abs(w) > r_cut, "Box axis {}, width={} too small for this r_cut={}", i, w, r_cut);
+        verify(std::abs(w) > r_cut, "Box axis {}, width={} too small for this r_cut={}", i, std::abs(w), r_cut);
 
         // Want normal in same direction as basis/edge.
         if (w < 0) {
@@ -177,6 +192,11 @@ namespace fly::system {
      * @param r_cut The cut-off radius for atomic interactions.
      */
     TriGrid make_grid(double r_cut) const { return {m_basis, r_cut}; }
+
+    /**
+     * @brief Get the minimum width along any dimension.
+     */
+    double min_width() const noexcept { return make_grid(1e-100).min_width(); }
 
   private:
     Mat m_basis = Mat::Zero();

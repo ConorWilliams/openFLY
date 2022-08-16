@@ -64,6 +64,8 @@ Small functions
 
 .. doxygenfunction:: visit
 
+.. doxygenfunction:: template_for
+
 Mathematical functions
 ~~~~~~~~~~~~~~~~~~~~~~~~
 

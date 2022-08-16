@@ -48,7 +48,7 @@ namespace fly::neighbour {
       // ND -> 1D
       auto to_1D = [cumprod = product_scan(shape)](Arr<int> const& x) { return (x * cumprod).sum(); };
 
-      template_for(Arr<int>::Zero(), shape, [&](auto... centre) {
+      template_for<int>(Arr<int>::Zero(), shape, [&](auto... centre) {
         //
         std::size_t slot = 0;
 
@@ -83,20 +83,6 @@ namespace fly::neighbour {
     };
 
     Vector<adjbours> m_adj_cells;
-
-    /**
-     * @brief Invoke ``f`` with every tuple of indexes between ``beg`` and ``end``.
-     */
-    template <int N = 0, typename F, typename... Args>
-    void template_for(Arr<int> const& beg, Arr<int> const& end, F const& f, Args... args) {
-      if constexpr (N == spatial_dims) {
-        f(args...);
-      } else {
-        for (int i = beg[spatial_dims - 1 - N]; i < end[spatial_dims - 1 - N]; i++) {
-          template_for<N + 1>(beg, end, f, i, args...);
-        }
-      }
-    }
   };
 
 }  // namespace fly::neighbour

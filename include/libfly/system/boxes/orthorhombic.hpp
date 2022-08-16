@@ -168,6 +168,11 @@ namespace fly::system {
      */
     OrthoGrid make_grid(double r_cut) const { return {m_extents, r_cut}; }
 
+    /**
+     * @brief Get the minimum width along any dimension.
+     */
+    double min_width() const noexcept { return m_extents.minCoeff(); }
+
   private:
     Arr<double> m_extents = Arr<double>::Zero();
     Arr<bool> m_periodic = Arr<bool>::Zero();

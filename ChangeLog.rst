@@ -8,20 +8,25 @@ Unreleased
 Added
 ~~~~~~~~~
 
-- ``AdjacentCells`` class
-- ``Vector`` class
-- ``Xoshiro`` class as the PRNG
-- ``Box`` has a new ``get()`` method to fetch the underlying ``std::variant`` 
+- ``AdjacentCells`` class.
+- ``Vector`` class to replace ``std::vector``.
+- ``Xoshiro`` class as the PRNG.
+- ``Box`` has a new ``get()`` method to fetch the underlying ``std::variant`` .
 - ``visit`` utility function.
+- ``neighbour::sort`` function to optimise ordering for neighbour operations.
+- ``operator=`` for the ``Atom`` class
+- New ``template_for`` utility function.
+- Added ``min_width`` member to crystal specialisations.
 
 Changed
 ~~~~~~~~~~
 
 - ``Property``'s ``array_ref_t`` is now an ``Eigen::Map`` to disallow resizing of ``SoA``'s individual arrays.
 - ``SoA``'s ``destructive_resize`` now returns a boolean.
-- Allow zero length ``SoA``s
+- Allow zero length ``SoA``s.
 - Crystal systems ``gen_image`` marked ``const``.
 - ``BinaryFile`` internals reworked to support clang.
+- ``VoS`` uses the ``Vector`` class.
 
 Fixes
 ~~~~~~~~~~~~~~
@@ -31,7 +36,7 @@ Fixes
 Removed
 ~~~~~~~~~
 
-- ``Box`` default constructor
+- ``Box`` default constructor.
 
 Meta 
 ~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -64,7 +69,7 @@ Added
 Changed
 ~~~~~~~~~~
 
-- GPL-2.0 -> GPL-3.0-or-later
+- GPL-2.0 -> GPL-3.0-or-later.
 
 Removed
 ~~~~~~~~~

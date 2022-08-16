@@ -429,6 +429,23 @@ macro.</p>
 </dl>
 </dd></dl>
 
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I00EN3fly5visitEDcRR1VRR1F">
+<span id="_CPPv3I00EN3fly5visitERR1VRR1F"></span><span id="_CPPv2I00EN3fly5visitERR1VRR1F"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">V</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">F</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="core_8hpp_1ac919e6f8a7387aaa3eefdf5f536c8efe"></span><span class="kt"><span class="pre">auto</span></span><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">fly</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">visit</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I00EN3fly5visitEDcRR1VRR1F" title="fly::visit::V"><span class="n"><span class="pre">V</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">v</span></span>, <a class="reference internal" href="#_CPPv4I00EN3fly5visitEDcRR1VRR1F" title="fly::visit::F"><span class="n"><span class="pre">F</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">f</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="o"><span class="pre">-&gt;</span></span><span class="w"> </span><span class="k"><span class="pre">decltype</span></span><span class="p"><span class="pre">(</span></span><span class="k"><span class="pre">auto</span></span><span class="p"><span class="pre">)</span></span><a class="headerlink" href="#_CPPv4I00EN3fly5visitEDcRR1VRR1F" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Utility to reverse argument order to <code class="docutils literal notranslate"><span class="pre">std::visit</span></code>. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>v</strong> – A variant to pass to the visitor. </p></li>
+<li><p><strong>f</strong> – A callable that accepts every possible alternative from every variant. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>decltype(auto) The result of calling <code class="docutils literal notranslate"><span class="pre">std::visit(std::forward&lt;F&gt;(f),</span> <span class="pre">std::forward&lt;V&gt;(v))</span></code> </p>
+</dd>
+</dl>
+</dd></dl>
+
 </section>
 <section id="mathematical-functions">
 <h3>Mathematical functions<a class="headerlink" href="#mathematical-functions" title="Permalink to this heading">#</a></h3>

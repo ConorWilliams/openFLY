@@ -62,6 +62,8 @@ Small functions
 
 .. doxygenfunction:: safe_cast
 
+.. doxygenfunction:: visit
+
 Mathematical functions
 ~~~~~~~~~~~~~~~~~~~~~~~~
 

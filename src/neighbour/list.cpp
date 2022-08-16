@@ -22,6 +22,7 @@
 #include <utility>
 #include <variant>
 
+#include "libfly/system/property.hpp"
 #include "libfly/utility/core.hpp"
 
 // #include "libatom/asserts.hpp"
@@ -33,31 +34,21 @@ namespace fly::neighbour {
   auto List::rebuild(system::SoA<Position const&> positions, int num_threads) -> void {
     //
     verify(num_threads > 0, "{} is not a valid number of threads for rebuild()", num_threads);
-
-    init_and_build_lcl(positions, num_threads);
-
-#pragma omp parallel for num_threads(num_threads) schedule(static)
-    for (Eigen::Index i = 0; i < m_neigh_lists.size(); i++) {
-      build_neigh_list(i);
-    }
-  }
-
-  void List::init_and_build_lcl(system::SoA<Position const&> atoms, int) {
     //
-    if (m_neigh_lists.size() != atoms.size()) {
+    if (m_neigh_lists.size() != positions.size()) {
       // Allocate space if needed
-      m_atoms.destructive_resize(atoms.size() * (1 + MAX_GHOST_RATIO));
-      m_neigh_lists.resize(atoms.size());
+      m_atoms.destructive_resize(positions.size() * (1 + MAX_GHOST_RATIO));
+      m_neigh_lists.resize(positions.size());
 
       // Need to re-index if size changed
-      for (Eigen::Index i = 0; i < atoms.size(); ++i) {
+      for (Eigen::Index i = 0; i < positions.size(); ++i) {
         m_atoms(Index{}, i) = i;
       }
     }
     // Copy in atoms
-    visit(m_box.get(), [this, &atoms](auto const& box) {
-      for (Eigen::Index i = 0; i < atoms.size(); ++i) {
-        m_atoms(Position{}, i) = box.canon_image(atoms(r_, i));
+    visit(m_box.get(), [this, &positions](auto const& box) {
+      for (Eigen::Index i = 0; i < positions.size(); ++i) {
+        m_atoms(r_, i) = box.canon_image(positions(r_, i));
       }
     });
 
@@ -77,6 +68,48 @@ namespace fly::neighbour {
 
       m_atoms(Next{}, i) = std::exchange(m_head[i_cell], i);
     }
+
+#pragma omp parallel for num_threads(num_threads) schedule(static)
+    for (Eigen::Index i = 0; i < m_neigh_lists.size(); i++) {
+      build_neigh_list(i);
+    }
+  }
+
+  /**
+   *
+   */
+  void List::make_ghosts() {
+    visit(m_grid, [this](auto const& grid) {
+      //
+      Eigen::Index next_slot = m_neigh_lists.size();
+
+      auto insert = [this](Eigen::Index slot, Vec im, Eigen::Index j) {
+        ASSERT(slot < m_atoms.size(), "Not enough space for ghost number: {}", slot - m_neigh_lists.size());
+        m_atoms(r_, slot) = im;
+        m_atoms(i_, slot) = m_atoms(i_, j);
+      };
+
+      for (int ax = 0; ax < spatial_dims; ++ax) {
+        // Only make ghosts if axis is periodic
+        if (m_box.periodic(ax)) {
+          //
+          Eigen::Index const end = next_slot;
+          //
+          for (Eigen::Index j = 0; j < end; ++j) {
+            if (std::optional im = grid.template gen_image<Sign::plus>(m_atoms(r_, j), ax)) {
+              insert(next_slot++, *im, j);
+            }
+          }
+
+          for (Eigen::Index j = 0; j < end; ++j) {
+            if (std::optional im = grid.template gen_image<Sign::minus>(m_atoms(r_, j), ax)) {
+              insert(next_slot++, *im, j);
+            }
+          }
+        }
+      }
+      m_num_plus_ghosts = next_slot;
+    });
   }
 
   //   void List::update_positions(Position::matrix_type const& deltas) {
@@ -124,39 +157,6 @@ namespace fly::neighbour {
         n = m_atoms(Next{}, n);
       }
     }
-  }
-
-  void List::make_ghosts() {
-    visit(m_grid, [this](auto const& grid) {
-      //
-      Eigen::Index next_slot = m_neigh_lists.size();
-
-      for (int ax = 0; ax < spatial_dims; ++ax) {
-        // Only make ghosts if axis is periodic
-        if (m_box.periodic(ax)) {
-          //
-          Eigen::Index const end = next_slot;
-
-          for (Eigen::Index j = 0; j < end; ++j) {
-            //
-            std::array const images = {
-                grid.template gen_image<Sign::plus>(m_atoms(r_, j), ax),
-                grid.template gen_image<Sign::minus>(m_atoms(r_, j), ax),
-            };
-
-            for (auto&& elem : images) {
-              if (elem) {
-                Eigen::Index slot = next_slot++;
-                ASSERT(slot < m_atoms.size(), "Not enough space for ghost number: {}", slot - m_atoms.size());
-                m_atoms(r_, slot) = *elem;
-                m_atoms(i_, slot) = m_atoms(i_, j);
-              }
-            }
-          }
-        }
-      }
-      m_num_plus_ghosts = next_slot;
-    });
   }
 
 }  // namespace fly::neighbour

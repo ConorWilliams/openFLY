@@ -14,11 +14,15 @@
 
 #include "libfly/neighbour/list.hpp"
 
+#include <Eigen/src/Core/util/Meta.h>
+#include <fmt/core.h>
 #include <omp.h>
 
 #include <catch2/catch_test_macros.hpp>
+#include <cstddef>
 #include <random>
 
+#include "libfly/neighbour/sort.hpp"
 #include "libfly/system/box.hpp"
 #include "libfly/system/boxes/orthorhombic.hpp"
 #include "libfly/system/supercell.hpp"
@@ -34,141 +38,147 @@ TEST_CASE("List", "[neighbour]") {
   //
 }
 
-// struct Neigh {
-//   std::size_t i;
-//   Vec3<floating> dr;
-// };
+struct Neigh {
+  Eigen::Index i;
+  fly::Vec dr;
+};
 
-// void slow_neigh_list(std::vector<std::vector<Neigh>>& nl, SimCell const& atoms, floating r_cut) {
-//   nl.resize(atoms.size());
+void slow_neigh_list(Vector<Vector<Neigh>>& nl, system::Box const& box, system::SoA<Position const&> atoms, double r_cut) {
+  //
+  nl.resize(atoms.size());
 
-//   for (std::size_t i = 0; i < atoms.size(); i++) {
-//     nl[i].clear();
+  // The displacement vectors move +/- 1 or zero supercells in each direction.
+  std::vector<Vec> disp_vectors;
 
-//     for (std::size_t j = 0; j < atoms.size(); j++) {
-//       if (i != j) {
-//         Vec3<floating> dr = atoms.min_image(atoms(Position{}, i), atoms(Position{}, j));
+  Mat basis = box.basis();
 
-//         if (norm(dr) < r_cut) {
-//           nl[i].push_back({j, dr});
-//         }
-//       }
-//     }
-//     std::sort(nl[i].begin(), nl[i].end(), [](auto const& a, auto const& b) { return a.i < b.i; });
-//   }
-// }
+  template_for<int>(Arr<int>::Constant(-1), Arr<int>::Constant(2), [&](auto... args) {
+    //
+    Arr<int> signs{args...};
 
-// TEST_CASE("Neighbour list speed testing") {
-//   SimCell atoms({{1, 2, 1}, {true, true, true}});
+    Vec offset = Vec::Zero();
 
-//   randomise(atoms, 10'000 * atoms.extents().prod());
+    for (int i = 0; i < spatial_dims; i++) {
+      offset += basis.col(i) * signs(i);
+    }
 
-//   fmt::print("num atoms is {}\n", atoms.size());
+    disp_vectors.push_back(offset);
+  });
 
-//   floating r_cut = 0.1;
+  for (Eigen::Index i = 0; i < atoms.size(); i++) {
+    //
+    nl[i].clear();
 
-//   {
-//     neighbour::List neigh;
+    for (Eigen::Index j = 0; j < atoms.size(); j++) {
+      if (i != j) {
+        Neigh best{
+            i,
+            {10e301, 10e301, 10e301},
+        };
+        // Brute for min-image
+        for (auto const& d : disp_vectors) {
+          Vec dr = (atoms(r_, j) + d) - atoms(r_, i);
 
-//     neigh.rebuild(atoms, r_cut);  // Warm up + alloc
+          if (gnorm(dr) < gnorm(best.dr)) {
+            best.i = j;
+            best.dr = dr;
+          }
+        }
 
-//     timeit("Fast", [&] { neigh.rebuild(atoms, r_cut); });
+        ASSERT(best.i != i, "should not have found self", 0);
 
-//     int x = 0;
-//     int y = 0;
-
-//     timeit("Counting", [&] {
-//       for (std::size_t i = 0; i < atoms.size(); i++) {
-//         //
-//         x++;
-//         neigh.for_neighbours(i, [&](std::size_t, floating, Vec3<floating> const&) { y++; });
-//       }
-//     });
-
-//     fmt::print("num neigh = {}\n", (double)y / x);
-//   }
-
-//   {
-//     std::vector<std::vector<Neigh>> nl;
-
-//     slow_neigh_list(nl, atoms, r_cut);  // Warm up + alloc
-
-//     timeit("Slow", [&] { slow_neigh_list(nl, atoms, r_cut); });
-//   }
-// }
+        if (gnorm(best.dr) < r_cut) {
+          nl[i].push_back(best);
+        }
+      }
+    }
+    std::sort(nl[i].begin(), nl[i].end(), [](auto const& a, auto const& b) { return a.i < b.i; });
+  }
+}
 
 void test(system::Box const& box, system::SoA<Position const&> atoms, double r_cut, int num_threads) {
   //
   neighbour::List neigh(box, r_cut);
 
-  timeit("rebuild", [&] { neigh.rebuild(atoms, num_threads); });
+  fmt::print("With {} threads, {} atoms and shaped={}\n", num_threads, atoms.size(),
+             visit(box.make_grid(r_cut), [](auto const g) { return g.shape(); }) - 2);
 
-  //   neigh.rebuild(atoms, num_threads);
+  timeit("rebuild   ", [&] { neigh.rebuild(atoms, num_threads); });
 
-  //   std::vector<std::vector<Neigh>> nl;
+  static Vector<Vector<Neigh>> nl;
 
-  //   slow_neigh_list(nl, atoms, r_cut);
+  timeit("slow build", [&] { slow_neigh_list(nl, box, atoms, r_cut); });
 
-  //   for (std::size_t i = 0; i < atoms.size(); i++) {
-  //     //
-  //     std::vector<Neigh> nl2;
+  Eigen::Index sum = 0;
 
-  //     neigh.for_neighbours(i, [&](std::size_t n, Vec3<floating> const& dr) { nl2.push_back({neigh.image_to_real(n), dr}); });
+  for (auto&& elem : nl) {
+    sum += elem.size();
+  }
 
-  //     std::sort(nl2.begin(), nl2.end(), [](auto const& a, auto const& b) { return a.i < b.i; });
+  fmt::print("Average number of neighbours is {}\n", static_cast<double>(sum) / static_cast<double>(nl.size()));
 
-  //     // Test same number of neighbours
-  //     REQUIRE(nl2.size() == nl[i].size());
+  for (Eigen::Index i = 0; i < atoms.size(); i++) {
+    //
+    Vector<Neigh> nl2;
 
-  //     for (std::size_t j = 0; j < nl2.size(); j++) {
-  //       // Test all neighbours have the same index
-  //       REQUIRE(nl2[j].i == nl[i][j].i);
-  //       // Test all neighbours have the same minimum image positions
-  //       REQUIRE(norm(nl2[j].dr - nl[i][j].dr) < 0.001);
-  //     }
-  //   }
+    // neigh.for_neighbours(i, [&](std::size_t n, Vec3<floating> const& dr) { nl2.push_back({neigh.image_to_real(n), dr}); });
+
+    // std::sort(nl2.begin(), nl2.end(), [](auto const& a, auto const& b) { return a.i < b.i; });
+
+    // // Test same number of neighbours
+    // REQUIRE(nl2.size() == nl[i].size());
+
+    // for (std::size_t j = 0; j < nl2.size(); j++) {
+    //   // Test all neighbours have the same index
+    //   REQUIRE(nl2[j].i == nl[i][j].i);
+    //   // Test all neighbours have the same minimum image positions
+    //   REQUIRE(norm(nl2[j].dr - nl[i][j].dr) < 0.001);
+    // }
+  }
 }
 
 TEST_CASE("List fuzz-testing", "[neighbour]") {
   //
 
   //
-  fly::Xoshiro gen({1, 2, 3, 4});
+  fly::Xoshiro gen({1, 3, 3, 4});
   std::uniform_real_distribution<double> dis(0, 1);
   std::uniform_int_distribution<Eigen::Index> idis(100, 1000);
 
   auto rand = [&dis, &gen]() { return dis(gen); };
 
-  for (int i = 0; i < 1; i++) {
+  for (int i = 0; i < 2; i++) {
     // Random simulation box
     fly::system::Box box = [&]() {
       //
-      Mat basis = Mat::Ones() + 9 * Mat::NullaryExpr(rand);
+      Mat basis = Mat::NullaryExpr(rand);
+
+      basis.diagonal() += Vec::Ones() + 9 * Vec::NullaryExpr(rand);
 
       basis = basis.triangularView<Eigen::Upper>();
 
-      if (true) {
+      if (i % 2 == 0) {
         basis = basis.triangularView<Eigen::Lower>();
       }
 
       fly::system::Box tmp{basis, fly::Arr<bool>::NullaryExpr(rand)};
 
-      if (true) {
-        CHECK(tmp.holding<system::Orthorhombic>());
-      }
-
       return tmp;
     }();
 
-    system::SoA<Position> cell(idis(gen) * 20);
+    system::SoA<Position> cell(idis(gen));
 
     for (int j = 0; j < cell.size(); j++) {
       cell(r_, j) = box.basis() * fly::Vec::NullaryExpr(rand);
     }
 
-    for (std::size_t j = 0; j < 10; j++) {
-      test(box, cell, 0.25 + 0.2499 * dis(gen), 1);
-      //   test(box, cell, 0.25 + 0.2499 * dis(gen), omp_get_max_threads());
-    }
+    double r_cut_max = visit(box.get(), [](auto const& g) { return g.min_width(); });
+
+    double r_cut = r_cut_max / 3;
+
+    cell = neighbour::sort(box, r_cut, cell);
+
+    test(box, cell, r_cut, 1);
+    test(box, cell, r_cut, omp_get_max_threads());
   }
 }

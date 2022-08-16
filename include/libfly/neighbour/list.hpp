@@ -40,7 +40,7 @@ namespace fly::neighbour {
    *
    * Designed with the intention of being reused List separates the building, updating and
    * using of neighbour lists (NLs). NLs can be constructed from a SimCell and then used to find all
-   * atoms within some cut off of an atom efficiantly.
+   * atoms within some cut off of an atom efficiently.
    *
    * List resolves periodicity using ghost atoms, these are stored and managed internally.
    *
@@ -123,11 +123,6 @@ namespace fly::neighbour {
     Vector<Vector<Eigen::Index>> m_neigh_lists;  ///< Neighbour list for each non-ghost atom.
 
     static constexpr auto NONE = std::numeric_limits<Eigen::Index>::max();
-
-    /**
-     * @brief Initialise memory, copy in atom atoms, build ghosts and build link cell lists.
-     */
-    void init_and_build_lcl(system::SoA<Position const&> positions, int num_threads);
 
     /**
      * @brief Set up all ghost indexes positions and offsets.

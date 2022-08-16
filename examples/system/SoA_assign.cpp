@@ -5,7 +5,7 @@
 void SoA_assign() {
   // Define a property to represent position that is a vector of 3 doubles.
   // Note there is a built-in property for this (Position).
-  struct xyz : fly::system::Property<double, 3> {};
+  struct xyz : fly::system::Property<double, 3, 1, Eigen::Matrix> {};
 
   fly::system::SoA<xyz> a(10);
   fly::system::SoA<xyz> b(10);

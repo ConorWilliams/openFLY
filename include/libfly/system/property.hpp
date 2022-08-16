@@ -50,7 +50,7 @@ namespace fly::system {
    * @tparam Cols Number of colums in this property
    * @tparam Rep The Eigen3 template, Eigen::[matrix||array], to use for this property.
    */
-  template <typename Scalar, int Rows = 1, int Cols = 1, template <typename, auto...> typename Rep = Eigen::Matrix>
+  template <typename Scalar, int Rows, int Cols, template <typename, auto...> typename Rep>
   struct Property {
     /** @brief True if this property represents a 1x1 matrix. */
     static constexpr bool is_1x1 = Rows == 1 && Cols == 1;
@@ -110,7 +110,7 @@ namespace fly {
      * Each atom has a Type, an atoms TypeID is a number between 0 and N - 1 with N the number of types in the simulation. A TypeMap
      * object performs the transformation from TypeId -> Type.
      */
-    struct TypeID : system::Property<std::uint32_t> {
+    struct TypeID : system::Property<std::uint32_t, 1, 1, Eigen::Matrix> {
       static constexpr char const* tag = "particles/typeid";  ///< GSD chunk label.
     };
 
@@ -119,49 +119,49 @@ namespace fly {
      *
      * Not used by libFLY, for consistency with HOOMD schema.
      */
-    struct Image : system::Property<std::int32_t, spatial_dims> {
+    struct Image : system::Property<std::int32_t, spatial_dims, 1, Eigen::Matrix> {
       static constexpr char const* tag = "particles/image";  ///< GSD chunk label.
     };
 
     /**
      * @brief Tag type for atom's mass.
      */
-    struct Mass : system::Property<double> {
+    struct Mass : system::Property<double, 1, 1, Eigen::Matrix> {
       static constexpr char const* tag = "particles/mass";  ///< GSD chunk label.
     };
 
     /**
      * @brief Tag type for atom's charge.
      */
-    struct Charge : system::Property<double> {
+    struct Charge : system::Property<double, 1, 1, Eigen::Matrix> {
       static constexpr char const* tag = "particles/charge";  ///< GSD chunk label.
     };
 
     /**
      * @brief Tag type for atom's effective diameter.
      */
-    struct Diameter : system::Property<double> {
+    struct Diameter : system::Property<double, 1, 1, Eigen::Matrix> {
       static constexpr char const* tag = "particles/diameter";  ///< GSD chunk label.
     };
 
     /**
      * @brief Tag type for atom's moment of inertia in an atoms body frame.
      */
-    struct MomentInertia : system::Property<double> {
+    struct MomentInertia : system::Property<double, 1, 1, Eigen::Matrix> {
       static constexpr char const* tag = "particles/moment_inertia";  ///< GSD chunk label.
     };
 
     /**
      * @brief Tag type for atom's position in real space.
      */
-    struct Position : system::Property<double, spatial_dims> {
+    struct Position : system::Property<double, spatial_dims, 1, Eigen::Matrix> {
       static constexpr char const* tag = "particles/position";  ///< GSD chunk label.
     };
 
     /**
      * @brief Tag type for atom's velocity in real space.
      */
-    struct Velocity : system::Property<double, spatial_dims> {
+    struct Velocity : system::Property<double, spatial_dims, 1, Eigen::Matrix> {
       static constexpr char const* tag = "particles/velocity";  ///< GSD chunk label.
     };
 
@@ -170,7 +170,7 @@ namespace fly {
     /**
      * @brief Tag type for atom's index i.e. position in some array.
      */
-    struct Index : system::Property<Eigen::Index> {
+    struct Index : system::Property<Eigen::Index, 1, 1, Eigen::Matrix> {
       static constexpr char const* tag = "log/particles/index";  ///< GSD chunk label.
     };
 
@@ -179,26 +179,26 @@ namespace fly {
      *
      * Note this cannot be written to a GSD file as it a boolean.
      */
-    struct Frozen : system::Property<bool> {};
+    struct Frozen : system::Property<bool, 1, 1, Eigen::Matrix> {};
 
     /**
      * @brief Tag type for atom's contribution to a dimer axis.
      */
-    struct Axis : system::Property<double, spatial_dims> {
+    struct Axis : system::Property<double, spatial_dims, 1, Eigen::Matrix> {
       static constexpr char const* tag = "log/particles/axis";  ///< GSD chunk label.
     };
 
     /**
      * @brief Tag type for atom's potential gradient acting on an atom.
      */
-    struct PotentialGradient : system::Property<double, spatial_dims> {
+    struct PotentialGradient : system::Property<double, spatial_dims, 1, Eigen::Matrix> {
       static constexpr char const* tag = "log/particles/potential_gradient";  ///< GSD chunk label.
     };
 
     /**
      * @brief Tag type for atom's acceleration.
      */
-    struct Acceleration : system::Property<double, spatial_dims> {
+    struct Acceleration : system::Property<double, spatial_dims, 1, Eigen::Matrix> {
       static constexpr char const* tag = "log/particles/acceleration";  ///< GSD chunk label.
     };
 

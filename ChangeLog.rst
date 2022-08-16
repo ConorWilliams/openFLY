@@ -20,6 +20,7 @@ Changed
 - ``SoA``'s ``destructive_resize`` now returns a boolean.
 - Allow zero length ``SoA``s
 - Crystal systems ``gen_image`` marked ``const``.
+- ``BinaryFile`` internals reworked to support clang.
 
 Fixes
 ~~~~~~~~~~~~~~

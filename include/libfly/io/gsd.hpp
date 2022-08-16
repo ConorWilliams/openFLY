@@ -284,17 +284,19 @@ namespace fly::io {
       return {std::is_floating_point_v<T>, std::is_signed_v<T>, sizeof(T)};
     }
 
-    template <typename T>
-    auto write_chunk(char const *name, std::uint64_t N, std::uint32_t M, T const *data) -> void {
-      write_chunk(name, N, M, data, get_info<T>());
+    template <typename T, typename U, typename V>
+    auto write_chunk(char const *name, U N, V M, T const *data) -> void {
+      write_chunk(name, safe_cast<std::uint64_t>(N), safe_cast<std::uint32_t>(M), data, get_info<T>());
     }
+
+    template <typename T, typename U, typename V>
+    auto read_chunk(std::uint64_t frame, char const *name, U N, V M, T *data) const -> void {
+      read_chunk(frame, name, safe_cast<std::uint64_t>(N), safe_cast<std::uint32_t>(M), data, get_info<T>());
+    }
+
+    // //////////////////////////////////////////
 
     auto write_chunk(char const *name, std::uint64_t N, std::uint32_t M, void const *data, type_info info) -> void;
-
-    template <typename T>
-    auto read_chunk(std::uint64_t frame, char const *name, std::uint64_t N, std::uint32_t M, T *data) const -> void {
-      read_chunk(frame, name, N, M, data, get_info<T>());
-    }
 
     auto read_chunk(std::uint64_t frame, char const *name, std::uint64_t N, std::uint32_t M, void *data, type_info info) const -> void;
   };

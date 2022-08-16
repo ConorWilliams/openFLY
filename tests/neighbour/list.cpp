@@ -87,7 +87,7 @@ void slow_neigh_list(Vector<Vector<Neigh>>& nl, system::Box const& box, system::
 
         ASSERT(best.i != i, "should not have found self", 0);
 
-        if (gnorm(best.dr) < r_cut) {
+        if (gnorm_sq(best.dr) < r_cut * r_cut) {
           nl[i].push_back(best);
         }
       }
@@ -96,44 +96,32 @@ void slow_neigh_list(Vector<Vector<Neigh>>& nl, system::Box const& box, system::
   }
 }
 
-void test(system::Box const& box, system::SoA<Position const&> atoms, double r_cut, int num_threads) {
+void test(Vector<Vector<Neigh>> const& nl, system::Box const& box, system::SoA<Position const&> atoms, double r_cut, int num_threads) {
   //
   neighbour::List neigh(box, r_cut);
 
-  fmt::print("With {} threads, {} atoms and shaped={}\n", num_threads, atoms.size(),
-             visit(box.make_grid(r_cut), [](auto const g) { return g.shape(); }) - 2);
-
-  timeit("rebuild   ", [&] { neigh.rebuild(atoms, num_threads); });
-
-  static Vector<Vector<Neigh>> nl;
-
-  timeit("slow build", [&] { slow_neigh_list(nl, box, atoms, r_cut); });
-
-  Eigen::Index sum = 0;
-
-  for (auto&& elem : nl) {
-    sum += elem.size();
-  }
-
-  fmt::print("Average number of neighbours is {}\n", static_cast<double>(sum) / static_cast<double>(nl.size()));
+  timeit(fmt::format("\trebuild {:<2}", num_threads), [&] { neigh.rebuild(atoms, num_threads); });
 
   for (Eigen::Index i = 0; i < atoms.size(); i++) {
     //
     Vector<Neigh> nl2;
 
-    // neigh.for_neighbours(i, [&](std::size_t n, Vec3<floating> const& dr) { nl2.push_back({neigh.image_to_real(n), dr}); });
+    neigh.for_neighbours(i, r_cut, [&](Eigen::Index n, double, Vec const& dr) {
+      //
+      nl2.push_back({n, dr});
+    });
 
-    // std::sort(nl2.begin(), nl2.end(), [](auto const& a, auto const& b) { return a.i < b.i; });
+    std::sort(nl2.begin(), nl2.end(), [](auto const& a, auto const& b) { return a.i < b.i; });
 
     // // Test same number of neighbours
-    // REQUIRE(nl2.size() == nl[i].size());
+    REQUIRE(nl2.size() == nl[i].size());
 
-    // for (std::size_t j = 0; j < nl2.size(); j++) {
-    //   // Test all neighbours have the same index
-    //   REQUIRE(nl2[j].i == nl[i][j].i);
-    //   // Test all neighbours have the same minimum image positions
-    //   REQUIRE(norm(nl2[j].dr - nl[i][j].dr) < 0.001);
-    // }
+    for (Eigen::Index j = 0; j < nl2.size(); j++) {
+      // Test all neighbours have the same index
+      REQUIRE(nl2[j].i == nl[i][j].i);
+      // Test all neighbours have the same minimum image positions
+      REQUIRE(near(0., gnorm(nl2[j].dr - nl[i][j].dr)));
+    }
   }
 }
 
@@ -147,7 +135,7 @@ TEST_CASE("List fuzz-testing", "[neighbour]") {
 
   auto rand = [&dis, &gen]() { return dis(gen); };
 
-  for (int i = 0; i < 2; i++) {
+  for (int i = 0; i < 100; i++) {
     // Random simulation box
     fly::system::Box box = [&]() {
       //
@@ -178,7 +166,21 @@ TEST_CASE("List fuzz-testing", "[neighbour]") {
 
     cell = neighbour::sort(box, r_cut, cell);
 
-    test(box, cell, r_cut, 1);
-    test(box, cell, r_cut, omp_get_max_threads());
+    static Vector<Vector<Neigh>> nl;
+
+    Eigen::Index sum = 0;
+
+    for (auto&& elem : nl) {
+      sum += elem.size();
+    }
+
+    fmt::print("{} atoms and shaped={}, avg_num_neigh={}\n", cell.size(),
+               visit(box.make_grid(r_cut), [](auto const g) { return g.shape(); }) - 2,
+               static_cast<double>(sum) / static_cast<double>(nl.size()));
+
+    timeit("\tslow build", [&] { slow_neigh_list(nl, box, cell, r_cut); });
+
+    test(nl, box, cell, r_cut, 1);
+    test(nl, box, cell, r_cut, omp_get_max_threads());
   }
 }

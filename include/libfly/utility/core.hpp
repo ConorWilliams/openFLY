@@ -359,7 +359,7 @@ namespace fly {
    */
   template <typename T>
   constexpr auto near(T a, T b) -> std::enable_if_t<std::is_floating_point_v<T>, bool> {
-    return std::abs(a - b) <= 0.0001 * std::max(std::abs(a), std::abs(b));
+    return std::abs(a - b) < 1e-10 || std::abs(a - b) <= 0.0001 * std::max(std::abs(a), std::abs(b));
   }
 
   /**
@@ -686,7 +686,7 @@ namespace fly {
 
       auto nan = duration_cast<nanoseconds>(elapsed);
 
-      fmt::print("Timing \"{}\" {:>4} {:>5} {:>5} {:>5}\n", name, sec, mil, mic, nan);
+      fmt::print("{} | {:>4} {:>5} {:>5} {:>5}\n", name, sec, mil, mic, nan);
     };
 
     if constexpr (std::is_void_v<std::invoke_result_t<F &&, Args &&...>>) {

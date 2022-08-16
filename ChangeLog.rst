@@ -28,15 +28,16 @@ Changed
 - ``BinaryFile`` internals reworked to support clang.
 - ``VoS`` uses the ``Vector`` class.
 
-Fixes
-~~~~~~~~~~~~~~
-- ``SoA``'s ``operator()`` was broken.
-- ``SoA``'s ``resize`` was broken.
-
 Removed
 ~~~~~~~~~
 
 - ``Box`` default constructor.
+
+Bugfixes
+~~~~~~~~~~~~~~
+- ``SoA``'s ``operator()`` was broken.
+- ``SoA``'s ``resize`` was broken.
+
 
 Meta 
 ~~~~~~~~~~~~~~~~~~~~~~~~~

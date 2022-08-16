@@ -76,7 +76,7 @@ namespace fly::system {
     /** @brief A reference-like type to the underlying array_t. */
     using array_ref_t = Eigen::Map<array_t>;
     /** @brief A const-reference-like type to the underlying array_t. */
-    using array_cref_t = Eigen::ArrayBase<array_t> const&;
+    using array_cref_t = array_t const&;
 
     /**
      * @brief Get the number of elements in the matrix_t.

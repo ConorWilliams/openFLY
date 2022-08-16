@@ -131,14 +131,12 @@ namespace fly::neighbour {
 
     auto i_cell = visit(m_grid, [this, i](auto const& grid) { return grid.cell_idx(this->m_atoms(r_, i)); });
 
-    double r_cut = visit(m_grid, [](auto const& grid) { return grid.r_cut(); });
-
     {
       auto n = m_head[i_cell];
 
       while (n != NONE) {
         // In same cell must check not-self
-        if (n != i && gnorm_sq(m_atoms(r_, i) - m_atoms(r_, n)) < r_cut * r_cut) {
+        if (n != i && gnorm_sq(m_atoms(r_, i) - m_atoms(r_, n)) < m_r_cut * m_r_cut) {
           m_neigh_lists[i].push_back(n);
         }
         n = m_atoms(Next{}, n);
@@ -151,7 +149,7 @@ namespace fly::neighbour {
 
       while (n != NONE) {
         // In adjacent cells -- don't need to check against self
-        if (gnorm_sq(m_atoms(r_, i) - m_atoms(r_, n)) < r_cut * r_cut) {
+        if (gnorm_sq(m_atoms(r_, i) - m_atoms(r_, n)) < m_r_cut * m_r_cut) {
           m_neigh_lists[i].push_back(n);
         }
         n = m_atoms(Next{}, n);

@@ -27,10 +27,25 @@
 #include <type_traits>
 #include <utility>
 
+//////
+#include <cxxabi.h>
+
+#include <typeinfo>  // Remove me
+//////
+
 #include "libfly/system/SoA.hpp"
 #include "libfly/system/box.hpp"
 #include "libfly/system/typemap.hpp"
 #include "libfly/utility/core.hpp"
+
+inline std::string demangle(const char *name) {
+  int status = -4;  // some arbitrary value to eliminate the compiler warning
+
+  // enable c++11 by passing the flag -std=c++11 to g++
+  std::unique_ptr<char, void (*)(void *)> res{abi::__cxa_demangle(name, NULL, NULL, &status), std::free};
+
+  return (status == 0) ? res.get() : name;
+}
 
 /**
  * \file gsd.hpp
@@ -173,7 +188,7 @@ namespace fly::io {
      */
     template <typename T>
     auto write(char const *name, T const &value) -> std::enable_if_t<std::is_arithmetic_v<T>> {
-      dump_span(name, 1, nonstd::span<std::uint32_t const>{&value, 1});
+      dump_span(name, 1, nonstd::span<T const>{&value, 1});
     }
 
     /**
@@ -192,7 +207,7 @@ namespace fly::io {
     template <typename... U>
     auto write(system::TypeMap<U...> const &map) -> void {
       //
-      write("log/typemap/N", safe_cast<std::uint32_t>(map.num_types()));  // explicitly store for reconstruction.
+      write("log/typemap/N", map.num_types());  // explicitly store for reconstruction.
 
       write(Type{}, static_cast<typename system::TypeMap<U...>::SOA const &>(map));
 
@@ -223,7 +238,8 @@ namespace fly::io {
     template <typename T>
     auto read(std::uint64_t i, char const *name) -> std::enable_if_t<std::is_arithmetic_v<T>, T> {
       std::array<T, 1> buf;
-      load_span(i, name, 1, buf);
+      nonstd::span<T> tmp{buf.data(), buf.size()};
+      load_span(i, name, (int)1, tmp);
       return buf[0];
     }
 
@@ -261,7 +277,7 @@ namespace fly::io {
     template <typename... U>
     auto read_map(std::uint64_t i) -> system::TypeMap<U...> {
       //
-      system::TypeMap<U...> map(read<std::uint32_t>(i, "log/typemap/N"));
+      system::TypeMap<U...> map(read<Eigen::Index>(i, "log/typemap/N"));
 
       read_to(i, Type{}, static_cast<typename system::TypeMap<U...>::SOA &>(map));
 
@@ -281,6 +297,16 @@ namespace fly::io {
     // ///////////////////////////////////////////
 
     void end_frame();
+
+    template <typename T>
+    void dump_span(char const *name, std::uint32_t, nonstd::span<T const> data) {
+      throw error("Dump invalid type: {} from: {}", demangle(typeid(data).name()), name);
+    }
+
+    template <typename T>
+    void load_span(std::uint64_t, char const *name, int, nonstd::span<T> data) {
+      throw error("Load invalid type: {} from: {}", demangle(typeid(data).name()), name);
+    }
 
 /**
  * @brief Define a [dump/load]_span for type ``type``.

@@ -27,25 +27,10 @@
 #include <type_traits>
 #include <utility>
 
-//////
-#include <cxxabi.h>
-
-#include <typeinfo>  // Remove me
-//////
-
 #include "libfly/system/SoA.hpp"
 #include "libfly/system/box.hpp"
 #include "libfly/system/typemap.hpp"
 #include "libfly/utility/core.hpp"
-
-inline std::string demangle(const char *name) {
-  int status = -4;  // some arbitrary value to eliminate the compiler warning
-
-  // enable c++11 by passing the flag -std=c++11 to g++
-  std::unique_ptr<char, void (*)(void *)> res{abi::__cxa_demangle(name, NULL, NULL, &status), std::free};
-
-  return (status == 0) ? res.get() : name;
-}
 
 /**
  * \file gsd.hpp
@@ -188,7 +173,7 @@ namespace fly::io {
      */
     template <typename T>
     auto write(char const *name, T const &value) -> std::enable_if_t<std::is_arithmetic_v<T>> {
-      dump_span(name, 1, nonstd::span<T const>{&value, 1});
+      write_chunk(name, 1, 1, &value);
     }
 
     /**
@@ -221,12 +206,8 @@ namespace fly::io {
      * @param in A fly::system::SoA containing the data to write to the file.
      */
     template <typename T, typename... U>
-    auto write([[maybe_unused]] T tag, system::SoA<U...> const &in) -> std::enable_if_t<std::is_arithmetic_v<typename T::scalar_t>> {
-      dump_span(T::tag, T::size(),
-                nonstd::span<typename T::scalar_t const>{
-                    in[T{}].derived().data(),
-                    safe_cast<std::size_t>(in.size() * T::size()),
-                });
+    auto write(T tag, system::SoA<U...> const &in) -> std::enable_if_t<std::is_arithmetic_v<typename T::scalar_t>> {
+      write_chunk(T::tag, in.size(), T::size(), in[tag].derived().data());
     }
 
     /**
@@ -237,10 +218,9 @@ namespace fly::io {
      */
     template <typename T>
     auto read(std::uint64_t i, char const *name) -> std::enable_if_t<std::is_arithmetic_v<T>, T> {
-      std::array<T, 1> buf;
-      nonstd::span<T> tmp{buf.data(), buf.size()};
-      load_span(i, name, (int)1, tmp);
-      return buf[0];
+      T tmp;
+      read_chunk(i, name, 1, 1, &tmp);
+      return tmp;
     }
 
     // ///////////////////////////////////////////////
@@ -260,13 +240,8 @@ namespace fly::io {
      * @param out A fly::system::SoA to write the read data to.
      */
     template <typename T, typename... U>
-    auto read_to(std::uint64_t i, [[maybe_unused]] T tag, system::SoA<U...> &out)
-        -> std::enable_if_t<std::is_arithmetic_v<typename T::scalar_t>> {
-      load_span(i, T::tag, T::size(),
-                nonstd::span<typename T::scalar_t>{
-                    out[T{}].data(),
-                    safe_cast<std::size_t>(out.size() * T::size()),
-                });
+    auto read_to(std::uint64_t i, T tag, system::SoA<U...> &out) -> std::enable_if_t<std::is_arithmetic_v<typename T::scalar_t>> {
+      read_chunk(i, T::tag, out.size(), T::size(), out[tag].data());
     }
 
     /**
@@ -298,39 +273,30 @@ namespace fly::io {
 
     void end_frame();
 
+    struct type_info {
+      bool is_floating;
+      bool is_signed;
+      std::size_t size;
+    };
+
     template <typename T>
-    void dump_span(char const *name, std::uint32_t, nonstd::span<T const> data) {
-      throw error("Dump invalid type: {} from: {}", demangle(typeid(data).name()), name);
+    static type_info get_info() noexcept {
+      return {std::is_floating_point_v<T>, std::is_signed_v<T>, sizeof(T)};
     }
 
     template <typename T>
-    void load_span(std::uint64_t, char const *name, int, nonstd::span<T> data) {
-      throw error("Load invalid type: {} from: {}", demangle(typeid(data).name()), name);
+    auto write_chunk(char const *name, std::uint64_t N, std::uint32_t M, T const *data) -> void {
+      write_chunk(name, N, M, data, get_info<T>());
     }
 
-/**
- * @brief Define a [dump/load]_span for type ``type``.
- */
-#define dump_load(TYPE_NAME)                                                             \
-  void dump_span(char const *name, std::uint32_t M, nonstd::span<TYPE_NAME const> data); \
-  void load_span(std::uint64_t i, char const *name, int M, nonstd::span<TYPE_NAME> data) const
+    auto write_chunk(char const *name, std::uint64_t N, std::uint32_t M, void const *data, type_info info) -> void;
 
-    dump_load(std::uint8_t);
-    dump_load(std::uint16_t);
-    dump_load(std::uint32_t);
-    dump_load(std::uint64_t);
+    template <typename T>
+    auto read_chunk(std::uint64_t frame, char const *name, std::uint64_t N, std::uint32_t M, T *data) const -> void {
+      read_chunk(frame, name, N, M, data, get_info<T>());
+    }
 
-    dump_load(std::int8_t);
-    dump_load(std::int16_t);
-    dump_load(std::int32_t);
-    dump_load(std::int64_t);
-
-    dump_load(float);
-    dump_load(double);
-
-    dump_load(char);  // Special handling as not a gsd-native type.
-
-#undef dump_load
+    auto read_chunk(std::uint64_t frame, char const *name, std::uint64_t N, std::uint32_t M, void *data, type_info info) const -> void;
   };
 
 }  // namespace fly::io

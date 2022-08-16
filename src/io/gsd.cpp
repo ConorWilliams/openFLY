@@ -27,10 +27,38 @@
 #include <type_traits>
 #include <utility>
 
-#include "io/gsd_helpers.hpp"
+#include "gsd/gsd/gsd.h"
 #include "libfly/utility/core.hpp"
 
 namespace fly::io {
+
+  template <typename F, typename... Args>
+  void call_gsd(std::string_view info, F &&f, Args &&...args) {
+    switch (std::invoke(std::forward<F>(f), std::forward<Args>(args)...)) {
+      case GSD_SUCCESS:
+        return;
+      case GSD_ERROR_IO:
+        throw error("GSD: {} - {}", std::strerror(errno), info);
+      case GSD_ERROR_INVALID_ARGUMENT:
+        throw error("GSD: Invalid argument - {}", info);
+      case GSD_ERROR_NOT_A_GSD_FILE:
+        throw error("GSD: Not a GSD file - {}", info);
+      case GSD_ERROR_INVALID_GSD_FILE_VERSION:
+        throw error("GSD: Invalid GSD file version - {}", info);
+      case GSD_ERROR_FILE_CORRUPT:
+        throw error("GSD: File corrupt - {}", info);
+      case GSD_ERROR_MEMORY_ALLOCATION_FAILED:
+        throw error("GSD: Memory allocation failed - {}", info);
+      case GSD_ERROR_NAMELIST_FULL:
+        throw error("GSD: Name-list full - {}", info);
+      case GSD_ERROR_FILE_MUST_BE_WRITABLE:
+        throw error("GSD: File must be writeable - {}", info);
+      case GSD_ERROR_FILE_MUST_BE_READABLE:
+        throw error("GSD: File must be readable - {}", info);
+      default:
+        throw error("GSD: Unknown error - {}", info);
+    }
+  }
 
   BinaryFile::BinaryFile(std::string_view fname, Flags flag) : m_fname(fname), m_handle(std::make_unique<gsd_handle>()) {
     //
@@ -74,11 +102,11 @@ namespace fly::io {
         basis(0, 0), basis(1, 1), basis(2, 2), basis(0, 1), basis(0, 2), basis(1, 2),
     };
 
-    write_chunk<float>(m_handle.get(), "configuration/box", 6, 1, hoomd_basis);
+    write_chunk("configuration/box", 6, 1, hoomd_basis.data());
 
     std::array<std::uint8_t, 3> const periodicity = {box.periodic(0), box.periodic(1), box.periodic(2)};
 
-    write_chunk<std::uint8_t>(m_handle.get(), "log/periodicity", 3, 1, periodicity);
+    write_chunk("log/periodicity", 3, 1, periodicity.data());
   }
 
   auto BinaryFile::read_box(std::uint64_t i) const -> system::Box {
@@ -90,7 +118,7 @@ namespace fly::io {
 
       std::array<float, 6> hoomd_basis;  // L_x, L_y, L_z , xy, xz, yz
 
-      read_chunk<float>(i, m_handle.get(), "configuration/box", 6, 1, hoomd_basis);
+      read_chunk(i, "configuration/box", 6, 1, hoomd_basis.data());
 
       basis(0, 0) = hoomd_basis[0];
       basis(1, 1) = hoomd_basis[1];
@@ -107,7 +135,7 @@ namespace fly::io {
     {
       std::array<std::uint8_t, 3> pr;
 
-      read_chunk<std::uint8_t>(i, m_handle.get(), "log/periodicity", 3, 1, pr);
+      read_chunk(i, "log/periodicity", 3, 1, pr.data());
 
       periodicity[0] = pr[0];
       periodicity[1] = pr[1];
@@ -119,31 +147,77 @@ namespace fly::io {
 
   //   ////////////////////////////////////////////////////////////////////////////////////////////////
 
-#define dump_load(TYPE_NAME)                                                                                 \
-  void BinaryFile::dump_span(char const *name, std::uint32_t M, nonstd::span<TYPE_NAME const> data) {        \
-    ASSERT(data.size() % M == 0, "Chunk `{}`, {} not divisible by {}", name, data.size(), M);                \
-    write_chunk(m_handle.get(), name, data.size() / M, M, data);                                             \
-  }                                                                                                          \
-                                                                                                             \
-  void BinaryFile::load_span(std::uint64_t i, char const *name, int M, nonstd::span<TYPE_NAME> data) const { \
-    read_chunk(i, m_handle.get(), name, -1, M, data);                                                        \
+  gsd_type get_gsd_tag(bool is_floating, bool is_signed, std::size_t size) {
+    if (is_floating) {
+      if (size == gsd_sizeof_type(GSD_TYPE_DOUBLE)) {
+        return GSD_TYPE_DOUBLE;
+      }
+      if (size == gsd_sizeof_type(GSD_TYPE_FLOAT)) {
+        return GSD_TYPE_FLOAT;
+      }
+      throw error("No GSD floating point type with size {}", size);
+    }
+    if (is_signed) {
+      if (size == gsd_sizeof_type(GSD_TYPE_INT8)) {
+        return GSD_TYPE_INT8;
+      }
+      if (size == gsd_sizeof_type(GSD_TYPE_INT16)) {
+        return GSD_TYPE_INT16;
+      }
+      if (size == gsd_sizeof_type(GSD_TYPE_INT32)) {
+        return GSD_TYPE_INT32;
+      }
+      if (size == gsd_sizeof_type(GSD_TYPE_INT64)) {
+        return GSD_TYPE_INT64;
+      }
+      throw error("No GSD signed integer type type with size {}", size);
+    } else {
+      if (size == gsd_sizeof_type(GSD_TYPE_UINT8)) {
+        return GSD_TYPE_UINT8;
+      }
+      if (size == gsd_sizeof_type(GSD_TYPE_UINT16)) {
+        return GSD_TYPE_UINT16;
+      }
+      if (size == gsd_sizeof_type(GSD_TYPE_UINT32)) {
+        return GSD_TYPE_UINT32;
+      }
+      if (size == gsd_sizeof_type(GSD_TYPE_UINT64)) {
+        return GSD_TYPE_UINT64;
+      }
+      throw error("No GSD unsigned integer type type with size {}", size);
+    }
   }
 
-  dump_load(std::uint8_t);
-  dump_load(std::uint16_t);
-  dump_load(std::uint32_t);
-  dump_load(std::uint64_t);
+  void BinaryFile::write_chunk(char const *name, std::uint64_t N, std::uint32_t M, void const *data, type_info x) {
+    call_gsd(name, gsd_write_chunk, m_handle.get(), name, get_gsd_tag(x.is_floating, x.is_signed, x.size), N, M, 0, data);
+  }
 
-  dump_load(std::int8_t);
-  dump_load(std::int16_t);
-  dump_load(std::int32_t);
-  dump_load(std::int64_t);
+  void BinaryFile::read_chunk(std::uint64_t frame, char const *name, std::uint64_t N, std::uint32_t M, void *data, type_info x) const {
+    //
+    gsd_index_entry const *chunk = gsd_find_chunk(m_handle.get(), frame, name);
 
-  dump_load(float);
-  dump_load(double);
+    // Fallback to initial frame
+    if (!chunk) {
+      if (frame == 0) {
+        throw error("GSD: Could not find chunk with name '{}' at frame {}", name, frame);
+      } else {
+        read_chunk(0, name, N, M, data, x);
+      }
+    } else {
+      if (N != chunk->N) {
+        throw error("GSD: Chunk '{}' frame {}, expected {} rows found {}", name, frame, N, chunk->N);
+      }
 
-  dump_load(char);
+      if (M != chunk->M) {
+        throw error("GSD: Chunk '{}' frame {}, expected {} columns found {}", name, frame, M, chunk->M);
+      }
 
-#undef dump_load
+      if (gsd_type tag = get_gsd_tag(x.is_floating, x.is_signed, x.size); chunk->type != tag) {
+        throw error("GSD: Chunk '{}' frame {}, expecting to read type {} but found type {}", name, frame, tag, chunk->type);
+      }
+
+      call_gsd(name, gsd_read_chunk, m_handle.get(), data, chunk);
+    }
+  }
 
 }  // namespace fly::io

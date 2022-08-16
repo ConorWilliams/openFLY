@@ -531,6 +531,76 @@ y_n &amp; = 1 \times x_1\times x_{2} \times \dots \times x_{n-1}\end{split}\]</d
 <section id="classes">
 <h3>Classes<a class="headerlink" href="#classes" title="Permalink to this heading">#</a></h3>
 <dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv4I0EN3fly6VectorE">
+<span id="_CPPv3I0EN3fly6VectorE"></span><span id="_CPPv2I0EN3fly6VectorE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classfly_1_1Vector"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Vector</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">private</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0EN3fly6VectorE" title="fly::Vector::T"><span class="n"><span class="pre">T</span></span></a><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4I0EN3fly6VectorE" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>A wrapper around a <code class="docutils literal notranslate"><span class="pre">std::vector</span></code>. </p>
+<p>Does bounds checking in debug and signed size_type. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3fly6Vector6assignEN5Eigen5IndexERK1T">
+<span id="_CPPv3N3fly6Vector6assignEN5Eigen5IndexERK1T"></span><span id="_CPPv2N3fly6Vector6assignEN5Eigen5IndexERK1T"></span><span id="fly::Vector::assign__Eigen::Index.TCR"></span><span class="target" id="classfly_1_1Vector_1ac914562e578c4588ad404d25db2c45df"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">auto</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">assign</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">Eigen</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">Index</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">count</span></span>, <a class="reference internal" href="#_CPPv4I0EN3fly6VectorE" title="fly::Vector::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">value</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="o"><span class="pre">-&gt;</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><a class="headerlink" href="#_CPPv4N3fly6Vector6assignEN5Eigen5IndexERK1T" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Replaces the contents with <code class="docutils literal notranslate"><span class="pre">count</span></code> copies of value <code class="docutils literal notranslate"><span class="pre">value</span></code>. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>count</strong> – The new size of the container. </p></li>
+<li><p><strong>value</strong> – The value to initialize elements of the container with. </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3fly6Vector5clearEv">
+<span id="_CPPv3N3fly6Vector5clearEv"></span><span id="_CPPv2N3fly6Vector5clearEv"></span><span id="fly::Vector::clear"></span><span class="target" id="classfly_1_1Vector_1a6c2810194dd01c2cb921886d1ababf55"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">auto</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">clear</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3fly6Vector5clearEv" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Clears the contents. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3fly6VectorixEN5Eigen5IndexE">
+<span id="_CPPv3N3fly6VectorixEN5Eigen5IndexE"></span><span id="_CPPv2N3fly6VectorixEN5Eigen5IndexE"></span><span id="fly::Vector::subscript-operator__Eigen::Index"></span><span class="target" id="classfly_1_1Vector_1a08f4f314d922f6626957491b75d54570"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">auto</span></span><span class="w"> </span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">[]</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">Eigen</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">Index</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">pos</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="o"><span class="pre">-&gt;</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0EN3fly6VectorE" title="fly::Vector::T"><span class="n"><span class="pre">T</span></span></a><span class="p"><span class="pre">&amp;</span></span><a class="headerlink" href="#_CPPv4N3fly6VectorixEN5Eigen5IndexE" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Returns a reference to the element at specified location <code class="docutils literal notranslate"><span class="pre">pos</span></code>. Bounds checking in DEBUG builds. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>pos</strong> – <a class="reference internal" href="system.html#structfly_1_1builtin__properties_1_1Position"><span class="std std-ref">Position</span></a> of the element to return. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK3fly6VectorixEN5Eigen5IndexE">
+<span id="_CPPv3NK3fly6VectorixEN5Eigen5IndexE"></span><span id="_CPPv2NK3fly6VectorixEN5Eigen5IndexE"></span><span id="fly::Vector::subscript-operator__Eigen::IndexC"></span><span class="target" id="classfly_1_1Vector_1a764c4cfe4ad71a8889d5642b784c7e3c"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">auto</span></span><span class="w"> </span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">[]</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">Eigen</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">Index</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">pos</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="o"><span class="pre">-&gt;</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0EN3fly6VectorE" title="fly::Vector::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="p"><span class="pre">&amp;</span></span><a class="headerlink" href="#_CPPv4NK3fly6VectorixEN5Eigen5IndexE" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Returns a reference to the element at specified location <code class="docutils literal notranslate"><span class="pre">pos</span></code>. Bounds checking in DEBUG builds. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>pos</strong> – <a class="reference internal" href="system.html#structfly_1_1builtin__properties_1_1Position"><span class="std std-ref">Position</span></a> of the element to return. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3fly6Vector6resizeEN5Eigen5IndexE">
+<span id="_CPPv3N3fly6Vector6resizeEN5Eigen5IndexE"></span><span id="_CPPv2N3fly6Vector6resizeEN5Eigen5IndexE"></span><span id="fly::Vector::resize__Eigen::Index"></span><span class="target" id="classfly_1_1Vector_1a05c613894b2284a395ec9778434bdfbc"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">auto</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">resize</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">Eigen</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">Index</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">count</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="o"><span class="pre">-&gt;</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><a class="headerlink" href="#_CPPv4N3fly6Vector6resizeEN5Eigen5IndexE" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Resizes the container to contain count elements. </p>
+<p>If the current size is greater than count, the container is reduced to its first count elements. If the current size is less than count, additional default-inserted elements are appended.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>count</strong> – New size of the container </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK3fly6Vector4sizeEv">
+<span id="_CPPv3NK3fly6Vector4sizeEv"></span><span id="_CPPv2NK3fly6Vector4sizeEv"></span><span id="fly::Vector::sizeC"></span><span class="target" id="classfly_1_1Vector_1a28d4610585f1213901384adc18758c45"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">auto</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">size</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="o"><span class="pre">-&gt;</span></span><span class="w"> </span><span class="n"><span class="pre">Eigen</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">Index</span></span><a class="headerlink" href="#_CPPv4NK3fly6Vector4sizeEv" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Fetch the number of elements in the vector. </p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="cpp class">
 <dt class="sig sig-object cpp" id="_CPPv4I00EN3fly5DeferE">
 <span id="_CPPv3I00EN3fly5DeferE"></span><span id="_CPPv2I00EN3fly5DeferE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">F</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">enable_if_t</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">is_nothrow_invocable_v</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I00EN3fly5DeferE" title="fly::Defer::F"><span class="n"><span class="pre">F</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classfly_1_1Defer"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Defer</span></span></span><a class="headerlink" href="#_CPPv4I00EN3fly5DeferE" title="Permalink to this definition">#</a><br /></dt>
 <dd><p>Basic implementation of a Golang like defer. </p>
@@ -633,6 +703,78 @@ y_n &amp; = 1 \times x_1\times x_{2} \times \dots \times x_{n-1}\end{split}\]</d
 
 </section>
 </section>
+<section id="random-numbers">
+<h2>Random numbers<a class="headerlink" href="#random-numbers" title="Permalink to this heading">#</a></h2>
+<p>File <code class="docutils literal notranslate"><span class="pre">random.hpp</span></code></p>
+<p>Pseudo random number generators (PRNG). </p>
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv4N3fly7XoshiroE">
+<span id="_CPPv3N3fly7XoshiroE"></span><span id="_CPPv2N3fly7XoshiroE"></span><span id="fly::Xoshiro"></span><span class="target" id="classfly_1_1Xoshiro"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Xoshiro</span></span></span><a class="headerlink" href="#_CPPv4N3fly7XoshiroE" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>A &lt;random&gt; compatible implementation of the xoshiro256** 1.0 PRNG. </p>
+<p><p><p>From <a class="reference external" href="https://prng.di.unimi.it/">the original</a>:</p>
+<blockquote>
+<div><p>This is xoshiro256** 1.0, one of our all-purpose, rock-solid generators. It has excellent (sub-ns) speed, a state (256 bits)
+that is large enough for any parallel application, and it passes all tests we are aware of.</p>
+</div></blockquote>
+</p>
+ </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-types">Public Types</p>
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N3fly7Xoshiro11result_typeE">
+<span id="_CPPv3N3fly7Xoshiro11result_typeE"></span><span id="_CPPv2N3fly7Xoshiro11result_typeE"></span><span class="target" id="classfly_1_1Xoshiro_1a014a2e64a8b38fb76915dc7349a62e93"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">result_type</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">uint64_t</span></span><a class="headerlink" href="#_CPPv4N3fly7Xoshiro11result_typeE" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Required by named requirement: UniformRandomBitGenerator. </p>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3fly7Xoshiro7XoshiroERKNSt5arrayI11result_typeXL4EEEE">
+<span id="_CPPv3N3fly7Xoshiro7XoshiroERKNSt5arrayI11result_typeXL4EEEE"></span><span id="_CPPv2N3fly7Xoshiro7XoshiroERKNSt5arrayI11result_typeX4EEE"></span><span id="fly::Xoshiro::Xoshiro__std::array:result_type.4:CRCE"></span><span class="target" id="classfly_1_1Xoshiro_1ac442fa083e6c14a78bcbc08c7b873cb9"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">explicit</span></span><span class="w"> </span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Xoshiro</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">array</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4N3fly7Xoshiro11result_typeE" title="fly::Xoshiro::result_type"><span class="n"><span class="pre">result_type</span></span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="m"><span class="pre">4</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">seed</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3fly7Xoshiro7XoshiroERKNSt5arrayI11result_typeXL4EEEE" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Construct and seed the PRNG. </p>
+<p>The state must be seeded so that it is not everywhere zero. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3fly7Xoshiro4jumpEv">
+<span id="_CPPv3N3fly7Xoshiro4jumpEv"></span><span id="_CPPv2N3fly7Xoshiro4jumpEv"></span><span id="fly::Xoshiro::jumpCE"></span><span class="target" id="classfly_1_1Xoshiro_1a9f880d22dc3292781146571016b965ff"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><span class="kt"><span class="pre">auto</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">jump</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">noexcept</span></span><span class="w"> </span><span class="o"><span class="pre">-&gt;</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><a class="headerlink" href="#_CPPv4N3fly7Xoshiro4jumpEv" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>This is the jump function for the generator. </p>
+<p>It is equivalent to 2^128 calls to operator(); it can be used to generate 2^128 non-overlapping sub-sequences for parallel computations. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3fly7Xoshiro9long_jumpEv">
+<span id="_CPPv3N3fly7Xoshiro9long_jumpEv"></span><span id="_CPPv2N3fly7Xoshiro9long_jumpEv"></span><span id="fly::Xoshiro::long_jumpCE"></span><span class="target" id="classfly_1_1Xoshiro_1aeca9b17a7d6a17aac9857652eee32336"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><span class="kt"><span class="pre">auto</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">long_jump</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">noexcept</span></span><span class="w"> </span><span class="o"><span class="pre">-&gt;</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><a class="headerlink" href="#_CPPv4N3fly7Xoshiro9long_jumpEv" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>This is the long-jump function for the generator. </p>
+<p>It is equivalent to 2^192 calls to operator(); it can be used to generate 2^64 starting points, from each of which <a class="reference internal" href="#classfly_1_1Xoshiro_1a9f880d22dc3292781146571016b965ff"><span class="std std-ref">jump()</span></a> will generate 2^64 non-overlapping sub-sequences for parallel distributed computations. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3fly7XoshiroclEv">
+<span id="_CPPv3N3fly7XoshiroclEv"></span><span id="_CPPv2N3fly7XoshiroclEv"></span><span id="fly::Xoshiro::call-operatorCE"></span><span class="target" id="classfly_1_1Xoshiro_1a392db2ea406712396a07fe6c9a2b4279"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><span class="kt"><span class="pre">auto</span></span><span class="w"> </span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">()</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">noexcept</span></span><span class="w"> </span><span class="o"><span class="pre">-&gt;</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N3fly7Xoshiro11result_typeE" title="fly::Xoshiro::result_type"><span class="n"><span class="pre">result_type</span></span></a><a class="headerlink" href="#_CPPv4N3fly7XoshiroclEv" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Generate a random bit sequence and advance the state of the generator. </p>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-static-functions">Public Static Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3fly7Xoshiro3maxEv">
+<span id="_CPPv3N3fly7Xoshiro3maxEv"></span><span id="_CPPv2N3fly7Xoshiro3maxEv"></span><span id="fly::Xoshiro::maxCE"></span><span class="target" id="classfly_1_1Xoshiro_1ae633f29413ba4ed1a2cfdb86821d4539"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><span class="kt"><span class="pre">auto</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">max</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">noexcept</span></span><span class="w"> </span><span class="o"><span class="pre">-&gt;</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N3fly7Xoshiro11result_typeE" title="fly::Xoshiro::result_type"><span class="n"><span class="pre">result_type</span></span></a><a class="headerlink" href="#_CPPv4N3fly7Xoshiro3maxEv" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Get the maximum value of the generator. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3fly7Xoshiro3minEv">
+<span id="_CPPv3N3fly7Xoshiro3minEv"></span><span id="_CPPv2N3fly7Xoshiro3minEv"></span><span id="fly::Xoshiro::minCE"></span><span class="target" id="classfly_1_1Xoshiro_1a43eac503989bc84ee1160ffffb1737e4"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><span class="kt"><span class="pre">auto</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">min</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">noexcept</span></span><span class="w"> </span><span class="o"><span class="pre">-&gt;</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N3fly7Xoshiro11result_typeE" title="fly::Xoshiro::result_type"><span class="n"><span class="pre">result_type</span></span></a><a class="headerlink" href="#_CPPv4N3fly7Xoshiro3minEv" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Get the minimum value of the generator. </p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+</section>
 </section>
 
         </article>
@@ -709,6 +851,7 @@ y_n &amp; = 1 \times x_1\times x_{2} \times \dots \times x_{n-1}\end{split}\]</d
 <li><a class="reference internal" href="#timing">Timing</a></li>
 </ul>
 </li>
+<li><a class="reference internal" href="#random-numbers">Random numbers</a></li>
 </ul>
 </li>
 </ul>

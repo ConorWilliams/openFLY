@@ -112,7 +112,7 @@ namespace fly::neighbour {
     // }
 
   private:
-    struct Next : system::Property<Eigen::Index, 1, 1, Eigen::Matrix> {};  ///< Index of the next atom in the linked cell list.
+    struct Next : system::Property<Eigen::Index> {};  ///< Index of the next atom in the linked cell list.
 
     system::Box m_box;                           ///< Store the box.
     typename system::Box::Grid m_grid;           ///< Store the grid (made by the box).

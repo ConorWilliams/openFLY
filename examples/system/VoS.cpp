@@ -7,7 +7,7 @@
 void example_VoS() {
   // Define a property to represent position that is a vector of 3 doubles.
   // Note there is a built-in property for this (Position).
-  struct xyz : fly::system::Property<double, 3, 1, Eigen::Matrix> {};
+  struct xyz : fly::system::Property<double, 3> {};
 
   fly::system::VoS<xyz> atoms;  // Empty VoS
 

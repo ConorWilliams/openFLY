@@ -19,10 +19,15 @@ Unreleased
 ----------
 Added
 ~~~~~
+
 - New ``DeltaPosition`` property.
+- New ``StepLBFGS`` class.
+
 Changed
 ~~~~~~~
+
 - ``neigh::List``'s ``update()`` API changed
+
 Removed
 ~~~~~~~
 Bugfixes

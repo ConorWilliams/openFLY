@@ -128,6 +128,7 @@ namespace fly::system {
      */
     Triclinic(Mat const& basis, Arr<bool> const& pd)
         : m_basis{basis.triangularView<Eigen::Upper>()}, m_basis_inv{m_basis.inverse()}, m_periodic{pd} {
+      //
       [[maybe_unused]] double eps = 1e-5;
 
       verify(((basis - m_basis).array().abs() < eps).all(), "Basis must be an upper triangular matrix.");

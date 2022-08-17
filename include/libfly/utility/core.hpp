@@ -361,6 +361,8 @@ namespace fly {
    *
    * \endrst
    *
+   * @tparam T The scalar type of the input arrays.
+   *
    * @param beg Array of loop start indexes.
    * @param end Array of loop end indexes.
    * @param f Invokable to call with every combination of indexes.
@@ -435,7 +437,7 @@ namespace fly {
    *
    * \endrst
    *
-   * @tparam Exp The exponent
+   * @tparam Exp The exponent.
    * @tparam T The type of ``x``, must be arithmetic.
    *
    * @param x The input parameter.
@@ -458,7 +460,7 @@ namespace fly {
   }
 
   /**
-   * @brief Generalised dot-product between two \c Eigen::Array objects.
+   * @brief Generalised dot-product between two \c Eigen objects.
    *
    * \rst
    *
@@ -481,7 +483,7 @@ namespace fly {
   }
 
   /**
-   * @brief Generic squared Frobenius norm of an \c Eigen::Array.
+   * @brief Generic squared Frobenius norm of an \c Eigen object.
    *
    * \rst
    *
@@ -534,12 +536,12 @@ namespace fly {
    *
    * \endrst
    *
-   * @tparam Scalar The scalar type of the input square-matrix.
-   * @tparam N The dimensions of the input matrix ``p``, must not be ``Eigen::Dynamic``.
+   * @tparam Scalar The scalar type of the input matrix.
+   * @tparam N The dimensions of the square-matrix ``p``, must not be ``Eigen::Dynamic``.
    *
-   * @param P The square input matrix, whose columns are the N-points the hyper plane will pass through.
+   * @param P The square input-matrix, whose columns are the N-points the hyper plane will pass through.
    *
-   * @return The unit normal of a hyperplane passing through the columns of ''P''.
+   * @return The unit normal of a hyperplane passing through the columns of ``P``.
    */
   template <typename Scalar, int N>
   auto hyperplane_normal(Eigen::Matrix<Scalar, N, N> const &P) -> std::enable_if_t<N != Eigen::Dynamic, Eigen::Vector<Scalar, N>> {

@@ -14,8 +14,8 @@
 
 // You should have received a copy of the GNU General Public License along with openFLY. If not, see <https://www.gnu.org/licenses/>.
 
-#include <variant>
-#include <vector>
+#include <cmath>
+#include <limits>
 
 #include "libfly/neigh/adjacent.hpp"
 #include "libfly/system/SoA.hpp"

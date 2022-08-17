@@ -40,11 +40,11 @@
  *     \vdots &  & & \ddots
  *     \end{bmatrix}
  *
- * with each column corresponding to a basis vector, all non-zero entries positive and all diagonal elements non-zero. This
+ * with: each column corresponding to a basis vector, all non-zero entries positive and all diagonal elements non-zero. This
  * constrains some of the rotational degrees of freedom of the parallelotope and ensures the existence of an inverse.
  *
  * The *canonical* cell/box/simulation-space is the volume of space inside the parallelotope with edges formed from the basis
- * vectors rooted at the origin. Along periodic axes atoms are allowed to have projected coordinates outside the canonical cell
+ * vectors rooted at the origin. Along periodic axes atoms are allowed to have projected coordinates outside the canonical-cell
  * however, along non-periodic axes atoms must be inside the canonical cell.
  *
  * LibFLY resolved periodicity using *ghost atoms*, these are the periodic images of *real atom*. To do this efficiently the canonical

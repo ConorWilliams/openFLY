@@ -1179,7 +1179,10 @@ distance.</p>
 <p>The <a class="reference internal" href="#classfly_1_1system_1_1Supercell"><span class="std std-ref">Supercell</span></a> is libFLY’s amalgamation of all the data required for a simulation. It <strong>is a</strong> <a class="reference internal" href="#classfly_1_1system_1_1SoA"><span class="std std-ref">SoA</span></a> containing all the atoms in the system <strong>has a</strong> <code class="docutils literal notranslate"><a class="reference internal" href="#classfly_1_1system_1_1Box"><span class="std std-ref"><span class="pre">Box</span></span></a></code> and a <code class="docutils literal notranslate"><a class="reference internal" href="#classfly_1_1system_1_1TypeMap"><span class="std std-ref"><span class="pre">TypeMap</span></span></a></code>. A <a class="reference internal" href="#classfly_1_1system_1_1Supercell"><span class="std std-ref">Supercell</span></a> always has the <code class="docutils literal notranslate"><a class="reference internal" href="#structfly_1_1builtin__properties_1_1TypeID"><span class="std std-ref"><span class="pre">TypeID</span></span></a></code> property for each atom and accepts the rest as template arguments.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Template Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>T</strong> – Tags derived from <code class="docutils literal notranslate"><a class="reference internal" href="#structfly_1_1system_1_1Property"><span class="std std-ref"><span class="pre">Property</span></span></a></code>, to describe each member. </p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>Map</strong> – A specialisation of <a class="reference internal" href="#classfly_1_1system_1_1TypeMap"><span class="std std-ref">fly::system::TypeMap</span></a>. </p></li>
+<li><p><strong>T</strong> – Tags derived from <code class="docutils literal notranslate"><a class="reference internal" href="#structfly_1_1system_1_1Property"><span class="std std-ref"><span class="pre">Property</span></span></a></code>, to describe each member. </p></li>
+</ul>
 </dd>
 </dl>
 <div class="breathe-sectiondef docutils container">

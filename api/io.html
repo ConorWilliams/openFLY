@@ -309,48 +309,6 @@ zero, an index entry may be written for a data chunk with no actual data written
 <span id="_CPPv3I0EN3fly2io10BinaryFile6commitERR1F"></span><span id="_CPPv2I0EN3fly2io10BinaryFile6commitERR1F"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">F</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="n"><span class="pre">noop</span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classfly_1_1io_1_1BinaryFile_1a546482cc54ef89506e507d08fec02f1a"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">auto</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">commit</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0EN3fly2io10BinaryFile6commitEvRR1F" title="fly::io::BinaryFile::commit::F"><span class="n"><span class="pre">F</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">f</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="p"><span class="pre">{</span></span><span class="p"><span class="pre">}</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="o"><span class="pre">-&gt;</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><a class="headerlink" href="#_CPPv4I0EN3fly2io10BinaryFile6commitEvRR1F" title="Permalink to this definition">#</a><br /></dt>
 <dd><p>Commit the current frame to disk. </p>
 <p><p>Example:</p>
-<div class="code highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;libfly/io/gsd.hpp&quot;</span><span class="cp"></span>
-<span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;libfly/system/box.hpp&quot;</span><span class="cp"></span>
-<span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;libfly/system/property.hpp&quot;</span><span class="cp"></span>
-<span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;libfly/system/supercell.hpp&quot;</span><span class="cp"></span>
-<span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;libfly/system/typemap.hpp&quot;</span><span class="cp"></span>
-
-<span class="kt">void</span><span class="w"> </span><span class="nf">example_gsd</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-<span class="w">  </span><span class="c1">//</span>
-<span class="w">  </span><span class="k">namespace</span><span class="w"> </span><span class="nn">fs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nn">fly</span><span class="o">::</span><span class="nn">system</span><span class="p">;</span><span class="w"></span>
-
-<span class="w">  </span><span class="n">fs</span><span class="o">::</span><span class="n">Box</span><span class="w"> </span><span class="nf">box</span><span class="p">(</span><span class="n">fly</span><span class="o">::</span><span class="n">Mat</span><span class="o">::</span><span class="n">Identity</span><span class="p">(),</span><span class="w"> </span><span class="n">fly</span><span class="o">::</span><span class="n">Arr</span><span class="o">&lt;</span><span class="kt">bool</span><span class="o">&gt;::</span><span class="n">Constant</span><span class="p">(</span><span class="nb">true</span><span class="p">));</span><span class="w"></span>
-
-<span class="w">  </span><span class="n">fs</span><span class="o">::</span><span class="n">TypeMap</span><span class="o">&lt;</span><span class="n">fly</span><span class="o">::</span><span class="n">Index</span><span class="o">&gt;</span><span class="w"> </span><span class="n">map</span><span class="p">(</span><span class="mi">2</span><span class="p">);</span><span class="w"></span>
-
-<span class="w">  </span><span class="c1">// Set up the map //</span>
-
-<span class="w">  </span><span class="n">fs</span><span class="o">::</span><span class="n">Supercell</span><span class="w"> </span><span class="n">cell</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">fs</span><span class="o">::</span><span class="n">make_supercell</span><span class="o">&lt;</span><span class="n">fly</span><span class="o">::</span><span class="n">Position</span><span class="o">&gt;</span><span class="p">(</span><span class="n">box</span><span class="p">,</span><span class="w"> </span><span class="n">map</span><span class="p">,</span><span class="w"> </span><span class="mi">4</span><span class="p">);</span><span class="w"></span>
-
-<span class="w">  </span><span class="c1">// Write some data to the supercell //</span>
-
-<span class="w">  </span><span class="n">fly</span><span class="o">::</span><span class="n">io</span><span class="o">::</span><span class="n">BinaryFile</span><span class="w"> </span><span class="n">file</span><span class="p">(</span><span class="s">&quot;example.gsd&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">fly</span><span class="o">::</span><span class="n">io</span><span class="o">::</span><span class="n">create</span><span class="p">);</span><span class="w"></span>
-
-<span class="w">  </span><span class="n">std</span><span class="o">::</span><span class="kt">uint32_t</span><span class="w"> </span><span class="n">N</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">fly</span><span class="o">::</span><span class="n">safe_cast</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="kt">uint32_t</span><span class="o">&gt;</span><span class="p">(</span><span class="n">cell</span><span class="p">.</span><span class="n">size</span><span class="p">());</span><span class="w">  </span><span class="c1">// Hoomd Schema requires uint32</span>
-
-<span class="w">  </span><span class="n">file</span><span class="p">.</span><span class="n">commit</span><span class="p">([</span><span class="o">&amp;</span><span class="p">]</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-<span class="w">    </span><span class="n">file</span><span class="p">.</span><span class="n">write</span><span class="p">(</span><span class="n">cell</span><span class="p">.</span><span class="n">box</span><span class="p">());</span><span class="w">        </span><span class="c1">//&lt; Write the box to frame 0.</span>
-<span class="w">    </span><span class="n">file</span><span class="p">.</span><span class="n">write</span><span class="p">(</span><span class="n">cell</span><span class="p">.</span><span class="n">map</span><span class="p">());</span><span class="w">        </span><span class="c1">//&lt; Write the map to frame 0.</span>
-<span class="w">    </span><span class="n">file</span><span class="p">.</span><span class="n">write</span><span class="p">(</span><span class="s">&quot;particles/N&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">N</span><span class="p">);</span><span class="w">  </span><span class="c1">//&lt; Write the number of atoms to frame 0.</span>
-<span class="w">    </span><span class="n">file</span><span class="p">.</span><span class="n">write</span><span class="p">(</span><span class="n">fly</span><span class="o">::</span><span class="n">id_</span><span class="p">,</span><span class="w"> </span><span class="n">cell</span><span class="p">);</span><span class="w">    </span><span class="c1">//&lt; Write the TypeID&#39;s of the atoms to frame 0.</span>
-<span class="w">    </span><span class="n">file</span><span class="p">.</span><span class="n">write</span><span class="p">(</span><span class="n">fly</span><span class="o">::</span><span class="n">r_</span><span class="p">,</span><span class="w"> </span><span class="n">cell</span><span class="p">);</span><span class="w">     </span><span class="c1">//&lt; Write the positions of the atoms to frame 0.</span>
-<span class="w">  </span><span class="p">});</span><span class="w"></span>
-
-<span class="w">  </span><span class="c1">// Do some data processing and compute new positions for each atom //</span>
-
-<span class="w">  </span><span class="n">file</span><span class="p">.</span><span class="n">commit</span><span class="p">([</span><span class="o">&amp;</span><span class="p">]</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-<span class="w">    </span><span class="n">file</span><span class="p">.</span><span class="n">write</span><span class="p">(</span><span class="n">fly</span><span class="o">::</span><span class="n">r_</span><span class="p">,</span><span class="w"> </span><span class="n">cell</span><span class="p">);</span><span class="w">  </span><span class="c1">//&lt; Write the positions of the atoms to frame 1.</span>
-
-<span class="w">    </span><span class="c1">// We do not need to duplicate box, map, etc. as they have not changed //</span>
-<span class="w">  </span><span class="p">});</span><span class="w"></span>
-<span class="p">}</span><span class="w"></span>
-</pre></div>
-</div>
 </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>

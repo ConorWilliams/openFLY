@@ -125,7 +125,7 @@ void test(Vector<Vector<Neigh>> const& nl, neigh::List const& neigh, double r_cu
   }
 }
 
-std::pair<system::SoA<Position>, system::Box> gen_rand(fly::Xoshiro& gen) {
+std::pair<system::SoA<Position>, system::Box> gen_rand(fly::Xoshiro& gen, bool full_periodic = false) {
   //
 
   std::uniform_real_distribution<double> dis(0, 1);
@@ -134,7 +134,7 @@ std::pair<system::SoA<Position>, system::Box> gen_rand(fly::Xoshiro& gen) {
   auto rand = [&dis, &gen]() { return dis(gen); };
 
   // Random simulation box
-  fly::system::Box box = [&]() {
+  auto box = [&]() -> fly::system::Box {
     //
     Mat basis = Mat::NullaryExpr(rand);
 
@@ -146,9 +146,11 @@ std::pair<system::SoA<Position>, system::Box> gen_rand(fly::Xoshiro& gen) {
       basis = basis.triangularView<Eigen::Lower>();
     }
 
-    fly::system::Box tmp{basis, fly::Arr<double>::NullaryExpr(rand) < 0.5};
-
-    return tmp;
+    if (full_periodic) {
+      return {basis, fly::Arr<bool>::Constant(true)};
+    } else {
+      return {basis, fly::Arr<double>::NullaryExpr(rand) < 0.5};
+    }
   }();
 
   system::SoA<Position> cell(idis(gen));
@@ -205,41 +207,44 @@ TEST_CASE("List fuzz-testing", "[neigh]") {
 }
 
 TEST_CASE("List::update()", "[neigh]") {
-  //   //
-  //   fly::Xoshiro gen({1, 1, 1, 1});
-  //   //
-  //   auto [cell, box] = gen_rand(gen);
+  //
+  fly::Xoshiro gen({1, 1, 1, 1});
 
-  //   double r_cut_max = visit(box.get(), [](auto const& g) { return g.min_width(); });
+  for (int anon = 0; anon < 10; anon++) {
+    //
+    auto [cell, box] = gen_rand(gen, true);
 
-  //   double r_cut = r_cut_max / 3;
+    double r_cut_max = visit(box.get(), [](auto const& g) { return g.min_width(); });
 
-  //   double skin = 0.1;
+    double r_cut = r_cut_max / 3;
 
-  //   neigh::List neigh(box, r_cut + 2 * skin);
+    double skin = 0.1;
 
-  //   //////////////////////////
+    neigh::List neigh(box, r_cut + 2 * skin);
 
-  //   neigh.rebuild(cell);
+    //////////////////////////
 
-  //   //////////////////////////
+    neigh.rebuild(cell, omp_get_max_threads());
 
-  //   system::SoA<DeltaPosition> deltas(cell.size());
+    //////////////////////////
 
-  //   std::uniform_real_distribution<double> dis(0, 1);
+    system::SoA<DeltaPosition> deltas(cell.size());
 
-  //   // Set up a displacement less than the skin distance.
-  //   for (int i = 0; i < deltas.size(); i++) {
-  //     deltas(dr_, i) = Vec::NullaryExpr([&] { return dis(gen); }).normalized() * (skin * 0.99);
-  //   }
+    std::uniform_real_distribution<double> dis(0, 1);
 
-  //   neigh.update(deltas);
+    // Set up a displacement less than the skin distance.
+    for (int i = 0; i < deltas.size(); i++) {
+      deltas(dr_, i) = Vec::NullaryExpr([&] { return dis(gen); }).normalized() * (skin * 0.99);
+    }
 
-  //   Vector<Vector<Neigh>> nl;
+    neigh.update(deltas);
 
-  //   cell[r_] -= deltas[dr_];
+    Vector<Vector<Neigh>> nl;
 
-  //   slow_neigh_list(nl, box, cell, r_cut);
+    cell[r_] -= deltas[dr_];
 
-  //   test(nl, neigh, r_cut);
+    slow_neigh_list(nl, box, cell, r_cut);
+
+    test(nl, neigh, r_cut);
+  }
 }

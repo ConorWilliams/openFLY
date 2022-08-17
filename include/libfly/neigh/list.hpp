@@ -104,26 +104,9 @@ namespace fly::neigh {
      *
      * \endrst
      *
-     * @param x A 3Nx1 vector containing the change in the positions of the real atoms.
+     * @param x The change in the positions of the real atoms.
      */
-    template <typename E>
-    auto update(Eigen::DenseBase<E> const& x) -> void {
-      //
-      constexpr auto k = Position::size();
-
-      auto kN = k * size();
-
-      if (x.rows() != kN || x.cols() != 1) {
-        throw error("Input to update is {}x{} but should be {}x1", x.rows(), x.cols(), kN);
-      }
-
-      m_atoms[r_].head(kN) -= x;  // Update real atoms directly.
-
-      // Update positions of ghosts.
-      for (Eigen::Index i = size(); i < m_num_plus_ghosts; i++) {
-        m_atoms(r_, i) -= x.segment<k>(k * image_to_real(i));
-      }
-    }
+    auto update(system::SoA<DeltaPosition const&> x) -> void;
 
     /**
      * @brief Call ``f(n, r, dr)`` for every neighbour of atom ``i`` within cut-off ``r_cut``.

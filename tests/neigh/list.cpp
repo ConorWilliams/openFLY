@@ -120,40 +120,52 @@ void test(Vector<Vector<Neigh>> const& nl, system::Box const& box, system::SoA<P
   }
 }
 
-TEST_CASE("List fuzz-testing", "[neigh]") {
+std::pair<system::SoA<Position>, system::Box> gen_rand(fly::Xoshiro& gen) {
   //
 
-  //
-  fly::Xoshiro gen({1, 3, 3, 4});
   std::uniform_real_distribution<double> dis(0, 1);
   std::uniform_int_distribution<Eigen::Index> idis(100, 1000);
 
   auto rand = [&dis, &gen]() { return dis(gen); };
 
-  for (int i = 0; i < 100; i++) {
-    // Random simulation box
-    fly::system::Box box = [&]() {
-      //
-      Mat basis = Mat::NullaryExpr(rand);
+  // Random simulation box
+  fly::system::Box box = [&]() {
+    //
+    Mat basis = Mat::NullaryExpr(rand);
 
-      basis.diagonal() += Vec::Ones() + 9 * Vec::NullaryExpr(rand);
+    basis.diagonal() += Vec::Ones() + 9 * Vec::NullaryExpr(rand);
 
-      basis = basis.triangularView<Eigen::Upper>();
+    basis = basis.triangularView<Eigen::Upper>();
 
-      if (i % 2 == 0) {
-        basis = basis.triangularView<Eigen::Lower>();
-      }
-
-      fly::system::Box tmp{basis, fly::Arr<bool>::NullaryExpr(rand)};
-
-      return tmp;
-    }();
-
-    system::SoA<Position> cell(idis(gen));
-
-    for (int j = 0; j < cell.size(); j++) {
-      cell(r_, j) = box.basis() * fly::Vec::NullaryExpr(rand);
+    if (dis(gen) < 0.5) {
+      basis = basis.triangularView<Eigen::Lower>();
     }
+
+    fly::system::Box tmp{basis, fly::Arr<bool>::NullaryExpr(rand)};
+
+    return tmp;
+  }();
+
+  system::SoA<Position> cell(idis(gen));
+
+  Mat basis = box.basis();
+
+  for (int j = 0; j < cell.size(); j++) {
+    cell(r_, j).noalias() = basis * fly::Vec::NullaryExpr(rand);
+  }
+
+  return {cell, box};
+}
+
+TEST_CASE("List fuzz-testing", "[neigh]") {
+  //
+
+  //
+  fly::Xoshiro gen({1, 3, 3, 4});
+
+  for (int i = 0; i < 100; i++) {
+    //
+    auto [cell, box] = gen_rand(gen);
 
     double r_cut_max = visit(box.get(), [](auto const& g) { return g.min_width(); });
 
@@ -173,9 +185,16 @@ TEST_CASE("List fuzz-testing", "[neigh]") {
                visit(box.make_grid(r_cut), [](auto const g) { return g.shape(); }) - 2,
                static_cast<double>(sum) / static_cast<double>(nl.size()));
 
-    timeit("\tslow build", [&] { slow_neigh_list(nl, box, cell, r_cut); });
+    timeit("\tslow build", [cell = cell, box = box, r_cut] { slow_neigh_list(nl, box, cell, r_cut); });
 
     test(nl, box, cell, r_cut, 1);
     test(nl, box, cell, r_cut, omp_get_max_threads());
   }
+}
+
+TEST_CASE("List::update()", "[neigh]") {
+  //
+  fly::Xoshiro gen({1, 1, 1, 1});
+  //
+  auto [cell, box] = gen_rand(gen);
 }

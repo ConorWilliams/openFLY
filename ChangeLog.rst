@@ -19,8 +19,10 @@ Unreleased
 ----------
 Added
 ~~~~~
+- New ``DeltaPosition`` property.
 Changed
 ~~~~~~~
+- ``neigh::List``'s ``update()`` API changed
 Removed
 ~~~~~~~
 Bugfixes

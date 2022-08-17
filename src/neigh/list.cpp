@@ -31,6 +31,22 @@
 
 namespace fly::neigh {
 
+  auto List::update(system::SoA<DeltaPosition const&> x) -> void {
+    //
+    verify(x.size() == size(), "Input to update has {} atoms but list contains {}", x.size(), size());
+
+    constexpr auto k = Position::size();
+
+    auto kN = k * size();
+
+    m_atoms[r_].head(kN) -= x[dr_];  // Update real atoms directly.
+
+    // Update positions of ghosts.
+    for (Eigen::Index i = size(); i < m_num_plus_ghosts; i++) {
+      m_atoms(r_, i) -= x(dr_, image_to_real(i));
+    }
+  }
+
   auto List::rebuild(system::SoA<Position const&> positions, int num_threads) -> void {
     //
     verify(num_threads > 0, "{} is not a valid number of threads for rebuild()", num_threads);

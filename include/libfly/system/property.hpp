@@ -196,6 +196,13 @@ namespace fly {
     };
 
     /**
+     * @brief Tag type for a change in atomic position.
+     */
+    struct DeltaPosition : system::Property<double, spatial_dims> {
+      static constexpr char const* tag = "log/particles/delta_position";  ///< GSD chunk label.
+    };
+
+    /**
      * @brief Tag type for atom's acceleration.
      */
     struct Acceleration : system::Property<double, spatial_dims> {
@@ -264,6 +271,11 @@ namespace fly {
      * @brief PotentialGradient literal.
      */
     inline constexpr PotentialGradient g_;
+
+    /**
+     * @brief DeltaPosition literal.
+     */
+    inline constexpr DeltaPosition dr_;
 
     /**
      * @brief Acceleration literal.

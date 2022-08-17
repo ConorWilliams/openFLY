@@ -249,10 +249,10 @@ a_1 &amp; b_1 &amp; c_1 &amp; \cdots\\
 \vdots &amp;  &amp; &amp; \ddots
 \end{bmatrix}\end{split}\]</div>
 </div>
-<p>with each column corresponding to a basis vector, all non-zero entries positive and all diagonal elements non-zero. This
+<p>with: each column corresponding to a basis vector, all non-zero entries positive and all diagonal elements non-zero. This
 constrains some of the rotational degrees of freedom of the parallelotope and ensures the existence of an inverse.</p>
 <p>The <em>canonical</em> cell/box/simulation-space is the volume of space inside the parallelotope with edges formed from the basis
-vectors rooted at the origin. Along periodic axes atoms are allowed to have projected coordinates outside the canonical cell
+vectors rooted at the origin. Along periodic axes atoms are allowed to have projected coordinates outside the canonical-cell
 however, along non-periodic axes atoms must be inside the canonical cell.</p>
 <p>LibFLY resolved periodicity using <em>ghost atoms</em>, these are the periodic images of <em>real atom</em>. To do this efficiently the canonical
 box is split into a <em>grid</em> of smaller parallelotopes. These <em>grid cells</em> are determined by the maximum interatomic interaction
@@ -1181,7 +1181,7 @@ distance.</p>
 <dt class="field-odd">Template Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>Map</strong> – A specialisation of <a class="reference internal" href="#classfly_1_1system_1_1TypeMap"><span class="std std-ref">fly::system::TypeMap</span></a>. </p></li>
-<li><p><strong>T</strong> – Tags derived from <code class="docutils literal notranslate"><a class="reference internal" href="#structfly_1_1system_1_1Property"><span class="std std-ref"><span class="pre">Property</span></span></a></code>, to describe each member. </p></li>
+<li><p><strong>T</strong> – <a class="reference internal" href="#structfly_1_1system_1_1Property"><span class="std std-ref">Property</span></a> tags derived from <code class="docutils literal notranslate"><a class="reference internal" href="#structfly_1_1system_1_1Property"><span class="std std-ref"><span class="pre">Property</span></span></a></code>. </p></li>
 </ul>
 </dd>
 </dl>
@@ -1224,7 +1224,22 @@ distance.</p>
 <dt class="sig sig-object cpp" id="_CPPv4IDpDpEN3fly6system14make_supercellE9SupercellI7TypeMapIDp1UEDp1TERK3BoxRK7TypeMapIDp1UEN5Eigen5IndexE">
 <span id="_CPPv3IDpDpEN3fly6system14make_supercellERK3BoxRK7TypeMapIDp1UEN5Eigen5IndexE"></span><span id="_CPPv2IDpDpEN3fly6system14make_supercellERK3BoxRK7TypeMapIDp1UEN5Eigen5IndexE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="sig-name descname"><span class="n"><span class="pre">U</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="supercell_8hpp_1af447d1b1f19638b284f94b7dcc4a7542"></span><span class="kt"><span class="pre">auto</span></span><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">fly</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">system</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">make_supercell</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N3fly6system3BoxE" title="fly::system::Box"><span class="n"><span class="pre">Box</span></span></a><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">box</span></span>, <a class="reference internal" href="#_CPPv4IDpEN3fly6system7TypeMapE" title="fly::system::TypeMap"><span class="n"><span class="pre">TypeMap</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4IDpDpEN3fly6system14make_supercellE9SupercellI7TypeMapIDp1UEDp1TERK3BoxRK7TypeMapIDp1UEN5Eigen5IndexE" title="fly::system::make_supercell::U"><span class="n"><span class="pre">U</span></span></a><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">map</span></span>, <span class="n"><span class="pre">Eigen</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">Index</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">num_atoms</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="o"><span class="pre">-&gt;</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0DpEN3fly6system9SupercellE" title="fly::system::Supercell"><span class="n"><span class="pre">Supercell</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4IDpEN3fly6system7TypeMapE" title="fly::system::TypeMap"><span class="n"><span class="pre">TypeMap</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4IDpDpEN3fly6system14make_supercellE9SupercellI7TypeMapIDp1UEDp1TERK3BoxRK7TypeMapIDp1UEN5Eigen5IndexE" title="fly::system::make_supercell::U"><span class="n"><span class="pre">U</span></span></a><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4IDpDpEN3fly6system14make_supercellE9SupercellI7TypeMapIDp1UEDp1TERK3BoxRK7TypeMapIDp1UEN5Eigen5IndexE" title="fly::system::make_supercell::T"><span class="n"><span class="pre">T</span></span></a><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4IDpDpEN3fly6system14make_supercellE9SupercellI7TypeMapIDp1UEDp1TERK3BoxRK7TypeMapIDp1UEN5Eigen5IndexE" title="Permalink to this definition">#</a><br /></dt>
 <dd><p>Utility to construct a new <a class="reference internal" href="#classfly_1_1system_1_1Supercell"><span class="std std-ref">Supercell</span></a> to store <code class="docutils literal notranslate"><span class="pre">num_atoms</span></code> atoms. </p>
-<p>Uses partial function-template argument deduction to deduce <a class="reference internal" href="#classfly_1_1system_1_1Supercell"><span class="std std-ref">Supercell</span></a>’s template parameters. </p>
+<p>Uses partial function-template argument deduction to deduce <a class="reference internal" href="#classfly_1_1system_1_1Supercell"><span class="std std-ref">Supercell</span></a>’s template parameters.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Template Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>Property</strong> – tags derived from <code class="docutils literal notranslate"><a class="reference internal" href="#structfly_1_1system_1_1Property"><span class="std std-ref"><span class="pre">Property</span></span></a></code>.</p>
+</dd>
+<dt class="field-even">Parameters<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>box</strong> – Input box to forward to <a class="reference internal" href="#classfly_1_1system_1_1Supercell"><span class="std std-ref">Supercell</span></a> constructor. </p></li>
+<li><p><strong>map</strong> – Input map to forward to <a class="reference internal" href="#classfly_1_1system_1_1Supercell"><span class="std std-ref">Supercell</span></a> constructor. </p></li>
+<li><p><strong>num_atoms</strong> – Number of atoms to forward to <a class="reference internal" href="#classfly_1_1system_1_1Supercell"><span class="std std-ref">Supercell</span></a> constructor.</p></li>
+</ul>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A constructed supercell with the Map template-parameter deduced. </p>
+</dd>
+</dl>
 </dd></dl>
 
 </section>

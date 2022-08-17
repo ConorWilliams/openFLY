@@ -30,9 +30,15 @@ Error handling
     :members:
     :undoc-members:
 
+-------------------
+
 .. doxygenfunction:: error
 
+-------------------
+
 .. doxygenfunction:: verify
+
+-------------------
 
 .. doxygendefine:: ASSERT
 
@@ -42,17 +48,31 @@ Defines, variables, etc.
 
 .. doxygenvariable:: spatial_dims
 
+-------------------
+
 .. doxygenenum:: Sign
+
+-------------------
 
 .. doxygentypedef:: Vec
 
+-------------------
+
 .. doxygentypedef:: Mat
+
+-------------------
 
 .. doxygentypedef:: Arr
 
+-------------------
+
 .. doxygentypedef:: first_t
 
+-------------------
+
 .. doxygentypedef:: remove_cref_t
+
+-------------------
 
 .. doxygenvariable:: always_false
 
@@ -62,7 +82,11 @@ Small functions
 
 .. doxygenfunction:: safe_cast
 
+-------------------
+
 .. doxygenfunction:: visit
+
+-------------------
 
 .. doxygenfunction:: template_for
 
@@ -71,15 +95,27 @@ Mathematical functions
 
 .. doxygenfunction:: near
 
+-------------------
+
 .. doxygenfunction:: product_scan
+
+-------------------
 
 .. doxygenfunction:: ipow
 
+-------------------
+
 .. doxygenfunction:: gdot
+
+-------------------
 
 .. doxygenfunction:: gnorm
 
+-------------------
+
 .. doxygenfunction:: gnorm_sq
+
+-------------------
 
 .. doxygenfunction:: hyperplane_normal
 
@@ -90,6 +126,8 @@ Classes
 .. doxygenclass:: fly::Vector
     :members:
     :undoc-members:
+
+-------------------
     
 .. doxygenclass:: fly::Defer
     :members:
@@ -110,7 +148,6 @@ File ``random.hpp``
 
 .. doxygenfile:: random.hpp
     :sections: briefdescription detaileddescription
-
 
 .. doxygenclass:: fly::Xoshiro
     :members:

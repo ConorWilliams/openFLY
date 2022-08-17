@@ -351,6 +351,11 @@ zero, an index entry may be written for a data chunk with no actual data written
 <dt class="sig sig-object cpp" id="_CPPv4NK3fly2io10BinaryFile8n_framesEv">
 <span id="_CPPv3NK3fly2io10BinaryFile8n_framesEv"></span><span id="_CPPv2NK3fly2io10BinaryFile8n_framesEv"></span><span id="fly::io::BinaryFile::n_framesC"></span><span class="target" id="classfly_1_1io_1_1BinaryFile_1a7db31b3a785704a248b76eeb0a137782"></span><span class="kt"><span class="pre">auto</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">n_frames</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="k"><span class="pre">noexcept</span></span><span class="w"> </span><span class="o"><span class="pre">-&gt;</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">uint64_t</span></span><a class="headerlink" href="#_CPPv4NK3fly2io10BinaryFile8n_framesEv" title="Permalink to this definition">#</a><br /></dt>
 <dd><p>Get the number of frames in the GSD file. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The number of committed frames in the file. </p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="cpp function">
@@ -358,11 +363,17 @@ zero, an index entry may be written for a data chunk with no actual data written
 <span id="_CPPv3I0EN3fly2io10BinaryFile4readENSt8uint64_tEPKc"></span><span id="_CPPv2I0EN3fly2io10BinaryFile4readENSt8uint64_tEPKc"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classfly_1_1io_1_1BinaryFile_1a391aacc640cde3ff842696bda718895a"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">auto</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">read</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">uint64_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">i</span></span>, <span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">name</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="o"><span class="pre">-&gt;</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">enable_if_t</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">is_arithmetic_v</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0EN3fly2io10BinaryFile4readENSt11enable_if_tINSt15is_arithmetic_vI1TEE1TEENSt8uint64_tEPKc" title="fly::io::BinaryFile::read::T"><span class="n"><span class="pre">T</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0EN3fly2io10BinaryFile4readENSt11enable_if_tINSt15is_arithmetic_vI1TEE1TEENSt8uint64_tEPKc" title="fly::io::BinaryFile::read::T"><span class="n"><span class="pre">T</span></span></a><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4I0EN3fly2io10BinaryFile4readENSt11enable_if_tINSt15is_arithmetic_vI1TEE1TEENSt8uint64_tEPKc" title="Permalink to this definition">#</a><br /></dt>
 <dd><p>Read and return a value stored in the file. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
+<dt class="field-odd">Template Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>T</strong> – The type of the value to read, must be arithmetic.</p>
+</dd>
+<dt class="field-even">Parameters<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
 <li><p><strong>i</strong> – <a class="reference internal" href="system.html#structfly_1_1builtin__properties_1_1Index"><span class="std std-ref">Index</span></a> of frame to read from. </p></li>
-<li><p><strong>name</strong> – Name of the chunk to read from (null terminated). </p></li>
+<li><p><strong>name</strong> – Name of the chunk to read from (null terminated).</p></li>
 </ul>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The value read from the file. </p>
 </dd>
 </dl>
 </dd></dl>
@@ -373,7 +384,10 @@ zero, an index entry may be written for a data chunk with no actual data written
 <dd><p>Read a <a class="reference internal" href="system.html#classfly_1_1system_1_1Box"><span class="std std-ref">fly::system::Box</span></a> stored at frame <code class="docutils literal notranslate"><span class="pre">i</span></code> and return it. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>i</strong> – <a class="reference internal" href="system.html#structfly_1_1builtin__properties_1_1Index"><span class="std std-ref">Index</span></a> of frame to read from. </p>
+<dd class="field-odd"><p><strong>i</strong> – <a class="reference internal" href="system.html#structfly_1_1builtin__properties_1_1Index"><span class="std std-ref">Index</span></a> of frame to read from.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A <a class="reference internal" href="system.html#classfly_1_1system_1_1Box"><span class="std std-ref">fly::system::Box</span></a> read from the <code class="docutils literal notranslate"><span class="pre">i</span></code>th frame of the file. </p>
 </dd>
 </dl>
 </dd></dl>
@@ -383,8 +397,14 @@ zero, an index entry may be written for a data chunk with no actual data written
 <span id="_CPPv3IDpEN3fly2io10BinaryFile8read_mapENSt8uint64_tE"></span><span id="_CPPv2IDpEN3fly2io10BinaryFile8read_mapENSt8uint64_tE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="sig-name descname"><span class="n"><span class="pre">U</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classfly_1_1io_1_1BinaryFile_1a48f560ea3dac0cfbfef9544479aaaf99"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">auto</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">read_map</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">uint64_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">i</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="o"><span class="pre">-&gt;</span></span><span class="w"> </span><span class="n"><span class="pre">system</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="system.html#_CPPv4IDpEN3fly6system7TypeMapE" title="fly::system::TypeMap"><span class="n"><span class="pre">TypeMap</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4IDpEN3fly2io10BinaryFile8read_mapEN6system7TypeMapIDp1UEENSt8uint64_tE" title="fly::io::BinaryFile::read_map::U"><span class="n"><span class="pre">U</span></span></a><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4IDpEN3fly2io10BinaryFile8read_mapEN6system7TypeMapIDp1UEENSt8uint64_tE" title="Permalink to this definition">#</a><br /></dt>
 <dd><p>Read a Box stored at frame <code class="docutils literal notranslate"><span class="pre">i</span></code> and return it. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>i</strong> – <a class="reference internal" href="system.html#structfly_1_1builtin__properties_1_1Index"><span class="std std-ref">Index</span></a> of frame to read from. </p>
+<dt class="field-odd">Template Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>U</strong> – A pack of properties.</p>
+</dd>
+<dt class="field-even">Parameters<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>i</strong> – <a class="reference internal" href="system.html#structfly_1_1builtin__properties_1_1Index"><span class="std std-ref">Index</span></a> of frame to read from.</p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A fly::system::TypeMap&lt;U…&gt; read from the <code class="docutils literal notranslate"><span class="pre">i</span></code>th frame of the file. </p>
 </dd>
 </dl>
 </dd></dl>
@@ -398,8 +418,11 @@ zero, an index entry may be written for a data chunk with no actual data written
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>i</strong> – <a class="reference internal" href="system.html#structfly_1_1builtin__properties_1_1Index"><span class="std std-ref">Index</span></a> of frame to read from. </p></li>
 <li><p><strong>tag</strong> – Property of you would like to read. </p></li>
-<li><p><strong>out</strong> – A <a class="reference internal" href="system.html#classfly_1_1system_1_1SoA"><span class="std std-ref">fly::system::SoA</span></a> to write the read data to. </p></li>
+<li><p><strong>out</strong> – A <a class="reference internal" href="system.html#classfly_1_1system_1_1SoA"><span class="std std-ref">fly::system::SoA</span></a> to write the read data to.</p></li>
 </ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>void. </p>
 </dd>
 </dl>
 </dd></dl>
@@ -409,11 +432,17 @@ zero, an index entry may be written for a data chunk with no actual data written
 <span id="_CPPv3I0EN3fly2io10BinaryFile5writeEPKcRK1T"></span><span id="_CPPv2I0EN3fly2io10BinaryFile5writeEPKcRK1T"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classfly_1_1io_1_1BinaryFile_1a3dd2f922476337354b5a385a0bf7cef8"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">auto</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">write</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">name</span></span>, <a class="reference internal" href="#_CPPv4I0EN3fly2io10BinaryFile5writeENSt11enable_if_tINSt15is_arithmetic_vI1TEEEEPKcRK1T" title="fly::io::BinaryFile::write::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">value</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="o"><span class="pre">-&gt;</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">enable_if_t</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">is_arithmetic_v</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0EN3fly2io10BinaryFile5writeENSt11enable_if_tINSt15is_arithmetic_vI1TEEEEPKcRK1T" title="fly::io::BinaryFile::write::T"><span class="n"><span class="pre">T</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4I0EN3fly2io10BinaryFile5writeENSt11enable_if_tINSt15is_arithmetic_vI1TEEEEPKcRK1T" title="Permalink to this definition">#</a><br /></dt>
 <dd><p>Write a chunk to the current frame. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
+<dt class="field-odd">Template Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>T</strong> – The type of <code class="docutils literal notranslate"><span class="pre">value</span></code>, must be arithmetic.</p>
+</dd>
+<dt class="field-even">Parameters<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
 <li><p><strong>name</strong> – The chunk label (null terminated). </p></li>
-<li><p><strong>value</strong> – Value to write to the chunk. </p></li>
+<li><p><strong>value</strong> – Value to write to the chunk.</p></li>
 </ul>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>void. </p>
 </dd>
 </dl>
 </dd></dl>
@@ -422,18 +451,26 @@ zero, an index entry may be written for a data chunk with no actual data written
 <dt class="sig sig-object cpp" id="_CPPv4N3fly2io10BinaryFile5writeERKN6system3BoxE">
 <span id="_CPPv3N3fly2io10BinaryFile5writeERKN6system3BoxE"></span><span id="_CPPv2N3fly2io10BinaryFile5writeERKN6system3BoxE"></span><span id="fly::io::BinaryFile::write__system::BoxCR"></span><span class="target" id="classfly_1_1io_1_1BinaryFile_1a146827f5c3ae9df9f619ee3fcf9374a1"></span><span class="kt"><span class="pre">auto</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">write</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">system</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="system.html#_CPPv4N3fly6system3BoxE" title="fly::system::Box"><span class="n"><span class="pre">Box</span></span></a><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">box</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="o"><span class="pre">-&gt;</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><a class="headerlink" href="#_CPPv4N3fly2io10BinaryFile5writeERKN6system3BoxE" title="Permalink to this definition">#</a><br /></dt>
 <dd><p>Write a <a class="reference internal" href="system.html#classfly_1_1system_1_1Box"><span class="std std-ref">fly::system::Box</span></a> to the current frame. </p>
-<p><p></p>
- </p>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
 <p>This is a lossy operation as GSD schema requires the basis vector must be stored as single precision floats.</p>
 </div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>box</strong> – A box to write to the current frame. </p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4IDpEN3fly2io10BinaryFile5writeEvRKN6system7TypeMapIDp1UEE">
 <span id="_CPPv3IDpEN3fly2io10BinaryFile5writeERKN6system7TypeMapIDp1UEE"></span><span id="_CPPv2IDpEN3fly2io10BinaryFile5writeERKN6system7TypeMapIDp1UEE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="sig-name descname"><span class="n"><span class="pre">U</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classfly_1_1io_1_1BinaryFile_1ac5e9a507291250b5c5d7594ec04012d2"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">auto</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">write</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">system</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="system.html#_CPPv4IDpEN3fly6system7TypeMapE" title="fly::system::TypeMap"><span class="n"><span class="pre">TypeMap</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4IDpEN3fly2io10BinaryFile5writeEvRKN6system7TypeMapIDp1UEE" title="fly::io::BinaryFile::write::U"><span class="n"><span class="pre">U</span></span></a><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">map</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="o"><span class="pre">-&gt;</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><a class="headerlink" href="#_CPPv4IDpEN3fly2io10BinaryFile5writeEvRKN6system7TypeMapIDp1UEE" title="Permalink to this definition">#</a><br /></dt>
 <dd><p>Write a <a class="reference internal" href="system.html#classfly_1_1system_1_1TypeMap"><span class="std std-ref">fly::system::TypeMap</span></a> to the current frame. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>map</strong> – A map to write to the current frame. </p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="cpp function">
@@ -444,8 +481,11 @@ zero, an index entry may be written for a data chunk with no actual data written
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>tag</strong> – Property of <code class="docutils literal notranslate"><span class="pre">in</span></code> you would like to write. </p></li>
-<li><p><strong>in</strong> – A <a class="reference internal" href="system.html#classfly_1_1system_1_1SoA"><span class="std std-ref">fly::system::SoA</span></a> containing the data to write to the file. </p></li>
+<li><p><strong>in</strong> – A <a class="reference internal" href="system.html#classfly_1_1system_1_1SoA"><span class="std std-ref">fly::system::SoA</span></a> containing the data to write to the file.</p></li>
 </ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>void. </p>
 </dd>
 </dl>
 </dd></dl>

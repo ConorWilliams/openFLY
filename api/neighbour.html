@@ -231,19 +231,33 @@
         <article role="main">
           <section id="neighbour">
 <h1>Neighbour<a class="headerlink" href="#neighbour" title="Permalink to this heading">#</a></h1>
-<p>Directory: <code class="docutils literal notranslate"><span class="pre">libfly/neighbour</span></code></p>
+<p>Directory: <code class="docutils literal notranslate"><span class="pre">libfly/neigh</span></code></p>
 <p>The <code class="docutils literal notranslate"><span class="pre">neigh</span></code> folder contains a collection of data structures and algorithms for generating and manipulating <em>neighbours</em>. Neighbours of an atom are atoms withing some cut-off radius, <code class="docutils literal notranslate"><span class="pre">r_cut</span></code>. Everything is contained within the namespace <code class="docutils literal notranslate"><span class="pre">fly::neigh</span></code>.</p>
 <section id="lists">
 <h2>Lists<a class="headerlink" href="#lists" title="Permalink to this heading">#</a></h2>
-<p>File: <code class="docutils literal notranslate"><span class="pre">libfly/neigh/box.hpp</span></code></p>
+<p>File: <code class="docutils literal notranslate"><span class="pre">libfly/neigh/list.hpp</span></code></p>
 <p>Classes to build and update neighbour lists. </p>
 <dl class="cpp class">
 <dt class="sig sig-object cpp" id="_CPPv4N3fly5neigh4ListE">
 <span id="_CPPv3N3fly5neigh4ListE"></span><span id="_CPPv2N3fly5neigh4ListE"></span><span id="fly::neigh::List"></span><span class="target" id="classfly_1_1neigh_1_1List"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">List</span></span></span><a class="headerlink" href="#_CPPv4N3fly5neigh4ListE" title="Permalink to this definition">#</a><br /></dt>
 <dd><p>A class to contain, build and manage neighbour lists in shared memory. </p>
-<p>Neighbour-lists are used to find the atoms within some cut-off of all atoms efficiently.</p>
-<p>Designed with the intention of being reused, <a class="reference internal" href="#classfly_1_1neigh_1_1List"><span class="std std-ref">List</span></a> separates the building (<a class="reference internal" href="#classfly_1_1neigh_1_1List_1a4d5b423b46d3c6fd5506c3771aefc45e"><span class="std std-ref">List::rebuild()</span></a>), updating (<a class="reference internal" href="#classfly_1_1neigh_1_1List_1ad0bd61e9fe1da4eb55e8157703e90251"><span class="std std-ref">List::update()</span></a>) and using (<a class="reference internal" href="#classfly_1_1neigh_1_1List_1a93fdc492b974de5e361b818ec9a88b71"><span class="std std-ref">List::for_neighbours()</span></a>) of the neighbour-lists.</p>
-<p><a class="reference internal" href="#classfly_1_1neigh_1_1List"><span class="std std-ref">List</span></a> resolves periodicity using <em>ghost</em> atoms, these are stored and managed internally. </p>
+<p>Neighbour-lists are used to find the atoms within some cut-off of all atoms efficiently. The cache efficiency of all <a class="reference internal" href="#classfly_1_1neigh_1_1List"><span class="std std-ref">List</span></a>’s major operations can be enhances by pre-sorting the atoms according to their grid index, this can be done with the <a class="reference internal" href="#sort_8hpp_1a5c07fd2995e75516c7edbe92f8003212"><span class="std std-ref">fly::neigh::sort()</span></a> function.</p>
+<p>Designed with the intention of being reused; <a class="reference internal" href="#classfly_1_1neigh_1_1List"><span class="std std-ref">List</span></a> separates the building, updating and using of the neighbour-lists, performed by <a class="reference internal" href="#classfly_1_1neigh_1_1List_1a4d5b423b46d3c6fd5506c3771aefc45e"><span class="std std-ref">List::rebuild()</span></a>, <a class="reference internal" href="#classfly_1_1neigh_1_1List_1a31abd5d8e3f20e0125009719100e41d2"><span class="std std-ref">List::update()</span></a> and <a class="reference internal" href="#classfly_1_1neigh_1_1List_1ad2cfcf599c7f420000f362b06c9c3053"><span class="std std-ref">List::for_neighbours()</span></a> respectively.</p>
+<p><a class="reference internal" href="#classfly_1_1neigh_1_1List"><span class="std std-ref">List</span></a> resolves periodicity using <em>ghost</em> atoms, these are stored and managed internally.</p>
+<p><p><div class="admonition-implementation-notes admonition">
+<p class="admonition-title">Implementation notes</p>
+<p>Construction of a neighbour-list occurs as follows:</p>
+<ol class="arabic simple">
+<li><p>Real atoms are mapped into the canonical cell.</p></li>
+<li><p>Ghost atoms are generated.</p></li>
+<li><p>All atoms are linked into lists of atoms in the same grid-cell.</p></li>
+<li><p>Iterating over all adjacent grid-cells the neighbour-lists or real atoms are built.</p></li>
+</ol>
+<p>The neighbour-lists contain the indexes of the real or ghost atoms. Alongside each atom we store the index of the real atom it
+may be an image of, this allows us to map ghost atoms to real atoms.</p>
+</div>
+</p>
+ </p>
 <div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
 <dl class="cpp function">
@@ -262,12 +276,9 @@
 
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4I0ENK3fly5neigh4List14for_neighboursEvN5Eigen5IndexEdRR1F">
-<span id="_CPPv3I0ENK3fly5neigh4List14for_neighboursEN5Eigen5IndexEdRR1F"></span><span id="_CPPv2I0ENK3fly5neigh4List14for_neighboursEN5Eigen5IndexEdRR1F"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">F</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classfly_1_1neigh_1_1List_1a93fdc492b974de5e361b818ec9a88b71"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">for_neighbours</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">Eigen</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">Index</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">i</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">r_cut</span></span>, <a class="reference internal" href="#_CPPv4I0ENK3fly5neigh4List14for_neighboursEvN5Eigen5IndexEdRR1F" title="fly::neigh::List::for_neighbours::F"><span class="n"><span class="pre">F</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">f</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4I0ENK3fly5neigh4List14for_neighboursEvN5Eigen5IndexEdRR1F" title="Permalink to this definition">#</a><br /></dt>
-<dd><p>Call f(n, r, dr) for every neighbour n of atom i, within distance r_cut. </p>
-<p>
-n is the neighbour index which could be a ghost or real atom, to convert to the index of the real atom regardless use .image_to_real(n)</p>
-<p>dr is the minimum image vector joining i to n and r is the norm of dr</p>
-<p><p><p>An example of using a List to count the average number of neighbours:</p>
+<span id="_CPPv3I0ENK3fly5neigh4List14for_neighboursEN5Eigen5IndexEdRR1F"></span><span id="_CPPv2I0ENK3fly5neigh4List14for_neighboursEN5Eigen5IndexEdRR1F"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">F</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classfly_1_1neigh_1_1List_1ad2cfcf599c7f420000f362b06c9c3053"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">auto</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">for_neighbours</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">Eigen</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">Index</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">i</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">r_cut</span></span>, <a class="reference internal" href="#_CPPv4I0ENK3fly5neigh4List14for_neighboursEvN5Eigen5IndexEdRR1F" title="fly::neigh::List::for_neighbours::F"><span class="n"><span class="pre">F</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">f</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="o"><span class="pre">-&gt;</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><a class="headerlink" href="#_CPPv4I0ENK3fly5neigh4List14for_neighboursEvN5Eigen5IndexEdRR1F" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Call <code class="docutils literal notranslate"><span class="pre">f(n,</span> <span class="pre">r,</span> <span class="pre">dr)</span></code> for every neighbour of atom <code class="docutils literal notranslate"><span class="pre">i</span></code> within cut-off <code class="docutils literal notranslate"><span class="pre">r_cut</span></code>. </p>
+<p><p>An example to count the average number of neighbours:</p>
 <div class="code highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;libfly/neigh/list.hpp&quot;</span><span class="cp"></span>
 
 <span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;libfly/system/property.hpp&quot;</span><span class="cp"></span>
@@ -302,10 +313,16 @@ n is the neighbour index which could be a ghost or real atom, to convert to the 
 </pre></div>
 </div>
 </p>
- </p>
 <dl class="field-list simple">
 <dt class="field-odd">Pre<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference internal" href="#classfly_1_1neigh_1_1List_1a4d5b423b46d3c6fd5506c3771aefc45e"><span class="std std-ref">List::rebuild()</span></a> must have be called.</p>
+</dd>
+<dt class="field-even">Parameters<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>i</strong> – The index of the atom whose neighbours will be iterated over. </p></li>
+<li><p><strong>r_cut</strong> – The neighbour cut-off. </p></li>
+<li><p><strong>f</strong> – The functor with signature <code class="docutils literal notranslate"><span class="pre">f</span></code> : <code class="docutils literal notranslate"><span class="pre">Eigen::Index</span></code>, <code class="docutils literal notranslate"><span class="pre">double</span></code>, <code class="docutils literal notranslate"><span class="pre">fly::Vec</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">void</span></code>. </p></li>
+</ul>
 </dd>
 </dl>
 </dd></dl>
@@ -318,7 +335,7 @@ n is the neighbour index which could be a ghost or real atom, to convert to the 
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>positions</strong> – The positions of the atoms. </p></li>
-<li><p><strong>num_threads</strong> – The number of threads to spawn (using openMP) to complete this operation. </p></li>
+<li><p><strong>num_threads</strong> – The number of (openMP) threads spawned to complete this operation. </p></li>
 </ul>
 </dd>
 </dl>
@@ -326,19 +343,20 @@ n is the neighbour index which could be a ghost or real atom, to convert to the 
 
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4NK3fly5neigh4List4sizeEv">
-<span id="_CPPv3NK3fly5neigh4List4sizeEv"></span><span id="_CPPv2NK3fly5neigh4List4sizeEv"></span><span id="fly::neigh::List::sizeC"></span><span class="target" id="classfly_1_1neigh_1_1List_1aa2811de5d36bd9a2a5e909777e501935"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">Eigen</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">Index</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">size</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="k"><span class="pre">noexcept</span></span><a class="headerlink" href="#_CPPv4NK3fly5neigh4List4sizeEv" title="Permalink to this definition">#</a><br /></dt>
+<span id="_CPPv3NK3fly5neigh4List4sizeEv"></span><span id="_CPPv2NK3fly5neigh4List4sizeEv"></span><span id="fly::neigh::List::sizeC"></span><span class="target" id="classfly_1_1neigh_1_1List_1a51376b688d8b4d806a73e4fa84c1bf80"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">auto</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">size</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="k"><span class="pre">noexcept</span></span><span class="w"> </span><span class="o"><span class="pre">-&gt;</span></span><span class="w"> </span><span class="n"><span class="pre">Eigen</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">Index</span></span><a class="headerlink" href="#_CPPv4NK3fly5neigh4List4sizeEv" title="Permalink to this definition">#</a><br /></dt>
 <dd><p>Get the number of real atoms in this neighbour list. </p>
 </dd></dl>
 
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4I0EN3fly5neigh4List6updateEvRKN5Eigen9DenseBaseI1EEE">
-<span id="_CPPv3I0EN3fly5neigh4List6updateERKN5Eigen9DenseBaseI1EEE"></span><span id="_CPPv2I0EN3fly5neigh4List6updateERKN5Eigen9DenseBaseI1EEE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">E</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classfly_1_1neigh_1_1List_1ad0bd61e9fe1da4eb55e8157703e90251"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">update</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">Eigen</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">DenseBase</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0EN3fly5neigh4List6updateEvRKN5Eigen9DenseBaseI1EEE" title="fly::neigh::List::update::E"><span class="n"><span class="pre">E</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">x</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0EN3fly5neigh4List6updateEvRKN5Eigen9DenseBaseI1EEE" title="Permalink to this definition">#</a><br /></dt>
-<dd><p>Update the positions of the real+ghost atoms. </p>
+<span id="_CPPv3I0EN3fly5neigh4List6updateERKN5Eigen9DenseBaseI1EEE"></span><span id="_CPPv2I0EN3fly5neigh4List6updateERKN5Eigen9DenseBaseI1EEE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">E</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classfly_1_1neigh_1_1List_1a31abd5d8e3f20e0125009719100e41d2"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">auto</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">update</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">Eigen</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">DenseBase</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0EN3fly5neigh4List6updateEvRKN5Eigen9DenseBaseI1EEE" title="fly::neigh::List::update::E"><span class="n"><span class="pre">E</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">x</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="o"><span class="pre">-&gt;</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><a class="headerlink" href="#_CPPv4I0EN3fly5neigh4List6updateEvRKN5Eigen9DenseBaseI1EEE" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Update the positions of the real + ghost atoms. </p>
 <p><p>If the positions of the real atoms are stored in the <span class="math notranslate nohighlight">\(3N \times 1\)</span> vector <span class="math notranslate nohighlight">\(r\)</span> then after calling this function:</p>
 <div class="math-wrapper docutils container">
 <div class="math notranslate nohighlight">
 \[r \gets r - x\]</div>
 </div>
+<p>The ghost atoms are then updated accordingly.</p>
 </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -354,10 +372,34 @@ n is the neighbour index which could be a ghost or real atom, to convert to the 
 <dt class="sig sig-object cpp" id="_CPPv4N3fly5neigh4List15MAX_GHOST_RATIOE">
 <span id="_CPPv3N3fly5neigh4List15MAX_GHOST_RATIOE"></span><span id="_CPPv2N3fly5neigh4List15MAX_GHOST_RATIOE"></span><span id="fly::neigh::List::MAX_GHOST_RATIO__Eigen::Index"></span><span class="target" id="classfly_1_1neigh_1_1List_1a7d0939d7cf492878a57f7e6c3da78993"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><span class="n"><span class="pre">Eigen</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">Index</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">MAX_GHOST_RATIO</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">6</span></span><a class="headerlink" href="#_CPPv4N3fly5neigh4List15MAX_GHOST_RATIOE" title="Permalink to this definition">#</a><br /></dt>
 <dd><p>Control the maximum number of ghosts. </p>
-<p><a class="reference internal" href="#classfly_1_1neigh_1_1List"><span class="std std-ref">List</span></a> supports up to MAX_GHOST_RATIO * <a class="reference internal" href="#classfly_1_1neigh_1_1List_1aa2811de5d36bd9a2a5e909777e501935"><span class="std std-ref">List::size()</span></a> ghost atoms. </p>
+<p><a class="reference internal" href="#classfly_1_1neigh_1_1List"><span class="std std-ref">List</span></a> supports up to MAX_GHOST_RATIO * <a class="reference internal" href="#classfly_1_1neigh_1_1List_1a51376b688d8b4d806a73e4fa84c1bf80"><span class="std std-ref">List::size()</span></a> ghost atoms. </p>
 </dd></dl>
 
 </div>
+</dd></dl>
+
+</section>
+<section id="sorting">
+<h2>Sorting<a class="headerlink" href="#sorting" title="Permalink to this heading">#</a></h2>
+<p>File: <code class="docutils literal notranslate"><span class="pre">libfly/neigh/sort.hpp</span></code></p>
+<p>Utility to enhance cache locality for <a class="reference internal" href="#classfly_1_1neigh_1_1List"><span class="std std-ref">fly::neigh::List</span></a>. </p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4IDpEN3fly5neigh4sortEN6system3SoAIDp13remove_cref_tI1TEEERKN6system3BoxEdRKN6system3SoAIDp1TEE">
+<span id="_CPPv3IDpEN3fly5neigh4sortERKN6system3BoxEdRKN6system3SoAIDp1TEE"></span><span id="_CPPv2IDpEN3fly5neigh4sortERKN6system3BoxEdRKN6system3SoAIDp1TEE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="sort_8hpp_1a5c07fd2995e75516c7edbe92f8003212"></span><span class="kt"><span class="pre">auto</span></span><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">fly</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">neigh</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">sort</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">system</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="system.html#_CPPv4N3fly6system3BoxE" title="fly::system::Box"><span class="n"><span class="pre">Box</span></span></a><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">box</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">r_cut</span></span>, <span class="n"><span class="pre">system</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="system.html#_CPPv4IDpEN3fly6system3SoAE" title="fly::system::SoA"><span class="n"><span class="pre">SoA</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4IDpEN3fly5neigh4sortEN6system3SoAIDp13remove_cref_tI1TEEERKN6system3BoxEdRKN6system3SoAIDp1TEE" title="fly::neigh::sort::T"><span class="n"><span class="pre">T</span></span></a><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">soa</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="o"><span class="pre">-&gt;</span></span><span class="w"> </span><span class="n"><span class="pre">system</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="system.html#_CPPv4IDpEN3fly6system3SoAE" title="fly::system::SoA"><span class="n"><span class="pre">SoA</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="utility.html#_CPPv4I0EN3fly13remove_cref_tE" title="fly::remove_cref_t"><span class="n"><span class="pre">remove_cref_t</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4IDpEN3fly5neigh4sortEN6system3SoAIDp13remove_cref_tI1TEEERKN6system3BoxEdRKN6system3SoAIDp1TEE" title="fly::neigh::sort::T"><span class="n"><span class="pre">T</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4IDpEN3fly5neigh4sortEN6system3SoAIDp13remove_cref_tI1TEEERKN6system3BoxEdRKN6system3SoAIDp1TEE" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Order the atoms in a SoA according to their grid index. </p>
+<p>This improves cache locality for neighbour reduction operations.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>box</strong> – System box that will be used to build the grid. </p></li>
+<li><p><strong>r_cut</strong> – Cut of radius for atomic interactions. </p></li>
+<li><p><strong>soa</strong> – Input SoA to order. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="system.html#classfly_1_1system_1_1SoA"><span class="std std-ref">system::SoA</span></a>&lt;remove_cref_t&lt;T&gt;…&gt; A SoA ordered according to their grid index. </p>
+</dd>
+</dl>
 </dd></dl>
 
 </section>
@@ -427,6 +469,7 @@ n is the neighbour index which could be a ghost or real atom, to convert to the 
             <ul>
 <li><a class="reference internal" href="#">Neighbour</a><ul>
 <li><a class="reference internal" href="#lists">Lists</a></li>
+<li><a class="reference internal" href="#sorting">Sorting</a></li>
 </ul>
 </li>
 </ul>

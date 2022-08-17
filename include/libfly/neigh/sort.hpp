@@ -24,7 +24,7 @@
 /**
  * \file sort.hpp
  *
- * @brief ...
+ * @brief Utility to enhance cache locality for fly::neigh::List.
  */
 
 namespace fly::system::detail {

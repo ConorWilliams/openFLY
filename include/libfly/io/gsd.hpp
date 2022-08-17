@@ -152,7 +152,7 @@ namespace fly::io {
      *
      * Example:
      *
-     * .. include:: ../../examples/io/io.cpp
+     * .. include:: ../../examples/io/gsd.cpp
      *    :code:
      *
      * \endrst

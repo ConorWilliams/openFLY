@@ -34,12 +34,30 @@ namespace fly::neigh {
   /**
    * @brief A class to contain, build and manage neighbour lists in shared memory.
    *
-   * Neighbour-lists are used to find the atoms within some cut-off of all atoms efficiently.
+   * Neighbour-lists are used to find the atoms within some cut-off of all atoms efficiently. The cache efficiency of all List's major
+   * operations can be enhances by pre-sorting the atoms according to their grid index, this can be done with the fly::neigh::sort()
+   * function.
    *
-   * Designed with the intention of being reused, List separates the building (List::rebuild()), updating (List::update()) and
-   * using (List::for_neighbours()) of the neighbour-lists.
+   * Designed with the intention of being reused; List separates the building, updating and using of the neighbour-lists,
+   * performed by List::rebuild(), List::update() and List::for_neighbours() respectively.
    *
    * List resolves periodicity using *ghost* atoms, these are stored and managed internally.
+   *
+   * \rst
+   *
+   * .. admonition:: Implementation notes
+   *
+   *    Construction of a neighbour-list occurs as follows:
+   *
+   *    1. Real atoms are mapped into the canonical cell.
+   *    2. Ghost atoms are generated.
+   *    3. All atoms are linked into lists of atoms in the same grid-cell.
+   *    4. Iterating over all adjacent grid-cells the neighbour-lists or real atoms are built.
+   *
+   *    The neighbour-lists contain the indexes of the real or ghost atoms. Alongside each atom we store the index of the real atom it
+   *    may be an image of, this allows us to map ghost atoms to real atoms.
+   *
+   * \endrst
    *
    */
   class List {
@@ -52,7 +70,7 @@ namespace fly::neigh {
     static constexpr Eigen::Index MAX_GHOST_RATIO = 6;
 
     /**
-     * @brief Construct a new List object
+     * @brief Construct a new List object.
      *
      * @param box The description of the simulation space.
      * @param r_cut The neighbour cut-off radius.
@@ -67,12 +85,12 @@ namespace fly::neigh {
      * @brief Builds the internal neighbour-lists.
      *
      * @param positions The positions of the atoms.
-     * @param num_threads The number of threads to spawn (using openMP) to complete this operation.
+     * @param num_threads The number of (openMP) threads spawned to complete this operation.
      */
     auto rebuild(system::SoA<Position const&> positions, int num_threads = 1) -> void;
 
     /**
-     * @brief Update the positions of the real+ghost atoms.
+     * @brief Update the positions of the real + ghost atoms.
      *
      * \rst
      *
@@ -82,12 +100,14 @@ namespace fly::neigh {
      *
      *    r \gets r - x
      *
+     * The ghost atoms are then updated accordingly.
+     *
      * \endrst
      *
      * @param x A 3Nx1 vector containing the change in the positions of the real atoms.
      */
     template <typename E>
-    void update(Eigen::DenseBase<E> const& x) {
+    auto update(Eigen::DenseBase<E> const& x) -> void {
       //
       constexpr auto k = Position::size();
 
@@ -106,26 +126,25 @@ namespace fly::neigh {
     }
 
     /**
-     * @brief Call f(n, r, dr) for every neighbour n of atom i, within distance r_cut.
+     * @brief Call ``f(n, r, dr)`` for every neighbour of atom ``i`` within cut-off ``r_cut``.
      *
      * \pre List::rebuild() must have be called.
      *
-     * n is the neighbour index which could be a ghost or real atom, to convert to the index of the
-     * real atom regardless use .image_to_real(n)
-     *
-     * dr is the minimum image vector joining i to n and r is the norm of dr
-     *
      * \rst
      *
-     * An example of using a List to count the average number of neighbours:
+     * An example to count the average number of neighbours:
      *
      * .. include:: ../../examples/neigh/list.cpp
      *    :code:
      *
      * \endrst
+     *
+     * @param i The index of the atom whose neighbours will be iterated over.
+     * @param r_cut The neighbour cut-off.
+     * @param f The functor with signature ``f`` : ``Eigen::Index``, ``double``, ``fly::Vec`` -> ``void``.
      */
     template <typename F>
-    void for_neighbours(Eigen::Index i, double r_cut, F&& f) const {
+    auto for_neighbours(Eigen::Index i, double r_cut, F&& f) const -> void {
       //
       if (r_cut > m_r_cut) {
         throw error("r_cut={} is bigger then than the internal r_cut={}", r_cut, m_r_cut);
@@ -145,7 +164,7 @@ namespace fly::neigh {
     /**
      * @brief Get the number of real atoms in this neighbour list.
      */
-    Eigen::Index size() const noexcept { return m_neigh_lists.size(); }
+    auto size() const noexcept -> Eigen::Index { return m_neigh_lists.size(); }
 
   private:
     struct Next : system::Property<Eigen::Index> {};  ///< Index of the next atom in the linked cell list.

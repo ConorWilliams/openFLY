@@ -94,11 +94,11 @@ namespace fly {
    * format the error message.
    *
    * @param fmt Format string.
-   * @param args Arguments to forward to format string.
-   * @return RuntimeError containing the formatted error message.
+   * @param args Format arguments (forwarded to ``fmt::format``).
+   * @return A fly::RuntimeError containing the formatted error message as by ``fmt::format(fmt, args...)``.
    */
   template <typename... Args>
-  RuntimeError error(fmt::format_string<Args...> fmt, Args &&...args) {
+  auto error(fmt::format_string<Args...> fmt, Args &&...args) -> RuntimeError {
     try {
       return RuntimeError{fmt::format(fmt, std::forward<Args>(args)...)};
     } catch (fmt::format_error const &err) {
@@ -109,14 +109,29 @@ namespace fly {
   }
 
   /**
-   * @brief Utility to check condition and throw RuntimeError if condition is
-   * false.
+   * @brief Utility to check ``cond`` and throw RuntimeError if condition is ``false``.
    *
-   * Forwards ``fmt`` and ``args`` to fly::error().
+   * \rst
+   *
+   * Shorthand for:
+   *
+   * .. code::
+   *
+   *     if (!cond) {
+   *         throw fly::error(fmt, args...);
+   *     }
+   *
+   * \endrst
+   *
+   * @param cond Condition to check.
+   * @param fmt Format string.
+   * @param args Format arguments (forwarded to ``fmt::format``).
+   *
+   * @return void.
    */
   template <typename... Args>
-  constexpr void verify(bool condition, fmt::format_string<Args...> fmt, Args &&...args) {
-    if (!condition) {
+  constexpr auto verify(bool cond, fmt::format_string<Args...> fmt, Args &&...args) -> void {
+    if (!cond) {
       throw error(std::move(fmt), std::forward<Args>(args)...);
     }
   }
@@ -133,7 +148,7 @@ namespace fly {
   }  // namespace detail
 
 /**
- * @brief Use like fly::verify but disabled if NDEBUG defined..
+ * @brief Use like fly::verify() but disabled if ``NDEBUG`` defined.
  */
 #  define ASSERT(expr, string_literal, ...)                                                                          \
     do {                                                                                                             \
@@ -145,7 +160,7 @@ namespace fly {
 #else
 
 /**
- * @brief Use like std \c assert(expr) but with an error message.
+ * @brief Use like fly::verify() but disabled if ``NDEBUG`` defined.
  */
 #  define ASSERT(...) \
     do {              \
@@ -160,8 +175,7 @@ namespace fly {
    *
    * \rst
    *
-   * Configurable using the :ref:`FLY_SPATIAL_DIMS <configure FLY_SPATIAL_DIMS>`
-   * macro.
+   * Must be greater than or equal to 2. Configurable using the :ref:`FLY_SPATIAL_DIMS <configure FLY_SPATIAL_DIMS>` macro.
    *
    * \endrst
    */
@@ -170,21 +184,19 @@ namespace fly {
   static_assert(spatial_dims >= 2, "libFLY is not optimal for 1D simulations");
 
   /**
-   * @brief Shorthand for creating an \c Eigen::Vector of doubles length \c
-   * spatial_dims
+   * @brief Shorthand for creating an \c Eigen::Vector of doubles of length \c spatial_dims.
    */
   using Vec = Eigen::Vector<double, spatial_dims>;
 
   /**
-   * @brief Shorthand for creating an \c spatial_dims x \c spatial_dims \c
-   * Eigen::Matrix of doubles.
+   * @brief Shorthand for creating an \c spatial_dims x \c spatial_dims \c Eigen::Matrix of doubles.
    */
   using Mat = Eigen::Matrix<double, spatial_dims, spatial_dims>;
 
   /**
    * @brief Shorthand for creating an \c spatial_dims x 1 \c Eigen::Array.
    *
-   * @tparam T The scalar type of the \c Eigen::Array
+   * @tparam T The scalar type of the \c Eigen::Array.
    */
   template <typename T>
   using Arr = Eigen::Array<T, spatial_dims, 1>;
@@ -193,8 +205,8 @@ namespace fly {
    * @brief Strongly typed +/- sign.
    */
   enum class Sign : int {
-    plus = 1,
-    minus = -1,
+    plus = 1,    ///< Representing +1 or the positive direction.
+    minus = -1,  ///< Representing -1 or the negative direction.
   };
 
   namespace detail {
@@ -213,7 +225,7 @@ namespace fly {
   using first_t = typename detail::First<T...>::type;
 
   /**
-   * @brief Non-deducable \c false for use in \c static_assert.
+   * @brief Non-deducible \c false for use in \c static_assert.
    *
    * \rst
    *
@@ -240,9 +252,10 @@ namespace fly {
   /**
    * @brief Utility to reverse argument order to ``std::visit``.
    *
-   * @param v A variant to pass to the visitor.
-   * @param f A callable that accepts every possible alternative from every variant.
-   * @return decltype(auto) The result of calling ``std::visit(std::forward<F>(f), std::forward<V>(v))``
+   * @param v A ``std::variant`` to pass to the visitor.
+   * @param f A callable that accepts every possible alternative in the variant ``v``.
+   *
+   * @return The result of calling ``std::visit(std::forward<F>(f), std::forward<V>(v))``.
    */
   template <typename V, typename F>
   auto visit(V &&v, F &&f) -> decltype(auto) {
@@ -283,13 +296,16 @@ namespace fly {
   /**
    * @brief Cast integral types asserting that conversion is lossless.
    *
-   * Perform a `static_cast` from type `T` to `R` with bounds checking in debug
-   * builds.
+   * Perform a `static_cast` from type `T` to `R` with bounds checking in debug builds.
    *
-   * Only SFINE enabled for integral types.
+   * @tparam T Type of input ``x``, must be integral.
+   * @tparam R Target type to cast to, must be integral.
    *
-   * @tparam R Target type to cast to.
+   * @param x The value to cast to a new type.
+   *
+   * @return Exactly ``static_cast<R>(x)``.
    */
+
   template <typename R, typename T>
   constexpr auto safe_cast(T x) -> std::enable_if_t<std::is_integral_v<R> && std::is_integral_v<T>, R> {
     //
@@ -326,7 +342,7 @@ namespace fly {
   }  // namespace detail
 
   /**
-   * @brief Invoke ``f`` with every tuple of indexes between ``beg`` and ``end``.
+   * @brief Invoke ``f`` with every combination of indexes between ``beg`` and ``end``.
    *
    * \rst
    *
@@ -344,6 +360,10 @@ namespace fly {
    *    }
    *
    * \endrst
+   *
+   * @param beg Array of loop start indexes.
+   * @param end Array of loop end indexes.
+   * @param f Invokable to call with every combination of indexes.
    */
   template <typename T, typename F>
   void template_for(Arr<T> const &beg, Arr<T> const &end, F const &f) {
@@ -353,9 +373,14 @@ namespace fly {
   // ------------------- Math functions ---------------- //
 
   /**
-   * @brief Test if two floating point numbers are within 0.01% of each other.
+   * @brief Test if two floating point numbers are close.
    *
-   * Only SFINE enabled if T is floating point.
+   * @tparam T Type of inputs, must be a floating point type.
+   *
+   * @param a First input.
+   * @param b Second input.
+   *
+   * @return ``true`` if ``a`` and  ``b`` are within 0.01% of each other.
    */
   template <typename T>
   constexpr auto near(T a, T b) -> std::enable_if_t<std::is_floating_point_v<T>, bool> {
@@ -381,9 +406,15 @@ namespace fly {
    *
    * \endrst
    *
+   * @tparam T Scalar type of the input array, must be arithmetic.
+   * @tparam N Number of columns in the input array.
+   *
+   * @param x The input array.
+   *
+   * @return The shifted prefix product (see above) of ``x``.
    */
   template <typename T, int N>
-  Eigen::Array<T, N, 1> product_scan(Eigen::Array<T, N, 1> x) {
+  auto product_scan(Eigen::Array<T, N, 1> x) -> std::enable_if_t<std::is_arithmetic_v<T>, Eigen::Array<T, N, 1>> {
     T prod = 1;
     for (Eigen::Index i = 0; i < x.size(); i++) {
       prod *= std::exchange(x[i], prod);
@@ -394,8 +425,6 @@ namespace fly {
   /**
    * @brief Compute integer powers of arithmetic types at compile time.
    *
-   * Only SFINE enabled if base is an arithmetic type.
-   *
    * \rst
    *
    * Computes:
@@ -405,6 +434,13 @@ namespace fly {
    *    \text{x}^{\text{Exp}}
    *
    * \endrst
+   *
+   * @tparam Exp The exponent
+   * @tparam T The type of ``x``, must be arithmetic.
+   *
+   * @param x The input parameter.
+   *
+   * @return ``x``^``Exp``.
    */
   template <std::size_t Exp, typename T>
   constexpr auto ipow(T x) -> std::enable_if_t<std::is_arithmetic_v<T>, T> {
@@ -433,6 +469,11 @@ namespace fly {
    *    \sum_{i} \sum_{j} a_{ij} b_{ij}
    *
    * \endrst
+   *
+   * @param a Array-like input.
+   * @param b Array-like input.
+   *
+   * @return The generalised dot-product (see above) of ``a`` and ``b``.
    */
   template <typename E1, typename E2>
   constexpr auto gdot(E1 const &a, E2 const &b) {
@@ -451,6 +492,10 @@ namespace fly {
    *    \sum_{i} \sum_{j} r^2_{ij}
    *
    * \endrst
+   *
+   * @param r Array-like input.
+   *
+   * @return The squared Frobenius norm (see above) of ``r``.
    */
   template <typename E>
   constexpr auto gnorm_sq(E const &r) {
@@ -469,10 +514,14 @@ namespace fly {
    *    \sqrt{\sum_{i} \sum_{j} r^2_{ij}}
    *
    * \endrst
+   *
+   * @param r Array-like input.
+   *
+   * @return The Frobenius norm (see above) of ``expr``.
    */
   template <typename E>
-  constexpr auto gnorm(E &&expr) {
-    return std::sqrt(gnorm_sq(std::forward<E>(expr)));
+  constexpr auto gnorm(E &&r) {
+    return std::sqrt(gnorm_sq(std::forward<E>(r)));
   }
 
   /**
@@ -480,15 +529,17 @@ namespace fly {
    *
    * \rst
    *
-   * Only SFINE enabled for fixed-size square matrices.
-   *
    * See: `StackExchange
    * <https://math.stackexchange.com/questions/2301110/fastest-way-to-find-equation-of-hyperplane>`_
    *
    * \endrst
    *
-   * @param P An NxN fixed-size matrix.
-   * @return Eigen::Vector<Scalar, N> The unit normal of the hyperplane passing through the column vectors of ``P``.
+   * @tparam Scalar The scalar type of the input square-matrix.
+   * @tparam N The dimensions of the input matrix ``p``, must not be ``Eigen::Dynamic``.
+   *
+   * @param P The square input matrix, whose columns are the N-points the hyper plane will pass through.
+   *
+   * @return The unit normal of a hyperplane passing through the columns of ''P''.
    */
   template <typename Scalar, int N>
   auto hyperplane_normal(Eigen::Matrix<Scalar, N, N> const &P) -> std::enable_if_t<N != Eigen::Dynamic, Eigen::Vector<Scalar, N>> {
@@ -515,7 +566,7 @@ namespace fly {
   /**
    * @brief A wrapper around a ``std::vector``.
    *
-   * Does bounds checking in debug and signed size_type.
+   * Does bounds checking in debug and has a signed size_type.
    */
   template <typename T>
   class Vector : private std::vector<T> {
@@ -550,9 +601,13 @@ namespace fly {
     }
 
     /**
-     * @brief Returns a reference to the element at specified location ``pos``. Bounds checking in DEBUG builds.
+     * @brief Returns a reference to the element at specified location ``pos``.
+     *
+     * Bounds checking in DEBUG builds.
      *
      * @param pos Position of the element to return.
+     *
+     * @return A mutable reference to the element.
      */
     auto operator[](Eigen::Index pos) -> T & {
       ASSERT(pos >= 0 && pos < size(), "Position, {}, is OoB in Vector length {}", pos, size());
@@ -560,9 +615,13 @@ namespace fly {
     }
 
     /**
-     * @brief Returns a reference to the element at specified location ``pos``. Bounds checking in DEBUG builds.
+     * @brief Returns a reference to the element at specified location ``pos``.
+     *
+     * Bounds checking in DEBUG builds.
      *
      * @param pos Position of the element to return.
+     *
+     * @return A constant reference to the element.
      */
     auto operator[](Eigen::Index pos) const -> T const & {
       ASSERT(pos >= 0 && pos < size(), "Position, {}, is OoB in Vector length {}", pos, size());
@@ -574,13 +633,15 @@ namespace fly {
 
     /**
      * @brief Fetch the number of elements in the vector.
+     *
+     * @return The number of elements in the Vector.
      */
     auto size() const -> Eigen::Index { return safe_cast<Eigen::Index>(Base::size()); }
 
     /**
      * @brief Clears the contents.
      */
-    auto clear() { Base::clear(); }
+    auto clear() -> void { Base::clear(); }
 
     /**
      * @brief Resizes the container to contain count elements.
@@ -602,10 +663,9 @@ namespace fly {
   /**
    * @brief Basic implementation of a Golang like defer.
    *
-   * Only SFINE enabled if callable is noexcept.
    *
-   * \tparam F The invocable's type, this **MUST** be deducted through CTAD by the
-   * deduction guide.
+   * \tparam F The nullary invocable's type, this **MUST** be deducted through CTAD by the deduction guide and it must be ``noexcept``
+   * callable.
    *
    * \rst
    *
@@ -622,7 +682,7 @@ namespace fly {
     /**
      * @brief Construct a new Defer object.
      *
-     * @param f Invocable forwarded into object and invoked by destructor.
+     * @param f Nullary invocable forwarded into object and invoked by destructor.
      */
     constexpr Defer(F &&f) : m_f(std::forward<F>(f)) {}
 
@@ -655,13 +715,12 @@ namespace fly {
    * The execution time is printed to stdout. Garantees RVO.
    *
    * @param name Name of function being called, also printed to stdout.
-   * @param f Function call.
-   * @param args Arguments to call \c f with.
-   * @return std::invoke_result_t<F&&, Args&&...> The result of calling \c f with
-   * \c args... .
+   * @param f Invocable to call.
+   * @param args Arguments to invoke \c f with.
+   * @return The result of invoking \c f with \c args... .
    */
   template <typename F, typename... Args>
-  std::invoke_result_t<F &&, Args &&...> timeit(std::string_view name, F &&f, Args &&...args) {
+  auto timeit(std::string_view name, F &&f, Args &&...args) -> std::invoke_result_t<F &&, Args &&...> {
     //
     auto start = std::chrono::steady_clock::now();
 

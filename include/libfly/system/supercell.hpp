@@ -36,7 +36,7 @@ namespace fly::system {
    * template arguments.
    *
    * @tparam Map A specialisation of fly::system::TypeMap.
-   * @tparam T Tags derived from ``Property``, to describe each member.
+   * @tparam T Property tags derived from ``Property``.
    */
   template <typename Map, typename... T>
   class Supercell : public SoA<TypeID, T...> {
@@ -82,6 +82,14 @@ namespace fly::system {
    * @brief Utility to construct a new Supercell to store `num_atoms` atoms.
    *
    * Uses partial function-template argument deduction to deduce Supercell's template parameters.
+   *
+   * @tparam Property tags derived from ``Property``.
+   *
+   * @param box Input box to forward to Supercell constructor.
+   * @param map Input map to forward to Supercell constructor.
+   * @param num_atoms Number of atoms to forward to Supercell constructor.
+   *
+   * @return A constructed supercell with the Map template-parameter deduced.
    */
   template <typename... T, typename... U>
   auto make_supercell(Box const& box, TypeMap<U...> const& map, Eigen::Index num_atoms) -> Supercell<TypeMap<U...>, T...> {

@@ -133,6 +133,8 @@ namespace fly::io {
 
     /**
      * @brief Get the number of frames in the GSD file.
+     *
+     * @return The number of committed frames in the file.
      */
     auto n_frames() const noexcept -> std::uint64_t;
 
@@ -168,8 +170,12 @@ namespace fly::io {
     /**
      * @brief Write a chunk to the current frame.
      *
+     * @tparam T The type of ``value``, must be arithmetic.
+     *
      * @param name The chunk label (null terminated).
      * @param value Value to write to the chunk.
+     *
+     * @return void.
      */
     template <typename T>
     auto write(char const *name, T const &value) -> std::enable_if_t<std::is_arithmetic_v<T>> {
@@ -183,11 +189,15 @@ namespace fly::io {
      * .. warning::
      *     This is a lossy operation as GSD schema requires the basis vector must be stored as single precision floats.
      * \endrst
+     *
+     * @param box A box to write to the current frame.
      */
     auto write(system::Box const &box) -> void;
 
     /**
      * @brief Write a fly::system::TypeMap to the current frame.
+     *
+     * @param map A map to write to the current frame.
      */
     template <typename... U>
     auto write(system::TypeMap<U...> const &map) -> void {
@@ -204,6 +214,8 @@ namespace fly::io {
      *
      * @param tag Property of ``in`` you would like to write.
      * @param in A fly::system::SoA containing the data to write to the file.
+     *
+     * @return void.
      */
     template <typename T, typename... U>
     auto write(T tag, system::SoA<U...> const &in) -> std::enable_if_t<std::is_arithmetic_v<typename T::scalar_t>> {
@@ -213,8 +225,12 @@ namespace fly::io {
     /**
      * @brief Read and return a value stored in the file.
      *
+     * @tparam T The type of the value to read, must be arithmetic.
+     *
      * @param i Index of frame to read from.
      * @param name Name of the chunk to read from (null terminated).
+     *
+     * @return The value read from the file.
      */
     template <typename T>
     auto read(std::uint64_t i, char const *name) -> std::enable_if_t<std::is_arithmetic_v<T>, T> {
@@ -229,6 +245,8 @@ namespace fly::io {
      * @brief Read a fly::system::Box stored at frame ``i`` and return it.
      *
      * @param i Index of frame to read from.
+     *
+     * @return A fly::system::Box read from the ``i``th frame of the file.
      */
     auto read_box(std::uint64_t i) const -> system::Box;
 
@@ -238,6 +256,8 @@ namespace fly::io {
      * @param i Index of frame to read from.
      * @param tag Property of you would like to read.
      * @param out A fly::system::SoA to write the read data to.
+     *
+     * @return void.
      */
     template <typename T, typename... U>
     auto read_to(std::uint64_t i, T tag, system::SoA<U...> &out) -> std::enable_if_t<std::is_arithmetic_v<typename T::scalar_t>> {
@@ -247,7 +267,11 @@ namespace fly::io {
     /**
      * @brief Read a Box stored at frame ``i`` and return it.
      *
+     * @tparam U A pack of properties.
+     *
      * @param i Index of frame to read from.
+     *
+     * @return A fly::system::TypeMap<U...> read from the ``i``th frame of the file.
      */
     template <typename... U>
     auto read_map(std::uint64_t i) -> system::TypeMap<U...> {

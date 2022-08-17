@@ -44,7 +44,7 @@ namespace fly {
     /**
      * @brief Construct and seed the PRNG.
      *
-     * The state must be seeded so that it is not everywhere zero.
+     * @param seed The PRNG's seed, must not be everywhere zero.
      */
     explicit constexpr Xoshiro(std::array<result_type, 4> const& seed) : m_state{seed} {
       if (seed == std::array<result_type, 4>{0, 0, 0, 0}) {
@@ -54,16 +54,22 @@ namespace fly {
 
     /**
      * @brief Get the minimum value of the generator.
+     *
+     * @return The minimum value that ``Xoshiro::operator()`` can return.
      */
     static constexpr auto min() noexcept -> result_type { return std::numeric_limits<result_type>::lowest(); }
 
     /**
      * @brief Get the maximum value of the generator.
+     *
+     * @return The maximum value that ``Xoshiro::operator()`` can return.
      */
     static constexpr auto max() noexcept -> result_type { return std::numeric_limits<result_type>::max(); }
 
     /**
      * @brief Generate a random bit sequence and advance the state of the generator.
+     *
+     * @return A pseudo-random number.
      */
     constexpr auto operator()() noexcept -> result_type {
       result_type const result = rotl(m_state[1] * 5, 7) * 9;
@@ -87,6 +93,8 @@ namespace fly {
      *
      * It is equivalent to 2^128 calls to operator(); it can be used to generate 2^128 non-overlapping sub-sequences for parallel
      * computations.
+     *
+     * @return void.
      */
     constexpr auto jump() noexcept -> void {
       jump_impl({0x180ec6d33cfd0aba, 0xd5a61266f0c9392c, 0xa9582618e03fc9aa, 0x39abdc4529b1661c});
@@ -97,6 +105,8 @@ namespace fly {
      *
      * It is equivalent to 2^192 calls to operator(); it can be used to generate 2^64 starting points, from each of which jump() will
      * generate 2^64 non-overlapping sub-sequences for parallel distributed computations.
+     *
+     * @return void.
      */
     constexpr auto long_jump() noexcept -> void {
       jump_impl({0x76e15d3efefdcbbf, 0xc5004e441c522fb3, 0x77710069854ee241, 0x39109bb02acbe635});

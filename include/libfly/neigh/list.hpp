@@ -163,6 +163,8 @@ namespace fly::neigh {
 
     /**
      * @brief Get the number of real atoms in this neighbour list.
+     *
+     * @return The number of real atoms in this List.
      */
     auto size() const noexcept -> Eigen::Index { return m_neigh_lists.size(); }
 

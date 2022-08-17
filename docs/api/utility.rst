@@ -122,13 +122,7 @@ Mathematical functions
 
 Classes
 ~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. doxygenclass:: fly::Vector
-    :members:
-    :undoc-members:
-
--------------------
-    
+ 
 .. doxygenclass:: fly::Defer
     :members:
     :undoc-members:

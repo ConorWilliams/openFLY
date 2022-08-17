@@ -1,17 +1,43 @@
 Changelog
 ============================
 
+.. Unreleased
+.. -------------------------------
+.. Added
+.. ~~~~~
+.. Changed
+.. ~~~~~~~
+.. Removed
+.. ~~~~~~~
+.. Bugfixes
+.. ~~~~~~~~
+.. Meta 
+.. ~~~~
+
 
 Unreleased
--------------------------------
+----------
+Added
+~~~~~
+Changed
+~~~~~~~
+Removed
+~~~~~~~
+Bugfixes
+~~~~~~~~
+Meta 
+~~~~
+
+Version 0.3.0
+------------------------
 
 Added
 ~~~~~~~~~
 
 - Neighbour-list support via the ``neigh::List`` class.
-- ``Vector`` class to replace ``std::vector``.
+- Internal ``Vector`` class to replace ``std::vector``.
 - ``Xoshiro`` class as the PRNG.
-- ``Box`` has a new ``get()`` method to fetch the underlying ``std::variant`` .
+- ``Box`` has a new ``get()`` method to fetch the underlying ``std::variant``.
 - ``visit`` utility function.
 - ``neighbour::sort`` function to optimise ordering for neighbour operations.
 - ``operator=`` for the ``Atom`` class
@@ -23,19 +49,20 @@ Changed
 
 - ``Property``'s ``array_ref_t`` is now an ``Eigen::Map`` to disallow resizing of ``SoA``'s individual arrays.
 - ``SoA``'s ``destructive_resize`` now returns a boolean.
-- Allow zero length ``SoA``s.
-- Crystal systems ``gen_image`` marked ``const``.
+- Allow zero length ``SoA`` s.
 - ``BinaryFile`` internals reworked to support clang.
 - ``VoS`` uses the ``Vector`` class.
 
 Removed
 ~~~~~~~~~
 
-- ``Box`` default constructor.
+- Removed the ``Orthorombic``'s deprecated member min-image. 
+- Removed ``Box`` default constructor.
 
 Bugfixes
 ~~~~~~~~~~~~~~
 
+- Crystal systems ``gen_image`` marked ``const``.
 - Fixes to test and examples that assumed 3D. 
 - ``SoA``'s ``operator()`` was broken.
 - ``SoA``'s ``resize`` was broken.
@@ -45,7 +72,7 @@ Meta
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
 - vcpkg + gsd are now submodules so all dependencies are tracked by Dependabot!
-
+- Many documentation engancements.
 
 Version 0.2.0
 --------------------------------
@@ -82,7 +109,7 @@ Meta
 
 - Hdoc is no longer used to build the documentation.
 
-Version 0.1.0-alpha
+Version 0.1.0 pre-release
 ---------------------------
 
 Continuous pre-release, not currently in a usable state.

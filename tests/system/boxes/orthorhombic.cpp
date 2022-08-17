@@ -21,23 +21,6 @@
 #include "libfly/system/atom.hpp"
 #include "libfly/utility/core.hpp"
 
-TEST_CASE("Orthorhombic::min_image", "[system]") {
-  //
-  using namespace fly;
-  using namespace fly::system;
-
-  Orthorhombic box{Arr<double>::Constant(10), Arr<bool>::Constant(true)};
-
-  Vec a = Vec::Constant(1);
-  Vec b = Vec::Constant(9);
-
-  Vec m = box.min_image(a, b);
-
-  Vec x = Vec::Constant(-2);
-
-  REQUIRE(gnorm(m - x) < 0.001);
-}
-
 TEST_CASE("Orthorhombic::canon_image", "[system]") {
   //
   using namespace fly;

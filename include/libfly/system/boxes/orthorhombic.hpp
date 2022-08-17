@@ -139,22 +139,6 @@ namespace fly::system {
     }
 
     /**
-     * @brief Compute shortest vector connecting ``a`` to a periodic image of ``b``.
-     *
-     * This function is branchy and should be avoided in hot code.
-     *
-     * See: https://doi.org/10.1524/zpch.2013.0311
-     *
-     * @deprecated No triclinic generalization.
-     */
-    template <typename A, typename B>
-    [[deprecated("No triclinic generalization")]] Vec min_image(Eigen::MatrixBase<A> const& a,
-                                                                Eigen::MatrixBase<B> const& b) const noexcept {
-      Arr<double> dr = b - a;
-      return m_periodic.select(dr - m_extents * (dr * m_inv_extents + 0.5).floor(), dr);
-    }
-
-    /**
      * @brief Comparison operator, no surprises.
      */
     friend bool operator==(Orthorhombic const& a, Orthorhombic const& b) noexcept {

@@ -41,11 +41,11 @@ TEST_CASE("BinaryFile", "[io]") {
 
   system::Supercell cell = system::make_supercell<Position>(box, map, 4);
 
-  cell(r_, 0) = Vec{0, 0, 0};
+  cell(r_, 0) = Vec::Constant(0);
 
-  cell(r_, 1) = Vec{1, 0, 0};
-  cell(r_, 2) = Vec{0, 1, 0};
-  cell(r_, 3) = Vec{0, 0, 1};
+  cell(r_, 1) = Vec::Constant(1);
+  cell(r_, 2) = Vec::Constant(2);
+  cell(r_, 3) = Vec::Constant(3);
 
   cell(id_, 0) = 0;
 

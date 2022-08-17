@@ -20,6 +20,7 @@
 
 #include <catch2/catch_test_macros.hpp>
 #include <cstddef>
+#include <limits>
 #include <random>
 
 #include "libfly/neigh/sort.hpp"
@@ -67,7 +68,7 @@ void slow_neigh_list(Vector<Vector<Neigh>>& nl, system::Box const& box, system::
       if (i != j) {
         Neigh best{
             i,
-            {10e301, 10e301, 10e301},
+            Vec::Constant(std::numeric_limits<double>::max()),
         };
         // Brute for min-image
         for (auto const& d : disp_vectors) {

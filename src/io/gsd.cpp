@@ -62,10 +62,6 @@ namespace fly::io {
 
   BinaryFile::BinaryFile(std::string_view fname, Flags flag) : m_fname(fname), m_handle(std::make_unique<gsd_handle>()) {
     //
-    if constexpr (spatial_dims != 3) {
-      throw std::runtime_error("GSD files are currently only supported in 3D");
-    }
-    //
     auto version = gsd_make_version(1, 4);
 
     switch (flag) {
@@ -92,57 +88,86 @@ namespace fly::io {
   //   ////////////////////////////////////////////////////////////////////////////////////////////////
 
   void BinaryFile::write(system::Box const &box) {
-    //          |L_x    xy L_y   xz L_z|
-    // basis =  |0         L_y   yz L_z|
-    //          |0         0        L_z|
-    Eigen::Matrix<float, 3, 3> basis = box.basis().cast<float>();
+    if constexpr (spatial_dims == 3) {
+      // Special handling for 3d case for HOOMD Schema
 
-    // L_x, L_y, L_z , xy, xz, yz
-    std::array<float, 6> const hoomd_basis = {
-        basis(0, 0), basis(1, 1), basis(2, 2), basis(0, 1), basis(0, 2), basis(1, 2),
-    };
+      //          |L_x    xy L_y   xz L_z|
+      // basis =  |0         L_y   yz L_z|
+      //          |0         0        L_z|
+      Eigen::Matrix<float, 3, 3> basis = box.basis().cast<float>();
 
-    write_chunk("configuration/box", 6, 1, hoomd_basis.data());
+      // L_x, L_y, L_z , xy, xz, yz
+      std::array<float, 6> const hoomd_basis = {
+          basis(0, 0), basis(1, 1), basis(2, 2), basis(0, 1), basis(0, 2), basis(1, 2),
+      };
 
-    std::array<std::uint8_t, 3> const periodicity = {box.periodic(0), box.periodic(1), box.periodic(2)};
+      write_chunk("configuration/box", 6, 1, hoomd_basis.data());
 
-    write_chunk("log/periodicity", 3, 1, periodicity.data());
+      std::array<std::uint8_t, 3> const periodicity = {box.periodic(0), box.periodic(1), box.periodic(2)};
+
+      write_chunk("log/periodicity", 3, 1, periodicity.data());
+    } else {
+      // Fall back to non-hoomd shema
+      Mat basis = box.basis();
+
+      write_chunk("configuration/box", basis.size(), 1, basis.data());
+
+      Arr<std::uint8_t> p;
+
+      for (int i = 0; i < spatial_dims; i++) {
+        p[i] = box.periodic(i);
+      }
+
+      write_chunk("log/periodicity", p.size(), 1, p.data());
+    }
   }
 
   auto BinaryFile::read_box(std::uint64_t i) const -> system::Box {
     //
+    if constexpr (spatial_dims == 3) {
+      Eigen::Matrix<float, 3, 3> basis = Eigen::Matrix<float, 3, 3>::Zero();
 
-    Eigen::Matrix<float, 3, 3> basis = Eigen::Matrix<float, 3, 3>::Zero();
+      {  // Load the configuration
 
-    {  // Load the configuration
+        std::array<float, 6> hoomd_basis;  // L_x, L_y, L_z , xy, xz, yz
 
-      std::array<float, 6> hoomd_basis;  // L_x, L_y, L_z , xy, xz, yz
+        read_chunk(i, "configuration/box", 6, 1, hoomd_basis.data());
 
-      read_chunk(i, "configuration/box", 6, 1, hoomd_basis.data());
+        basis(0, 0) = hoomd_basis[0];
+        basis(1, 1) = hoomd_basis[1];
+        basis(2, 2) = hoomd_basis[2];
 
-      basis(0, 0) = hoomd_basis[0];
-      basis(1, 1) = hoomd_basis[1];
-      basis(2, 2) = hoomd_basis[2];
+        basis(0, 1) = hoomd_basis[3];
+        basis(0, 2) = hoomd_basis[4];
+        basis(1, 2) = hoomd_basis[5];
+      }
+      // Load the periodicity
 
-      basis(0, 1) = hoomd_basis[3];
-      basis(0, 2) = hoomd_basis[4];
-      basis(1, 2) = hoomd_basis[5];
+      Arr<bool> periodicity = Arr<bool>::Zero();
+
+      {
+        std::array<std::uint8_t, 3> pr;
+
+        read_chunk(i, "log/periodicity", 3, 1, pr.data());
+
+        periodicity[0] = pr[0];
+        periodicity[1] = pr[1];
+        periodicity[2] = pr[2];
+      }
+
+      return {basis.cast<double>(), periodicity};
+    } else {
+      // Fall back to non-hoomd shema
+      Mat basis;
+
+      read_chunk(i, "configuration/box", basis.size(), 1, basis.data());
+
+      Arr<std::uint8_t> p;
+
+      read_chunk(i, "log/periodicity", p.size(), 1, p.data());
+
+      return {basis, p.cast<bool>()};
     }
-    // Load the periodicity
-
-    Arr<bool> periodicity = Arr<bool>::Zero();
-
-    {
-      std::array<std::uint8_t, 3> pr;
-
-      read_chunk(i, "log/periodicity", 3, 1, pr.data());
-
-      periodicity[0] = pr[0];
-      periodicity[1] = pr[1];
-      periodicity[2] = pr[2];
-    }
-
-    return {basis.cast<double>(), periodicity};
   }
 
   //   ////////////////////////////////////////////////////////////////////////////////////////////////

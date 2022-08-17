@@ -18,6 +18,7 @@
 #include <utility>
 
 #include "libfly/system/property.hpp"
+#include "libfly/utility/core.hpp"
 
 TEST_CASE("SoA", "[system]") {
   using namespace fly;
@@ -55,8 +56,8 @@ TEST_CASE("SoA", "[system]") {
     count = 0;
 
     for (auto&& elem : arr[r_]) {
-      if (count % 3 == 0) {
-        CHECK(near<double>(elem, count / 3));
+      if (count % spatial_dims == 0) {
+        CHECK(near<double>(elem, count / spatial_dims));
       } else {
         CHECK(near<double>(elem, 0));
       }
@@ -67,8 +68,8 @@ TEST_CASE("SoA", "[system]") {
     count = 0;
 
     for (auto&& elem : std::as_const(arr)[r_]) {
-      if (count % 3 == 0) {
-        CHECK(near<double>(elem, count / 3));
+      if (count % spatial_dims == 0) {
+        CHECK(near<double>(elem, count / spatial_dims));
       } else {
         CHECK(near<double>(elem, 0));
       }

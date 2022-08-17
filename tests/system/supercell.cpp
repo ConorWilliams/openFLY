@@ -25,18 +25,22 @@ TEST_CASE("TypeMap + Supercell", "[system]") {
 
   system::TypeMap<Mass, Position> map{4};
 
-  map.set(0, "Fe", 1.2, {0, 1, 0});
+  Vec x = Vec::Zero();
+
+  x[1] = 1;
+
+  map.set(0, "Fe", 1.2, x);
 
   //   Slicing
 
   system::TypeMap<Position> pmap(map);
 
   CHECK(pmap.get(0, tp_) == "Fe");
-  CHECK(pmap.get(0, r_) == Vec{0, 1, 0});
+  CHECK(pmap.get(0, r_) == x);
 
   // Supercell
 
-  system::Box box(Mat::Identity(), {true, false, true});
+  system::Box box(Mat::Identity(), Arr<bool>::Constant(true));
 
   auto cell = system::make_supercell<Position>(box, map, 10);
 

@@ -35,6 +35,8 @@ Removed
 
 Bugfixes
 ~~~~~~~~~~~~~~
+
+- Fixes to test and examples that assumed 3D. 
 - ``SoA``'s ``operator()`` was broken.
 - ``SoA``'s ``resize`` was broken.
 

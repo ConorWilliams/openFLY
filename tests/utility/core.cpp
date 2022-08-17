@@ -58,9 +58,11 @@ TEST_CASE("product_scan", "[utility]") {
 
   using T = Arr<int>;
 
-  CHECK((product_scan(T{1, 1, 1}) == T{1, 1, 1}).all());
-  CHECK((product_scan(T{10, 9, 0}) == T{1, 10, 90}).all());
-  CHECK((product_scan(T{3, 2, 3}) == T{1, 3, 6}).all());
+  if constexpr (spatial_dims == 3) {
+    CHECK((product_scan(T{1, 1, 1}) == T{1, 1, 1}).all());
+    CHECK((product_scan(T{10, 9, 0}) == T{1, 10, 90}).all());
+    CHECK((product_scan(T{3, 2, 3}) == T{1, 3, 6}).all());
+  }
 }
 
 TEST_CASE("ipow", "[utility]") {

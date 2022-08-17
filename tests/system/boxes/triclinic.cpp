@@ -59,7 +59,7 @@ TEST_CASE("Triclinic::canon_image", "[system]") {
 
     Vec b_prime = b;
 
-    for (int j = 0; j < 3; j++) {
+    for (int j = 0; j < spatial_dims; j++) {
       if (periodic[j]) {
         b_prime += offsets.col(j);
       }

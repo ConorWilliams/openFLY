@@ -31,6 +31,8 @@ Meta
 Version 0.3.0
 ------------------------
 
+The second alpha version of openFLY, this release brings neighbour-list support to libFLY.
+
 Added
 ~~~~~~~~~
 

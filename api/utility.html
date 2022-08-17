@@ -181,8 +181,8 @@
 <li class="toctree-l3"><a class="reference internal" href="crystal_systems.html#hypergrid">Hypergrid</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="io.html">IO</a></li>
-<li class="toctree-l2"><a class="reference internal" href="neighbour.html">Neighbour</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io.html">Input/Output (IO)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="neighbour.html">Neighbours</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../ChangeLog-stub.html">Changelog</a></li>
@@ -688,107 +688,6 @@ y_n &amp; = 1 \times x_1\times x_{2} \times \dots \times x_{n-1}\end{split}\]</d
 </section>
 <section id="classes">
 <h3>Classes<a class="headerlink" href="#classes" title="Permalink to this heading">#</a></h3>
-<dl class="cpp class">
-<dt class="sig sig-object cpp" id="_CPPv4I0EN3fly6VectorE">
-<span id="_CPPv3I0EN3fly6VectorE"></span><span id="_CPPv2I0EN3fly6VectorE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classfly_1_1Vector"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Vector</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">private</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0EN3fly6VectorE" title="fly::Vector::T"><span class="n"><span class="pre">T</span></span></a><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4I0EN3fly6VectorE" title="Permalink to this definition">#</a><br /></dt>
-<dd><p>A wrapper around a <code class="docutils literal notranslate"><span class="pre">std::vector</span></code>. </p>
-<p>Does bounds checking in debug and has a signed size_type. </p>
-<div class="breathe-sectiondef docutils container">
-<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4N3fly6Vector6VectorEv">
-<span id="_CPPv3N3fly6Vector6VectorEv"></span><span id="_CPPv2N3fly6Vector6VectorEv"></span><span id="fly::Vector::Vector"></span><span class="target" id="classfly_1_1Vector_1a792a4fcc395f464832f1abcea1c6220c"></span><span class="sig-name descname"><span class="n"><span class="pre">Vector</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><a class="headerlink" href="#_CPPv4N3fly6Vector6VectorEv" title="Permalink to this definition">#</a><br /></dt>
-<dd><p>Construct a new empty <a class="reference internal" href="#classfly_1_1Vector"><span class="std std-ref">Vector</span></a>. </p>
-</dd></dl>
-
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4N3fly6Vector6VectorEN5Eigen5IndexE">
-<span id="_CPPv3N3fly6Vector6VectorEN5Eigen5IndexE"></span><span id="_CPPv2N3fly6Vector6VectorEN5Eigen5IndexE"></span><span id="fly::Vector::Vector__Eigen::Index"></span><span class="target" id="classfly_1_1Vector_1a54df0b58340231441d54743a161b4ae3"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">explicit</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Vector</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">Eigen</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">Index</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">size</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3fly6Vector6VectorEN5Eigen5IndexE" title="Permalink to this definition">#</a><br /></dt>
-<dd><p>Construct a new <a class="reference internal" href="#classfly_1_1Vector"><span class="std std-ref">Vector</span></a> object containing <code class="docutils literal notranslate"><span class="pre">size</span></code> default initialised elements. </p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>size</strong> – The size of the new container. </p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4N3fly6Vector6assignEN5Eigen5IndexERK1T">
-<span id="_CPPv3N3fly6Vector6assignEN5Eigen5IndexERK1T"></span><span id="_CPPv2N3fly6Vector6assignEN5Eigen5IndexERK1T"></span><span id="fly::Vector::assign__Eigen::Index.TCR"></span><span class="target" id="classfly_1_1Vector_1ac914562e578c4588ad404d25db2c45df"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">auto</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">assign</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">Eigen</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">Index</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">count</span></span>, <a class="reference internal" href="#_CPPv4I0EN3fly6VectorE" title="fly::Vector::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">value</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="o"><span class="pre">-&gt;</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><a class="headerlink" href="#_CPPv4N3fly6Vector6assignEN5Eigen5IndexERK1T" title="Permalink to this definition">#</a><br /></dt>
-<dd><p>Replaces the contents with <code class="docutils literal notranslate"><span class="pre">count</span></code> copies of value <code class="docutils literal notranslate"><span class="pre">value</span></code>. </p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>count</strong> – The new size of the container. </p></li>
-<li><p><strong>value</strong> – The value to initialize elements of the container with. </p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4N3fly6Vector5clearEv">
-<span id="_CPPv3N3fly6Vector5clearEv"></span><span id="_CPPv2N3fly6Vector5clearEv"></span><span id="fly::Vector::clear"></span><span class="target" id="classfly_1_1Vector_1ad57aab13350cb3d062bd2eca704c3004"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">auto</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">clear</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="o"><span class="pre">-&gt;</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><a class="headerlink" href="#_CPPv4N3fly6Vector5clearEv" title="Permalink to this definition">#</a><br /></dt>
-<dd><p>Clears the contents. </p>
-</dd></dl>
-
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4N3fly6VectorixEN5Eigen5IndexE">
-<span id="_CPPv3N3fly6VectorixEN5Eigen5IndexE"></span><span id="_CPPv2N3fly6VectorixEN5Eigen5IndexE"></span><span id="fly::Vector::subscript-operator__Eigen::Index"></span><span class="target" id="classfly_1_1Vector_1a08f4f314d922f6626957491b75d54570"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">auto</span></span><span class="w"> </span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">[]</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">Eigen</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">Index</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">pos</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="o"><span class="pre">-&gt;</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0EN3fly6VectorE" title="fly::Vector::T"><span class="n"><span class="pre">T</span></span></a><span class="p"><span class="pre">&amp;</span></span><a class="headerlink" href="#_CPPv4N3fly6VectorixEN5Eigen5IndexE" title="Permalink to this definition">#</a><br /></dt>
-<dd><p>Returns a reference to the element at specified location <code class="docutils literal notranslate"><span class="pre">pos</span></code>. </p>
-<p>Bounds checking in DEBUG builds.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>pos</strong> – <a class="reference internal" href="system.html#structfly_1_1builtin__properties_1_1Position"><span class="std std-ref">Position</span></a> of the element to return.</p>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>A mutable reference to the element. </p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4NK3fly6VectorixEN5Eigen5IndexE">
-<span id="_CPPv3NK3fly6VectorixEN5Eigen5IndexE"></span><span id="_CPPv2NK3fly6VectorixEN5Eigen5IndexE"></span><span id="fly::Vector::subscript-operator__Eigen::IndexC"></span><span class="target" id="classfly_1_1Vector_1a764c4cfe4ad71a8889d5642b784c7e3c"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">auto</span></span><span class="w"> </span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">[]</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">Eigen</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">Index</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">pos</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="o"><span class="pre">-&gt;</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0EN3fly6VectorE" title="fly::Vector::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="p"><span class="pre">&amp;</span></span><a class="headerlink" href="#_CPPv4NK3fly6VectorixEN5Eigen5IndexE" title="Permalink to this definition">#</a><br /></dt>
-<dd><p>Returns a reference to the element at specified location <code class="docutils literal notranslate"><span class="pre">pos</span></code>. </p>
-<p>Bounds checking in DEBUG builds.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>pos</strong> – <a class="reference internal" href="system.html#structfly_1_1builtin__properties_1_1Position"><span class="std std-ref">Position</span></a> of the element to return.</p>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>A constant reference to the element. </p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4N3fly6Vector6resizeEN5Eigen5IndexE">
-<span id="_CPPv3N3fly6Vector6resizeEN5Eigen5IndexE"></span><span id="_CPPv2N3fly6Vector6resizeEN5Eigen5IndexE"></span><span id="fly::Vector::resize__Eigen::Index"></span><span class="target" id="classfly_1_1Vector_1a05c613894b2284a395ec9778434bdfbc"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">auto</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">resize</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">Eigen</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">Index</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">count</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="o"><span class="pre">-&gt;</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><a class="headerlink" href="#_CPPv4N3fly6Vector6resizeEN5Eigen5IndexE" title="Permalink to this definition">#</a><br /></dt>
-<dd><p>Resizes the container to contain count elements. </p>
-<p>If the current size is greater than count, the container is reduced to its first count elements. If the current size is less than count, additional default-inserted elements are appended.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>count</strong> – New size of the container </p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4NK3fly6Vector4sizeEv">
-<span id="_CPPv3NK3fly6Vector4sizeEv"></span><span id="_CPPv2NK3fly6Vector4sizeEv"></span><span id="fly::Vector::sizeC"></span><span class="target" id="classfly_1_1Vector_1a28d4610585f1213901384adc18758c45"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">auto</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">size</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="o"><span class="pre">-&gt;</span></span><span class="w"> </span><span class="n"><span class="pre">Eigen</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">Index</span></span><a class="headerlink" href="#_CPPv4NK3fly6Vector4sizeEv" title="Permalink to this definition">#</a><br /></dt>
-<dd><p>Fetch the number of elements in the vector. </p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>The number of elements in the <a class="reference internal" href="#classfly_1_1Vector"><span class="std std-ref">Vector</span></a>. </p>
-</dd>
-</dl>
-</dd></dl>
-
-</div>
-</dd></dl>
-
-<hr class="docutils" />
 <dl class="cpp class">
 <dt class="sig sig-object cpp" id="_CPPv4I00EN3fly5DeferE">
 <span id="_CPPv3I00EN3fly5DeferE"></span><span id="_CPPv2I00EN3fly5DeferE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">F</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">enable_if_t</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">is_nothrow_invocable_v</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I00EN3fly5DeferE" title="fly::Defer::F"><span class="n"><span class="pre">F</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classfly_1_1Defer"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Defer</span></span></span><a class="headerlink" href="#_CPPv4I00EN3fly5DeferE" title="Permalink to this definition">#</a><br /></dt>

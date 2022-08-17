@@ -3,7 +3,7 @@
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
-<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Todo!" href="todo.html" /><link rel="prev" title="Neighbour" href="api/neighbour.html" />
+<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Todo!" href="todo.html" /><link rel="prev" title="Neighbours" href="api/neighbour.html" />
 
     <link rel="shortcut icon" href="_static/favicon.ico"/><meta name="generator" content="sphinx-5.1.1, furo 2022.06.21"/>
         <title>Changelog - OpenFLY documentation</title>
@@ -181,8 +181,8 @@
 <li class="toctree-l3"><a class="reference internal" href="api/crystal_systems.html#hypergrid">Hypergrid</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="api/io.html">IO</a></li>
-<li class="toctree-l2"><a class="reference internal" href="api/neighbour.html">Neighbour</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/io.html">Input/Output (IO)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/neighbour.html">Neighbours</a></li>
 </ul>
 </li>
 <li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Changelog</a></li>
@@ -235,11 +235,29 @@
 <h2>Unreleased<a class="headerlink" href="#unreleased" title="Permalink to this heading">#</a></h2>
 <section id="added">
 <h3>Added<a class="headerlink" href="#added" title="Permalink to this heading">#</a></h3>
+</section>
+<section id="changed">
+<h3>Changed<a class="headerlink" href="#changed" title="Permalink to this heading">#</a></h3>
+</section>
+<section id="removed">
+<h3>Removed<a class="headerlink" href="#removed" title="Permalink to this heading">#</a></h3>
+</section>
+<section id="bugfixes">
+<h3>Bugfixes<a class="headerlink" href="#bugfixes" title="Permalink to this heading">#</a></h3>
+</section>
+<section id="meta">
+<h3>Meta<a class="headerlink" href="#meta" title="Permalink to this heading">#</a></h3>
+</section>
+</section>
+<section id="version-0-3-0">
+<h2>Version 0.3.0<a class="headerlink" href="#version-0-3-0" title="Permalink to this heading">#</a></h2>
+<section id="id1">
+<h3>Added<a class="headerlink" href="#id1" title="Permalink to this heading">#</a></h3>
 <ul class="simple">
 <li><p>Neighbour-list support via the <code class="docutils literal notranslate"><span class="pre">neigh::List</span></code> class.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">Vector</span></code> class to replace <code class="docutils literal notranslate"><span class="pre">std::vector</span></code>.</p></li>
+<li><p>Internal <code class="docutils literal notranslate"><span class="pre">Vector</span></code> class to replace <code class="docutils literal notranslate"><span class="pre">std::vector</span></code>.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">Xoshiro</span></code> class as the PRNG.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">Box</span></code> has a new <code class="docutils literal notranslate"><span class="pre">get()</span></code> method to fetch the underlying <code class="docutils literal notranslate"><span class="pre">std::variant</span></code> .</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Box</span></code> has a new <code class="docutils literal notranslate"><span class="pre">get()</span></code> method to fetch the underlying <code class="docutils literal notranslate"><span class="pre">std::variant</span></code>.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">visit</span></code> utility function.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">neighbour::sort</span></code> function to optimise ordering for neighbour operations.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">operator=</span></code> for the <code class="docutils literal notranslate"><span class="pre">Atom</span></code> class</p></li>
@@ -247,42 +265,45 @@
 <li><p>Added <code class="docutils literal notranslate"><span class="pre">min_width</span></code> member to crystal specialisations.</p></li>
 </ul>
 </section>
-<section id="changed">
-<h3>Changed<a class="headerlink" href="#changed" title="Permalink to this heading">#</a></h3>
+<section id="id2">
+<h3>Changed<a class="headerlink" href="#id2" title="Permalink to this heading">#</a></h3>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">Property</span></code>’s <code class="docutils literal notranslate"><span class="pre">array_ref_t</span></code> is now an <code class="docutils literal notranslate"><span class="pre">Eigen::Map</span></code> to disallow resizing of <code class="docutils literal notranslate"><span class="pre">SoA</span></code>’s individual arrays.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">SoA</span></code>’s <code class="docutils literal notranslate"><span class="pre">destructive_resize</span></code> now returns a boolean.</p></li>
-<li><p>Allow zero length <a href="#id1"><span class="problematic" id="id2">``</span></a>SoA``s.</p></li>
-<li><p>Crystal systems <code class="docutils literal notranslate"><span class="pre">gen_image</span></code> marked <code class="docutils literal notranslate"><span class="pre">const</span></code>.</p></li>
+<li><p>Allow zero length <code class="docutils literal notranslate"><span class="pre">SoA</span></code> s.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">BinaryFile</span></code> internals reworked to support clang.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">VoS</span></code> uses the <code class="docutils literal notranslate"><span class="pre">Vector</span></code> class.</p></li>
 </ul>
 </section>
-<section id="removed">
-<h3>Removed<a class="headerlink" href="#removed" title="Permalink to this heading">#</a></h3>
+<section id="id3">
+<h3>Removed<a class="headerlink" href="#id3" title="Permalink to this heading">#</a></h3>
 <ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">Box</span></code> default constructor.</p></li>
+<li><p>Removed the <code class="docutils literal notranslate"><span class="pre">Orthorombic</span></code>’s deprecated member min-image.</p></li>
+<li><p>Removed <code class="docutils literal notranslate"><span class="pre">Box</span></code> default constructor.</p></li>
 </ul>
 </section>
-<section id="bugfixes">
-<h3>Bugfixes<a class="headerlink" href="#bugfixes" title="Permalink to this heading">#</a></h3>
+<section id="id4">
+<h3>Bugfixes<a class="headerlink" href="#id4" title="Permalink to this heading">#</a></h3>
 <ul class="simple">
+<li><p>Crystal systems <code class="docutils literal notranslate"><span class="pre">gen_image</span></code> marked <code class="docutils literal notranslate"><span class="pre">const</span></code>.</p></li>
+<li><p>Fixes to test and examples that assumed 3D.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">SoA</span></code>’s <code class="docutils literal notranslate"><span class="pre">operator()</span></code> was broken.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">SoA</span></code>’s <code class="docutils literal notranslate"><span class="pre">resize</span></code> was broken.</p></li>
 </ul>
 </section>
-<section id="meta">
-<h3>Meta<a class="headerlink" href="#meta" title="Permalink to this heading">#</a></h3>
+<section id="id5">
+<h3>Meta<a class="headerlink" href="#id5" title="Permalink to this heading">#</a></h3>
 <ul class="simple">
 <li><p>vcpkg + gsd are now submodules so all dependencies are tracked by Dependabot!</p></li>
+<li><p>Many documentation engancements.</p></li>
 </ul>
 </section>
 </section>
 <section id="version-0-2-0">
 <h2>Version 0.2.0<a class="headerlink" href="#version-0-2-0" title="Permalink to this heading">#</a></h2>
 <p>The first released alpha version of openFLY! This is a minimal feature-set release with just the base classes that underpin openFLY as well as binary IO.</p>
-<section id="id3">
-<h3>Added<a class="headerlink" href="#id3" title="Permalink to this heading">#</a></h3>
+<section id="id6">
+<h3>Added<a class="headerlink" href="#id6" title="Permalink to this heading">#</a></h3>
 <ul class="simple">
 <li><p>Binary IO using the GSD format through the <code class="docutils literal notranslate"><span class="pre">BinaryFile</span></code> class.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">Property</span></code> base class template.</p></li>
@@ -296,24 +317,24 @@
 <li><p>New CI workflow now includes C++20 and Intel compilers, MSVC removed due to compiler bug.</p></li>
 </ul>
 </section>
-<section id="id4">
-<h3>Changed<a class="headerlink" href="#id4" title="Permalink to this heading">#</a></h3>
+<section id="id7">
+<h3>Changed<a class="headerlink" href="#id7" title="Permalink to this heading">#</a></h3>
 <ul class="simple">
 <li><p>GPL-2.0 -&gt; GPL-3.0-or-later.</p></li>
 </ul>
 </section>
-<section id="id5">
-<h3>Removed<a class="headerlink" href="#id5" title="Permalink to this heading">#</a></h3>
+<section id="id8">
+<h3>Removed<a class="headerlink" href="#id8" title="Permalink to this heading">#</a></h3>
 </section>
-<section id="id6">
-<h3>Meta<a class="headerlink" href="#id6" title="Permalink to this heading">#</a></h3>
+<section id="id9">
+<h3>Meta<a class="headerlink" href="#id9" title="Permalink to this heading">#</a></h3>
 <ul class="simple">
 <li><p>Hdoc is no longer used to build the documentation.</p></li>
 </ul>
 </section>
 </section>
-<section id="version-0-1-0-alpha">
-<h2>Version 0.1.0-alpha<a class="headerlink" href="#version-0-1-0-alpha" title="Permalink to this heading">#</a></h2>
+<section id="version-0-1-0-pre-release">
+<h2>Version 0.1.0 pre-release<a class="headerlink" href="#version-0-1-0-pre-release" title="Permalink to this heading">#</a></h2>
 <p>Continuous pre-release, not currently in a usable state.</p>
 </section>
 </section>
@@ -339,7 +360,7 @@
                   <span>Previous</span>
                 </div>
                 
-                <div class="title">Neighbour</div>
+                <div class="title">Neighbours</div>
                 
               </div>
             </a>
@@ -389,14 +410,22 @@
 <li><a class="reference internal" href="#meta">Meta</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#version-0-2-0">Version 0.2.0</a><ul>
-<li><a class="reference internal" href="#id3">Added</a></li>
-<li><a class="reference internal" href="#id4">Changed</a></li>
-<li><a class="reference internal" href="#id5">Removed</a></li>
-<li><a class="reference internal" href="#id6">Meta</a></li>
+<li><a class="reference internal" href="#version-0-3-0">Version 0.3.0</a><ul>
+<li><a class="reference internal" href="#id1">Added</a></li>
+<li><a class="reference internal" href="#id2">Changed</a></li>
+<li><a class="reference internal" href="#id3">Removed</a></li>
+<li><a class="reference internal" href="#id4">Bugfixes</a></li>
+<li><a class="reference internal" href="#id5">Meta</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#version-0-1-0-alpha">Version 0.1.0-alpha</a></li>
+<li><a class="reference internal" href="#version-0-2-0">Version 0.2.0</a><ul>
+<li><a class="reference internal" href="#id6">Added</a></li>
+<li><a class="reference internal" href="#id7">Changed</a></li>
+<li><a class="reference internal" href="#id8">Removed</a></li>
+<li><a class="reference internal" href="#id9">Meta</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#version-0-1-0-pre-release">Version 0.1.0 pre-release</a></li>
 </ul>
 </li>
 </ul>

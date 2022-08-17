@@ -3,7 +3,7 @@
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
-<link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="IO" href="io.html" /><link rel="prev" title="System" href="system.html" />
+<link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="Input/Output (IO)" href="io.html" /><link rel="prev" title="System" href="system.html" />
 
     <link rel="shortcut icon" href="../_static/favicon.ico"/><meta name="generator" content="sphinx-5.1.1, furo 2022.06.21"/>
         <title>Crystal systems - OpenFLY documentation</title>
@@ -181,8 +181,8 @@
 <li class="toctree-l3"><a class="reference internal" href="#hypergrid">Hypergrid</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="io.html">IO</a></li>
-<li class="toctree-l2"><a class="reference internal" href="neighbour.html">Neighbour</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io.html">Input/Output (IO)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="neighbour.html">Neighbours</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../ChangeLog-stub.html">Changelog</a></li>
@@ -287,21 +287,6 @@
 <dd class="field-odd"><p><strong>r_cut</strong> – The cut-off radius for atomic interactions. </p>
 </dd>
 </dl>
-</dd></dl>
-
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4I00ENK3fly6system12Orthorhombic9min_imageE3VecRKN5Eigen10MatrixBaseI1AEERKN5Eigen10MatrixBaseI1BEE">
-<span id="_CPPv3I00ENK3fly6system12Orthorhombic9min_imageERKN5Eigen10MatrixBaseI1AEERKN5Eigen10MatrixBaseI1BEE"></span><span id="_CPPv2I00ENK3fly6system12Orthorhombic9min_imageERKN5Eigen10MatrixBaseI1AEERKN5Eigen10MatrixBaseI1BEE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">A</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">B</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classfly_1_1system_1_1Orthorhombic_1a3c029fb179b64d12ff0527731c7129f7"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="utility.html#_CPPv4N3fly3VecE" title="fly::Vec"><span class="n"><span class="pre">Vec</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">min_image</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">Eigen</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">MatrixBase</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I00ENK3fly6system12Orthorhombic9min_imageE3VecRKN5Eigen10MatrixBaseI1AEERKN5Eigen10MatrixBaseI1BEE" title="fly::system::Orthorhombic::min_image::A"><span class="n"><span class="pre">A</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">a</span></span>, <span class="n"><span class="pre">Eigen</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">MatrixBase</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I00ENK3fly6system12Orthorhombic9min_imageE3VecRKN5Eigen10MatrixBaseI1AEERKN5Eigen10MatrixBaseI1BEE" title="fly::system::Orthorhombic::min_image::B"><span class="n"><span class="pre">B</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">b</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="k"><span class="pre">noexcept</span></span><a class="headerlink" href="#_CPPv4I00ENK3fly6system12Orthorhombic9min_imageE3VecRKN5Eigen10MatrixBaseI1AEERKN5Eigen10MatrixBaseI1BEE" title="Permalink to this definition">#</a><br /></dt>
-<dd><p>Compute shortest vector connecting <code class="docutils literal notranslate"><span class="pre">a</span></code> to a periodic image of <code class="docutils literal notranslate"><span class="pre">b</span></code>. </p>
-<p>This function is branchy and should be avoided in hot code.</p>
-<p>See: <a class="reference external" href="https://doi.org/10.1524/zpch.2013.0311">https://doi.org/10.1524/zpch.2013.0311</a></p>
-<p><dl>
-<dt class="sig sig-object cpp">
-<em><span class="pre">Deprecated:</span></em></dt>
-<dd><p>No triclinic generalization. </p>
-</dd></dl>
-
-</p>
 </dd></dl>
 
 <dl class="cpp function">
@@ -564,7 +549,7 @@
                 <div class="context">
                   <span>Next</span>
                 </div>
-                <div class="title">IO</div>
+                <div class="title">Input/Output (IO)</div>
               </div>
               <svg><use href="#svg-arrow-right"></use></svg>
             </a>

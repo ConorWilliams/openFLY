@@ -1,4 +1,4 @@
-Neighbour
+Neighbours
 ======================================
 
 Directory: ``libfly/neigh``

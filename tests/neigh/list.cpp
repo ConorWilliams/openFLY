@@ -24,6 +24,7 @@
 #include <random>
 
 #include "libfly/neigh/sort.hpp"
+#include "libfly/system/SoA.hpp"
 #include "libfly/system/box.hpp"
 #include "libfly/system/boxes/orthorhombic.hpp"
 #include "libfly/system/supercell.hpp"
@@ -54,10 +55,14 @@ void slow_neigh_list(Vector<Vector<Neigh>>& nl, system::Box const& box, system::
     Vec offset = Vec::Zero();
 
     for (int i = 0; i < spatial_dims; i++) {
-      offset += basis.col(i) * signs(i);
+      if (box.periodic(i)) {  // Only in periodic axis
+        offset += basis.col(i) * signs(i);
+      }
     }
 
-    disp_vectors.push_back(offset);
+    if ((signs == 0).all() || offset != Vec::Zero()) {
+      disp_vectors.push_back(offset);
+    }
   });
 
   for (Eigen::Index i = 0; i < atoms.size(); i++) {
@@ -91,13 +96,13 @@ void slow_neigh_list(Vector<Vector<Neigh>>& nl, system::Box const& box, system::
   }
 }
 
-void test(Vector<Vector<Neigh>> const& nl, system::Box const& box, system::SoA<Position const&> atoms, double r_cut, int num_threads) {
+void test(Vector<Vector<Neigh>> const& nl, neigh::List const& neigh, double r_cut) {
   //
-  neigh::List neigh(box, r_cut);
+  //   neigh::List neigh(box, r_cut);
 
-  timeit(fmt::format("\trebuild {:<2}", num_threads), [&] { neigh.rebuild(atoms, num_threads); });
+  //   timeit(fmt::format("\trebuild {:<2}", num_threads), [&] { neigh.rebuild(atoms, num_threads); });
 
-  for (Eigen::Index i = 0; i < atoms.size(); i++) {
+  for (Eigen::Index i = 0; i < neigh.size(); i++) {
     //
     Vector<Neigh> nl2;
 
@@ -141,7 +146,7 @@ std::pair<system::SoA<Position>, system::Box> gen_rand(fly::Xoshiro& gen) {
       basis = basis.triangularView<Eigen::Lower>();
     }
 
-    fly::system::Box tmp{basis, fly::Arr<bool>::NullaryExpr(rand)};
+    fly::system::Box tmp{basis, fly::Arr<double>::NullaryExpr(rand) < 0.5};
 
     return tmp;
   }();
@@ -187,14 +192,54 @@ TEST_CASE("List fuzz-testing", "[neigh]") {
 
     timeit("\tslow build", [cell = cell, box = box, r_cut] { slow_neigh_list(nl, box, cell, r_cut); });
 
-    test(nl, box, cell, r_cut, 1);
-    test(nl, box, cell, r_cut, omp_get_max_threads());
+    neigh::List neigh(box, r_cut);
+
+    timeit(fmt::format("\trebuild {:<2}", 1), [&, cell = cell] { neigh.rebuild(cell, 1); });
+
+    test(nl, neigh, r_cut);
+
+    timeit(fmt::format("\trebuild {:<2}", omp_get_max_threads()), [&, cell = cell] { neigh.rebuild(cell, omp_get_max_threads()); });
+
+    test(nl, neigh, r_cut);
   }
 }
 
 TEST_CASE("List::update()", "[neigh]") {
-  //
-  fly::Xoshiro gen({1, 1, 1, 1});
-  //
-  auto [cell, box] = gen_rand(gen);
+  //   //
+  //   fly::Xoshiro gen({1, 1, 1, 1});
+  //   //
+  //   auto [cell, box] = gen_rand(gen);
+
+  //   double r_cut_max = visit(box.get(), [](auto const& g) { return g.min_width(); });
+
+  //   double r_cut = r_cut_max / 3;
+
+  //   double skin = 0.1;
+
+  //   neigh::List neigh(box, r_cut + 2 * skin);
+
+  //   //////////////////////////
+
+  //   neigh.rebuild(cell);
+
+  //   //////////////////////////
+
+  //   system::SoA<DeltaPosition> deltas(cell.size());
+
+  //   std::uniform_real_distribution<double> dis(0, 1);
+
+  //   // Set up a displacement less than the skin distance.
+  //   for (int i = 0; i < deltas.size(); i++) {
+  //     deltas(dr_, i) = Vec::NullaryExpr([&] { return dis(gen); }).normalized() * (skin * 0.99);
+  //   }
+
+  //   neigh.update(deltas);
+
+  //   Vector<Vector<Neigh>> nl;
+
+  //   cell[r_] -= deltas[dr_];
+
+  //   slow_neigh_list(nl, box, cell, r_cut);
+
+  //   test(nl, neigh, r_cut);
 }

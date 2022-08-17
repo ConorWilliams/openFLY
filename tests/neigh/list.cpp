@@ -12,7 +12,7 @@
 
 // You should have received a copy of the GNU General Public License along with openFLY. If not, see <https://www.gnu.org/licenses/>.
 
-#include "libfly/neighbour/list.hpp"
+#include "libfly/neigh/list.hpp"
 
 #include <Eigen/src/Core/util/Meta.h>
 #include <fmt/core.h>
@@ -22,7 +22,7 @@
 #include <cstddef>
 #include <random>
 
-#include "libfly/neighbour/sort.hpp"
+#include "libfly/neigh/sort.hpp"
 #include "libfly/system/box.hpp"
 #include "libfly/system/boxes/orthorhombic.hpp"
 #include "libfly/system/supercell.hpp"
@@ -31,12 +31,6 @@
 #include "libfly/utility/random.hpp"
 
 using namespace fly;
-
-TEST_CASE("List", "[neighbour]") {
-  //
-  REQUIRE(true);
-  //
-}
 
 struct Neigh {
   Eigen::Index i;
@@ -98,7 +92,7 @@ void slow_neigh_list(Vector<Vector<Neigh>>& nl, system::Box const& box, system::
 
 void test(Vector<Vector<Neigh>> const& nl, system::Box const& box, system::SoA<Position const&> atoms, double r_cut, int num_threads) {
   //
-  neighbour::List neigh(box, r_cut);
+  neigh::List neigh(box, r_cut);
 
   timeit(fmt::format("\trebuild {:<2}", num_threads), [&] { neigh.rebuild(atoms, num_threads); });
 
@@ -125,7 +119,7 @@ void test(Vector<Vector<Neigh>> const& nl, system::Box const& box, system::SoA<P
   }
 }
 
-TEST_CASE("List fuzz-testing", "[neighbour]") {
+TEST_CASE("List fuzz-testing", "[neigh]") {
   //
 
   //
@@ -164,7 +158,7 @@ TEST_CASE("List fuzz-testing", "[neighbour]") {
 
     double r_cut = r_cut_max / 3;
 
-    cell = neighbour::sort(box, r_cut, cell);
+    cell = neigh::sort(box, r_cut, cell);
 
     static Vector<Vector<Neigh>> nl;
 

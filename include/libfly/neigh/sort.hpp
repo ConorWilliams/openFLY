@@ -54,7 +54,7 @@ namespace fly::system::detail {
   }
 }  // namespace fly::system::detail
 
-namespace fly::neighbour {
+namespace fly::neigh {
 
   /**
    * @brief Order the atoms in a SoA according to their grid index.
@@ -80,4 +80,4 @@ namespace fly::neighbour {
     return system::detail::VoS_to_SoA(vos);
   }
 
-}  // namespace fly::neighbour
+}  // namespace fly::neigh

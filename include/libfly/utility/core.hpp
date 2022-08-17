@@ -488,8 +488,7 @@ namespace fly {
    * \endrst
    *
    * @param P An NxN fixed-size matrix.
-   * @return Eigen::Vector<Scalar, N> The unit normal of the hyperplane passing
-   * through the column vectors of ``P``.
+   * @return Eigen::Vector<Scalar, N> The unit normal of the hyperplane passing through the column vectors of ``P``.
    */
   template <typename Scalar, int N>
   auto hyperplane_normal(Eigen::Matrix<Scalar, N, N> const &P) -> std::enable_if_t<N != Eigen::Dynamic, Eigen::Vector<Scalar, N>> {

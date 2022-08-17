@@ -1,23 +1,11 @@
 
 #include "libfly/io/gsd.hpp"
-#include "libfly/system/box.hpp"
+
 #include "libfly/system/property.hpp"
 #include "libfly/system/supercell.hpp"
-#include "libfly/system/typemap.hpp"
 
-void example_gsd() {
+void example_gsd(fly::system::Supercell<fly::system::TypeMap<>, fly::Position> const& cell) {
   //
-  namespace fs = fly::system;
-
-  fs::Box box(fly::Mat::Identity(), fly::Arr<bool>::Constant(true));
-
-  fs::TypeMap<fly::Index> map(2);
-
-  // Set up the map //
-
-  fs::Supercell cell = fs::make_supercell<fly::Position>(box, map, 4);
-
-  // Write some data to the supercell //
 
   fly::io::BinaryFile file("example.gsd", fly::io::create);
 

@@ -12,7 +12,7 @@
 
 // You should have received a copy of the GNU General Public License along with openFLY. If not, see <https://www.gnu.org/licenses/>.
 
-#include "libfly/neighbour/list.hpp"
+#include "libfly/neigh/list.hpp"
 
 // #include <algorithm>
 // #include <cassert>
@@ -29,13 +29,13 @@
 // #include "libatom/sim_cell.hpp"
 // #include "libatom/utils.hpp"
 
-namespace fly::neighbour {
+namespace fly::neigh {
 
   auto List::rebuild(system::SoA<Position const&> positions, int num_threads) -> void {
     //
     verify(num_threads > 0, "{} is not a valid number of threads for rebuild()", num_threads);
     //
-    if (m_neigh_lists.size() != positions.size()) {
+    if (size() != positions.size()) {
       // Allocate space if needed
       m_atoms.destructive_resize(positions.size() * (1 + MAX_GHOST_RATIO));
       m_neigh_lists.resize(positions.size());
@@ -70,7 +70,7 @@ namespace fly::neighbour {
     }
 
 #pragma omp parallel for num_threads(num_threads) schedule(static)
-    for (Eigen::Index i = 0; i < m_neigh_lists.size(); i++) {
+    for (Eigen::Index i = 0; i < size(); i++) {
       build_neigh_list(i);
     }
   }
@@ -81,10 +81,10 @@ namespace fly::neighbour {
   void List::make_ghosts() {
     visit(m_grid, [this](auto const& grid) {
       //
-      Eigen::Index next_slot = m_neigh_lists.size();
+      Eigen::Index next_slot = size();
 
       auto insert = [this](Eigen::Index slot, Vec im, Eigen::Index j) {
-        ASSERT(slot < m_atoms.size(), "Not enough space for ghost number: {}", slot - m_neigh_lists.size());
+        ASSERT(slot < m_atoms.size(), "Not enough space for ghost number: {}", slot - size());
         m_atoms(r_, slot) = im;
         m_atoms(i_, slot) = m_atoms(i_, j);
       };
@@ -111,18 +111,6 @@ namespace fly::neighbour {
       m_num_plus_ghosts = next_slot;
     });
   }
-
-  //   void List::update_positions(Position::matrix_type const& deltas) {
-  //     // Copy in atoms
-  //     for (std::size_t i = 0; i < m_neigh_lists.size(); ++i) {
-  //       m_atoms(Position{}, i) -= deltas.col(i);
-  //     }
-
-  //     // Update ghosts
-  //     for (std::size_t i = m_neigh_lists.size(); i < m_num_plus_ghosts; i++) {
-  //       m_atoms(Position{}, i) -= deltas.col(image_to_real(i));
-  //     }
-  //   }
 
   void List::build_neigh_list(Eigen::Index i) {
     //
@@ -157,4 +145,4 @@ namespace fly::neighbour {
     }
   }
 
-}  // namespace fly::neighbour
+}  // namespace fly::neigh

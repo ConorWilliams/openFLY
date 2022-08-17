@@ -12,7 +12,7 @@
 
 // You should have received a copy of the GNU General Public License along with openFLY. If not, see <https://www.gnu.org/licenses/>.
 
-#include "libfly/neighbour/adjacent.hpp"
+#include "libfly/neigh/adjacent.hpp"
 
 #include <catch2/catch_test_macros.hpp>
 
@@ -20,11 +20,11 @@
 #include "libfly/system/boxes/orthorhombic.hpp"
 #include "libfly/utility/core.hpp"
 
-TEST_CASE("AdjacentCells", "[neighbour]") {
+TEST_CASE("AdjacentCells", "[neigh]") {
   //
   if constexpr (fly::spatial_dims == 3) {
     //
-    fly::neighbour::AdjacentCells cells({5, 5, 5});
+    fly::neigh::detail::AdjacentCells cells({5, 5, 5});
 
     {
       auto neigh = cells[(1) + (1) * 5 + (1) * 5 * 5];

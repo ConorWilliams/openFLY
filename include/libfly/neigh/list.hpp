@@ -17,7 +17,7 @@
 #include <variant>
 #include <vector>
 
-#include "libfly/neighbour/adjacent.hpp"
+#include "libfly/neigh/adjacent.hpp"
 #include "libfly/system/SoA.hpp"
 #include "libfly/system/box.hpp"
 #include "libfly/system/property.hpp"
@@ -26,62 +26,103 @@
 /**
  * \file list.hpp
  *
- * @brief ...
+ * @brief Classes to build and update neighbour lists.
  */
 
-namespace fly::neighbour {
-
-  /**
-   * @brief The maximum number of ghosts neighbour cell supports is MAX_GHOST_RATIO * num_atoms
-   */
-  inline constexpr Eigen::Index MAX_GHOST_RATIO = 6;
+namespace fly::neigh {
 
   /**
    * @brief A class to contain, build and manage neighbour lists in shared memory.
    *
-   * Designed with the intention of being reused List separates the building, updating and
-   * using of neighbour lists (NLs). NLs can be constructed from a SimCell and then used to find all
-   * atoms within some cut off of an atom efficiently.
+   * Neighbour-lists are used to find the atoms within some cut-off of all atoms efficiently.
    *
-   * List resolves periodicity using ghost atoms, these are stored and managed internally.
+   * Designed with the intention of being reused, List separates the building (List::rebuild()), updating (List::update()) and
+   * using (List::for_neighbours()) of the neighbour-lists.
    *
-   * An example of using a List to count the average number of atoms within r_cut of each
-   * atom:
+   * List resolves periodicity using *ghost* atoms, these are stored and managed internally.
+   *
    */
   class List {
   public:
     /**
-     * @brief Construct a new Neighbour List object. The cut off, r_cut, must be smaller than the
-     * minimum OrthSimCell extent.
+     * @brief Control the  maximum number of ghosts.
+     *
+     * List supports up to MAX_GHOST_RATIO * List::size() ghost atoms.
+     */
+    static constexpr Eigen::Index MAX_GHOST_RATIO = 6;
+
+    /**
+     * @brief Construct a new List object
+     *
+     * @param box The description of the simulation space.
+     * @param r_cut The neighbour cut-off radius.
      */
     List(system::Box const& box, double r_cut)
         : m_box(box),
           m_grid(box.make_grid(r_cut)),
-          m_cells(visit(m_grid, [](auto const& grid) -> Arr<int> { return grid.shape(); })),
+          m_cells(visit(m_grid, [](auto const& grid) { return grid.shape(); })),
           m_r_cut(r_cut) {}
 
     /**
-     * @brief Build the internal neighbour lists in parallel with openMP.
+     * @brief Builds the internal neighbour-lists.
      *
-     * After a call to this function the for_neighbours methods can be used to iterate over all
-     * atoms within r_cut of any atom.
+     * @param positions The positions of the atoms.
+     * @param num_threads The number of threads to spawn (using openMP) to complete this operation.
      */
     auto rebuild(system::SoA<Position const&> positions, int num_threads = 1) -> void;
 
-    // /**
-    //  * @brief Update the positions of all atoms and ghosts to Position{} -= deltas
-    //  *
-    //  * Usefull if using a skin distance and wanting to avoid rebuilding the lists.
-    //  */
-    // void update_positions(Position::matrix_type const& deltas);
+    /**
+     * @brief Update the positions of the real+ghost atoms.
+     *
+     * \rst
+     *
+     * If the positions of the real atoms are stored in the :math:`3N \times 1` vector :math:`r` then after calling this function:
+     *
+     * .. math::
+     *
+     *    r \gets r - x
+     *
+     * \endrst
+     *
+     * @param x A 3Nx1 vector containing the change in the positions of the real atoms.
+     */
+    template <typename E>
+    void update(Eigen::DenseBase<E> const& x) {
+      //
+      constexpr auto k = Position::size();
+
+      auto kN = k * size();
+
+      if (x.rows() != kN || x.cols() != 1) {
+        throw error("Input to update is {}x{} but should be {}x1", x.rows(), x.cols(), kN);
+      }
+
+      m_atoms[r_].head(kN) -= x;  // Update real atoms directly.
+
+      // Update positions of ghosts.
+      for (Eigen::Index i = size(); i < m_num_plus_ghosts; i++) {
+        m_atoms(r_, i) -= x.segment<k>(k * image_to_real(i));
+      }
+    }
 
     /**
      * @brief Call f(n, r, dr) for every neighbour n of atom i, within distance r_cut.
+     *
+     * \pre List::rebuild() must have be called.
      *
      * n is the neighbour index which could be a ghost or real atom, to convert to the index of the
      * real atom regardless use .image_to_real(n)
      *
      * dr is the minimum image vector joining i to n and r is the norm of dr
+     *
+     * \rst
+     *
+     * An example of using a List to count the average number of neighbours:
+     *
+     * .. include:: ../../examples/neigh/list.cpp
+     *    :code:
+     *
+     * \endrst
      */
     template <typename F>
     void for_neighbours(Eigen::Index i, double r_cut, F&& f) const {
@@ -89,6 +130,8 @@ namespace fly::neighbour {
       if (r_cut > m_r_cut) {
         throw error("r_cut={} is bigger then than the internal r_cut={}", r_cut, m_r_cut);
       }
+
+      ASSERT(i >= 0 && i < size(), "Atom {} is not in neighbour list length {}", i, size());
 
       for (auto&& n : m_neigh_lists[i]) {
         Vec dr = m_atoms(r_, n) - m_atoms(r_, i);
@@ -99,12 +142,17 @@ namespace fly::neighbour {
       }
     }
 
+    /**
+     * @brief Get the number of real atoms in this neighbour list.
+     */
+    Eigen::Index size() const noexcept { return m_neigh_lists.size(); }
+
   private:
     struct Next : system::Property<Eigen::Index> {};  ///< Index of the next atom in the linked cell list.
 
     system::Box m_box;                           ///< Store the box.
     typename system::Box::Grid m_grid;           ///< Store the grid (made by the box).
-    AdjacentCells m_cells;                       ///< Store the neighbour cell lists.
+    detail::AdjacentCells m_cells;               ///< Store the neighbour cell lists.
     double m_r_cut;                              ///< Store the cut of radius.
     system::SoA<Index, Next, Position> m_atoms;  ///< Store the canonical positions, Index = index-in-input for real+ghosts.
     Eigen::Index m_num_plus_ghosts = 0;          ///< Number of real atoms + number of ghost atoms.
@@ -134,4 +182,4 @@ namespace fly::neighbour {
     Eigen::Index image_to_real(Eigen::Index i) const noexcept { return *(m_atoms[Index{}].data() + Index::size() * i); }
   };
 
-}  // namespace fly::neighbour
+}  // namespace fly::neigh

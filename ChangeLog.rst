@@ -8,7 +8,7 @@ Unreleased
 Added
 ~~~~~~~~~
 
-- ``AdjacentCells`` class.
+
 - ``Vector`` class to replace ``std::vector``.
 - ``Xoshiro`` class as the PRNG.
 - ``Box`` has a new ``get()`` method to fetch the underlying ``std::variant`` .

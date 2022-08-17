@@ -24,10 +24,10 @@
 /**
  * \file adjacent.hpp
  *
- * @brief Helper types for neighbour::List
+ * @brief Helper types for neigh::List
  */
 
-namespace fly::neighbour {
+namespace fly::neigh::detail {
 
   /**
    * @brief Construct a list of adjacent cell lists.
@@ -85,4 +85,4 @@ namespace fly::neighbour {
     Vector<adjbours> m_adj_cells;
   };
 
-}  // namespace fly::neighbour
+}  // namespace fly::neigh::detail

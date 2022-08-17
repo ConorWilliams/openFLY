@@ -43,6 +43,12 @@ namespace fly::system {
     template <typename... T>
     struct same_properties<TypeMap<T...>, T...> : std::true_type {};
 
+    template <typename>
+    struct is_TypeMap : std::false_type {};
+
+    template <typename... T>
+    struct is_TypeMap<TypeMap<T...>> : std::true_type {};
+
   }  // namespace detail
 
   /**

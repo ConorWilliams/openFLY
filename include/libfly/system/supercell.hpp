@@ -35,6 +35,7 @@ namespace fly::system {
    * system **has a** ``Box`` and a ``TypeMap``. A Supercell always has the ``TypeID`` property for each atom and accepts the rest as
    * template arguments.
    *
+   * @tparam Map A specialisation of fly::system::TypeMap.
    * @tparam T Tags derived from ``Property``, to describe each member.
    */
   template <typename Map, typename... T>
@@ -43,6 +44,8 @@ namespace fly::system {
     using SOA = SoA<TypeID, T...>;
 
     static_assert(SOA::owns_all, "Supercells must own all their data");
+
+    static_assert(detail::is_TypeMap<Map>::value, "The Map template param must be a specialisation of system::TypeMap");
 
   public:
     /**

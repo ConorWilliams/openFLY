@@ -147,4 +147,14 @@ File ``random.hpp``
     :members:
     :undoc-members:
 
+Natural Splines
+---------------------
 
+File ``spline.hpp``
+
+.. doxygenfile:: spline.hpp
+    :sections: briefdescription detaileddescription
+
+.. doxygenclass:: fly::Spline
+    :members:
+    :undoc-members:

@@ -31,7 +31,7 @@
 
 namespace fly::neigh {
 
-  auto List::update(system::SoA<DeltaPosition const&> x) -> void {
+  auto List::update(system::SoA<Delta const&> x) -> void {
     //
     verify(x.size() == size(), "Input to update has {} atoms but list contains {}", x.size(), size());
 

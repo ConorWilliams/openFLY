@@ -23,7 +23,7 @@
 
 namespace fly::minimise {
 
-  system::SoA<DeltaPosition &> StepLBFGS::newton_step(system::SoA<Position const &, PotentialGradient const &> in) {
+  system::SoA<Delta &> StepLBFGS::newton_step(system::SoA<Position const &, PotentialGradient const &> in) {
     //
     int prev = (m_k - 1) % m_n;
 

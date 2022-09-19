@@ -228,7 +228,7 @@ TEST_CASE("List::update()", "[neigh]") {
 
     //////////////////////////
 
-    system::SoA<DeltaPosition> deltas(cell.size());
+    system::SoA<Delta> deltas(cell.size());
 
     std::uniform_real_distribution<double> dis(0, 1);
 

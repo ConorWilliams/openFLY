@@ -20,7 +20,7 @@ Unreleased
 Added
 ~~~~~
 
-- New ``DeltaPosition`` property.
+- New ``Delta`` property.
 - New ``StepLBFGS`` class.
 
 Changed

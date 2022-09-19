@@ -80,7 +80,7 @@ namespace fly::minimise {
      * @param in The current position and potential gradient.
      * @return A view of the approximate Newton-step (see above) (it is OK to modify this view it will be overwritten upon next call).
      */
-    auto newton_step(system::SoA<Position const &, PotentialGradient const &> in) -> system::SoA<DeltaPosition &>;
+    auto newton_step(system::SoA<Position const &, PotentialGradient const &> in) -> system::SoA<Delta &>;
 
   private:
     int m_n;
@@ -100,7 +100,7 @@ namespace fly::minimise {
     Array m_prev_x;
     Array m_prev_g;
 
-    system::SoA<DeltaPosition> m_r;
+    system::SoA<Delta> m_r;
 
     Array m_q;
   };

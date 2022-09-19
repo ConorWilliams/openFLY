@@ -106,7 +106,7 @@ namespace fly::neigh {
      *
      * @param x The change in the positions of the real atoms.
      */
-    auto update(system::SoA<DeltaPosition const&> x) -> void;
+    auto update(system::SoA<Delta const&> x) -> void;
 
     /**
      * @brief Call ``f(n, r, dr)`` for every neighbour of atom ``i`` within cut-off ``r_cut``.

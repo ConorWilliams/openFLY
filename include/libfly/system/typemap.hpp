@@ -83,6 +83,16 @@ namespace fly::system {
     TypeMap(TypeMap&&) noexcept = default;
 
     /**
+     * @brief Defaulted copy-assignment.
+     */
+    TypeMap& operator=(TypeMap const&) = default;
+
+    /**
+     * @brief Defaulted move-assignment.
+     */
+    TypeMap& operator=(TypeMap&&) = default;
+
+    /**
      * @brief Construct a TypeMap to hold ``num_types`` types.
      *
      * \rst

@@ -382,11 +382,14 @@ namespace fly {
    * @param a First input.
    * @param b Second input.
    *
-   * @return ``true`` if ``a`` and  ``b`` are within 0.01% of each other.
+   * @param atol Tolerance of absolute difference between ``a`` and  ``b`` for them to be close.
+   * @param ftol Tolerance of fractional difference between ``a`` and  ``b`` for them to be close.
+   *
+   * @return ``true`` if ``a`` and  ``b`` are within ``atol`` or fractionally within ``ftol`` of each other.
    */
   template <typename T>
-  constexpr auto near(T a, T b) -> std::enable_if_t<std::is_floating_point_v<T>, bool> {
-    return std::abs(a - b) < 1e-10 || std::abs(a - b) <= 0.0001 * std::max(std::abs(a), std::abs(b));
+  constexpr auto near(T a, T b, T atol = 1e-10, T ftol = 0.0001) -> std::enable_if_t<std::is_floating_point_v<T>, bool> {
+    return std::abs(a - b) < atol || std::abs(a - b) <= ftol * std::max(std::abs(a), std::abs(b));
   }
 
   /**

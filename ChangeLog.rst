@@ -26,6 +26,7 @@ Added
 Changed
 ~~~~~~~
 
+- ``fly::near()`` now has customizable tolerances.
 - ``neigh::List``'s ``update()`` API changed
 
 Removed

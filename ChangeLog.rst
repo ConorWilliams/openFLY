@@ -22,6 +22,9 @@ Added
 
 - New ``Delta`` property.
 - New ``StepLBFGS`` class.
+- New ``Spline`` utility class.
+- New ``DataEAM`` class with eam/fs parsing.
+- New ``potential::Base`` class (virtual interface class)
 
 Changed
 ~~~~~~~

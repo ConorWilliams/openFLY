@@ -102,13 +102,13 @@ namespace fly {
 
     std::pair<double, Spine const&> fetch(double x) const {
       //
-      verify(x >= 0, "x={}, not less than zero", x);
+      ASSERT(x >= 0, "x={}, not less than zero", x);
 
       auto i = static_cast<std::size_t>(x * m_inv_dx);
 
       // Could clamp this value:  i = std::min(i, m_spines.size() - 1)
 
-      verify(i < m_spines.size(), "x={} is outside tabulated region with i={}, len={}", x, i, m_spines.size());
+      ASSERT(i < m_spines.size(), "x={} is outside tabulated region with i={}, len={}", x, i, m_spines.size());
 
       return {x - static_cast<double>(i) * m_dx, m_spines[i]};
     }

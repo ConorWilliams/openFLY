@@ -2,6 +2,10 @@
 /.cache
 /.vscode
 
+data/xyz
+data/*.fs
+!/data/wen.eam.fs
+
 CMakeUserPresets.json
 BinaryFile_test.gsd
 compile_commands.json

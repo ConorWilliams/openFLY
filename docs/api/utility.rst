@@ -92,7 +92,7 @@ Small functions
 
 -----------------------
 
-.. doxygenfunction:: ssize
+.. doxygenfunction:: xise
 
 Mathematical functions
 ~~~~~~~~~~~~~~~~~~~~~~~~

@@ -80,9 +80,9 @@ auto make_super() {
 
   auto box = fly::system::Box(basis, {true, true, true});
 
-  auto cell = fly::system::make_supercell<Position, Frozen, PotentialGradient>(box, map, ssize(lat));
+  auto cell = fly::system::make_supercell<Position, Frozen, PotentialGradient>(box, map, xise(lat));
 
-  for (int i = 0; i < ssize(lat); i++) {
+  for (int i = 0; i < xise(lat); i++) {
     cell(r_, i) = lat[safe_cast<std::size_t>(i)].off;
     cell(id_, i) = lat[safe_cast<std::size_t>(i)].num;
     cell(Frozen{}, i) = false;

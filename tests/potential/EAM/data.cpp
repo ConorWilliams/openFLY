@@ -22,7 +22,7 @@
 
 using namespace fly;
 
-TEST_CASE("EAM parsing", "[utility]") {
+TEST_CASE("EAM parsing", "[potential]") {
   //
   std::ifstream file{"../../../data/wen.eam.fs"};
 

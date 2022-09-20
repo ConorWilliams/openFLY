@@ -58,7 +58,7 @@ namespace fly::potential {
      * @param threads Number of openMP threads to use.
      * @return double The potential energy of the system of atoms.
      */
-    virtual auto energy(system::SoA<TypeID const&, Frozen const&> in, neigh::List const& nl, std::size_t threads = 1) -> double = 0;
+    virtual auto energy(system::SoA<TypeID const&, Frozen const&> in, neigh::List const& nl, int threads = 1) -> double = 0;
 
     /**
      * @brief Compute potential energy gradient.
@@ -69,8 +69,8 @@ namespace fly::potential {
      * @param nl Neighbour list (in ready state i.e. neigh::List::update() or neigh::List::rebuild() called).
      * @param threads Number of openMP threads to use.
      */
-    virtual auto gradient(system::SoA<TypeID const&, Frozen const&, PotentialGradient&> inout, neigh::List const& nl,
-                          std::size_t threads = 1) -> double
+    virtual auto gradient(system::SoA<TypeID const&, Frozen const&, PotentialGradient&> inout, neigh::List const& nl, int threads = 1)
+        -> void
         = 0;
 
     // /**
@@ -78,7 +78,7 @@ namespace fly::potential {
     //  *
     //  * The resulting hessian will be m by m and only include contributions from the m active atoms.
     //  */
-    // virtual auto hessian(system::SoA<TypeID const&, Frozen const&> info, neigh::List const& nl, std::size_t threads = 1) -> double =
+    // virtual auto hessian(system::SoA<TypeID const&, Frozen const&> info, neigh::List const& nl, int threads = 1) -> double =
     // 0;
 
     /**

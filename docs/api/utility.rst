@@ -90,6 +90,10 @@ Small functions
 
 .. doxygenfunction:: template_for
 
+-----------------------
+
+.. doxygenfunction:: ssize
+
 Mathematical functions
 ~~~~~~~~~~~~~~~~~~~~~~~~
 

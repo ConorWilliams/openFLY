@@ -372,6 +372,20 @@ namespace fly {
     detail::template_for_impl(beg, end, f);
   }
 
+  /**
+   * @brief Get the signed size of a container.
+   *
+   * See https://en.cppreference.com/w/cpp/iterator/size
+   *
+   * @param c Container to find the size of.
+   * @return The result of ``c.size()`` cast to an appropriate signed type.
+   */
+  template <typename C>
+  constexpr auto ssize(C const &c) -> std::common_type_t<std::ptrdiff_t, std::make_signed_t<decltype(c.size())>> {
+    using R = std::common_type_t<std::ptrdiff_t, std::make_signed_t<decltype(c.size())>>;
+    return static_cast<R>(c.size());
+  }
+
   // ------------------- Math functions ---------------- //
 
   /**

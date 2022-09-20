@@ -56,22 +56,32 @@ namespace fly::system {
     /**
      * @brief Simulation box const-getter.
      */
-    Box const& box() const { return m_box; }
+    Box const& box() const noexcept { return m_box; }
 
     /**
      * @brief Simulation box getter.
      */
-    Box& box() { return m_box; }
+    Box& box() noexcept { return m_box; }
 
     /**
      * @brief TypeMap const-getter.
      */
-    Map const& map() const { return m_map; }
+    Map const& map() const noexcept { return m_map; }
 
     /**
      * @brief TypeMap getter.
      */
-    Map& map() { return m_map; }
+    Map& map() noexcept { return m_map; }
+
+    /**
+     * @brief Explicitly fetch the base SoA class.
+     */
+    SOA& soa() noexcept { return *this; }
+
+    /**
+     * @brief Explicitly fetch the base SoA class.
+     */
+    SOA const& soa() const noexcept { return *this; }
 
   private:
     Box m_box;

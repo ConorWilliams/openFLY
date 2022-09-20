@@ -90,6 +90,21 @@ namespace fly::potential {
     auto gradient(system::SoA<TypeID const&, Frozen const&, PotentialGradient&> inout, neigh::List const& nl, int threads = 1)
         -> void override;
 
+    /**
+     * @brief Compute hessian matrix of the active atoms.
+     *
+     * Assumes the neighbour list are ready. The resulting hessian will be m by m and only include contributions from the m active
+     * atoms. As hessian matrices are always symmetric this function only computes the lower diagonal portion.
+     *
+     *
+     * @param in Input data.
+     * @param out Hessian matrix to write output to.
+     * @param nl Neighbour list (in ready state i.e. neigh::List::update() or neigh::List::rebuild() called).
+     * @param threads Number of openMP threads to use.
+     */
+    auto hessian(system::SoA<TypeID const&, Frozen const&> in, system::Hessian& out, neigh::List const& nl, int threads = 1)
+        -> void override;
+
   private:
     std::shared_ptr<DataEAM const> m_data;
 
@@ -97,7 +112,7 @@ namespace fly::potential {
     struct Rho : system::Property<double, 1> {};
     struct Mu : system::Property<double, spatial_dims> {};
 
-    struct Hidx : system::Property<std::size_t, 1> {};
+    struct Hidx : system::Property<Eigen::Index, 1> {};
 
     system::SoA<Fprime, Rho, Mu, Hidx> m_aux;
   };

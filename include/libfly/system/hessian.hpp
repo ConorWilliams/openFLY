@@ -30,10 +30,8 @@ namespace fly::system {
   /**
    * @brief A class to represent the blocked hessian of a system.
    *
-   * The hessian is an nm by nm matrix with m the number of active atoms and n the number of spatial dimensions. Each n by n sub-matrix
-   * is a "block" of the hessian.
-   *
-   * It is assumed and must be ensured that Hessians are symmetric.
+   * The hessian is a symmetric nm by nm matrix with m the number of active atoms and n the number of spatial dimensions. Each n by n
+   * sub-matrix is a "block" of the hessian.
    */
   class Hessian {
   private:
@@ -57,13 +55,16 @@ namespace fly::system {
      * @param j The index (in the hessian matrix) of the second atom in the pair.
      */
     auto operator()(Eigen::Index i, Eigen::Index j) {
+      ASSERT(i >= 0 && i < m_hess.rows(), "{} is not a valid index with {} rows", i, m_hess.rows());
+      ASSERT(j >= 0 && j < m_hess.cols(), "{} is not a valid index with {} cols", i, m_hess.cols());
       return m_hess.block<spatial_dims, spatial_dims>(spatial_dims * i, spatial_dims * j);
     }
 
     /**
      * @brief Compute and return an ordered vector of Eigen Values.
      *
-     * See: https://eigen.tuxfamily.org/dox/classEigen_1_1SelfAdjointEigenSolver.html
+     * See: https://eigen.tuxfamily.org/dox/classEigen_1_1SelfAdjointEigenSolver.html only reads the lower diagonal portion of the
+     * matrix.
      */
     auto const& eigenvalues() {
       //

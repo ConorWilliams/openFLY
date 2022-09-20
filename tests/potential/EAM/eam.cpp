@@ -22,13 +22,14 @@
 
 #include "libfly/potential/EAM/data.hpp"
 #include "libfly/system/box.hpp"
+#include "libfly/system/hessian.hpp"
 #include "libfly/system/supercell.hpp"
 #include "libfly/system/typemap.hpp"
 #include "libfly/utility/core.hpp"
 
 using namespace fly;
 
-auto make_super() {
+auto make_super(bool erase = true) {
   // Generate a BBC lattice, from old code base.
 
   struct MotifPt {
@@ -38,8 +39,8 @@ auto make_super() {
 
   // Fractional motif
   std::array BCC = {
-      MotifPt{0, Vec{0.0, 0.0, 0.0}},
-      MotifPt{0, Vec{0.5, 0.5, 0.5}},
+      MotifPt{0, Vec::Zero()},
+      MotifPt{0, Vec::Constant(0.5)},
   };
 
   double T = 300.0;
@@ -52,20 +53,19 @@ auto make_super() {
 
   Arr<int> shape = Arr<int>::Constant(7);  // In unit cells
 
-  for (int k = 0; k < shape[0]; k++) {
-    for (int j = 0; j < shape[1]; j++) {
-      for (int i = 0; i < shape[2]; i++) {
-        for (auto &&mot : BCC) {
-          //
-          Vec lp = Arr<int>{i, j, k}.cast<double>().matrix() + mot.off;
+  template_for<int>(Arr<int>::Zero(), shape, [&](auto... i) {
+    for (auto const& mot : BCC) {
+      //
 
-          lat.push_back({mot.num, lp * a});
-        }
-      }
+      Vec lp = Arr<int>{i...}.cast<double>().matrix() + mot.off;
+
+      lat.push_back({mot.num, lp * a});
     }
-  }
+  });
 
-  lat.erase(lat.begin() + 1);
+  if (erase) {
+    lat.erase(lat.begin() + 1);
+  }
 
   system::TypeMap<> map{2};
 
@@ -78,19 +78,20 @@ auto make_super() {
     basis(i, i) = a * shape[i];
   }
 
-  auto box = fly::system::Box(basis, {true, true, true});
+  auto box = fly::system::Box(basis, Arr<bool>::Constant(true));
 
   auto cell = fly::system::make_supercell<Position, Frozen, PotentialGradient>(box, map, xise(lat));
 
   for (int i = 0; i < xise(lat); i++) {
     cell(r_, i) = lat[safe_cast<std::size_t>(i)].off;
     cell(id_, i) = lat[safe_cast<std::size_t>(i)].num;
-    cell(Frozen{}, i) = false;
+    cell(fzn_, i) = false;
   }
 
   return cell;
 }
 
+// Testing away from a minima
 TEST_CASE("EAM compute", "[potential]") {
   //
   std::ifstream eam_tab{"../../../data/wen.eam.fs"};
@@ -112,6 +113,68 @@ TEST_CASE("EAM compute", "[potential]") {
     timeit("energy", [&] { E0 = pot->energy(cell.soa(), nl, omp_get_max_threads()); });
 
     REQUIRE(near(E0, -2748.5339306065985));  // Known good data for 3D
+
+    timeit("potential", [&] { pot->gradient(cell.soa(), nl, omp_get_max_threads()); });
+
+    Vec head = cell(g_, 0);
+
+    REQUIRE(gnorm(head - Vec::Constant(-0.19182439085483005)) < 1e-10);
+
+    system::Hessian H;
+
+    timeit("hessian", [&] { pot->hessian(cell.soa(), H, nl, omp_get_max_threads()); });
+
+    Mat ngd = Mat{
+        {+9.0654715551510830, -1.0875103661087880, -1.0875103661087877},
+        {-1.0875103661087880, +9.0654715551510830, -1.0875103661087873},
+        {-1.0875103661087877, -1.0875103661087873, +9.0654715551510830},
+    };
+
+    REQUIRE(gnorm(ngd - H(0, 0)) < 1e-10);
+
+  } else {
+    fmt::print("WARN - tests could not open eam file\n");
+  }
+}
+
+// Testing at a minima
+TEST_CASE("EAM hess", "[potential]") {
+  //
+  std::ifstream eam_tab{"../../../data/wen.eam.fs"};
+
+  if (eam_tab.good()) {
+    //
+    auto data = std::make_shared<potential::DataEAM>(std::move(eam_tab));
+
+    system::Supercell cell = make_super(false);
+
+    std::unique_ptr<potential::Base> pot = std::make_unique<potential::EAM>(cell.map(), data);
+
+    neigh::List nl(cell.box(), pot->r_cut());
+
+    timeit("rebuild", [&] { nl.rebuild(cell.soa(), omp_get_max_threads()); });
+
+    timeit("potential", [&] { pot->gradient(cell.soa(), nl, omp_get_max_threads()); });
+
+    REQUIRE(gnorm(cell[g_]) < 1e-7);
+
+    system::Hessian H;
+
+    timeit("hessian", [&] { pot->hessian(cell.soa(), H, nl, omp_get_max_threads()); });
+
+    CHECK(false);
+
+    auto const& ev = H.eigenvalues();
+
+    fmt::print("eigen_values = {}", ev.head(10));
+
+    for (int i = 0; i < spatial_dims; i++) {
+      REQUIRE(near(ev[i], 0.0));
+    }
+
+    for (int i = spatial_dims; i < ev.size(); i++) {
+      REQUIRE(!near(ev[i], 0.0));
+    }
 
   } else {
     fmt::print("WARN - tests could not open eam file\n");

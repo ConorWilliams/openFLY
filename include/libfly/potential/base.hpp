@@ -20,6 +20,7 @@
 
 #include "libfly/neigh/list.hpp"
 #include "libfly/system/SoA.hpp"
+#include "libfly/system/hessian.hpp"
 #include "libfly/system/property.hpp"
 
 /**
@@ -73,13 +74,20 @@ namespace fly::potential {
         -> void
         = 0;
 
-    // /**
-    //  * @brief Compute hessian matrix, assumes the neighbour list are ready.
-    //  *
-    //  * The resulting hessian will be m by m and only include contributions from the m active atoms.
-    //  */
-    // virtual auto hessian(system::SoA<TypeID const&, Frozen const&> info, neigh::List const& nl, int threads = 1) -> double =
-    // 0;
+    /**
+     * @brief Compute hessian matrix of the active atoms.
+     *
+     * Assumes the neighbour list are ready. The resulting hessian will be m by m and only include contributions from the m active
+     * atoms. As hessian matrices are always symmetric this function is only required to compute the lower diagonal portion.
+     *
+     * @param in Input data.
+     * @param out Hessian matrix to write output to.
+     * @param nl Neighbour list (in ready state i.e. neigh::List::update() or neigh::List::rebuild() called).
+     * @param threads Number of openMP threads to use.
+     */
+    virtual auto hessian(system::SoA<TypeID const&, Frozen const&> in, system::Hessian& out, neigh::List const& nl, int threads = 1)
+        -> void
+        = 0;
 
     /**
      * @brief Call parent destructor.

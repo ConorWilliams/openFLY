@@ -38,167 +38,156 @@ namespace fly::potential {
     return (0.5 * v_sum) + f_sum;
   }
 
-  auto EAM::gradient(system::SoA<TypeID const&, Frozen const&, PotentialGradient&> inout, neigh::List const& nl, int threads) -> void {
+  void EAM::gradient(system::SoA<TypeID const&, Frozen const&, PotentialGradient&> inout, neigh::List const& nl, int num_threads) {
+    // Usually a noop
+    m_aux.destructive_resize(inout.size());
+
+// First sum computes density  at each real atom, runs over frozen+active atoms.
+#pragma omp parallel for num_threads(num_threads) schedule(static)
+    // Compute rho at all
+    for (Eigen::Index b = 0; b < inout.size(); b++) {
+      double rho = 0;
+
+      // Computes rho at atom
+      nl.for_neighbours(b, r_cut(), [&](auto a, double r, Vec const&) {
+        //
+        rho += m_data->phi(inout(id_, a), inout(id_, b)).f(r);
+      });
+
+      // Compute F'(rho) at atom
+      m_aux(Fprime{}, b) = m_data->f(inout(id_, b)).fp(rho);
+    }
+
+// Second sum computes gradient, only runs over active atoms
+#pragma omp parallel for num_threads(num_threads) schedule(static)
+    //
+    for (Eigen::Index g = 0; g < inout.size(); ++g) {
+      //
+      Vec grad = Vec::Zero();
+
+      if (!inout(fzn_, g)) {
+        nl.for_neighbours(g, r_cut(), [&](auto a, double r, Vec const& dr) {
+          //
+
+          double mag = m_data->v(inout(id_, a), inout(id_, g)).fp(r)
+                       + m_aux(Fprime{}, g) * m_data->phi(inout(id_, a), inout(id_, g)).fp(r)
+                       + m_aux(Fprime{}, a) * m_data->phi(inout(id_, g), inout(id_, a)).fp(r);
+
+          grad -= (mag / r) * dr;
+        });
+      }
+
+      // Write grad to atom
+      inout(g_, g) = grad;
+    }
   }
 
-  //   std::optional<double> EAM::gradient(SimCell& x, neighbour::List& nl, std::size_t num_threads) {
-  //     // Usually a noop
-  //     m_aux.destructive_resize(x.size());
+  void EAM::hessian(system::SoA<TypeID const&, Frozen const&> in, system::Hessian& out, neigh::List const& nl, int num_threads) {
+    // Usually a noop, make space in aux
+    m_aux.destructive_resize(in.size());
 
-  // // First sum computes density  at each atom, runs over active+boundary atoms
-  // #pragma omp parallel for num_threads(num_threads) schedule(static)
-  //     for (std::size_t b = 0; b < x.size(); b++) {
-  //       double rho = 0;
+    // Compute hessian indexes and count active
+    Eigen::Index num_active = 0;
 
-  //       // Computes rho at atom
-  //       nl.for_neighbours(b, r_cut(), [&](std::size_t a, double r, Vec3<double> const&) {
-  //         rho += m_data->phi(x(id_, nl.image_to_real(a)), x(id_, b)).f(r);
-  //       });
+    for (Eigen::Index i = 0; i < in.size(); i++) {
+      if (!in(fzn_, i)) {
+        m_aux(Hidx{}, i) = num_active++;
+      }
+    }
 
-  //       // Compute F'(rho) at atom
-  //       m_aux(Fprime{}, b) = m_data->f(x(id_, b)).fp(rho);
-  //     }
+    out.zero_for(num_active);
 
-  // // Second sum computes gradient, only runs over active atoms
-  // #pragma omp parallel for num_threads(num_threads) schedule(static)
-  //     for (std::size_t g = 0; g < x.size(); ++g) {
-  //       //
-  //       Vec3<double> grad = Vec3<double>::Zero();
+// First sum computes  rho & mu  at each atom, runs over active + frozen atoms
+#pragma omp parallel for num_threads(num_threads) schedule(static)
+    for (Eigen::Index b = 0; b < in.size(); ++b) {
+      double rho = 0;
+      Vec mu = Vec::Zero();
+      // Compute rho and mu at atom via local sum
+      nl.for_neighbours(b, r_cut(), [&](auto a, double r, Vec const& dr) {
+        rho += m_data->phi(in(id_, a), in(id_, b)).f(r);
+        mu -= m_data->phi(in(id_, a), in(id_, b)).fp(r) * dr / r;  // A.13
+      });
 
-  //       if (!x(fzn_, g)) {
-  //         nl.for_neighbours(g, r_cut(), [&](std::size_t ap, double r, Vec3<double> const& dr) {
-  //           //
-  //           std::size_t a = nl.image_to_real(ap);
+      // Write
+      m_aux(Rho{}, b) = rho;
+      m_aux(Mu{}, b) = mu;
+    }
 
-  //           double mag = m_data->v(x(id_, a), x(id_, g)).fp(r)
-  //                        + m_aux(Fprime{}, g) * m_data->phi(x(id_, a), x(id_, g)).fp(r)
-  //                        + m_aux(Fprime{}, a) * m_data->phi(x(id_, g), x(id_, a)).fp(r);
+    // Second sums computes hessian, running over all atoms, only writing to z^th column block.
+#pragma omp parallel for num_threads(num_threads) schedule(dynamic)
+    for (Eigen::Index z = 0; z < in.size(); ++z) {
+      // During this section we only write to the z^th column block
 
-  //           grad -= (mag / r) * dr;
-  //         });
-  //       }
+      if (!in(fzn_, z)) {
+        //
+        Vec v = m_aux(Mu{}, z);
+        // A.15 pre sum term, including off-diagonal elements along block diagonal make code simpler.
+        out(m_aux(Hidx{}, z), m_aux(Hidx{}, z)).noalias() = m_data->f(in(id_, z)).fpp(m_aux(Rho{}, z)) * v * v.transpose();
 
-  //       // Write grad to atom
-  //       x(Gradient{}, g) = grad;
-  //     }
+        // Note: dr = r^{za}
+        nl.for_neighbours(z, r_cut(), [&](auto a, double r, Vec const& dr) {
+          // First compute sum over neigh for block-diagonal hessian-elements, neighbours can be
+          // frozen or not
 
-  //     return std::nullopt;
-  //   }
+          // A.14
+          double A = (m_data->v(in(id_, a), in(id_, z)).fp(r) +
 
-  //   void EAM::hessian(SimCell& x, neighbour::List& nl, std::size_t) {
-  //     // Usually a noop, make space in aux
-  //     m_aux.destructive_resize(x.size());
+                      m_data->f(in(id_, z)).fp(m_aux(Rho{}, z)) * m_data->phi(in(id_, a), in(id_, z)).fp(r) +
 
-  //     // Compute hessian indexes
-  //     std::size_t count = 0;
-  //     for (std::size_t i = 0; i < x.size(); i++) {
-  //       if (!x(fzn_, i)) {
-  //         m_aux(Hidx{}, i) = count++;
-  //       }
-  //     }
+                      m_data->f(in(id_, a)).fp(m_aux(Rho{}, a)) * m_data->phi(in(id_, z), in(id_, a)).fp(r))
+                     / r;
 
-  //     // First sum computes  rho & mu  at each atom, runs over active + frozen atoms
-  //     for (std::size_t b = 0; b < x.size(); ++b) {
-  //       double rho = 0;
-  //       Vec3<double> mu = Vec3<double>::Zero();
-  //       // Compute rho and mu at atom via local sum
-  //       nl.for_neighbours(b, r_cut(), [&](std::size_t ap, double r, Vec3<double> const& dr) {
-  //         //
-  //         std::size_t a = nl.image_to_real(ap);
+          // A.14
+          double B = m_data->v(in(id_, a), in(id_, z)).fpp(r) +
 
-  //         rho += m_data->phi(x(id_, a), x(id_, b)).f(r);
-  //         mu -= m_data->phi(x(id_, a), x(id_, b)).fp(r) * dr / r;  // A.13
-  //       });
+                     m_data->f(in(id_, z)).fp(m_aux(Rho{}, z)) * m_data->phi(in(id_, a), in(id_, z)).fpp(r) +
 
-  //       // Write
-  //       m_aux(Rho{}, b) = rho;
-  //       m_aux(Mu{}, b) = mu;
-  //     }
+                     m_data->f(in(id_, a)).fp(m_aux(Rho{}, a)) * m_data->phi(in(id_, z), in(id_, a)).fpp(r);
 
-  //     x.zero_hess();
+          double ABFpp
+              = (A - B - m_data->f(in(id_, a)).fpp(m_aux(Rho{}, a)) * ipow<2>(m_data->phi(in(id_, z), in(id_, a)).fp(r))) / (r * r);
 
-  //     // Second sums computes hessian, running over all atoms
-  //     for (std::size_t z = 0; z < x.size(); ++z) {
-  //       // During this section we only write to the z^th column triplet
+          out(m_aux(Hidx{}, z), m_aux(Hidx{}, z)) += A * Mat::Identity() - ABFpp * dr * dr.transpose();
 
-  //       if (!x(fzn_, z)) {
-  //         auto v = m_aux(Mu{}, z).matrix();
-  //         // A.15 pre sum term
-  //         x.hess(m_aux(Hidx{}, z), m_aux(Hidx{}, z)).matrix() = m_data->f(x(id_, z)).fpp(m_aux(Rho{}, z)) * v *
-  //         v.transpose();
+          // Now we will compute the off diagonal element in this column block of H, the a's must now not be frozen, we do not
+          // compute overlap here. Only need to compute lower triangular part of hessian hence, drop writes to out(z, a) with a > z.
+          ASSERT(z != a, "Atoms {} is interacting with itself", z);
 
-  //         // Note: dr = r^{za}
-  //         nl.for_neighbours(z, r_cut(), [&](std::size_t ap, double r, Vec3<double> const& dr) {
-  //           // First compute sum over neigh for block-diagonal hessian-elements, neighbours can be
-  //           // frozen or not
+          if (z >= a && !in(fzn_, a)) {
+            double BArr = (B - A) / (r * r);
 
-  //           std::size_t a = nl.image_to_real(ap);
+            double ur = m_data->f(in(id_, z)).fpp(m_aux(Rho{}, z)) * m_data->phi(in(id_, a), in(id_, z)).fp(r) / r;
 
-  //           // A.14
-  //           double A = (m_data->v(x(id_, a), x(id_, z)).fp(r) +
+            double ru = m_data->f(in(id_, a)).fpp(m_aux(Rho{}, a)) * m_data->phi(in(id_, z), in(id_, a)).fp(r) / r;
 
-  //                       m_data->f(x(id_, z)).fp(m_aux(Rho{}, z)) * m_data->phi(x(id_, a), x(id_, z)).fp(r) +
+            out(m_aux(Hidx{}, z), m_aux(Hidx{}, a)).noalias() = -BArr * dr * dr.transpose() - A * Mat::Identity()
+                                                                + ur * m_aux(Mu{}, z) * dr.transpose()
+                                                                - ru * m_aux(Mu{}, a) * dr.transpose();
+          }
+        });
+      }
+    }
 
-  //                       m_data->f(x(id_, a)).fp(m_aux(Rho{}, a)) * m_data->phi(x(id_, z), x(id_, a)).fp(r))
-  //                      / r;
+    // Finally compute overlap terms of e coupling to active atom g via a. Each thread only writes to e^th column blocks.
+#pragma omp parallel for num_threads(num_threads) schedule(dynamic)
+    for (Eigen::Index e = 0; e < in.size(); ++e) {
+      //     //
+      if (!in(fzn_, e)) {
+        nl.for_neighbours(e, r_cut(), [&](auto a, double r_e, Vec const& dr_ea) {
+          //
+          double ddFg = m_data->f(in(id_, a)).fpp(m_aux(Rho{}, a)) * m_data->phi(in(id_, e), in(id_, a)).fp(r_e);
 
-  //           // A.14
-  //           double B = m_data->v(x(id_, a), x(id_, z)).fpp(r) +
+          nl.for_neighbours(a, r_cut(), [&](auto g, double r_g, Vec const& dr_ag) {
+            if (e > g && !in(fzn_, g)) {
+              // Now iterating over all pair of unfrozen neighbours of a
+              double mag = ddFg / (r_e * r_g) * m_data->phi(in(id_, g), in(id_, a)).fp(r_g);
 
-  //                      m_data->f(x(id_, z)).fp(m_aux(Rho{}, z)) * m_data->phi(x(id_, a), x(id_, z)).fpp(r) +
+              out(m_aux(Hidx{}, e), m_aux(Hidx{}, g)).noalias() -= mag * dr_ea * dr_ag.transpose();
+            }
+          });
+        });
+      }
+    }
+  }
 
-  //                      m_data->f(x(id_, a)).fp(m_aux(Rho{}, a)) * m_data->phi(x(id_, z), x(id_, a)).fpp(r);
-
-  //           double ABFpp = (A - B
-  //                           - m_data->f(x(id_, a)).fpp(m_aux(Rho{}, a))
-  //                                 * ipow<2>(m_data->phi(x(id_, z), x(id_, a)).fp(r)))
-  //                          / (r * r);
-
-  //           x.hess(m_aux(Hidx{}, z), m_aux(Hidx{}, z)).matrix()
-  //               += A * Eigen::Matrix<double, spatial_dims, spatial_dims>::Identity() - ABFpp * dr.matrix() *
-  //               dr.matrix().transpose();
-
-  //           // Now we will compute the off diagonal element in this column block of H, the a's must
-  //           // now not be frozen, we do not commpute overlap here
-  //           if (!x(fzn_, a)) {
-  //             double BArr = (B - A) / (r * r);
-
-  //             double ur
-  //                 = m_data->f(x(id_, z)).fpp(m_aux(Rho{}, z)) * m_data->phi(x(id_, a), x(id_, z)).fp(r) / r;
-
-  //             double ru
-  //                 = m_data->f(x(id_, a)).fpp(m_aux(Rho{}, a)) * m_data->phi(x(id_, z), x(id_, a)).fp(r) / r;
-
-  //             // TODO : .noaliase()
-
-  //             x.hess(m_aux(Hidx{}, z), m_aux(Hidx{}, a)).matrix()
-  //                 = -BArr * dr.matrix() * dr.matrix().transpose() - A * Eigen::Matrix<double, spatial_dims,
-  //                 spatial_dims>::Identity()
-  //                   + ur * m_aux(Mu{}, z).matrix() * dr.matrix().transpose() - ru * m_aux(Mu{}, a).matrix() *
-  //                   dr.matrix().transpose();
-  //           }
-  //         });
-  //       }
-  //     }
-
-  //     // Finally we must compute the overlap terms
-  //     for (std::size_t a = 0; a < x.size(); ++a) {
-  //       //
-  //       double ddFg = m_data->f(x(id_, a)).fpp(m_aux(Rho{}, a));
-
-  //       nl.for_neighbours(a, r_cut(), [&](std::size_t ep, double r_e, auto const& dr_ae) {
-  //         nl.for_neighbours(a, r_cut(), [&](std::size_t gp, double r_g, auto const& dr_ag) {
-  //           std::size_t e = nl.image_to_real(ep);
-  //           std::size_t g = nl.image_to_real(gp);
-  //           if (e != g && !x(fzn_, e) && !x(fzn_, g)) {
-  //             // Now iterating over all pair of unfrozen neighbours of a
-  //             double mag = ddFg / (r_e * r_g) * m_data->phi(x(id_, g), x(id_, a)).fp(r_g)
-  //                          * m_data->phi(x(id_, e), x(id_, a)).fp(r_e);
-
-  //             x.hess(m_aux(Hidx{}, e), m_aux(Hidx{}, g)).matrix() += mag * dr_ae.matrix() * dr_ag.matrix().transpose();
-  //           }
-  //         });
-  //       });
-  //     }
-  //   }
 }  // namespace fly::potential

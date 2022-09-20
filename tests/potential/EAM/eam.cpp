@@ -162,8 +162,6 @@ TEST_CASE("EAM hess", "[potential]") {
 
     timeit("hessian", [&] { pot->hessian(cell.soa(), H, nl, omp_get_max_threads()); });
 
-    CHECK(false);
-
     auto const& ev = H.eigenvalues();
 
     fmt::print("eigen_values = {}", ev.head(10));

@@ -15,38 +15,42 @@
 // You should have received a copy of the GNU General Public License along with openFLY. If not, see <https://www.gnu.org/licenses/>.
 
 #include <cstddef>
-#include <exception>
 #include <memory>
 
 #include "libfly/neigh/list.hpp"
+#include "libfly/potential/EAM/data.hpp"
+#include "libfly/potential/base.hpp"
 #include "libfly/system/SoA.hpp"
 #include "libfly/system/property.hpp"
+#include "libfly/utility/core.hpp"
 
 /**
- * \file base.hpp
+ * \file eam.hpp
  *
- * @brief Virtual interface class definition.
+ * @brief EAM potential implementation.
  */
 
 namespace fly::potential {
 
   /**
-   * @brief Thrown from fly::potentials::Base child classes if a pure virtual function is not supported.
+   * @brief EAM potential child class.
    */
-  struct unsupported : std::exception {};
-
-  /**
-   * @brief Specifies the virtual-interface for potentials in libFLY.
-   */
-  class Base {
+  class EAM : public Base {
   public:
+    /**
+     * @brief Construct a new EAM object.
+     *
+     * @param data Tabulated EAM data.
+     */
+    explicit EAM(std::shared_ptr<DataEAM const> data) : m_data(std::move(data)) {}
+
     /**
      * @brief Get this potentials cut-off radius.
      *
      * This is the maximum distance two atom can interact. The neighbour::List passed to the other functions should be configured with
      * a cut-off equal or greater than this.
      */
-    virtual auto r_cut() const noexcept -> double = 0;
+    auto r_cut() const noexcept -> double override;
 
     /**
      * @brief Compute the potential energy.
@@ -58,7 +62,7 @@ namespace fly::potential {
      * @param threads Number of openMP threads to use.
      * @return double The potential energy of the system of atoms.
      */
-    virtual auto energy(system::SoA<TypeID const&, Frozen const&> in, neigh::List const& nl, std::size_t threads = 1) -> double = 0;
+    auto energy(system::SoA<TypeID const&, Frozen const&> in, neigh::List const& nl, std::size_t threads = 1) -> double override;
 
     /**
      * @brief Compute potential energy gradient.
@@ -69,28 +73,18 @@ namespace fly::potential {
      * @param nl Neighbour list (in ready state i.e. neigh::List::update() or neigh::List::rebuild() called).
      * @param threads Number of openMP threads to use.
      */
-    virtual auto gradient(system::SoA<TypeID const&, Frozen const&, PotentialGradient&> inout, neigh::List const& nl,
-                          std::size_t threads = 1) -> double
-        = 0;
+    auto gradient(system::SoA<TypeID const&, Frozen const&, PotentialGradient&> inout, neigh::List const& nl, std::size_t threads = 1)
+        -> double override;
 
-    // /**
-    //  * @brief Compute hessian matrix, assumes the neighbour list are ready.
-    //  *
-    //  * The resulting hessian will be m by m and only include contributions from the m active atoms.
-    //  */
-    // virtual auto hessian(system::SoA<TypeID const&, Frozen const&> info, neigh::List const& nl, std::size_t threads = 1) -> double =
-    // 0;
+  private:
+    std::shared_ptr<DataEAM const> m_data;
 
-    /**
-     * @brief Call parent destructor.
-     */
-    virtual ~Base() {}
+    struct Fprime : MemTag<double, 1> {};
+    struct Rho : MemTag<double, 1> {};
+    struct Mu : MemTag<double, spatial_dims> {};
+    struct Hidx : MemTag<std::size_t, 1> {};
 
-  protected:
-    /**
-     * @brief Protected constructor as this is an interface class.
-     */
-    constexpr Base() noexcept = default;
+    AtomArray<Fprime, Rho, Mu, Hidx> m_aux;
   };
 
 }  // namespace fly::potential

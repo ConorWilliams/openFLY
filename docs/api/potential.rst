@@ -23,12 +23,28 @@ File: ``libfly/potential/base.hpp``
 EAM
 ----------------------
 
+Parsing
+~~~~~~~~~~~~~~~~~~~~~
+
 File: ``libfly/potential/EAM/data.hpp``
 
 .. doxygenfile:: libfly/potential/EAM/data.hpp
     :sections: briefdescription detaileddescription
 
 .. doxygenclass:: fly::potential::DataEAM
+    :members:
+    :undoc-members:
+
+
+Evaluating
+~~~~~~~~~~~~~~~~~~~~~
+
+File: ``libfly/potential/EAM/eam.hpp``
+
+.. doxygenfile:: libfly/potential/EAM/eam.hpp
+    :sections: briefdescription detaileddescription
+
+.. doxygenclass:: fly::potential::EAM
     :members:
     :undoc-members:
 

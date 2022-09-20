@@ -36,6 +36,9 @@ Removed
 ~~~~~~~
 Bugfixes
 ~~~~~~~~
+
+- Box (Ortho and Triclinic, valid bounds now include zero).
+
 Meta 
 ~~~~
 

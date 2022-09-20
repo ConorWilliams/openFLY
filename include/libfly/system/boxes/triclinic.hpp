@@ -48,15 +48,20 @@ namespace fly::system {
     std::optional<Vec> gen_image(Eigen::MatrixBase<E> const& x, int ax) const {
       //
       if constexpr (S == Sign::plus) {
-        // Shortest distance point to hyperplane
-        auto dx = gdot(x, m_hyper.col(ax));
-        ASSERT(dx > 0, "Sign error: {}", dx);
+        //
+        auto dx = gdot(x, m_hyper.col(ax));  // Shortest distance point to hyperplane
+
+        ASSERT(dx >= 0, "Sign error: {}", dx);
+
         if (dx < HyperGrid::r_cut()) {
           return x + m_basis.col(ax);
         }
       } else {
-        auto dx = gdot(m_basis.col(ax) - x, m_hyper.col(ax));
-        ASSERT(dx > 0, "Sign error: {}", dx);
+        //
+        auto dx = gdot(m_basis.col(ax) - x, m_hyper.col(ax));  // Shortest distance point to hyperplane
+
+        ASSERT(dx >= 0, "Sign error: {}", dx);
+
         if (dx < HyperGrid::r_cut()) {
           return x - m_basis.col(ax);
         }

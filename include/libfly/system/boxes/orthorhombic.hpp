@@ -57,7 +57,7 @@ namespace fly::system {
       static_assert(S == Sign::plus || S == Sign::minus, "Unreachable");
 
       if constexpr (S == Sign::plus) {
-        ASSERT(x[ax] > 0, "Atom {} outside canonical cell along axis {}", x, ax);
+        ASSERT(x[ax] >= 0, "Atom {} outside canonical cell along axis {}", x, ax);
         if (x[ax] < HyperGrid::r_cut()) {
           x[ax] += m_extents[ax];
           return x;

@@ -1283,6 +1283,54 @@ distance.</p>
 </dd></dl>
 
 </section>
+<section id="hessians">
+<h2>Hessians<a class="headerlink" href="#hessians" title="Permalink to this heading">#</a></h2>
+<p>File: <code class="docutils literal notranslate"><span class="pre">libfly/system/hessian.hpp</span></code></p>
+<p>Represent and manipulate Hessians. </p>
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv4N3fly6system7HessianE">
+<span id="_CPPv3N3fly6system7HessianE"></span><span id="_CPPv2N3fly6system7HessianE"></span><span id="fly::system::Hessian"></span><span class="target" id="classfly_1_1system_1_1Hessian"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Hessian</span></span></span><a class="headerlink" href="#_CPPv4N3fly6system7HessianE" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>A class to represent the blocked hessian of a system. </p>
+<p>The hessian is an nm by nm matrix with m the number of active atoms and n the number of spatial dimensions. Each n by n sub-matrix is a “block” of the hessian.</p>
+<p>It is assumed and must be ensured that Hessians are symmetric. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3fly6system7Hessian11eigenvaluesEv">
+<span id="_CPPv3N3fly6system7Hessian11eigenvaluesEv"></span><span id="_CPPv2N3fly6system7Hessian11eigenvaluesEv"></span><span id="fly::system::Hessian::eigenvalues"></span><span class="target" id="classfly_1_1system_1_1Hessian_1a61eb379d5e150ed21ba56f9aff4150c6"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">auto</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">eigenvalues</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3fly6system7Hessian11eigenvaluesEv" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Compute and return an ordered vector of Eigen Values. </p>
+<p>See: <a class="reference external" href="https://eigen.tuxfamily.org/dox/classEigen_1_1SelfAdjointEigenSolver.html">https://eigen.tuxfamily.org/dox/classEigen_1_1SelfAdjointEigenSolver.html</a> </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3fly6system7HessianclEN5Eigen5IndexEN5Eigen5IndexE">
+<span id="_CPPv3N3fly6system7HessianclEN5Eigen5IndexEN5Eigen5IndexE"></span><span id="_CPPv2N3fly6system7HessianclEN5Eigen5IndexEN5Eigen5IndexE"></span><span id="fly::system::Hessian::call-operator__Eigen::Index.Eigen::Index"></span><span class="target" id="classfly_1_1system_1_1Hessian_1a6634e68b20fe32a46b6c48e6303bfcf6"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">auto</span></span><span class="w"> </span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">()</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">Eigen</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">Index</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">i</span></span>, <span class="n"><span class="pre">Eigen</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">Index</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">j</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3fly6system7HessianclEN5Eigen5IndexEN5Eigen5IndexE" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Get a view of the block corresponding to the <code class="docutils literal notranslate"><span class="pre">ij</span></code> atom pair. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>i</strong> – The index (in the hessian matrix) of the first atom in the pair. </p></li>
+<li><p><strong>j</strong> – The index (in the hessian matrix) of the second atom in the pair. </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3fly6system7Hessian8zero_forEN5Eigen5IndexE">
+<span id="_CPPv3N3fly6system7Hessian8zero_forEN5Eigen5IndexE"></span><span id="_CPPv2N3fly6system7Hessian8zero_forEN5Eigen5IndexE"></span><span id="fly::system::Hessian::zero_for__Eigen::Index"></span><span class="target" id="classfly_1_1system_1_1Hessian_1a8a841aba62d442e6b21212c6cb7016b3"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">auto</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">zero_for</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">Eigen</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">Index</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">num_active</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="o"><span class="pre">-&gt;</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><a class="headerlink" href="#_CPPv4N3fly6system7Hessian8zero_forEN5Eigen5IndexE" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Allocates and zeros <a class="reference internal" href="#classfly_1_1system_1_1Hessian"><span class="std std-ref">Hessian</span></a> large enough for <code class="docutils literal notranslate"><span class="pre">num_active</span></code> atoms. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>num_active</strong> – Number of active atoms that hessian will contain. </p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+</section>
 </section>
 
         </article>
@@ -1365,6 +1413,7 @@ distance.</p>
 </ul>
 </li>
 <li><a class="reference internal" href="#supercells">Supercells</a></li>
+<li><a class="reference internal" href="#hessians">Hessians</a></li>
 </ul>
 </li>
 </ul>

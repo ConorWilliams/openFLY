@@ -118,6 +118,14 @@ File: ``libfly/system/supercell.hpp``
 .. doxygenfunction:: fly::system::make_supercell
 
 
+Hessians
+-----------------------
 
+File: ``libfly/system/hessian.hpp``
 
+.. doxygenfile:: libfly/system/hessian.hpp
+    :sections: briefdescription detaileddescription
 
+.. doxygenclass:: fly::system::Hessian
+    :members:
+    :undoc-members:

@@ -24,7 +24,9 @@ Added
 - New ``StepLBFGS`` class.
 - New ``Spline`` utility class.
 - New ``DataEAM`` class with eam/fs parsing.
-- New ``potential::Base`` class (virtual interface class)
+- New ``potential::Base`` class (virtual interface class).
+- New ``EAM`` class.
+- Supercell has a SoA getter method.
 
 Changed
 ~~~~~~~

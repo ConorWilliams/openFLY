@@ -183,6 +183,7 @@
 </li>
 <li class="toctree-l2"><a class="reference internal" href="io.html">Input/Output (IO)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="neighbour.html">Neighbours</a></li>
+<li class="toctree-l2"><a class="reference internal" href="potential.html">Potentials</a></li>
 <li class="toctree-l2"><a class="reference internal" href="minimise.html">Minimisers</a></li>
 </ul>
 </li>
@@ -516,12 +517,28 @@ step append:</p>
 </dl>
 </dd></dl>
 
+<hr class="docutils" />
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0EN3fly4xiseENSt13common_type_tINSt9ptrdiff_tENSt13make_signed_tIDTcldt1c4sizeEEEEEERK1C">
+<span id="_CPPv3I0EN3fly4xiseERK1C"></span><span id="_CPPv2I0EN3fly4xiseERK1C"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">C</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="core_8hpp_1ad720df60b125587bcdad8f8976589ecf"></span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><span class="kt"><span class="pre">auto</span></span><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">fly</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">xise</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0EN3fly4xiseENSt13common_type_tINSt9ptrdiff_tENSt13make_signed_tIDTcldt1c4sizeEEEEEERK1C" title="fly::xise::C"><span class="n"><span class="pre">C</span></span></a><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">c</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="o"><span class="pre">-&gt;</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">common_type_t</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">ptrdiff_t</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">make_signed_t</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">decltype</span></span><span class="p"><span class="pre">(</span></span><a class="reference internal" href="#_CPPv4I0EN3fly4xiseENSt13common_type_tINSt9ptrdiff_tENSt13make_signed_tIDTcldt1c4sizeEEEEEERK1C" title="fly::xise::c"><span class="n"><span class="pre">c</span></span></a><span class="p"><span class="pre">.</span></span><span class="n"><span class="pre">size</span></span><span class="p"><span class="pre">(</span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4I0EN3fly4xiseENSt13common_type_tINSt9ptrdiff_tENSt13make_signed_tIDTcldt1c4sizeEEEEEERK1C" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Get the signed size of a container. </p>
+<p>See <a class="reference external" href="https://en.cppreference.com/w/cpp/iterator/size">https://en.cppreference.com/w/cpp/iterator/size</a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>c</strong> – Container to find the size of. </p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The result of <code class="docutils literal notranslate"><span class="pre">c.size()</span></code> cast to an appropriate signed type. </p>
+</dd>
+</dl>
+</dd></dl>
+
 </section>
 <section id="mathematical-functions">
 <h3>Mathematical functions<a class="headerlink" href="#mathematical-functions" title="Permalink to this heading">#</a></h3>
 <dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4I0EN3fly4nearENSt11enable_if_tINSt19is_floating_point_vI1TEEbEE1T1T">
-<span id="_CPPv3I0EN3fly4nearE1T1T"></span><span id="_CPPv2I0EN3fly4nearE1T1T"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="core_8hpp_1ac0c88bc71d22cdea312211576973d57b"></span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><span class="kt"><span class="pre">auto</span></span><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">fly</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">near</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0EN3fly4nearENSt11enable_if_tINSt19is_floating_point_vI1TEEbEE1T1T" title="fly::near::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">a</span></span>, <a class="reference internal" href="#_CPPv4I0EN3fly4nearENSt11enable_if_tINSt19is_floating_point_vI1TEEbEE1T1T" title="fly::near::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">b</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="o"><span class="pre">-&gt;</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">enable_if_t</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">is_floating_point_v</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0EN3fly4nearENSt11enable_if_tINSt19is_floating_point_vI1TEEbEE1T1T" title="fly::near::T"><span class="n"><span class="pre">T</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4I0EN3fly4nearENSt11enable_if_tINSt19is_floating_point_vI1TEEbEE1T1T" title="Permalink to this definition">#</a><br /></dt>
+<dt class="sig sig-object cpp" id="_CPPv4I0EN3fly4nearENSt11enable_if_tINSt19is_floating_point_vI1TEEbEE1T1T1T1T">
+<span id="_CPPv3I0EN3fly4nearE1T1T1T1T"></span><span id="_CPPv2I0EN3fly4nearE1T1T1T1T"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="core_8hpp_1afd58b45b6bba4226b0e61252c4382a12"></span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><span class="kt"><span class="pre">auto</span></span><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">fly</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">near</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0EN3fly4nearENSt11enable_if_tINSt19is_floating_point_vI1TEEbEE1T1T1T1T" title="fly::near::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">a</span></span>, <a class="reference internal" href="#_CPPv4I0EN3fly4nearENSt11enable_if_tINSt19is_floating_point_vI1TEEbEE1T1T1T1T" title="fly::near::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">b</span></span>, <a class="reference internal" href="#_CPPv4I0EN3fly4nearENSt11enable_if_tINSt19is_floating_point_vI1TEEbEE1T1T1T1T" title="fly::near::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">atol</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">1e-10</span></span>, <a class="reference internal" href="#_CPPv4I0EN3fly4nearENSt11enable_if_tINSt19is_floating_point_vI1TEEbEE1T1T1T1T" title="fly::near::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">ftol</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0.0001</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="o"><span class="pre">-&gt;</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">enable_if_t</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">is_floating_point_v</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0EN3fly4nearENSt11enable_if_tINSt19is_floating_point_vI1TEEbEE1T1T1T1T" title="fly::near::T"><span class="n"><span class="pre">T</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4I0EN3fly4nearENSt11enable_if_tINSt19is_floating_point_vI1TEEbEE1T1T1T1T" title="Permalink to this definition">#</a><br /></dt>
 <dd><p>Test if two floating point numbers are close. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Template Parameters<span class="colon">:</span></dt>
@@ -531,10 +548,12 @@ step append:</p>
 <dd class="field-even"><ul class="simple">
 <li><p><strong>a</strong> – First input. </p></li>
 <li><p><strong>b</strong> – Second input.</p></li>
+<li><p><strong>atol</strong> – Tolerance of absolute difference between <code class="docutils literal notranslate"><span class="pre">a</span></code> and <code class="docutils literal notranslate"><span class="pre">b</span></code> for them to be close. </p></li>
+<li><p><strong>ftol</strong> – Tolerance of fractional difference between <code class="docutils literal notranslate"><span class="pre">a</span></code> and <code class="docutils literal notranslate"><span class="pre">b</span></code> for them to be close.</p></li>
 </ul>
 </dd>
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">true</span></code> if <code class="docutils literal notranslate"><span class="pre">a</span></code> and <code class="docutils literal notranslate"><span class="pre">b</span></code> are within 0.01% of each other. </p>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">true</span></code> if <code class="docutils literal notranslate"><span class="pre">a</span></code> and <code class="docutils literal notranslate"><span class="pre">b</span></code> are within <code class="docutils literal notranslate"><span class="pre">atol</span></code> or fractionally within <code class="docutils literal notranslate"><span class="pre">ftol</span></code> of each other. </p>
 </dd>
 </dl>
 </dd></dl>
@@ -892,6 +911,88 @@ that is large enough for any parallel application, and it passes all tests we ar
 </dd></dl>
 
 </section>
+<section id="natural-splines">
+<h2>Natural Splines<a class="headerlink" href="#natural-splines" title="Permalink to this heading">#</a></h2>
+<p>File <code class="docutils literal notranslate"><span class="pre">spline.hpp</span></code></p>
+<p>Utility for working with natural cubic splines. </p>
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv4N3fly6SplineE">
+<span id="_CPPv3N3fly6SplineE"></span><span id="_CPPv2N3fly6SplineE"></span><span id="fly::Spline"></span><span class="target" id="classfly_1_1Spline"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Spline</span></span></span><a class="headerlink" href="#_CPPv4N3fly6SplineE" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Computes a set of natural cubic spline coefficients for a uniformly tabulated function. </p>
+<p>See Wikipedia algorithm: <a class="reference external" href="https://en.wikipedia.org/wiki/Spline_(mathematics)">https://en.wikipedia.org/wiki/Spline_(mathematics)</a> </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3fly6Spline6SplineEv">
+<span id="_CPPv3N3fly6Spline6SplineEv"></span><span id="_CPPv2N3fly6Spline6SplineEv"></span><span id="fly::Spline::Spline"></span><span class="target" id="classfly_1_1Spline_1a250868d598d6e9fede08ea58ea0ec59a"></span><span class="sig-name descname"><span class="n"><span class="pre">Spline</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><a class="headerlink" href="#_CPPv4N3fly6Spline6SplineEv" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Construct an empty <a class="reference internal" href="#classfly_1_1Spline"><span class="std std-ref">Spline</span></a>. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3fly6Spline6SplineENSt6vectorIdEEd">
+<span id="_CPPv3N3fly6Spline6SplineENSt6vectorIdEEd"></span><span id="_CPPv2N3fly6Spline6SplineENSt6vectorIdEEd"></span><span id="fly::Spline::Spline__std::vector:double:.double"></span><span class="target" id="classfly_1_1Spline_1a0dfee6e0704eeaada993a7d3d7fe9fa2"></span><span class="sig-name descname"><span class="n"><span class="pre">Spline</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">double</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">y</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">dx</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3fly6Spline6SplineENSt6vectorIdEEd" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Construct a new <a class="reference internal" href="#classfly_1_1Spline"><span class="std std-ref">Spline</span></a> object. </p>
+<p>From (n + 1) evenly spaced tabulated values on the interval {0, dx, …, ndx}.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>y</strong> – Tabulated values of the function <code class="docutils literal notranslate"><span class="pre">f</span></code>. </p></li>
+<li><p><strong>dx</strong> – Tabulation interval. </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK3fly6Spline1fEd">
+<span id="_CPPv3NK3fly6Spline1fEd"></span><span id="_CPPv2NK3fly6Spline1fEd"></span><span id="fly::Spline::f__doubleC"></span><span class="target" id="classfly_1_1Spline_1a8a9d47bcf24df4181a34b04cf616cc24"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">auto</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">f</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">x</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="o"><span class="pre">-&gt;</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><a class="headerlink" href="#_CPPv4NK3fly6Spline1fEd" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Interpolate tabulated function. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>x</strong> – Point to interpolate <code class="docutils literal notranslate"><span class="pre">f</span></code>. </p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">f(x)</span></code> The interpolated value of the function at <code class="docutils literal notranslate"><span class="pre">x</span></code>. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK3fly6Spline2fpEd">
+<span id="_CPPv3NK3fly6Spline2fpEd"></span><span id="_CPPv2NK3fly6Spline2fpEd"></span><span id="fly::Spline::fp__doubleC"></span><span class="target" id="classfly_1_1Spline_1a5909607ca86d0016b414f2d921615f17"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">fp</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">x</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK3fly6Spline2fpEd" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Interpolate tabulated function’s gradient. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>x</strong> – Point to interpolate <code class="docutils literal notranslate"><span class="pre">f'</span></code>. </p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">f'(x)</span></code> The interpolated gradient of the function at <code class="docutils literal notranslate"><span class="pre">x</span></code>. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK3fly6Spline3fppEd">
+<span id="_CPPv3NK3fly6Spline3fppEd"></span><span id="_CPPv2NK3fly6Spline3fppEd"></span><span id="fly::Spline::fpp__doubleC"></span><span class="target" id="classfly_1_1Spline_1a5bf3da0a31e50a2b8adcd7bd14889f15"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">auto</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">fpp</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">x</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="o"><span class="pre">-&gt;</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><a class="headerlink" href="#_CPPv4NK3fly6Spline3fppEd" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Interpolate tabulated function’s second derivative. </p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This may not be continuous or smooth.</p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>x</strong> – Point to interpolate <code class="docutils literal notranslate"><span class="pre">f''</span></code>. </p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">f''(x)</span></code> The interpolated second derivative of the function at <code class="docutils literal notranslate"><span class="pre">x</span></code>. </p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+</section>
 </section>
 
         </article>
@@ -969,6 +1070,7 @@ that is large enough for any parallel application, and it passes all tests we ar
 </ul>
 </li>
 <li><a class="reference internal" href="#random-numbers">Random numbers</a></li>
+<li><a class="reference internal" href="#natural-splines">Natural Splines</a></li>
 </ul>
 </li>
 </ul>

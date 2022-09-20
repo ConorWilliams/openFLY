@@ -183,6 +183,7 @@
 </li>
 <li class="toctree-l2"><a class="reference internal" href="api/io.html">Input/Output (IO)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="api/neighbour.html">Neighbours</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/potential.html">Potentials</a></li>
 <li class="toctree-l2"><a class="reference internal" href="api/minimise.html">Minimisers</a></li>
 </ul>
 </li>
@@ -239,11 +240,17 @@
 <ul class="simple">
 <li><p>New <code class="docutils literal notranslate"><span class="pre">Delta</span></code> property.</p></li>
 <li><p>New <code class="docutils literal notranslate"><span class="pre">StepLBFGS</span></code> class.</p></li>
+<li><p>New <code class="docutils literal notranslate"><span class="pre">Spline</span></code> utility class.</p></li>
+<li><p>New <code class="docutils literal notranslate"><span class="pre">DataEAM</span></code> class with eam/fs parsing.</p></li>
+<li><p>New <code class="docutils literal notranslate"><span class="pre">potential::Base</span></code> class (virtual interface class).</p></li>
+<li><p>New <code class="docutils literal notranslate"><span class="pre">EAM</span></code> class.</p></li>
+<li><p>Supercell has a SoA getter method.</p></li>
 </ul>
 </section>
 <section id="changed">
 <h3>Changed<a class="headerlink" href="#changed" title="Permalink to this heading">#</a></h3>
 <ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">fly::near()</span></code> now has customizable tolerances.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">neigh::List</span></code>’s <code class="docutils literal notranslate"><span class="pre">update()</span></code> API changed</p></li>
 </ul>
 </section>
@@ -252,6 +259,9 @@
 </section>
 <section id="bugfixes">
 <h3>Bugfixes<a class="headerlink" href="#bugfixes" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p>Box (Ortho and Triclinic, valid bounds now include zero).</p></li>
+</ul>
 </section>
 <section id="meta">
 <h3>Meta<a class="headerlink" href="#meta" title="Permalink to this heading">#</a></h3>

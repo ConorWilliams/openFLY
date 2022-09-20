@@ -12,7 +12,9 @@ Welcome to the libFLY API reference this serves as information for developers to
    api/system.rst
    api/io.rst
    api/neighbour.rst
+   api/potential.rst
    api/minimise.rst
+   
 
 
 

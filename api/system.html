@@ -1291,15 +1291,14 @@ distance.</p>
 <dt class="sig sig-object cpp" id="_CPPv4N3fly6system7HessianE">
 <span id="_CPPv3N3fly6system7HessianE"></span><span id="_CPPv2N3fly6system7HessianE"></span><span id="fly::system::Hessian"></span><span class="target" id="classfly_1_1system_1_1Hessian"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Hessian</span></span></span><a class="headerlink" href="#_CPPv4N3fly6system7HessianE" title="Permalink to this definition">#</a><br /></dt>
 <dd><p>A class to represent the blocked hessian of a system. </p>
-<p>The hessian is an nm by nm matrix with m the number of active atoms and n the number of spatial dimensions. Each n by n sub-matrix is a “block” of the hessian.</p>
-<p>It is assumed and must be ensured that Hessians are symmetric. </p>
+<p>The hessian is a symmetric nm by nm matrix with m the number of active atoms and n the number of spatial dimensions. Each n by n sub-matrix is a “block” of the hessian. </p>
 <div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4N3fly6system7Hessian11eigenvaluesEv">
 <span id="_CPPv3N3fly6system7Hessian11eigenvaluesEv"></span><span id="_CPPv2N3fly6system7Hessian11eigenvaluesEv"></span><span id="fly::system::Hessian::eigenvalues"></span><span class="target" id="classfly_1_1system_1_1Hessian_1a61eb379d5e150ed21ba56f9aff4150c6"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">auto</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">eigenvalues</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3fly6system7Hessian11eigenvaluesEv" title="Permalink to this definition">#</a><br /></dt>
 <dd><p>Compute and return an ordered vector of Eigen Values. </p>
-<p>See: <a class="reference external" href="https://eigen.tuxfamily.org/dox/classEigen_1_1SelfAdjointEigenSolver.html">https://eigen.tuxfamily.org/dox/classEigen_1_1SelfAdjointEigenSolver.html</a> </p>
+<p>See: <a class="reference external" href="https://eigen.tuxfamily.org/dox/classEigen_1_1SelfAdjointEigenSolver.html">https://eigen.tuxfamily.org/dox/classEigen_1_1SelfAdjointEigenSolver.html</a> only reads the lower diagonal portion of the matrix. </p>
 </dd></dl>
 
 <dl class="cpp function">

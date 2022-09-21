@@ -305,6 +305,29 @@ namespace fly {
   template <class Default, template <class...> class Fn, class... Args>
   using detected_or_t = typename detail::detector<Default, void, Fn, Args...>::type;
 
+  namespace detail {
+
+    //
+    template <typename...>
+    struct find : std::false_type {};
+
+    template <typename T, typename... Ts>
+    struct find<T, T, Ts...> : std::true_type {};
+
+    template <typename T, typename U, typename... Ts>
+    struct find<T, U, Ts...> : find<T, Ts...> {};
+
+  }  // namespace detail
+
+  /**
+   * @brief Test if a parameter pack contains a type.
+   *
+   * @tparam Target Type to search for.
+   * @tparam Candidates Types to search through.
+   */
+  template <typename Target, typename... Candidates>
+  inline constexpr bool contains_v = detail::find<Target, Candidates...>::value;
+
   // ------------------- Small functions ---------------- //
 
   /**

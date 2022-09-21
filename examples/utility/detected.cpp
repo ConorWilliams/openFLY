@@ -3,7 +3,8 @@
 #include "libfly/utility/core.hpp"
 
 template <typename T>
-using has_foo = decltype(std::declval<T>().foo());  // Error if T does not have foo member.
+// Will error if T does not have foo member.
+using has_foo = decltype(std::declval<T>().foo());
 
 // If T supports the .foo() method call and return it, otherwise throw an error.
 template <typename T>

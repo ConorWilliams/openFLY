@@ -73,16 +73,6 @@ namespace fly::system {
      */
     Map& map() noexcept { return m_map; }
 
-    /**
-     * @brief Explicitly fetch the base SoA class.
-     */
-    SOA& soa() noexcept { return *this; }
-
-    /**
-     * @brief Explicitly fetch the base SoA class.
-     */
-    SOA const& soa() const noexcept { return *this; }
-
   private:
     Box m_box;
     Map m_map;

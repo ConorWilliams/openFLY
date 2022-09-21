@@ -102,19 +102,19 @@ TEST_CASE("EAM compute", "[potential]") {
 
     system::Supercell cell = make_super();
 
-    std::unique_ptr<potential::Base> pot = std::make_unique<potential::EAM>(cell.map(), data);
+    auto pot = std::make_unique<potential::EAM>(cell.map(), data);
 
     neigh::List nl(cell.box(), pot->r_cut());
 
-    timeit("rebuild", [&] { nl.rebuild(cell.soa(), omp_get_max_threads()); });
+    timeit("rebuild", [&] { nl.rebuild(cell, omp_get_max_threads()); });
 
     double E0;
 
-    timeit("energy", [&] { E0 = pot->energy(cell.soa(), nl, omp_get_max_threads()); });
+    timeit("energy", [&] { E0 = pot->energy(cell, nl, omp_get_max_threads()); });
 
     REQUIRE(near(E0, -2748.5339306065985));  // Known good data for 3D
 
-    timeit("potential", [&] { pot->gradient(cell.soa(), nl, omp_get_max_threads()); });
+    timeit("potential", [&] { pot->gradient(cell, nl, omp_get_max_threads()); });
 
     Vec head = cell(g_, 0);
 
@@ -122,7 +122,7 @@ TEST_CASE("EAM compute", "[potential]") {
 
     system::Hessian H;
 
-    timeit("hessian", [&] { pot->hessian(cell.soa(), H, nl, omp_get_max_threads()); });
+    timeit("hessian", [&] { pot->hessian(cell, H, nl, omp_get_max_threads()); });
 
     Mat ngd = Mat{
         {+9.0654715551510830, -1.0875103661087880, -1.0875103661087877},
@@ -148,19 +148,19 @@ TEST_CASE("EAM hess", "[potential]") {
 
     system::Supercell cell = make_super(false);
 
-    std::unique_ptr<potential::Base> pot = std::make_unique<potential::EAM>(cell.map(), data);
+    auto pot = std::make_unique<potential::EAM>(cell.map(), data);
 
     neigh::List nl(cell.box(), pot->r_cut());
 
-    timeit("rebuild", [&] { nl.rebuild(cell.soa(), omp_get_max_threads()); });
+    timeit("rebuild", [&] { nl.rebuild(cell, omp_get_max_threads()); });
 
-    timeit("potential", [&] { pot->gradient(cell.soa(), nl, omp_get_max_threads()); });
+    timeit("potential", [&] { pot->gradient(cell, nl, omp_get_max_threads()); });
 
     REQUIRE(gnorm(cell[g_]) < 1e-7);
 
     system::Hessian H;
 
-    timeit("hessian", [&] { pot->hessian(cell.soa(), H, nl, omp_get_max_threads()); });
+    timeit("hessian", [&] { pot->hessian(cell, H, nl, omp_get_max_threads()); });
 
     auto const& ev = H.eigenvalues();
 

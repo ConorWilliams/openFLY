@@ -24,9 +24,8 @@ Added
 - New ``StepLBFGS`` class.
 - New ``Spline`` utility class.
 - New ``DataEAM`` class with eam/fs parsing.
-- New ``potential::Base`` class (virtual interface class).
+- New ``potential::Generic`` class.
 - New ``EAM`` class.
-- ``Supercell`` has a ``SoA`` getter method.
 - New ``xize`` utility function.
 - New Hessian class.
 
@@ -38,6 +37,8 @@ Changed
 - ``neigh::List``'s ``update()`` API changed.
 - ``SoA``'s converting constructors are now SFINE friendly.
 - ``SoA``'s base classes are now public.
+- ``TypeMap``'s converting constructor is now SFINE friendly.
+- De-generalised ``SoA``'s converting constructors to allow implicit casts.
 
 Removed
 ~~~~~~~

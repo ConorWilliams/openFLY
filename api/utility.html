@@ -403,7 +403,10 @@ step append:</p>
 </dl>
 </dd></dl>
 
+</section>
 <hr class="docutils" />
+<section id="meta-programming">
+<h3>Meta programming<a class="headerlink" href="#meta-programming" title="Permalink to this heading">#</a></h3>
 <dl class="cpp type">
 <dt class="sig sig-object cpp" id="_CPPv4IDpEN3fly7first_tE">
 <span id="_CPPv3IDpEN3fly7first_tE"></span><span id="_CPPv2IDpEN3fly7first_tE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="core_8hpp_1a4b928265c8f07591b09e77e2b3da5ee1"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">fly</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">first_t</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="n"><span class="pre">detail</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">First</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4IDpEN3fly7first_tE" title="fly::first_t::T"><span class="n"><span class="pre">T</span></span></a><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">type</span></span><a class="headerlink" href="#_CPPv4IDpEN3fly7first_tE" title="Permalink to this definition">#</a><br /></dt>
@@ -442,6 +445,79 @@ step append:</p>
 </div>
 </p>
  </p>
+</dd></dl>
+
+<hr class="docutils" />
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4IIDpE0DpEN3fly13is_detected_vE">
+<span id="_CPPv3IIDpE0DpEN3fly13is_detected_vE"></span><span id="_CPPv2IIDpE0DpEN3fly13is_detected_vE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">class</span></span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Fn</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="sig-name descname"><span class="n"><span class="pre">Args</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="core_8hpp_1ae9009dd926fbc2a3c06cf5d27b7e9e1d"></span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">fly</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">is_detected_v</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="n"><span class="pre">detail</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">detector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">void</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4IIDpE0DpEN3fly13is_detected_vE" title="fly::is_detected_v::Fn"><span class="n"><span class="pre">Fn</span></span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4IIDpE0DpEN3fly13is_detected_vE" title="fly::is_detected_v::Args"><span class="n"><span class="pre">Args</span></span></a><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">value</span></span><a class="headerlink" href="#_CPPv4IIDpE0DpEN3fly13is_detected_vE" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Utility to detect if a meta function has substitution failure. </p>
+<p>False if <code class="docutils literal notranslate"><span class="pre">Fn&lt;Args...&gt;</span></code> triggers substitution failure, true otherwise.</p>
+<p><p>Example:</p>
+<div class="code highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;utility&gt;</span><span class="cp"></span>
+
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;libfly/utility/core.hpp&quot;</span><span class="cp"></span>
+
+<span class="k">template</span><span class="w"> </span><span class="o">&lt;</span><span class="k">typename</span><span class="w"> </span><span class="nc">T</span><span class="o">&gt;</span><span class="w"></span>
+<span class="k">using</span><span class="w"> </span><span class="n">has_foo</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">decltype</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">declval</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="p">().</span><span class="n">foo</span><span class="p">());</span><span class="w">  </span><span class="c1">// Error if T does not have foo member.</span>
+
+<span class="c1">// If T supports the .foo() method call and return it, otherwise throw an error.</span>
+<span class="k">template</span><span class="w"> </span><span class="o">&lt;</span><span class="k">typename</span><span class="w"> </span><span class="nc">T</span><span class="o">&gt;</span><span class="w"></span>
+<span class="k">auto</span><span class="w"> </span><span class="n">foo_or_throw</span><span class="p">(</span><span class="n">T</span><span class="w"> </span><span class="n">any</span><span class="p">)</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">fly</span><span class="o">::</span><span class="n">detected_or_t</span><span class="o">&lt;</span><span class="kt">void</span><span class="p">,</span><span class="w"> </span><span class="n">has_foo</span><span class="p">,</span><span class="w"> </span><span class="n">T</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="k">constexpr</span><span class="w"> </span><span class="p">(</span><span class="n">fly</span><span class="o">::</span><span class="n">is_detected_v</span><span class="o">&lt;</span><span class="n">has_foo</span><span class="p">,</span><span class="w"> </span><span class="n">T</span><span class="o">&gt;</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">any</span><span class="p">.</span><span class="n">foo</span><span class="p">();</span><span class="w"></span>
+<span class="w">  </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="k">throw</span><span class="w"> </span><span class="n">fly</span><span class="o">::</span><span class="n">error</span><span class="p">(</span><span class="s">&quot;Type &#39;T&#39; does not have a foo method&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="w">  </span><span class="p">}</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+</p>
+<dl class="field-list simple">
+<dt class="field-odd">Template Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>Fn</strong> – A template template meta-function. </p></li>
+<li><p><strong>Args</strong> – Meta arguments to invoke with meta function. </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<hr class="docutils" />
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4I0IDpE0DpEN3fly13detected_or_tE">
+<span id="_CPPv3I0IDpE0DpEN3fly13detected_or_tE"></span><span id="_CPPv2I0IDpE0DpEN3fly13detected_or_tE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Default</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">class</span></span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Fn</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="sig-name descname"><span class="n"><span class="pre">Args</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="core_8hpp_1a32d13dab48b75502e3b3a120746f18a0"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">fly</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">detected_or_t</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="n"><span class="pre">detail</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">detector</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0IDpE0DpEN3fly13detected_or_tE" title="fly::detected_or_t::Default"><span class="n"><span class="pre">Default</span></span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0IDpE0DpEN3fly13detected_or_tE" title="fly::detected_or_t::Fn"><span class="n"><span class="pre">Fn</span></span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0IDpE0DpEN3fly13detected_or_tE" title="fly::detected_or_t::Args"><span class="n"><span class="pre">Args</span></span></a><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">type</span></span><a class="headerlink" href="#_CPPv4I0IDpE0DpEN3fly13detected_or_tE" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Utility to get the result of a meta function or a default value. </p>
+<p>If <code class="docutils literal notranslate"><span class="pre">Fn&lt;Args...&gt;</span></code> triggers substitution failure returns <code class="docutils literal notranslate"><span class="pre">Default</span></code> otherwise, returns <code class="docutils literal notranslate"><span class="pre">Fn&lt;Args...&gt;</span></code>.</p>
+<p><p>Example:</p>
+<div class="code highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;utility&gt;</span><span class="cp"></span>
+
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;libfly/utility/core.hpp&quot;</span><span class="cp"></span>
+
+<span class="k">template</span><span class="w"> </span><span class="o">&lt;</span><span class="k">typename</span><span class="w"> </span><span class="nc">T</span><span class="o">&gt;</span><span class="w"></span>
+<span class="k">using</span><span class="w"> </span><span class="n">has_foo</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">decltype</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">declval</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="p">().</span><span class="n">foo</span><span class="p">());</span><span class="w">  </span><span class="c1">// Error if T does not have foo member.</span>
+
+<span class="c1">// If T supports the .foo() method call and return it, otherwise throw an error.</span>
+<span class="k">template</span><span class="w"> </span><span class="o">&lt;</span><span class="k">typename</span><span class="w"> </span><span class="nc">T</span><span class="o">&gt;</span><span class="w"></span>
+<span class="k">auto</span><span class="w"> </span><span class="n">foo_or_throw</span><span class="p">(</span><span class="n">T</span><span class="w"> </span><span class="n">any</span><span class="p">)</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">fly</span><span class="o">::</span><span class="n">detected_or_t</span><span class="o">&lt;</span><span class="kt">void</span><span class="p">,</span><span class="w"> </span><span class="n">has_foo</span><span class="p">,</span><span class="w"> </span><span class="n">T</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="k">constexpr</span><span class="w"> </span><span class="p">(</span><span class="n">fly</span><span class="o">::</span><span class="n">is_detected_v</span><span class="o">&lt;</span><span class="n">has_foo</span><span class="p">,</span><span class="w"> </span><span class="n">T</span><span class="o">&gt;</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">any</span><span class="p">.</span><span class="n">foo</span><span class="p">();</span><span class="w"></span>
+<span class="w">  </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="k">throw</span><span class="w"> </span><span class="n">fly</span><span class="o">::</span><span class="n">error</span><span class="p">(</span><span class="s">&quot;Type &#39;T&#39; does not have a foo method&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="w">  </span><span class="p">}</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+</p>
+<dl class="field-list simple">
+<dt class="field-odd">Template Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>Default</strong> – The type to return in case of substitution failure. </p></li>
+<li><p><strong>Fn</strong> – A template template meta-function. </p></li>
+<li><p><strong>Args</strong> – Meta arguments to invoke with meta function. </p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 </section>
@@ -1063,6 +1139,7 @@ that is large enough for any parallel application, and it passes all tests we ar
 <li><a class="reference internal" href="#configuration-macros">Configuration macros</a></li>
 <li><a class="reference internal" href="#error-handling">Error handling</a></li>
 <li><a class="reference internal" href="#defines-variables-etc">Defines, variables, etc.</a></li>
+<li><a class="reference internal" href="#meta-programming">Meta programming</a></li>
 <li><a class="reference internal" href="#small-functions">Small functions</a></li>
 <li><a class="reference internal" href="#mathematical-functions">Mathematical functions</a></li>
 <li><a class="reference internal" href="#classes">Classes</a></li>

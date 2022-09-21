@@ -16,36 +16,12 @@
 #include "libfly/system/supercell.hpp"
 #include "libfly/utility/core.hpp"
 
-namespace detail {
-
-  // See https://en.cppreference.com/w/cpp/experimental/is_detected
-
-  template <class Default, class AlwaysVoid, template <class...> class Op, class... Args>
-  struct detector : std::false_type {
-    using type = Default;
-  };
-
-  template <class Default, template <class...> class Op, class... Args>
-  struct detector<Default, std::void_t<Op<Args...>>, Op, Args...> : std::true_type {
-    using type = Op<Args...>;
-  };
-}  // namespace detail
-
-/**
- * @brief Utility to detect the presence
- *
- * @tparam Op
- * @tparam Args
- */
-template <template <class...> class Op, class... Args>
-inline constexpr bool is_detected_v = detail::detector<int, void, Op, Args...>::value;
-
 using namespace fly;
 
 // Implementations of potential are concrete
 
 struct A {
-  void foo(system::SoA<Frozen const&>){};
+  void foo(system::SoA<Mass const&>){};
 };
 
 struct B {

@@ -209,6 +209,8 @@ namespace fly {
     minus = -1,  ///< Representing -1 or the negative direction.
   };
 
+  // ------------------- Meta --------------------- //
+
   namespace detail {
 
     template <typename T, typename...>
@@ -246,6 +248,62 @@ namespace fly {
    */
   template <typename T>
   using remove_cref_t = std::remove_const_t<std::remove_reference_t<T>>;
+
+  namespace detail {
+
+    // See https://en.cppreference.com/w/cpp/experimental/is_detected
+
+    template <class Default, class AlwaysVoid, template <class...> class Fn, class... Args>
+    struct detector : std::false_type {
+      using type = Default;
+    };
+
+    template <class Default, template <class...> class Fn, class... Args>
+    struct detector<Default, std::void_t<Fn<Args...>>, Fn, Args...> : std::true_type {
+      using type = Fn<Args...>;
+    };
+  }  // namespace detail
+
+  /**
+   * @brief Utility to detect if a meta function has substitution failure.
+   *
+   * False if ``Fn<Args...>`` triggers substitution failure, true otherwise.
+   *
+   * \rst
+   *
+   * Example:
+   *
+   * .. include:: ../../examples/utility/detected.cpp
+   *    :code:
+   *
+   * \endrst
+   *
+   * @tparam Fn A template template meta-function.
+   * @tparam Args Meta arguments to invoke with meta function.
+   */
+  template <template <class...> class Fn, class... Args>
+  inline constexpr bool is_detected_v = detail::detector<void, void, Fn, Args...>::value;
+
+  /**
+   * @brief Utility to get the result of a meta function or a default value.
+   *
+   * If ``Fn<Args...>`` triggers substitution failure returns ``Default`` otherwise, returns ``Fn<Args...>``.
+   *
+   * \rst
+   *
+   * Example:
+   *
+   * .. include:: ../../examples/utility/detected.cpp
+   *    :code:
+   *
+   * \endrst
+   *
+   * @tparam Default The type to return in case of substitution failure.
+   * @tparam Fn A template template meta-function.
+   * @tparam Args Meta arguments to invoke with meta function.
+   */
+  template <class Default, template <class...> class Fn, class... Args>
+  using detected_or_t = typename detail::detector<Default, void, Fn, Args...>::type;
 
   // ------------------- Small functions ---------------- //
 

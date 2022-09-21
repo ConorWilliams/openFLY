@@ -66,6 +66,9 @@ Defines, variables, etc.
 
 -------------------
 
+Meta programming
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 .. doxygentypedef:: first_t
 
 -------------------
@@ -75,6 +78,14 @@ Defines, variables, etc.
 -------------------
 
 .. doxygenvariable:: always_false
+
+-------------------
+
+.. doxygenvariable:: is_detected_v
+
+-------------------
+
+.. doxygentypedef:: detected_or_t
 
 
 Small functions

@@ -69,7 +69,7 @@ namespace fly::potential {
     template <typename Potential, typename SOA>
     using Hessian = decltype(
         std::declval<Potential>().hessian(
-            std::declval<SOA>(), std::declval<system::Hessian>(), std::declval<neigh::List const&>(), std::declval<int>()
+            std::declval<SOA>(), std::declval<system::Hessian &>(), std::declval<neigh::List const&>(), std::declval<int>()
         )
     );
 
@@ -109,7 +109,7 @@ namespace fly::potential {
         if constexpr (is_detected_v<Energy, decltype(pot), system::SoA<Ts...> const&>) {
           return pot.energy(in, nl, threads);
         } else {
-          throw error("Generic potential {}, does not support this system.", m_pot.index());
+          throw error("Generic potential {}, does not support .energy(...) of this system.", m_pot.index());
         }
       });
     }
@@ -117,7 +117,7 @@ namespace fly::potential {
     /**
      * @brief Compute potential energy gradient.
      *
-     * Assumes the neighbour list are ready, force on frozen atoms will be zero.
+     * Can assume the neighbour list are ready, force on frozen atoms must be zero.
      *
      * @param inout Per-atom data used by potential for computation. Result is written to the PotentialGradient property.
      * @param nl Neighbour list (in ready state i.e. neigh::List::update() or neigh::List::rebuild() called).
@@ -125,11 +125,33 @@ namespace fly::potential {
      */
     template <typename... Ts>
     auto gradient(system::SoA<Ts...>& inout, neigh::List const& nl, int threads = 1) -> void {
-      return visit(m_pot, [&](auto& pot) -> void {
+      return visit(m_pot, [&](auto& pot) {
         if constexpr (is_detected_v<Energy, decltype(pot), system::SoA<Ts...>&>) {
           pot.gradient(inout, nl, threads);
         } else {
-          throw error("Generic potential {}, does not support this system.", m_pot.index());
+          throw error("Generic potential {}, does not support .gradient(...) of this system.", m_pot.index());
+        }
+      });
+    }
+
+    /**
+     * @brief Compute hessian matrix..
+     *
+     * Can assume the neighbour list are ready. The resulting hessian must be m by m and only include contributions from the m active
+     * atoms. As hessian matrices are always symmetric this function is only required to compute the lower diagonal portion.
+     *
+     * @param in er-atom data used by potential for computation.
+     * @param out Hessian matrix to write output to.
+     * @param nl Neighbour list (in ready state i.e. neigh::List::update() or neigh::List::rebuild() called).
+     * @param threads Number of openMP threads to use.
+     */
+    template <typename... Ts>
+    auto hessian(system::SoA<Ts...> const& in, system::Hessian& out, neigh::List const& nl, int threads = 1) -> void {
+      return visit(m_pot, [&](auto& pot) {
+        if constexpr (is_detected_v<Hessian, decltype(pot), system::SoA<Ts...>&>) {
+          pot.hessian(in, out, nl, threads);
+        } else {
+          throw error("Generic potential {}, does not support .hessian(...) of this system.", m_pot.index());
         }
       });
     }
@@ -137,39 +159,5 @@ namespace fly::potential {
   private:
     std::variant<EAM> m_pot;
   };
-
-  //   /**
-  //    * @brief Specifies the virtual-interface for potentials in libFLY.
-  //    */
-  //   class Base {
-  //   public:
-
-  //     /**
-  //      * @brief Compute hessian matrix of the active atoms.
-  //      *
-  //      * Assumes the neighbour list are ready. The resulting hessian will be m by m and only include contributions from the m active
-  //      * atoms. As hessian matrices are always symmetric this function is only required to compute the lower diagonal portion.
-  //      *
-  //      * @param in Input data.
-  //      * @param out Hessian matrix to write output to.
-  //      * @param nl Neighbour list (in ready state i.e. neigh::List::update() or neigh::List::rebuild() called).
-  //      * @param threads Number of openMP threads to use.
-  //      */
-  //     virtual auto hessian(system::SoA<TypeID const&, Frozen const&> in, system::Hessian& out, neigh::List const& nl, int threads =
-  //     1)
-  //         -> void
-  //         = 0;
-
-  //     /**
-  //      * @brief Call parent destructor.
-  //      */
-  //     virtual ~Base() {}
-
-  //   protected:
-  //     /**
-  //      * @brief Protected constructor as this is an interface class.
-  //      */
-  //     constexpr Base() noexcept = default;
-  //   };
 
 }  // namespace fly::potential

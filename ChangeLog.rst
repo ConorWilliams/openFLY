@@ -35,7 +35,9 @@ Changed
 ~~~~~~~
 
 - ``fly::near()`` now has customizable tolerances.
-- ``neigh::List``'s ``update()`` API changed
+- ``neigh::List``'s ``update()`` API changed.
+- ``SoA``'s converting constructors are now SFINE friendly.
+- ``SoA``'s base classes are now public.
 
 Removed
 ~~~~~~~

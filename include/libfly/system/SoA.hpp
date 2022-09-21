@@ -42,6 +42,16 @@ namespace fly::system {
     template <typename... Pr, typename... Mx>
     struct different_SoA<SoA<Pr...>, SoA<Mx...>> : std::true_type {};
 
+    //
+    template <typename...>
+    struct find : std::false_type {};
+
+    template <typename T, typename... Ts>
+    struct find<T, T, Ts...> : std::true_type {};
+
+    template <typename T, typename U, typename... Ts>
+    struct find<T, U, Ts...> : find<T, Ts...> {};
+
   }  // namespace detail
 
   /**
@@ -68,7 +78,7 @@ namespace fly::system {
    * @tparam Pr a series of empty types, derived from ``Property``, to describe each member.
    */
   template <typename... Pr>
-  class SoA : private detail::Adaptor<Pr>... {
+  class SoA : public detail::Adaptor<Pr>... {
   public:
     /**
      * @brief True if this SoA is a pure view i.e. all its properties  are reference types.
@@ -115,28 +125,37 @@ namespace fly::system {
     template <bool OwnsAll = owns_all>
     explicit SoA(Eigen::Index size, std::enable_if_t<OwnsAll>* = 0) : detail::Adaptor<Pr>(size)..., m_size(size) {}
 
+  private:
+    /**
+     * @brief Check Other is a specialization of a SoA but different from this SoA and that this SoA's Adaptors are (move)
+     * constructable from Other's adaptors.
+     */
+    template <typename Other>
+    static constexpr bool constructible = different_SoA_v<Other> && (std::is_constructible_v<detail::Adaptor<Pr>, Other&&> && ...);
+
+  public:
     /**
      * @brief Implicitly construct a new SoA object from SoA 'other' with different properties .
      *
-     * Only SFINE enabled if this SoA owns non of its arrays.
+     * Only SFINE enabled if this SoA owns non of its arrays and this SoA is actually constructable from other.
      *
      */
-    template <typename T, typename = std::enable_if_t<different_SoA_v<T> && owns_none>>
+    template <typename T, typename = std::enable_if_t<owns_none && constructible<T>>>
     SoA(T&& other) : detail::Adaptor<Pr>(std::forward<T>(other))..., m_size(other.size()) {
-      // Ok to ``std::move`` ``other`` multiple times but this is ok as the detail::Adaptor constructor will only move its
+      // OK to ``std::move`` ``other`` multiple times as the detail::Adaptor constructor will only move its
       // corresponding base slice.
     }
 
     /**
      * @brief Explicitly construct a new SoA object from SoA 'other' with different properties .
      *
-     * SFINE enabled if this SoA owns some of its arrays.
+     * SFINE enabled if this SoA owns some of its arrays and this SoA is actually constructable from other.
      *
      */
-    template <typename T, typename = std::enable_if_t<different_SoA_v<T> && !owns_none>, typename = void>
+    template <typename T, typename = std::enable_if_t<!owns_none && constructible<T>>, typename = void>
     explicit SoA(T&& other) : detail::Adaptor<Pr>(std::forward<T>(other))..., m_size(other.size()) {
-      // Ok to ``std::move`` ``other`` multiple times but this is ok as the detail::Adaptor constructor will only move its
-      // corresponding base slice.
+      // OK to ``std::move`` ``other`` multiple times as the detail::Adaptor constructor will only move its
+      // corresponding base slice. The unnamed template parameter is a dummy to distinguish this from the implicit version.
     }
 
     /**

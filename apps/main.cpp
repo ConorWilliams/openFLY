@@ -3,11 +3,13 @@
 
 #include <array>
 #include <ctime>
+#include <fstream>
 #include <iostream>
 #include <utility>
 #include <variant>
 
 #include "libfly/io/gsd.hpp"
+#include "libfly/potential/generic.hpp"
 #include "libfly/system/SoA.hpp"
 #include "libfly/system/atom.hpp"
 #include "libfly/system/box.hpp"
@@ -18,55 +20,94 @@
 
 using namespace fly;
 
-// Implementations of potential are concrete
+auto make_super(bool erase = true) {
+  // Generate a BBC lattice, from old code base.
 
-struct A {
-  void foo(system::SoA<Mass const&>){};
-};
+  struct MotifPt {
+    TypeID::scalar_t num;
+    Vec off;
+  };
 
-struct B {
-  void foo(system::SoA<Position const&>){};
-};
+  // Fractional motif
+  std::array BCC = {
+      MotifPt{0, Vec::Zero()},
+      MotifPt{0, Vec::Constant(0.5)},
+  };
 
-class Pot {
-private:
-  template <typename Ptr, typename... Args>
-  using foo_callable_with = decltype(std::declval<Ptr>().foo(std::declval<Args>()...));
+  double T = 300.0;
 
-public:
-  template <typename... U, typename... V>
-  void foo(system::Supercell<system::TypeMap<U...>, V...> const& cell) {
-    //
-    visit(pots, [&](auto& x) {
-      fmt::print("Detected={}\n", is_detected_v<foo_callable_with, decltype(x), decltype(cell.soa())>);
+  double V = 11.64012 + T * (9.37798e-5 + T * (3.643134e-7 + T * (1.851593e-10 + T * 5.669148e-14)));
 
-      //   x.foo(cell.soa());
+  double a = std::pow(2 * V, 1.0 / 3);  // lat param
+
+  std::vector<MotifPt> lat;
+
+  Arr<int> shape = Arr<int>::Constant(7);  // In unit cells
+
+  template_for<int>(Arr<int>::Zero(), shape, [&](auto... i) {
+    for (auto const& mot : BCC) {
       //
-    });
 
-    // if constexpr (is_detected_v<foo_impl_callable_with, T*, decltype(any.soa())>) {
-    //   return parent()->foo_impl(any.soa());
-    // } else {
-    //   throw error("Supercell does not supply properties required for this potential");
-    // }
+      Vec lp = Arr<int>{i...}.cast<double>().matrix() + mot.off;
+
+      lat.push_back({mot.num, lp * a});
+    }
+  });
+
+  if (erase) {
+    lat.erase(lat.begin() + 1);
   }
 
-private:
-  std::variant<A, B> pots;
-};
+  system::TypeMap<> map{2};
+
+  map.set(0, "Fe");
+  map.set(1, "H");
+
+  Mat basis = Mat::Zero();
+
+  for (int i = 0; i < spatial_dims; i++) {
+    basis(i, i) = a * shape[i];
+  }
+
+  auto box = fly::system::Box(basis, Arr<bool>::Constant(true));
+
+  auto cell = fly::system::make_supercell<Position, Frozen, PotentialGradient>(box, map, xise(lat));
+
+  for (int i = 0; i < xise(lat); i++) {
+    cell(r_, i) = lat[safe_cast<std::size_t>(i)].off;
+    cell(id_, i) = lat[safe_cast<std::size_t>(i)].num;
+    cell(fzn_, i) = false;
+  }
+
+  return cell;
+}
 
 int main() {
   //
 
-  system::Supercell<system::TypeMap<>, Mass> cell({Mat::Identity(), Arr<bool>::Constant(true)}, system::TypeMap<>(2), 100);
+  std::ifstream eam_tab{"data/wen.eam.fs"};
 
-  Pot p;
+  system::Supercell cell = make_super();
 
-  p.foo(cell);
+  potential::Generic pot(potential::EAM{cell.map(), std::make_shared<potential::DataEAM>(std::move(eam_tab))});
 
-  /**
-   * Supercell = SoA + Box + Map
-   */
+  fmt::print("r_cut={}\n", pot.r_cut());
+
+  neigh::List nl(cell.box(), pot.r_cut());
+
+  timeit("rebuild", [&] { nl.rebuild(cell, omp_get_max_threads()); });
+
+  pot.energy(cell, nl, 4);
+
+  timeit("grad", [&] { pot.gradient(cell, nl, omp_get_max_threads()); });
+
+  //   potential::EAM p2{cell.map(), std::make_shared<potential::DataEAM>(std::ifstream{"data/wen.eam.fs"})};
+
+  //   p2.gradient(cell.soa(), nl, 8);
+
+  fmt::print("pot={}\n", cell[g_].head(10));
+
+  //   std::unique_ptr<potential::Base> pot = std::make_unique<potential::EAM>(cell.map(), data);
 
   fmt::print("Done\n");
 

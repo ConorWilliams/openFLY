@@ -6,19 +6,19 @@ Directory: ``libfly/potential``
 The ``potential`` folder contains a collection of potential energy functions. Everything is contained within the namespace ``fly::potential``.
 
 
-Virtual base class
+
+Generic potential
 ----------------------
 
-File: ``libfly/potential/base.hpp``
+File: ``libfly/potential/generic.hpp``
 
-.. doxygenfile:: libfly/potential/base.hpp
+.. doxygenfile:: libfly/potential/generic.hpp
     :sections: briefdescription detaileddescription
 
-.. doxygenclass:: fly::potential::Base
+
+.. doxygenclass:: fly::potential::Generic
     :members:
     :undoc-members:
-
-
 
 EAM
 ----------------------

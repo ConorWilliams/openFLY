@@ -54,7 +54,7 @@ namespace fly::system {
    * atom or as an ``Eigen::Array`` to enable collective operations.
    *
    * SoA also supports slicing and reference properties  which transform that property into a view, this enables SoA to act as a
-   * concrete type in interfaces whilst allowing implicit conversions from any comptable SoA.
+   * concrete type in interfaces whilst allowing implicit conversions from any compatible SoA.
    *
    * \rst
    *
@@ -102,7 +102,7 @@ namespace fly::system {
     SoA(SoA const&) = default;
 
     /**
-     * @brief Construct a new SoA conatining 'size' atoms.
+     * @brief Construct a new SoA containing 'size' atoms.
      *
      * \rst
      *
@@ -169,7 +169,7 @@ namespace fly::system {
      * .. _`note on assignment to references`:
      *
      * .. note::
-     *    Assignement to reference properties  follows pointer-semantics:
+     *    Assignment to reference properties  follows pointer-semantics:
      *
      *    .. include:: ../../examples/system/SoA_assign.cpp
      *       :code:

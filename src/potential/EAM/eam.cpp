@@ -113,7 +113,8 @@ namespace fly::potential {
       m_aux(Mu{}, b) = mu;
     }
 
-    // Second sums computes hessian, running over all atoms, only writing to z^th column block.
+    // Second sums computes hessian, running over all atoms, only writing to z^th column block. As responsible for LOWER z^th column
+    // use dynamic scheduling.
 #pragma omp parallel for num_threads(num_threads) schedule(dynamic)
     for (Eigen::Index z = 0; z < in.size(); ++z) {
       // During this section we only write to the z^th column block

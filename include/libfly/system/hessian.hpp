@@ -16,6 +16,7 @@
 
 #include <Eigen/Core>
 #include <Eigen/Eigenvalues>
+#include <type_traits>
 
 #include "libfly/utility/core.hpp"
 
@@ -39,6 +40,11 @@ namespace fly::system {
 
   public:
     /**
+     * @brief The vector types used to store the eigen values of the hessian.
+     */
+    using Vector = Eigen::Vector<double, Eigen::Dynamic>;
+
+    /**
      * @brief Allocates and zeros Hessian large enough for ``num_active`` atoms.
      *
      * @param num_active Number of active atoms that hessian will contain.
@@ -61,13 +67,15 @@ namespace fly::system {
     }
 
     /**
-     * @brief Compute and return an ordered vector of Eigen Values.
+     * @brief Compute and return a reference to an ordered vector of Eigen Values.
      *
      * See: https://eigen.tuxfamily.org/dox/classEigen_1_1SelfAdjointEigenSolver.html only reads the lower diagonal portion of the
      * matrix.
      */
-    auto const& eigenvalues() {
+    Vector const& eigenvalues() {
       //
+      static_assert(std::is_same_v<decltype(m_solver.eigenvalues()), Vector const&>, "Eigen allocation");
+
       m_solver.compute(m_hess, Eigen::EigenvaluesOnly);
 
       return m_solver.eigenvalues();

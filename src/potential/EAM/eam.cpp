@@ -160,29 +160,21 @@ namespace fly::potential {
 
             double ru = m_data->f(in(id_, a)).fpp(m_aux(Rho{}, a)) * m_data->phi(in(id_, z), in(id_, a)).fp(r) / r;
 
-            out(m_aux(Hidx{}, z), m_aux(Hidx{}, a)).noalias() = -BArr * dr * dr.transpose() - A * Mat::Identity()
-                                                                + ur * m_aux(Mu{}, z) * dr.transpose()
-                                                                - ru * m_aux(Mu{}, a) * dr.transpose();
+            out(m_aux(Hidx{}, z), m_aux(Hidx{}, a)).noalias() += -BArr * dr * dr.transpose() - A * Mat::Identity()
+                                                                 + ur * m_aux(Mu{}, z) * dr.transpose()
+                                                                 - ru * m_aux(Mu{}, a) * dr.transpose();
           }
-        });
-      }
-    }
 
-    // Finally compute overlap terms of e coupling to active atom g via a. Each thread only writes to e^th column blocks.
-#pragma omp parallel for num_threads(num_threads) schedule(dynamic)
-    for (Eigen::Index e = 0; e < in.size(); ++e) {
-      //     //
-      if (!in(fzn_, e)) {
-        nl.for_neighbours(e, r_cut(), [&](auto a, double r_e, Vec const& dr_ea) {
-          //
-          double ddFg = m_data->f(in(id_, a)).fpp(m_aux(Rho{}, a)) * m_data->phi(in(id_, e), in(id_, a)).fp(r_e);
+          // Finally compute overlap terms of z coupling to active atom g via a. Each thread only writes to e^th column blocks.
+
+          double ddFg = m_data->f(in(id_, a)).fpp(m_aux(Rho{}, a)) * m_data->phi(in(id_, z), in(id_, a)).fp(r);
 
           nl.for_neighbours(a, r_cut(), [&](auto g, double r_g, Vec const& dr_ag) {
-            if (e > g && !in(fzn_, g)) {
+            if (z > g && !in(fzn_, g)) {
               // Now iterating over all pair of unfrozen neighbours of a
-              double mag = ddFg / (r_e * r_g) * m_data->phi(in(id_, g), in(id_, a)).fp(r_g);
+              double mag = ddFg / (r * r_g) * m_data->phi(in(id_, g), in(id_, a)).fp(r_g);
 
-              out(m_aux(Hidx{}, e), m_aux(Hidx{}, g)).noalias() -= mag * dr_ea * dr_ag.transpose();
+              out(m_aux(Hidx{}, z), m_aux(Hidx{}, g)).noalias() -= mag * dr * dr_ag.transpose();
             }
           });
         });

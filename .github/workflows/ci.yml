@@ -58,7 +58,8 @@ jobs:
 
       - name: Install vcpkg
         uses: friendlyanon/setup-vcpkg@v1
-        with: { path: "external/vcpkg", cache-version: "${{ matrix.cpp }}" }
+        with:
+          { path: "external/vcpkg", cache-version: "intel-${{ matrix.cpp }}" }
 
       - name: Intel Apt repository
         timeout-minutes: 1

@@ -234,14 +234,14 @@ TEST_CASE("List::update()", "[neigh]") {
 
     // Set up a displacement less than the skin distance.
     for (int i = 0; i < deltas.size(); i++) {
-      deltas(dr_, i) = Vec::NullaryExpr([&] { return dis(gen); }).normalized() * (skin * 0.99);
+      deltas(del_, i) = Vec::NullaryExpr([&] { return dis(gen); }).normalized() * (skin * 0.99);
     }
 
     neigh.update(deltas);
 
     Vector<Vector<Neigh>> nl;
 
-    cell[r_] -= deltas[dr_];
+    cell[r_] -= deltas[del_];
 
     slow_neigh_list(nl, box, cell, r_cut);
 

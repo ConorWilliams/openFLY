@@ -19,33 +19,38 @@
 #include <utility>
 #include <vector>
 
+#include "libfly/system/property.hpp"
 #include "libfly/utility/core.hpp"
 
 namespace fly::minimise {
 
-  system::SoA<Delta &> StepLBFGS::newton_step(system::SoA<Position const &, PotentialGradient const &> in) {
+  system::SoA<Delta> &StepLBFGS::newton_step(system::SoA<Position const &> r, system::SoA<PotentialGradient const &> g) {
+    //
+    verify(r.size() == g.size(), "LBFGS core inputs size mismatch, r={} g={}", r.size(), g.size());
     //
     int prev = (m_k - 1) % m_n;
+
+    m_r.destructive_resize(r.size());
 
     // Compute the k-1 th y, s and rho
     if (m_k > 0) {
       //
-      if (in.size() != m_prev_x.size()) {
-        throw error("Call to newton_step() with {} atoms but history has {} atoms", in.size(), m_prev_x.size());
+      if (r.size() * Position::size() != m_prev_x.size()) {
+        throw error("Call to newton_step() with {} atoms but history has {} atoms", r.size(), m_prev_x.size());
       }
       //
-      m_hist[prev].s = in[r_] - m_prev_x;
-      m_hist[prev].y = in[g_] - m_prev_g;
+      m_hist[prev].s = r[r_] - m_prev_x;
+      m_hist[prev].y = g[g_] - m_prev_g;
 
       // If Wolfie conditions fulfilled during the line search then dot(y, s) > 0. Otherwise we take
       // absolute value to prevent ascent direction.
       m_hist[prev].rho = 1.0 / std::abs(gdot(m_hist[prev].s, m_hist[prev].y));
     }
 
-    m_prev_x = in[r_];
-    m_prev_g = in[g_];
+    m_prev_x = r[r_];
+    m_prev_g = g[g_];
 
-    m_q = in[g_];
+    m_q = g[g_];
 
     int incur = m_k <= m_n ? 0 : m_k - m_n;
     int bound = m_k <= m_n ? m_k : m_n;
@@ -60,18 +65,18 @@ namespace fly::minimise {
 
     // Scaling Hessian_0.
     if (m_k > 0) {
-      m_r[dr_] = m_q * (1.0 / m_hist[prev].rho / gdot(m_hist[prev].y, m_hist[prev].y));
+      m_r[del_] = m_q * (1.0 / m_hist[prev].rho / gdot(m_hist[prev].y, m_hist[prev].y));
     } else {
-      m_r[dr_] = m_q;  // Start with identity hessian.
+      m_r[del_] = m_q;  // Start with identity hessian.
     }
 
     // Loop 2:
     for (int i = 0; i <= bound - 1; ++i) {
       int j = (i + incur) % m_n;
 
-      double beta = m_hist[j].rho * gdot(m_hist[j].y, std::as_const(m_r)[dr_]);
+      double beta = m_hist[j].rho * gdot(m_hist[j].y, std::as_const(m_r)[del_]);
 
-      m_r[dr_] += (m_hist[j].alpha - beta) * m_hist[j].s;
+      m_r[del_] += (m_hist[j].alpha - beta) * m_hist[j].s;
     }
 
     ++m_k;

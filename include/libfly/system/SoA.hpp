@@ -243,7 +243,7 @@ namespace fly::system {
     Eigen::Index size() const noexcept { return m_size; }
 
     /**
-     * @brief Resize the SoA.
+     * @brief Resize the SoA, no-op if ``size() == new_size``.
      *
      * \rst
      * .. warning::

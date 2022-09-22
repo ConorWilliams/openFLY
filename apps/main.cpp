@@ -1,14 +1,18 @@
 
 #include <fmt/core.h>
+#include <omp.h>
 
 #include <array>
 #include <ctime>
 #include <fstream>
 #include <iostream>
+#include <string_view>
 #include <utility>
 #include <variant>
 
 #include "libfly/io/gsd.hpp"
+#include "libfly/minimise/LBFGS/lbfgs.hpp"
+#include "libfly/neigh/sort.hpp"
 #include "libfly/potential/generic.hpp"
 #include "libfly/system/SoA.hpp"
 #include "libfly/system/atom.hpp"
@@ -16,9 +20,26 @@
 #include "libfly/system/boxes/orthorhombic.hpp"
 #include "libfly/system/property.hpp"
 #include "libfly/system/supercell.hpp"
+#include "libfly/system/typemap.hpp"
 #include "libfly/utility/core.hpp"
 
 using namespace fly;
+
+template <typename... Ts>
+system::Supercell<system::TypeMap<>, Ts...> supercell_from(std::string_view fname, std::uint64_t frame) {
+  //
+  io::BinaryFile file(fname, io::read_only);
+
+  system::TypeMap out_map = file.read_map(frame);
+
+  system::Box out_box = file.read_box(frame);
+
+  system::Supercell out_cell = system::make_supercell<Ts...>(out_box, out_map, file.read<std::uint32_t>(frame, "particles/N"));
+
+  (file.read_to(frame, Ts{}, out_cell), ...);
+
+  return out_cell;
+}
 
 auto make_super(bool erase = true) {
   // Generate a BBC lattice, from old code base.
@@ -42,7 +63,7 @@ auto make_super(bool erase = true) {
 
   std::vector<MotifPt> lat;
 
-  Arr<int> shape = Arr<int>::Constant(7);  // In unit cells
+  Arr<int> shape = Arr<int>::Constant(15);  // In unit cells
 
   template_for<int>(Arr<int>::Zero(), shape, [&](auto... i) {
     for (auto const& mot : BCC) {
@@ -85,31 +106,46 @@ auto make_super(bool erase = true) {
 int main() {
   //
 
-  std::ifstream eam_tab{"data/wen.eam.fs"};
+  system::Supercell cell = supercell_from<Position, Frozen>("data/xyz/V1-unrelaxed.gsd", 0);
 
-  system::Supercell cell = make_super();
+  cell(fzn_, 0) = true;
+  cell(fzn_, 113) = true;
 
-  potential::Generic pot(potential::EAM{cell.map(), std::make_shared<potential::DataEAM>(std::move(eam_tab))});
+  //   auto cell = make_super();
 
-  fmt::print("r_cut={}\n", pot.r_cut());
+  // IO
 
-  neigh::List nl(cell.box(), pot.r_cut());
+  fly::io::BinaryFile fout("lbfgs.gsd", fly::io::create);
 
-  timeit("rebuild", [&] { nl.rebuild(cell, omp_get_max_threads()); });
+  fout.write(cell.box());                                                 //< Write the box to frame 0.
+  fout.write(cell.map());                                                 //< Write the map to frame 0.
+  fout.write("particles/N", fly::safe_cast<std::uint32_t>(cell.size()));  //< Write the number of atoms to frame 0.
+  fout.write(fly::id_, cell);                                             //< Write the TypeID's of the atoms to frame 0.
 
-  pot.energy(cell, nl, 4);
+  //   WORK
 
-  timeit("grad", [&] { pot.gradient(cell, cell, nl, omp_get_max_threads()); });
+  minimise::LBFGS::Options opt;
 
-  //   potential::EAM p2{cell.map(), std::make_shared<potential::DataEAM>(std::ifstream{"data/wen.eam.fs"})};
+  opt.debug = true;
+  //   opt.fout = &fout;
 
-  //   p2.gradient(cell.soa(), nl, 8);
+  opt.skin_frac = 1.05;
 
-  fmt::print("pot={}\n", cell[g_].head(10));
+  minimise::LBFGS minimiser(opt, cell.box());
 
-  //   std::unique_ptr<potential::Base> pot = std::make_unique<potential::EAM>(cell.map(), data);
+  potential::Generic pot{
+      potential::EAM{
+          cell.map(),
+          std::make_shared<potential::DataEAM>(std::ifstream{"data/wen.eam.fs"}),
+      },
+  };
 
-  fmt::print("Done\n");
+  bool done = timeit("Minimise", [&] {
+    //
+    return minimiser.minimise(cell, cell, pot, omp_get_max_threads());
+  });
+
+  fmt::print("FoundMin?={}\n", done);
 
   return 0;
 }

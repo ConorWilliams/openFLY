@@ -233,7 +233,7 @@ namespace fly::io {
      * @return The value read from the file.
      */
     template <typename T>
-    auto read(std::uint64_t i, char const *name) -> std::enable_if_t<std::is_arithmetic_v<T>, T> {
+    auto read(std::uint64_t i, char const *name) const -> std::enable_if_t<std::is_arithmetic_v<T>, T> {
       T tmp;
       read_chunk(i, name, 1, 1, &tmp);
       return tmp;
@@ -260,7 +260,8 @@ namespace fly::io {
      * @return void.
      */
     template <typename T, typename... U>
-    auto read_to(std::uint64_t i, T tag, system::SoA<U...> &out) -> std::enable_if_t<std::is_arithmetic_v<typename T::scalar_t>> {
+    auto read_to(std::uint64_t i, T tag, system::SoA<U...> &out) const
+        -> std::enable_if_t<std::is_arithmetic_v<typename T::scalar_t>> {
       read_chunk(i, T::tag, out.size(), T::size(), out[tag].data());
     }
 
@@ -274,7 +275,7 @@ namespace fly::io {
      * @return A fly::system::TypeMap<U...> read from the ``i``th frame of the file.
      */
     template <typename... U>
-    auto read_map(std::uint64_t i) -> system::TypeMap<U...> {
+    auto read_map(std::uint64_t i) const -> system::TypeMap<U...> {
       //
       system::TypeMap<U...> map(read<Eigen::Index>(i, "log/typemap/N"));
 

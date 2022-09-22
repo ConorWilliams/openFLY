@@ -27,7 +27,9 @@ Added
 - New ``potential::Generic`` class.
 - New ``EAM`` class.
 - New ``xize`` utility function.
+- New ``LBFGS`` class.
 - New Hessian class.
+- Frozen property has a tag to enable GSD IO.
 
 
 Changed
@@ -39,6 +41,7 @@ Changed
 - ``SoA``'s base classes are now public.
 - ``TypeMap``'s converting constructor is now SFINE friendly.
 - De-generalised ``SoA``'s converting constructors to allow implicit casts.
+- Read methods on ``BinaryFile`` are ``const``.
 
 Removed
 ~~~~~~~

@@ -25,3 +25,13 @@ File: ``libfly/minimise/LBFGS/lbfgs_core.hpp``
 
 Minimiser
 ~~~~~~~~~~~~~
+
+File: ``libfly/minimise/LBFGS/lbfgs.hpp``
+
+.. doxygenfile:: libfly/minimise/LBFGS/lbfgs.hpp
+    :sections: briefdescription detaileddescription
+
+
+.. doxygenclass:: fly::minimise::LBFGS
+    :members:
+    :undoc-members:

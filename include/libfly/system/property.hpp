@@ -179,7 +179,9 @@ namespace fly {
      *
      * Note this cannot be written to a GSD file as it a boolean.
      */
-    struct Frozen : system::Property<bool> {};
+    struct Frozen : system::Property<bool> {
+      static constexpr char const* tag = "log/particles/frozen";  ///< Custom chunk label.
+    };
 
     /**
      * @brief Tag type for atom's contribution to a dimer axis.
@@ -275,7 +277,7 @@ namespace fly {
     /**
      * @brief Delta literal.
      */
-    inline constexpr Delta dr_;
+    inline constexpr Delta del_;
 
     /**
      * @brief Acceleration literal.

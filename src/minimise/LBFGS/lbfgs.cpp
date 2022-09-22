@@ -1,122 +1,136 @@
-// // Copyright © 2020 Conor Williams <conorwilliams@outlook.com>
+// Copyright © 2020 Conor Williams <conorwilliams@outlook.com>
 
-// // SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: GPL-3.0-or-later
 
-// // This file is part of openFLY.
+// This file is part of openFLY.
 
-// // OpenFLY is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License
-// // as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+// OpenFLY is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License
+// as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 
-// // OpenFLY is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
-// // warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+// OpenFLY is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
+// warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
 
-// // You should have received a copy of the GNU General Public License along with openFLY. If not, see
-// <https://www.gnu.org/licenses/>.
+// You should have received a copy of the GNU General Public License along with openFLY. If not, see <https://www.gnu.org/licenses/>.
 
-// #include "libatom/minimise/LBFGS/lbfgs.hpp"
+#include "libfly/minimise/LBFGS/lbfgs.hpp"
 
-// #include <fmt/core.h>
-// #include <fmt/os.h>
+#include <fmt/core.h>
+#include <fmt/os.h>
 
-// #include <cmath>
-// #include <cstddef>
-// #include <optional>
-// #include <utility>
+#include <cmath>
+#include <cstddef>
+#include <functional>
+#include <optional>
+#include <utility>
 
-// #include "libatom/asserts.hpp"
-// #include "libatom/atom.hpp"
-// #include "libatom/io/xyz.hpp"
-// #include "libatom/minimise/LBFGS/core.hpp"
-// #include "libatom/neighbour/list.hpp"
-// #include "libatom/potentials/base.hpp"
-// #include "libatom/sim_cell.hpp"
-// #include "libatom/utils.hpp"
+#include "libfly/minimise/LBFGS/lbfgs_core.hpp"
+#include "libfly/neigh/list.hpp"
+#include "libfly/potential/generic.hpp"
+#include "libfly/system/SoA.hpp"
+#include "libfly/system/box.hpp"
+#include "libfly/system/hessian.hpp"
+#include "libfly/system/property.hpp"
+#include "libfly/utility/core.hpp"
 
-// namespace otf::minimise {
+namespace fly::minimise {
 
-//   bool LBFGS::minimise(SimCell &atoms, potentials::Base &pot, std::size_t num_threads) {
-//     //
-//     // Clear history from previous runs;
+  bool LBFGS::minimise(system::SoA<Position &> out, system::SoA<Position const &, TypeID const &, Frozen const &> in,
+                       potential::Generic &pot, int num_threads) {
+    // Check inputs
 
-//     m_core.clear();
+    verify(in.size() == out.size(), "LBFGS minimizer inputs size mismatch, in={} out={}", in.size(), out.size());
 
-//     floating skin = std::max(std::pow(m_opt.skin_frac, 1. / 3.) - 1, 0.0) * pot.rcut();
+    m_grad.destructive_resize(in.size());
 
-//     if (m_opt.debug) {
-//       fmt::print("Skin = {}\n", skin);
-//     }
+    // Clear history from previous runs;
 
-//     m_nl = neighbour::List(atoms, pot.rcut() + skin);
+    m_core.clear();
 
-//     m_nl->rebuild(atoms, num_threads);
+    double skin = std::max(std::pow(m_opt.skin_frac, 1. / 3.) - 1, 0.0) * pot.r_cut();
 
-//     pot.gradient(atoms, *m_nl, num_threads);
+    if (m_opt.debug) {
+      fmt::print("LBFGS: threads = {}\n", num_threads);
+      fmt::print("LBFGS: Skin = {}\n", skin);
+    }
 
-//     floating trust = m_opt.min_trust;
+    // This std::not_equal thing avoid floating point comparison warnings.
+    if (double r_cut = pot.r_cut() + skin; std::not_equal_to<double>{}(std::exchange(m_r_cut, r_cut), r_cut) || !m_nl) {
+      m_nl = neigh::List(m_box, r_cut);
 
-//     auto file = [&]() -> std::optional<fmt::ostream> {
-//       if (m_opt.debug) {
-//         return fmt::output_file("lbfgs_debug.xyz");
-//       } else {
-//         return std::nullopt;
-//       }
-//     }();
+      if (m_opt.debug) {
+        fmt::print("LBFGS: Reallocating neigh list\n");
+      }
+    }
 
-//     floating acc = 0;
-//     floating convex_count = 0;
+    out[r_] = in[r_];  // Initialise out - in;
 
-//     for (std::size_t i = 0; i < m_opt.iter_max; ++i) {
-//       //
-//       floating mag_g = norm_sq(atoms(Gradient{}));
+    m_nl->rebuild(out, num_threads);
 
-//       if (m_opt.debug) {
-//         constexpr auto str = "LBFGS: i={:<4} trust={:f} acc={:f} norm(g)={:e}\n";
-//         fmt::print(str, i, trust, acc, std::sqrt(mag_g));
-//         io::dump_xyz(*file, atoms, "Debug");
-//       }
+    pot.gradient(m_grad, in, *m_nl, num_threads);
 
-//       if (mag_g < m_opt.f2norm * m_opt.f2norm) {
-//         return true;
-//       } else if (convex_count >= m_opt.convex_max) {
-//         return false;
-//       }
+    double trust = m_opt.min_trust;
 
-//       Position::matrix_type &Hg = m_core.newton_step(atoms(Position{}), atoms(Gradient{}));
+    double acc = 0;
+    double convex_count = 0;
 
-//       ASSERT(gdot(atoms(Gradient{}), Hg) > 0, "Ascent direction");
+    for (int i = 0; i < m_opt.iter_max; ++i) {
+      //
+      double mag_g = gnorm_sq(m_grad[g_]);
 
-//       // Limit step size.
-//       Hg *= std::min(1.0, trust / norm(Hg));
+      if (m_opt.debug) {
+        fmt::print("LBFGS: i={:<4} trust={:f} acc={:f} norm(g)={:e} rebuild={}\n", i, trust, acc, std::sqrt(mag_g), acc == 0.0);
+      }
 
-//       // Add distance of most displaced atom
-//       acc += std::sqrt((Hg * Hg).colwise().sum().maxCoeff());
+      if (m_opt.fout) {
+        m_opt.fout->commit([&] {
+          m_opt.fout->write(fly::r_, out);  //< Write the positions of the atoms.
+        });
+      }
 
-//       // Update positions in real space
-//       atoms(Position{}) -= Hg;
+      if (mag_g < m_opt.f2norm * m_opt.f2norm) {
+        return true;
+      } else if (convex_count >= m_opt.convex_max) {
+        return false;
+      }
 
-//       if (acc > 0.5 * skin) {
-//         m_nl->rebuild(atoms, num_threads);
-//         acc = 0;
-//       } else {
-//         m_nl->update_positions(Hg);
-//       }
+      auto &Hg = m_core.newton_step(out, m_grad);
 
-//       if (std::optional curv = pot.gradient(atoms, *m_nl, num_threads); curv > 0) {
-//         convex_count += 1;
-//       } else {
-//         convex_count = 0;
-//       }
+      ASSERT(gdot(m_grad[g_], Hg[del_]) > 0, "Ascent direction in lbfgs", 0);
 
-//       floating proj = gdot(atoms(Gradient{}), Hg);
+      // Limit step size.
+      Hg[del_] *= std::min(1.0, trust / gnorm(Hg[del_]));
 
-//       if (proj < -m_opt.proj_tol) {
-//         trust = std::max(m_opt.min_trust, m_opt.shrink_trust * trust);
-//       } else if (proj > m_opt.proj_tol) {
-//         trust = std::min(m_opt.max_trust, m_opt.grow_trust * trust);
-//       }
-//     }
+      // Add distance of most displaced atom
+      acc += std::sqrt((Hg[del_] * Hg[del_]).colwise().sum().maxCoeff());
 
-//     return false;
-//   }
+      // Update positions in real space
+      out[r_] -= Hg[del_];
 
-// }  // namespace otf::minimise
+      if (acc > 0.5 * skin) {
+        m_nl->rebuild(out, num_threads);
+        acc = 0;
+      } else {
+        m_nl->update(Hg);
+      }
+
+      pot.gradient(m_grad, in, *m_nl, num_threads);
+
+      //   if (std::optional curv = ; curv > 0) {
+      //     convex_count += 1;
+      //   } else {
+      //     convex_count = 0;
+      //   }
+
+      double proj = gdot(m_grad[g_], Hg[del_]);
+
+      if (proj < -m_opt.proj_tol) {
+        trust = std::max(m_opt.min_trust, m_opt.shrink_trust * trust);
+      } else if (proj > m_opt.proj_tol) {
+        trust = std::min(m_opt.max_trust, m_opt.grow_trust * trust);
+      }
+    }
+
+    return false;
+  }
+
+}  // namespace fly::minimise

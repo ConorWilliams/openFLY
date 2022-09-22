@@ -6,6 +6,9 @@ data/xyz
 data/*.fs
 !/data/wen.eam.fs
 
+gmon.out
+out.png
+
 *.gsd
 
 CMakeUserPresets.json

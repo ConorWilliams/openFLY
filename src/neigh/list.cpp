@@ -39,11 +39,11 @@ namespace fly::neigh {
 
     auto kN = k * size();
 
-    m_atoms[r_].head(kN) -= x[dr_];  // Update real atoms directly.
+    m_atoms[r_].head(kN) -= x[del_];  // Update real atoms directly.
 
     // Update positions of ghosts.
     for (Eigen::Index i = size(); i < m_num_plus_ghosts; i++) {
-      m_atoms(r_, i) -= x(dr_, image_to_real(i));
+      m_atoms(r_, i) -= x(del_, image_to_real(i));
     }
   }
 

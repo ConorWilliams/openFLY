@@ -77,10 +77,11 @@ namespace fly::minimise {
      *
      * \endrst
      *
-     * @param in The current position and potential gradient.
+     * @param g The current potential gradient.
+     * @param r The current position of the atoms.
      * @return A view of the approximate Newton-step (see above) (it is OK to modify this view it will be overwritten upon next call).
      */
-    auto newton_step(system::SoA<Position const &, PotentialGradient const &> in) -> system::SoA<Delta &>;
+    auto newton_step(system::SoA<Position const &> r, system::SoA<PotentialGradient const &> g) -> system::SoA<Delta> &;
 
   private:
     int m_n;

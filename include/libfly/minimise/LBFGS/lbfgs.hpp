@@ -16,13 +16,18 @@
 
 #include <cstddef>
 #include <memory>
+#include <optional>
 #include <utility>
 
+#include "libfly/io/gsd.hpp"
+#include "libfly/minimise/LBFGS/lbfgs_core.hpp"
 #include "libfly/neigh/list.hpp"
-#include "libfly/potential/property.hpp"
+#include "libfly/potential/generic.hpp"
 #include "libfly/system/SoA.hpp"
+#include "libfly/system/box.hpp"
 #include "libfly/system/hessian.hpp"
 #include "libfly/system/property.hpp"
+#include "libfly/system/typemap.hpp"
 
 /**
  * \file lbfgs.hpp
@@ -43,9 +48,9 @@ namespace fly::minimise {
      */
     struct Options {
       /** @brief Number of previous steps held in memory. */
-      std::size_t n = 10;
+      int n = 10;
       /** @brief Number of steps before exit with failure. */
-      std::size_t iter_max = 2000;
+      int iter_max = 2000;
       /** @brief Force convergence criterion (eV/Angstroms). */
       double f2norm = 1e-5;
       /**
@@ -69,31 +74,48 @@ namespace fly::minimise {
       double shrink_trust = 0.5;
       /** @brief If minimising a dimer and convex_max steps with +Ve curvature exit. */
       double convex_max = 3;
-      /** @brief Print out debug info and dumps minimisation trace to "lbfgs_debug.xyz" */
+      /** @brief Print out debug info. */
       bool debug = false;
+      /**
+       * @brief If provided each frame of the minimisation will be written to this file.
+       *
+       * It is the users responsibility to ensure the lifetime of ``fout`` is at least as long as the lifetime of the ``LBFGS`` object
+       * and ensure only a single ``LBFGS`` object writes to ``fout`` at any one time. This really only exist for debugging purposes...
+       */
+      io::BinaryFile *fout = nullptr;
     };
 
     /**
      * @brief Construct a new LBFGS object
      *
-     * @param opt
+     * @param opt Options strut.
+     * @param box Description of simulation space.
      */
-    explicit LBFGS(Options const &opt) : m_opt{opt}, m_core{opt.n} {}
+    LBFGS(Options const &opt, system::Box const &box) : m_opt{opt}, m_core{opt.n}, m_box{box} {}
 
     /**
-     * @brief Move the atoms in the SimCell to a local minimum of the potential.
+     * @brief Find the nearest local minimum of a potential.
      *
-     * @param in
-     * @param threads
-     * @return true
-     * @return false
+     * @param out Final position of optimiser.
+     * @param in Initial position + per particle info.
+     * @param pot Potential to minimise.
+     * @param threads Number of openMP threads to use.
+     * @return true If a local minimum was found.
+     * @return false If no local minimum was found.
      */
-    bool minimise(system::SoA<TypeID const &, Frozen const &> in, potential::Base &, int threads = 1);
+    auto minimise(system::SoA<Position &> out, system::SoA<Position const &, TypeID const &, Frozen const &> in,
+                  potential::Generic &pot, int threads = 1) -> bool;
 
   private:
     Options m_opt;
     StepLBFGS m_core;
+
+    system::Box m_box;
+    double m_r_cut = -1;
+
     std::optional<neigh::List> m_nl;
+
+    system::SoA<PotentialGradient> m_grad;
   };
 
 }  // namespace fly::minimise

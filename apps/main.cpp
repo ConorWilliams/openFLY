@@ -99,7 +99,7 @@ int main() {
 
   pot.energy(cell, nl, 4);
 
-  timeit("grad", [&] { pot.gradient(cell, nl, omp_get_max_threads()); });
+  timeit("grad", [&] { pot.gradient(cell, cell, nl, omp_get_max_threads()); });
 
   //   potential::EAM p2{cell.map(), std::make_shared<potential::DataEAM>(std::ifstream{"data/wen.eam.fs"})};
 

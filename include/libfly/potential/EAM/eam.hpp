@@ -84,11 +84,13 @@ namespace fly::potential {
      *
      * Assumes the neighbour list are ready, force on frozen atoms will be zero.
      *
-     * @param inout Per-atom TypeID's and Frozen properties, potential gradient written to this.
+     * @param out Per-atom TypeID's and Frozen properties
+     * @param in Per-atom Potential gradient written to this.
      * @param nl Neighbour list (in ready state i.e. neigh::List::update() or neigh::List::rebuild() called).
      * @param threads Number of openMP threads to use.
      */
-    auto gradient(system::SoA<TypeID const&, Frozen const&, PotentialGradient&> inout, neigh::List const& nl, int threads = 1) -> void;
+    auto gradient(system::SoA<PotentialGradient&> in, system::SoA<TypeID const&, Frozen const&> out, neigh::List const& nl,
+                  int threads = 1) -> void;
 
     /**
      * @brief Compute hessian matrix of the active atoms.
@@ -102,7 +104,7 @@ namespace fly::potential {
      * @param nl Neighbour list (in ready state i.e. neigh::List::update() or neigh::List::rebuild() called).
      * @param threads Number of openMP threads to use.
      */
-    auto hessian(system::SoA<TypeID const&, Frozen const&> in, system::Hessian& out, neigh::List const& nl, int threads = 1) -> void;
+    auto hessian(system::Hessian& out, system::SoA<TypeID const&, Frozen const&> in, neigh::List const& nl, int threads = 1) -> void;
 
   private:
     std::shared_ptr<DataEAM const> m_data;

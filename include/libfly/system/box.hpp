@@ -151,7 +151,3 @@ namespace fly::system {
   };
 
 }  // namespace fly::system
-
-//    * The canonical grid cell is the parallelepiped of space spanned by the extents of the canonical cell, canon_grid_pos() maps a
-//    * point into the canonical cell and then nudges it by one grid cell in the (1,1,1) direction. This leaves room for a layer of
-//    * ghost atom cells around the canonical cell.

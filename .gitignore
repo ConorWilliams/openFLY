@@ -6,6 +6,8 @@ data/xyz
 data/*.fs
 !/data/wen.eam.fs
 
+*.gsd
+
 CMakeUserPresets.json
 BinaryFile_test.gsd
 compile_commands.json

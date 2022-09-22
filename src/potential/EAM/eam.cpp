@@ -38,51 +38,54 @@ namespace fly::potential {
     return (0.5 * v_sum) + f_sum;
   }
 
-  void EAM::gradient(system::SoA<TypeID const&, Frozen const&, PotentialGradient&> inout, neigh::List const& nl, int num_threads) {
+  void EAM::gradient(system::SoA<PotentialGradient&> out, system::SoA<TypeID const&, Frozen const&> in, neigh::List const& nl,
+                     int num_threads) {
+    //
+    verify(in.size() == out.size(), "EAM gradient size mismatch in={} out={}", in.size(), out.size());
+
     // Usually a noop
-    m_aux.destructive_resize(inout.size());
+    m_aux.destructive_resize(in.size());
 
 // First sum computes density  at each real atom, runs over frozen+active atoms.
 #pragma omp parallel for num_threads(num_threads) schedule(static)
     // Compute rho at all
-    for (Eigen::Index b = 0; b < inout.size(); b++) {
+    for (Eigen::Index b = 0; b < in.size(); b++) {
       double rho = 0;
 
       // Computes rho at atom
       nl.for_neighbours(b, r_cut(), [&](auto a, double r, Vec const&) {
         //
-        rho += m_data->phi(inout(id_, a), inout(id_, b)).f(r);
+        rho += m_data->phi(in(id_, a), in(id_, b)).f(r);
       });
 
       // Compute F'(rho) at atom
-      m_aux(Fprime{}, b) = m_data->f(inout(id_, b)).fp(rho);
+      m_aux(Fprime{}, b) = m_data->f(in(id_, b)).fp(rho);
     }
 
 // Second sum computes gradient, only runs over active atoms
 #pragma omp parallel for num_threads(num_threads) schedule(static)
     //
-    for (Eigen::Index g = 0; g < inout.size(); ++g) {
+    for (Eigen::Index g = 0; g < in.size(); ++g) {
       //
       Vec grad = Vec::Zero();
 
-      if (!inout(fzn_, g)) {
+      if (!in(fzn_, g)) {
         nl.for_neighbours(g, r_cut(), [&](auto a, double r, Vec const& dr) {
           //
 
-          double mag = m_data->v(inout(id_, a), inout(id_, g)).fp(r)
-                       + m_aux(Fprime{}, g) * m_data->phi(inout(id_, a), inout(id_, g)).fp(r)
-                       + m_aux(Fprime{}, a) * m_data->phi(inout(id_, g), inout(id_, a)).fp(r);
+          double mag = m_data->v(in(id_, a), in(id_, g)).fp(r) + m_aux(Fprime{}, g) * m_data->phi(in(id_, a), in(id_, g)).fp(r)
+                       + m_aux(Fprime{}, a) * m_data->phi(in(id_, g), in(id_, a)).fp(r);
 
           grad -= (mag / r) * dr;
         });
       }
 
       // Write grad to atom
-      inout(g_, g) = grad;
+      out(g_, g) = grad;
     }
   }
 
-  void EAM::hessian(system::SoA<TypeID const&, Frozen const&> in, system::Hessian& out, neigh::List const& nl, int num_threads) {
+  void EAM::hessian(system::Hessian& out, system::SoA<TypeID const&, Frozen const&> in, neigh::List const& nl, int num_threads) {
     // Usually a noop, make space in aux
     m_aux.destructive_resize(in.size());
 

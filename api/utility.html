@@ -459,7 +459,8 @@ step append:</p>
 <span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;libfly/utility/core.hpp&quot;</span><span class="cp"></span>
 
 <span class="k">template</span><span class="w"> </span><span class="o">&lt;</span><span class="k">typename</span><span class="w"> </span><span class="nc">T</span><span class="o">&gt;</span><span class="w"></span>
-<span class="k">using</span><span class="w"> </span><span class="n">has_foo</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">decltype</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">declval</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="p">().</span><span class="n">foo</span><span class="p">());</span><span class="w">  </span><span class="c1">// Error if T does not have foo member.</span>
+<span class="c1">// Will error if T does not have foo member.</span>
+<span class="k">using</span><span class="w"> </span><span class="n">has_foo</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">decltype</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">declval</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="p">().</span><span class="n">foo</span><span class="p">());</span><span class="w"></span>
 
 <span class="c1">// If T supports the .foo() method call and return it, otherwise throw an error.</span>
 <span class="k">template</span><span class="w"> </span><span class="o">&lt;</span><span class="k">typename</span><span class="w"> </span><span class="nc">T</span><span class="o">&gt;</span><span class="w"></span>
@@ -495,7 +496,8 @@ step append:</p>
 <span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;libfly/utility/core.hpp&quot;</span><span class="cp"></span>
 
 <span class="k">template</span><span class="w"> </span><span class="o">&lt;</span><span class="k">typename</span><span class="w"> </span><span class="nc">T</span><span class="o">&gt;</span><span class="w"></span>
-<span class="k">using</span><span class="w"> </span><span class="n">has_foo</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">decltype</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">declval</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="p">().</span><span class="n">foo</span><span class="p">());</span><span class="w">  </span><span class="c1">// Error if T does not have foo member.</span>
+<span class="c1">// Will error if T does not have foo member.</span>
+<span class="k">using</span><span class="w"> </span><span class="n">has_foo</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">decltype</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">declval</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="p">().</span><span class="n">foo</span><span class="p">());</span><span class="w"></span>
 
 <span class="c1">// If T supports the .foo() method call and return it, otherwise throw an error.</span>
 <span class="k">template</span><span class="w"> </span><span class="o">&lt;</span><span class="k">typename</span><span class="w"> </span><span class="nc">T</span><span class="o">&gt;</span><span class="w"></span>

@@ -237,45 +237,62 @@
 <h2>Unreleased<a class="headerlink" href="#unreleased" title="Permalink to this heading">#</a></h2>
 <section id="added">
 <h3>Added<a class="headerlink" href="#added" title="Permalink to this heading">#</a></h3>
-<ul class="simple">
-<li><p>New <code class="docutils literal notranslate"><span class="pre">Delta</span></code> property.</p></li>
-<li><p>New <code class="docutils literal notranslate"><span class="pre">StepLBFGS</span></code> class.</p></li>
-<li><p>New <code class="docutils literal notranslate"><span class="pre">Spline</span></code> utility class.</p></li>
-<li><p>New <code class="docutils literal notranslate"><span class="pre">DataEAM</span></code> class with eam/fs parsing.</p></li>
-<li><p>New <code class="docutils literal notranslate"><span class="pre">potential::Base</span></code> class (virtual interface class).</p></li>
-<li><p>New <code class="docutils literal notranslate"><span class="pre">EAM</span></code> class.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">Supercell</span></code> has a <code class="docutils literal notranslate"><span class="pre">SoA</span></code> getter method.</p></li>
-<li><p>New <code class="docutils literal notranslate"><span class="pre">xize</span></code> utility function.</p></li>
-<li><p>New Hessian class.</p></li>
-</ul>
 </section>
 <section id="changed">
 <h3>Changed<a class="headerlink" href="#changed" title="Permalink to this heading">#</a></h3>
-<ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">fly::near()</span></code> now has customizable tolerances.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">neigh::List</span></code>’s <code class="docutils literal notranslate"><span class="pre">update()</span></code> API changed.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">SoA</span></code>’s converting constructors are now SFINE friendly.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">SoA</span></code>’s base classes are now public.</p></li>
-</ul>
 </section>
 <section id="removed">
 <h3>Removed<a class="headerlink" href="#removed" title="Permalink to this heading">#</a></h3>
 </section>
 <section id="bugfixes">
 <h3>Bugfixes<a class="headerlink" href="#bugfixes" title="Permalink to this heading">#</a></h3>
-<ul class="simple">
-<li><p>Box (Ortho and Triclinic, valid bounds now include zero).</p></li>
-</ul>
 </section>
 <section id="meta">
 <h3>Meta<a class="headerlink" href="#meta" title="Permalink to this heading">#</a></h3>
 </section>
 </section>
+<section id="version-0-4-0">
+<h2>Version 0.4.0<a class="headerlink" href="#version-0-4-0" title="Permalink to this heading">#</a></h2>
+<p>This release introduces generic potentials and the first concrete potential into openFLY, EAM. The EAM implementation includes support for analytic Hessians and is fully openMP parallelised. Additionally, an efficient parallel implementation of the LBFGS minimiser is included.</p>
+<section id="id1">
+<h3>Added<a class="headerlink" href="#id1" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p>New <code class="docutils literal notranslate"><span class="pre">Delta</span></code> property.</p></li>
+<li><p>New <code class="docutils literal notranslate"><span class="pre">StepLBFGS</span></code> class.</p></li>
+<li><p>New <code class="docutils literal notranslate"><span class="pre">Spline</span></code> utility class.</p></li>
+<li><p>New <code class="docutils literal notranslate"><span class="pre">DataEAM</span></code> class with eam/fs parsing.</p></li>
+<li><p>New <code class="docutils literal notranslate"><span class="pre">potential::Generic</span></code> class.</p></li>
+<li><p>New <code class="docutils literal notranslate"><span class="pre">EAM</span></code> class.</p></li>
+<li><p>New <code class="docutils literal notranslate"><span class="pre">xize</span></code> utility function.</p></li>
+<li><p>New <code class="docutils literal notranslate"><span class="pre">LBFGS</span></code> class.</p></li>
+<li><p>New <code class="docutils literal notranslate"><span class="pre">Hessian</span></code> class.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Frozen</span></code> property has a tag to enable GSD IO.</p></li>
+</ul>
+</section>
+<section id="id2">
+<h3>Changed<a class="headerlink" href="#id2" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">fly::near()</span></code> now has customizable tolerances.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">neigh::List</span></code>’s <code class="docutils literal notranslate"><span class="pre">update()</span></code> API changed.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">SoA</span></code>’s converting constructors are now SFINE friendly.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">SoA</span></code>’s base classes are now public.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">TypeMap</span></code>’s converting constructor is now SFINE friendly.</p></li>
+<li><p>De-generalised <code class="docutils literal notranslate"><span class="pre">SoA</span></code>’s converting constructors to allow implicit casts.</p></li>
+<li><p>Read methods on <code class="docutils literal notranslate"><span class="pre">BinaryFile</span></code> are <code class="docutils literal notranslate"><span class="pre">const</span></code>.</p></li>
+</ul>
+</section>
+<section id="id3">
+<h3>Bugfixes<a class="headerlink" href="#id3" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p>Box (Ortho and Triclinic, valid bounds now include zero).</p></li>
+</ul>
+</section>
+</section>
 <section id="version-0-3-0">
 <h2>Version 0.3.0<a class="headerlink" href="#version-0-3-0" title="Permalink to this heading">#</a></h2>
 <p>The second alpha version of openFLY, this release brings neighbour-list support to libFLY.</p>
-<section id="id1">
-<h3>Added<a class="headerlink" href="#id1" title="Permalink to this heading">#</a></h3>
+<section id="id4">
+<h3>Added<a class="headerlink" href="#id4" title="Permalink to this heading">#</a></h3>
 <ul class="simple">
 <li><p>Neighbour-list support via the <code class="docutils literal notranslate"><span class="pre">neigh::List</span></code> class.</p></li>
 <li><p>Internal <code class="docutils literal notranslate"><span class="pre">Vector</span></code> class to replace <code class="docutils literal notranslate"><span class="pre">std::vector</span></code>.</p></li>
@@ -288,8 +305,8 @@
 <li><p>Added <code class="docutils literal notranslate"><span class="pre">min_width</span></code> member to crystal specialisations.</p></li>
 </ul>
 </section>
-<section id="id2">
-<h3>Changed<a class="headerlink" href="#id2" title="Permalink to this heading">#</a></h3>
+<section id="id5">
+<h3>Changed<a class="headerlink" href="#id5" title="Permalink to this heading">#</a></h3>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">Property</span></code>’s <code class="docutils literal notranslate"><span class="pre">array_ref_t</span></code> is now an <code class="docutils literal notranslate"><span class="pre">Eigen::Map</span></code> to disallow resizing of <code class="docutils literal notranslate"><span class="pre">SoA</span></code>’s individual arrays.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">SoA</span></code>’s <code class="docutils literal notranslate"><span class="pre">destructive_resize</span></code> now returns a boolean.</p></li>
@@ -298,15 +315,15 @@
 <li><p><code class="docutils literal notranslate"><span class="pre">VoS</span></code> uses the <code class="docutils literal notranslate"><span class="pre">Vector</span></code> class.</p></li>
 </ul>
 </section>
-<section id="id3">
-<h3>Removed<a class="headerlink" href="#id3" title="Permalink to this heading">#</a></h3>
+<section id="id6">
+<h3>Removed<a class="headerlink" href="#id6" title="Permalink to this heading">#</a></h3>
 <ul class="simple">
 <li><p>Removed the <code class="docutils literal notranslate"><span class="pre">Orthorombic</span></code>’s deprecated member min-image.</p></li>
 <li><p>Removed <code class="docutils literal notranslate"><span class="pre">Box</span></code> default constructor.</p></li>
 </ul>
 </section>
-<section id="id4">
-<h3>Bugfixes<a class="headerlink" href="#id4" title="Permalink to this heading">#</a></h3>
+<section id="id7">
+<h3>Bugfixes<a class="headerlink" href="#id7" title="Permalink to this heading">#</a></h3>
 <ul class="simple">
 <li><p>Crystal systems <code class="docutils literal notranslate"><span class="pre">gen_image</span></code> marked <code class="docutils literal notranslate"><span class="pre">const</span></code>.</p></li>
 <li><p>Fixes to test and examples that assumed 3D.</p></li>
@@ -314,8 +331,8 @@
 <li><p><code class="docutils literal notranslate"><span class="pre">SoA</span></code>’s <code class="docutils literal notranslate"><span class="pre">resize</span></code> was broken.</p></li>
 </ul>
 </section>
-<section id="id5">
-<h3>Meta<a class="headerlink" href="#id5" title="Permalink to this heading">#</a></h3>
+<section id="id8">
+<h3>Meta<a class="headerlink" href="#id8" title="Permalink to this heading">#</a></h3>
 <ul class="simple">
 <li><p>vcpkg + gsd are now submodules so all dependencies are tracked by Dependabot!</p></li>
 <li><p>Many documentation engancements.</p></li>
@@ -325,8 +342,8 @@
 <section id="version-0-2-0">
 <h2>Version 0.2.0<a class="headerlink" href="#version-0-2-0" title="Permalink to this heading">#</a></h2>
 <p>The first released alpha version of openFLY! This is a minimal feature-set release with just the base classes that underpin openFLY as well as binary IO.</p>
-<section id="id6">
-<h3>Added<a class="headerlink" href="#id6" title="Permalink to this heading">#</a></h3>
+<section id="id9">
+<h3>Added<a class="headerlink" href="#id9" title="Permalink to this heading">#</a></h3>
 <ul class="simple">
 <li><p>Binary IO using the GSD format through the <code class="docutils literal notranslate"><span class="pre">BinaryFile</span></code> class.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">Property</span></code> base class template.</p></li>
@@ -340,17 +357,14 @@
 <li><p>New CI workflow now includes C++20 and Intel compilers, MSVC removed due to compiler bug.</p></li>
 </ul>
 </section>
-<section id="id7">
-<h3>Changed<a class="headerlink" href="#id7" title="Permalink to this heading">#</a></h3>
+<section id="id10">
+<h3>Changed<a class="headerlink" href="#id10" title="Permalink to this heading">#</a></h3>
 <ul class="simple">
 <li><p>GPL-2.0 -&gt; GPL-3.0-or-later.</p></li>
 </ul>
 </section>
-<section id="id8">
-<h3>Removed<a class="headerlink" href="#id8" title="Permalink to this heading">#</a></h3>
-</section>
-<section id="id9">
-<h3>Meta<a class="headerlink" href="#id9" title="Permalink to this heading">#</a></h3>
+<section id="id11">
+<h3>Meta<a class="headerlink" href="#id11" title="Permalink to this heading">#</a></h3>
 <ul class="simple">
 <li><p>Hdoc is no longer used to build the documentation.</p></li>
 </ul>
@@ -433,19 +447,24 @@
 <li><a class="reference internal" href="#meta">Meta</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#version-0-3-0">Version 0.3.0</a><ul>
+<li><a class="reference internal" href="#version-0-4-0">Version 0.4.0</a><ul>
 <li><a class="reference internal" href="#id1">Added</a></li>
 <li><a class="reference internal" href="#id2">Changed</a></li>
-<li><a class="reference internal" href="#id3">Removed</a></li>
-<li><a class="reference internal" href="#id4">Bugfixes</a></li>
-<li><a class="reference internal" href="#id5">Meta</a></li>
+<li><a class="reference internal" href="#id3">Bugfixes</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#version-0-3-0">Version 0.3.0</a><ul>
+<li><a class="reference internal" href="#id4">Added</a></li>
+<li><a class="reference internal" href="#id5">Changed</a></li>
+<li><a class="reference internal" href="#id6">Removed</a></li>
+<li><a class="reference internal" href="#id7">Bugfixes</a></li>
+<li><a class="reference internal" href="#id8">Meta</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#version-0-2-0">Version 0.2.0</a><ul>
-<li><a class="reference internal" href="#id6">Added</a></li>
-<li><a class="reference internal" href="#id7">Changed</a></li>
-<li><a class="reference internal" href="#id8">Removed</a></li>
-<li><a class="reference internal" href="#id9">Meta</a></li>
+<li><a class="reference internal" href="#id9">Added</a></li>
+<li><a class="reference internal" href="#id10">Changed</a></li>
+<li><a class="reference internal" href="#id11">Meta</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#version-0-1-0-pre-release">Version 0.1.0 pre-release</a></li>

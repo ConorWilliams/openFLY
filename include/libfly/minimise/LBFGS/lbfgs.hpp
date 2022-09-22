@@ -96,6 +96,14 @@ namespace fly::minimise {
     /**
      * @brief Find the nearest local minimum of a potential.
      *
+     * \rst
+     *
+     * .. todo::
+     *    Currently there is a small but non negligible non-parallelised part of this workload in the LBFGS step function. If this is a
+     *    bottleneck (require profiling in real workload) consider work on this.
+     *
+     * \endrst
+     *
      * @param out Final position of optimiser.
      * @param in Initial position + per particle info.
      * @param pot Potential to minimise.

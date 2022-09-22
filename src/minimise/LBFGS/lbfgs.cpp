@@ -53,8 +53,10 @@ namespace fly::minimise {
       fmt::print("LBFGS: Skin = {}\n", skin);
     }
 
-    // This std::not_equal thing avoid floating point comparison warnings.
-    if (double r_cut = pot.r_cut() + skin; std::not_equal_to<double>{}(std::exchange(m_r_cut, r_cut), r_cut) || !m_nl) {
+    // Avoid floating point comparison warnings.
+    constexpr std::equal_to<> eq;
+
+    if (double r_cut = pot.r_cut() + skin; !eq(std::exchange(m_r_cut, r_cut), r_cut) || !m_nl) {
       m_nl = neigh::List(m_box, r_cut);
 
       if (m_opt.debug) {
@@ -78,7 +80,7 @@ namespace fly::minimise {
       double mag_g = gnorm_sq(m_grad[g_]);
 
       if (m_opt.debug) {
-        fmt::print("LBFGS: i={:<4} trust={:f} acc={:f} norm(g)={:e} rebuild={}\n", i, trust, acc, std::sqrt(mag_g), acc == 0.0);
+        fmt::print("LBFGS: i={:<4} trust={:f} acc={:f} norm(g)={:e} rebuild={}\n", i, trust, acc, std::sqrt(mag_g), eq(acc, 0.0));
       }
 
       if (m_opt.fout) {

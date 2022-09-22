@@ -14,9 +14,29 @@ Changelog
 .. Meta 
 .. ~~~~
 
+.. Version is specified in vcpkg.json, index.rst and version.hpp
 
 Unreleased
-----------
+-------------------------------
+Added
+~~~~~
+Changed
+~~~~~~~
+Removed
+~~~~~~~
+Bugfixes
+~~~~~~~~
+Meta 
+~~~~
+
+
+
+Version 0.4.0
+--------------
+
+This release introduces generic potentials and the first concrete potential into openFLY, EAM. The EAM implementation includes support for analytic Hessians and is fully openMP parallelised. Additionally, an efficient parallel implementation of the LBFGS minimiser is included.
+
+
 Added
 ~~~~~
 
@@ -28,8 +48,8 @@ Added
 - New ``EAM`` class.
 - New ``xize`` utility function.
 - New ``LBFGS`` class.
-- New Hessian class.
-- Frozen property has a tag to enable GSD IO.
+- New ``Hessian`` class.
+- ``Frozen`` property has a tag to enable GSD IO.
 
 
 Changed
@@ -43,15 +63,11 @@ Changed
 - De-generalised ``SoA``'s converting constructors to allow implicit casts.
 - Read methods on ``BinaryFile`` are ``const``.
 
-Removed
-~~~~~~~
 Bugfixes
 ~~~~~~~~
 
 - Box (Ortho and Triclinic, valid bounds now include zero).
 
-Meta 
-~~~~
 
 Version 0.3.0
 ------------------------
@@ -94,7 +110,6 @@ Bugfixes
 - ``SoA``'s ``operator()`` was broken.
 - ``SoA``'s ``resize`` was broken.
 
-
 Meta 
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -127,9 +142,6 @@ Changed
 ~~~~~~~~~~
 
 - GPL-2.0 -> GPL-3.0-or-later.
-
-Removed
-~~~~~~~~~
 
 Meta 
 ~~~~~~~~~~~~~~~~~~~~~~~~~

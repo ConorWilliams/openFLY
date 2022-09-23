@@ -127,7 +127,7 @@ namespace fly::potential {
     template <typename... Ts>
     auto gradient(system::SoA<PotentialGradient&> out, system::SoA<Ts...> const& in, neigh::List const& nl, int threads = 1) -> void {
       return visit(m_pot, [&](auto& pot) {
-        if constexpr (is_detected_v<Gradient, decltype(pot), system::SoA<Ts...>&>) {
+        if constexpr (is_detected_v<Gradient, decltype(pot), system::SoA<Ts...> const&>) {
           pot.gradient(out, in, nl, threads);
         } else {
           throw error("Generic potential {}, does not support .gradient(...) of this system.", m_pot.index());

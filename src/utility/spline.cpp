@@ -21,6 +21,8 @@ namespace fly {
   Spline::Spline(std::vector<double> y, double dx) : m_dx(dx), m_inv_dx(1 / dx) {
     //
 
+    y.push_back(y.back());  // Fix-up floating point rounding
+
     std::size_t n = y.size() - 1;
 
     // 1

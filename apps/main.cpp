@@ -6,14 +6,18 @@
 #include <ctime>
 #include <fstream>
 #include <iostream>
+#include <random>
 #include <string_view>
 #include <utility>
 #include <variant>
 
 #include "libfly/io/gsd.hpp"
 #include "libfly/minimise/LBFGS/lbfgs.hpp"
+#include "libfly/neigh/list.hpp"
 #include "libfly/neigh/sort.hpp"
 #include "libfly/potential/generic.hpp"
+#include "libfly/saddle/dimer.hpp"
+#include "libfly/saddle/perturb.hpp"
 #include "libfly/system/SoA.hpp"
 #include "libfly/system/atom.hpp"
 #include "libfly/system/box.hpp"
@@ -22,6 +26,7 @@
 #include "libfly/system/supercell.hpp"
 #include "libfly/system/typemap.hpp"
 #include "libfly/utility/core.hpp"
+#include "libfly/utility/random.hpp"
 
 using namespace fly;
 
@@ -41,75 +46,10 @@ system::Supercell<system::TypeMap<>, Ts...> supercell_from(std::string_view fnam
   return out_cell;
 }
 
-auto make_super(bool erase = true) {
-  // Generate a BBC lattice, from old code base.
-
-  struct MotifPt {
-    TypeID::scalar_t num;
-    Vec off;
-  };
-
-  // Fractional motif
-  std::array BCC = {
-      MotifPt{0, Vec::Zero()},
-      MotifPt{0, Vec::Constant(0.5)},
-  };
-
-  double T = 300.0;
-
-  double V = 11.64012 + T * (9.37798e-5 + T * (3.643134e-7 + T * (1.851593e-10 + T * 5.669148e-14)));
-
-  double a = std::pow(2 * V, 1.0 / 3);  // lat param
-
-  std::vector<MotifPt> lat;
-
-  Arr<int> shape = Arr<int>::Constant(15);  // In unit cells
-
-  template_for<int>(Arr<int>::Zero(), shape, [&](auto... i) {
-    for (auto const& mot : BCC) {
-      //
-
-      Vec lp = Arr<int>{i...}.cast<double>().matrix() + mot.off;
-
-      lat.push_back({mot.num, lp * a});
-    }
-  });
-
-  if (erase) {
-    lat.erase(lat.begin() + 1);
-  }
-
-  system::TypeMap<> map{2};
-
-  map.set(0, "Fe");
-  map.set(1, "H");
-
-  Mat basis = Mat::Zero();
-
-  for (int i = 0; i < spatial_dims; i++) {
-    basis(i, i) = a * shape[i];
-  }
-
-  auto box = fly::system::Box(basis, Arr<bool>::Constant(true));
-
-  auto cell = fly::system::make_supercell<Position, Frozen, PotentialGradient>(box, map, xise(lat));
-
-  for (int i = 0; i < xise(lat); i++) {
-    cell(r_, i) = lat[safe_cast<std::size_t>(i)].off;
-    cell(id_, i) = lat[safe_cast<std::size_t>(i)].num;
-    cell(fzn_, i) = false;
-  }
-
-  return cell;
-}
-
 int main() {
   //
 
   system::Supercell cell = supercell_from<Position, Frozen>("data/xyz/V1-unrelaxed.gsd", 0);
-
-  cell(fzn_, 0) = true;
-  cell(fzn_, 113) = true;
 
   //   auto cell = make_super();
 
@@ -127,9 +67,7 @@ int main() {
   minimise::LBFGS::Options opt;
 
   opt.debug = true;
-  //   opt.fout = &fout;
-
-  opt.skin_frac = 1.05;
+  opt.fout = &fout;
 
   minimise::LBFGS minimiser(opt, cell.box());
 
@@ -140,12 +78,41 @@ int main() {
       },
   };
 
-  bool done = timeit("Minimise", [&] {
-    //
-    return minimiser.minimise(cell, cell, pot, omp_get_max_threads());
-  });
+  bool done = timeit("Minimise", [&] { return minimiser.minimise(cell, cell, pot, omp_get_max_threads()); });
 
   fmt::print("FoundMin?={}\n", done);
+
+  //   /////////////////////////////////////////////////
+
+  system::Supercell<system::TypeMap<>, Position, Axis, Frozen, PotentialGradient> dcell(cell.box(), cell.map(), cell.size());
+
+  dcell[r_] = cell[r_];
+  dcell[fzn_] = cell[fzn_];
+  dcell[id_] = cell[id_];
+  dcell[ax_] = 1;
+  dcell[ax_] /= gnorm(dcell[ax_]);
+
+  std::random_device dev;
+
+  Xoshiro rng({0, 0, 1, dev()});
+
+  saddle::perturb(dcell, rng, dcell.box(), dcell(r_, 113), dcell, 100, 0);
+
+  fout.commit([&] {
+    fout.write(fly::r_, dcell);  //< Write the positions of the atoms.
+  });
+
+  saddle::Dimer::Options opt2;
+
+  opt2.debug = true;
+
+  saddle::Dimer dimer(opt2, pot);
+
+  neigh::List nl(dcell.box(), dimer.r_cut());
+
+  nl.rebuild(dcell);
+
+  dimer.eff_gradient(dcell, dcell, nl);
 
   return 0;
 }

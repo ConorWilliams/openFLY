@@ -34,8 +34,10 @@
 
 namespace fly::minimise {
 
-  bool LBFGS::minimise(system::SoA<Position &> out, system::SoA<Position const &, TypeID const &, Frozen const &> in,
-                       potential::Generic &pot, int num_threads) {
+  bool LBFGS::minimise(system::SoA<Position &> out,
+                       system::SoA<Position const &, TypeID const &, Frozen const &> in,
+                       potential::Generic &pot,
+                       int num_threads) {
     // Check inputs
 
     verify(in.size() == out.size(), "LBFGS minimizer inputs size mismatch, in={} out={}", in.size(), out.size());
@@ -95,7 +97,7 @@ namespace fly::minimise {
         return false;
       }
 
-      auto &Hg = m_core.newton_step(out, m_grad);
+      auto &Hg = m_core.newton_step<Position, PotentialGradient>(out, m_grad);
 
       ASSERT(gdot(m_grad[g_], Hg[del_]) > 0, "Ascent direction in lbfgs", 0);
 

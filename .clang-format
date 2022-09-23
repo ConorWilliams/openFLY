@@ -13,3 +13,5 @@ IndentWidth: "2"
 NamespaceIndentation: All
 BreakBeforeBinaryOperators: All
 BreakBeforeTernaryOperators: "true"
+BinPackArguments: "false"
+BinPackParameters: "false"

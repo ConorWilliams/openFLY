@@ -20,15 +20,25 @@ Unreleased
 -------------------------------
 Added
 ~~~~~
+
+- New ``Dimer`` class.
+- New ``perturb()`` function
+
 Changed
 ~~~~~~~
+
+- Generalised ``StepLBFGS``'s ``.newton_step()``.
+
 Removed
 ~~~~~~~
 Bugfixes
 ~~~~~~~~
+
+- Const-corrected ``Generic::gradient``.
+- Padded spline with terminator to fix-up floating point rounding errors.
+
 Meta 
 ~~~~
-
 
 
 Version 0.4.0

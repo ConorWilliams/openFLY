@@ -14,6 +14,8 @@
 
 #include "libfly/minimise/LBFGS/lbfgs_core.hpp"
 
+#include <fmt/core.h>
+
 #include <cmath>
 #include <cstddef>
 #include <utility>
@@ -24,33 +26,33 @@
 
 namespace fly::minimise {
 
-  system::SoA<Delta> &StepLBFGS::newton_step(system::SoA<Position const &> r, system::SoA<PotentialGradient const &> g) {
+  system::SoA<Delta> &StepLBFGS::newton_step_impl(GenericArr const &r, GenericArr const &g) {
     //
     verify(r.size() == g.size(), "LBFGS core inputs size mismatch, r={} g={}", r.size(), g.size());
     //
     int prev = (m_k - 1) % m_n;
 
-    m_r.destructive_resize(r.size());
+    m_r.destructive_resize(r.size() / spatial_dims);
 
     // Compute the k-1 th y, s and rho
     if (m_k > 0) {
       //
-      if (r.size() * Position::size() != m_prev_x.size()) {
+      if (r.size() != m_prev_x.size()) {
         throw error("Call to newton_step() with {} atoms but history has {} atoms", r.size(), m_prev_x.size());
       }
       //
-      m_hist[prev].s = r[r_] - m_prev_x;
-      m_hist[prev].y = g[g_] - m_prev_g;
+      m_hist[prev].s = r - m_prev_x;
+      m_hist[prev].y = g - m_prev_g;
 
       // If Wolfie conditions fulfilled during the line search then dot(y, s) > 0. Otherwise we take
       // absolute value to prevent ascent direction.
       m_hist[prev].rho = 1.0 / std::abs(gdot(m_hist[prev].s, m_hist[prev].y));
     }
 
-    m_prev_x = r[r_];
-    m_prev_g = g[g_];
+    m_prev_x = r;
+    m_prev_g = g;
 
-    m_q = g[g_];
+    m_q = g;
 
     int incur = m_k <= m_n ? 0 : m_k - m_n;
     int bound = m_k <= m_n ? m_k : m_n;

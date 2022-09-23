@@ -100,7 +100,7 @@ namespace fly::minimise {
      *
      * .. todo::
      *    Currently there is a small but non negligible non-parallelised part of this workload in the LBFGS step function. If this is a
-     *    bottleneck (require profiling in real workload) consider work on this.
+     *    bottleneck (require profiling in real workload) consider working on this.
      *
      * \endrst
      *
@@ -111,8 +111,10 @@ namespace fly::minimise {
      * @return true If a local minimum was found.
      * @return false If no local minimum was found.
      */
-    auto minimise(system::SoA<Position &> out, system::SoA<Position const &, TypeID const &, Frozen const &> in,
-                  potential::Generic &pot, int threads = 1) -> bool;
+    auto minimise(system::SoA<Position &> out,
+                  system::SoA<Position const &, TypeID const &, Frozen const &> in,
+                  potential::Generic &pot,
+                  int threads = 1) -> bool;
 
   private:
     Options m_opt;

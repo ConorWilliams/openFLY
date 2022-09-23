@@ -15,6 +15,7 @@
 // You should have received a copy of the GNU General Public License along with openFLY. If not, see <https://www.gnu.org/licenses/>.
 
 #include <cstddef>
+#include <type_traits>
 #include <utility>
 #include <vector>
 
@@ -47,6 +48,10 @@ namespace fly::minimise {
      */
     auto clear() -> void { m_k = 0; }
 
+  private:
+    using GenericArr = system::Property<double>::array_t;
+
+  public:
     /**
      * @brief Compute the approximate Newton-step.
      *
@@ -74,36 +79,43 @@ namespace fly::minimise {
      *
      * with :math:`\alpha = 1` the best guess in the absence of a line-search.
      *
+     * This function accepts generic ``SoA``'s to allow exotic notions of position/gradient.
      *
      * \endrst
      *
-     * @param g The current potential gradient.
-     * @param r The current position of the atoms.
+     * @param g The current 'potential gradient'.
+     * @param x The current 'position' of the atoms.
      * @return A view of the approximate Newton-step (see above) (it is OK to modify this view it will be overwritten upon next call).
      */
-    auto newton_step(system::SoA<Position const &> r, system::SoA<PotentialGradient const &> g) -> system::SoA<Delta> &;
+    template <typename T1, typename T2>
+    auto newton_step(system::SoA<T1 const &> x, system::SoA<T2 const &> g) -> system::SoA<Delta> & {
+      static_assert(std::is_same_v<typename T1::matrix_t, typename T2::matrix_t>, ".newton_step()'s r and g must be compatible");
+      static_assert(std::is_same_v<decltype(x[T1{}]), GenericArr const &>, ".newton_step() will allocate");
+      static_assert(std::is_same_v<decltype(g[T2{}]), GenericArr const &>, ".newton_step() will allocate");
+      return newton_step_impl(x[T1{}], g[T2{}]);
+    }
 
   private:
+    auto newton_step_impl(GenericArr const &r, GenericArr const &g) -> system::SoA<Delta> &;
+
     int m_n;
     int m_k = 0;
 
-    using Array = Eigen::Array<double, Eigen::Dynamic, 1>;
-
     struct Elem {
-      Array s;
-      Array y;
+      GenericArr s;
+      GenericArr y;
       double rho;
       double alpha;
     };
 
     Vector<Elem> m_hist;
 
-    Array m_prev_x;
-    Array m_prev_g;
+    GenericArr m_prev_x;
+    GenericArr m_prev_g;
+
+    GenericArr m_q;
 
     system::SoA<Delta> m_r;
-
-    Array m_q;
   };
 
 }  // namespace fly::minimise

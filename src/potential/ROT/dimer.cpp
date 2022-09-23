@@ -1,11 +1,10 @@
 
 
-#include "libfly/saddle/dimer.hpp"
-
-#include <fmt/core.h>
+#include "libfly/potential/ROT/dimer.hpp"
 
 #include <cmath>
 #include <cstddef>
+#include <memory>
 
 #include "libfly/minimise/LBFGS/lbfgs_core.hpp"
 #include "libfly/neigh/list.hpp"
@@ -14,7 +13,17 @@
 #include "libfly/system/property.hpp"
 #include "libfly/utility/core.hpp"
 
-namespace fly::saddle {
+namespace fly::potential {
+
+  Dimer::Dimer(Options const& opt, potential::Generic const& to_wrap)
+      : m_opt(opt), m_core(opt.n), m_wrapped(std::make_unique<potential::Generic>(to_wrap)) {}
+
+  Dimer::Dimer(Dimer const& other)
+      : m_opt{other.m_opt}, m_core(m_opt.n), m_wrapped(std::make_unique<potential::Generic>(*other.m_wrapped)) {}
+
+  Dimer::Dimer(Dimer&& other) noexcept : m_opt{other.m_opt}, m_core(std::move(other.m_core)), m_wrapped(std::move(other.m_wrapped)) {}
+
+  double Dimer::r_cut() const noexcept { return m_wrapped->r_cut() + m_opt.delta_r * 2; }
 
   double Dimer::eff_gradient(system::SoA<PotentialGradient&, Axis&> out,
                              system::SoA<TypeID const&, Frozen const&, Axis const&> in,
@@ -39,11 +48,7 @@ namespace fly::saddle {
     //
     m_core.clear();
 
-    fmt::print("A\n");
-
-    m_wrapped.gradient(m_g0, in, nl, num_threads);  // Gradient at centre (g0)
-
-    fmt::print("B\n");
+    m_wrapped->gradient(m_g0, in, nl, num_threads);  // Gradient at centre (g0)
 
     m_delta[del_] = -m_opt.delta_r * out[ax_];
 
@@ -53,7 +58,7 @@ namespace fly::saddle {
 
     swap(m_delta, m_delta_prev);
 
-    m_wrapped.gradient(m_g1, in, nl, num_threads);  // Gradient at end (g1)
+    m_wrapped->gradient(m_g1, in, nl, num_threads);  // Gradient at end (g1)
 
     double curv = [&] {
       for (int i = 0;; i++) {
@@ -81,7 +86,7 @@ namespace fly::saddle {
           m_delta[del_] = m_delta_prev[del_] - m_delta[del_];
           nl.update(m_delta);
 
-          m_wrapped.gradient(m_g1p, in, nl, num_threads);  // Gradient at primed end (g1p)
+          m_wrapped->gradient(m_g1p, in, nl, num_threads);  // Gradient at primed end (g1p)
 
           double c_x1 = gdot(m_g1p[g_] - m_g0[g_], m_axisp[ax_]) / m_opt.delta_r;
           double a_1 = (c_x0 - c_x1 + b_1 * sin(2 * theta_1)) / (1 - std::cos(2 * theta_1));
@@ -113,8 +118,8 @@ namespace fly::saddle {
       }
     }();
 
-    m_delta[del_] = -m_delta_prev[del_];
-    nl.update(m_delta);  // Reset neighbour lists to input state.
+    m_delta[del_] = -m_delta_prev[del_];  // Flip to reverse last.
+    nl.update(m_delta);                   // Reset neighbour lists to input state.
 
     if (!m_opt.relax_in_convex && curv > 0) {
       out[g_] = -gdot(m_g0[g_], out[ax_]) * out[ax_];
@@ -125,4 +130,4 @@ namespace fly::saddle {
     return curv;
   }
 
-}  // namespace fly::saddle
+}  // namespace fly::potential

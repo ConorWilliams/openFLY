@@ -20,7 +20,6 @@
 
 #include "libfly/minimise/LBFGS/lbfgs_core.hpp"
 #include "libfly/neigh/list.hpp"
-#include "libfly/potential/generic.hpp"
 #include "libfly/system/SoA.hpp"
 #include "libfly/system/property.hpp"
 #include "libfly/utility/core.hpp"
@@ -31,7 +30,12 @@
  * @brief A second-order potential.
  */
 
-namespace fly::saddle {
+namespace fly::potential {
+
+  /**
+   * @brief Forward declare.
+   */
+  class Generic;
 
   /**
    * @brief Dimer is a potential adaptor.
@@ -64,7 +68,17 @@ namespace fly::saddle {
      * @param opt Options for minimisation pass.
      * @param to_wrap Potential to wrap.
      */
-    Dimer(Options const& opt, potential::Generic const& to_wrap) : m_opt(opt), m_core(opt.n), m_wrapped(to_wrap) {}
+    Dimer(Options const& opt, potential::Generic const& to_wrap);
+
+    /**
+     * @brief Copy construct a new Dimer object.
+     */
+    Dimer(Dimer const&);
+
+    /**
+     * @brief Move construct a new Dimer object.
+     */
+    Dimer(Dimer&&) noexcept;
 
     /**
      * @brief Get this potentials cut-off radius that the neighbour lists should be configured for.
@@ -72,7 +86,7 @@ namespace fly::saddle {
      * This is the wrapped potentials cut-off plus two times delta_r, this means we can displace every atom by delta_r during the
      * minimisation pass and the not need to rebuild the neighbour lists.
      */
-    double r_cut() const noexcept { return m_wrapped.r_cut() + m_opt.delta_r * 2; }
+    double r_cut() const noexcept;
 
     /**
      * @brief Compute the effective potential's gradient.
@@ -95,7 +109,7 @@ namespace fly::saddle {
   private:
     Options m_opt;
     minimise::StepLBFGS m_core;
-    potential::Generic m_wrapped;
+    std::unique_ptr<potential::Generic> m_wrapped;
 
     system::SoA<Delta> m_delta;       // Store displacement for updates
     system::SoA<Delta> m_delta_prev;  // Store previous displacement for updates
@@ -109,4 +123,4 @@ namespace fly::saddle {
     system::SoA<Delta> m_delta_g;  // Gradient difference
   };
 
-}  // namespace fly::saddle
+}  // namespace fly::potential

@@ -15,8 +15,8 @@
 #include "libfly/minimise/LBFGS/lbfgs.hpp"
 #include "libfly/neigh/list.hpp"
 #include "libfly/neigh/sort.hpp"
+#include "libfly/potential/ROT/dimer.hpp"
 #include "libfly/potential/generic.hpp"
-#include "libfly/saddle/dimer.hpp"
 #include "libfly/saddle/perturb.hpp"
 #include "libfly/system/SoA.hpp"
 #include "libfly/system/atom.hpp"
@@ -102,11 +102,11 @@ int main() {
     fout.write(fly::r_, dcell);  //< Write the positions of the atoms.
   });
 
-  saddle::Dimer::Options opt2;
+  potential::Dimer::Options opt2;
 
   opt2.debug = true;
 
-  saddle::Dimer dimer(opt2, pot);
+  potential::Dimer dimer(opt2, pot);
 
   neigh::List nl(dcell.box(), dimer.r_cut());
 

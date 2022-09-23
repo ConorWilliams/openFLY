@@ -50,28 +50,14 @@ namespace fly::potential {
    */
   class Generic {
   private:
-    // clang-format off
+    template <typename Potential, typename... Args>
+    using Energy = decltype(std::declval<Potential>().energy(std::declval<Args>()...));
 
-    template <typename Potential, typename SOA>
-    using Energy = decltype(
-        std::declval<Potential>().energy(
-            std::declval<SOA>(), std::declval<neigh::List const&>(), std::declval<int>()
-        )
-    );
+    template <typename Potential, typename... Args>
+    using Gradient = decltype(std::declval<Potential>().gradient(std::declval<Args>()...));
 
-    template <typename Potential, typename SOA>
-    using Gradient = decltype(
-        std::declval<Potential>().gradient(
-            std::declval<system::SoA<PotentialGradient&>&>(), std::declval<SOA>(), std::declval<neigh::List const&>(), std::declval<int>()
-        )
-    );
-
-    template <typename Potential, typename SOA>
-    using Hessian = decltype(
-        std::declval<Potential>().hessian(
-             std::declval<system::Hessian &>(), std::declval<SOA>(), std::declval<neigh::List const&>(), std::declval<int>()
-        )
-    );
+    template <typename Potential, typename... Args>
+    using Hessian = decltype(std::declval<Potential>().hessian(std::declval<Args>()...));
 
     // clang-format on
   public:
@@ -80,8 +66,18 @@ namespace fly::potential {
      *
      * @param args Forwarded to ``std::variant``'s constructor.
      */
-    template <typename... Args>
+    template <typename... Args, typename = std::enable_if_t<std::is_constructible_v<std::variant<EAM>, Args&&...>>>
     explicit Generic(Args&&... args) : m_pot(std::forward<Args>(args)...) {}
+
+    /**
+     * @brief Construct a new Generic object.
+     */
+    Generic(Generic const&) = default;
+
+    /**
+     * @brief Construct a new Generic object.
+     */
+    Generic(Generic&&) = default;
 
     /**
      * @brief Get this potentials cut-off radius.
@@ -106,7 +102,7 @@ namespace fly::potential {
     template <typename... Ts>
     auto energy(system::SoA<Ts...> const& in, neigh::List const& nl, int threads = 1) -> double {
       return visit(m_pot, [&, threads](auto& pot) -> double {
-        if constexpr (is_detected_v<Energy, decltype(pot), system::SoA<Ts...> const&>) {
+        if constexpr (is_detected_v<Energy, decltype(pot), system::SoA<Ts...> const&, neigh::List const&, int>) {
           return pot.energy(in, nl, threads);
         } else {
           throw error("Generic potential {}, does not support .energy(...) of this system.", m_pot.index());
@@ -124,10 +120,10 @@ namespace fly::potential {
      * @param nl Neighbour list (in ready state i.e. neigh::List::update() or neigh::List::rebuild() called).
      * @param threads Number of openMP threads to use.
      */
-    template <typename... Ts>
-    auto gradient(system::SoA<PotentialGradient&> out, system::SoA<Ts...> const& in, neigh::List const& nl, int threads = 1) -> void {
+    template <typename... T, typename... U>
+    auto gradient(system::SoA<T...>& out, system::SoA<U...> const& in, neigh::List const& nl, int threads = 1) -> void {
       return visit(m_pot, [&](auto& pot) {
-        if constexpr (is_detected_v<Gradient, decltype(pot), system::SoA<Ts...> const&>) {
+        if constexpr (is_detected_v<Gradient, decltype(pot), system::SoA<T...>&, system::SoA<U...> const&, neigh::List const&, int>) {
           pot.gradient(out, in, nl, threads);
         } else {
           throw error("Generic potential {}, does not support .gradient(...) of this system.", m_pot.index());
@@ -149,7 +145,7 @@ namespace fly::potential {
     template <typename... Ts>
     auto hessian(system::Hessian& out, system::SoA<Ts...> const& in, neigh::List const& nl, int threads = 1) -> void {
       return visit(m_pot, [&](auto& pot) {
-        if constexpr (is_detected_v<Hessian, decltype(pot), system::SoA<Ts...> const&>) {
+        if constexpr (is_detected_v<Hessian, decltype(pot), system::Hessian&, system::SoA<Ts...> const&, neigh::List const&, int>) {
           pot.hessian(in, out, nl, threads);
         } else {
           throw error("Generic potential {}, does not support .hessian(...) of this system.", m_pot.index());

@@ -21,13 +21,15 @@ Unreleased
 Added
 ~~~~~
 
-- New ``Dimer`` class.
+- New ``Dimer`` potential adaptor.
 - New ``perturb()`` function
 
 Changed
 ~~~~~~~
 
 - Generalised ``StepLBFGS``'s ``.newton_step()``.
+- ``Generic`` potential API + constructor changes + new ``visit()`` method.
+- Generalised ``LBFGS`` minimise API.
 
 Removed
 ~~~~~~~

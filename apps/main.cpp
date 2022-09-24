@@ -41,7 +41,15 @@ system::Supercell<system::TypeMap<>, Ts...> supercell_from(std::string_view fnam
 
   system::Supercell out_cell = system::make_supercell<Ts...>(out_box, out_map, file.read<std::uint32_t>(frame, "particles/N"));
 
-  (file.read_to(frame, Ts{}, out_cell), ...);
+  auto read = [&](auto property) {
+    try {
+      file.read_to(frame, property, out_cell);
+    } catch (fly::RuntimeError const& err) {
+      fmt::print("Ignoring error, what(): {}\n", err.what());
+    }
+  };
+
+  (read(Ts{}), ...);
 
   return out_cell;
 }
@@ -49,7 +57,7 @@ system::Supercell<system::TypeMap<>, Ts...> supercell_from(std::string_view fnam
 int main() {
   //
 
-  system::Supercell cell = supercell_from<Position, Frozen>("data/xyz/V1-unrelaxed.gsd", 0);
+  system::Supercell cell = supercell_from<Position, Frozen, PotentialGradient, Axis>("data/xyz/V1-unrelaxed.gsd", 0);
 
   //   auto cell = make_super();
 
@@ -67,7 +75,7 @@ int main() {
   minimise::LBFGS::Options opt;
 
   opt.debug = true;
-  opt.fout = &fout;
+  //   opt.fout = &fout;
 
   minimise::LBFGS minimiser(opt, cell.box());
 
@@ -94,25 +102,34 @@ int main() {
 
   std::random_device dev;
 
-  Xoshiro rng({0, 0, 1, dev()});
+  Xoshiro rng({0, 0, 1, 1});
 
-  saddle::perturb(dcell, rng, dcell.box(), dcell(r_, 113), dcell, 100, 0);
+  saddle::perturb(dcell, rng, dcell.box(), dcell(r_, 113), dcell, 4, 0.6);
 
   fout.commit([&] {
-    fout.write(fly::r_, dcell);  //< Write the positions of the atoms.
+    fout.write(fly::r_, dcell);  //< Write the positions of perturbed the atoms.
+    fout.write(fly::ax_, dcell);
   });
 
   potential::Dimer::Options opt2;
 
   opt2.debug = true;
 
-  potential::Dimer dimer(opt2, pot);
+  potential::Generic dimer{
+      potential::Dimer{
+          opt2,
+          pot,
+      },
+  };
 
-  neigh::List nl(dcell.box(), dimer.r_cut());
+  bool sp = timeit("FindSP", [&] { return minimiser.minimise(dcell, dcell, dimer, omp_get_max_threads()); });
 
-  nl.rebuild(dcell);
+  fout.commit([&] {
+    fout.write(fly::r_, dcell);  //< Write the position of the SP.
+    fout.write(fly::ax_, dcell);
+  });
 
-  dimer.eff_gradient(dcell, dcell, nl);
+  fmt::print("FoundSP?={}\n", sp);
 
   return 0;
 }

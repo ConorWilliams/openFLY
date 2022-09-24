@@ -23,6 +23,7 @@
 
 #include "libfly/neigh/list.hpp"
 #include "libfly/potential/EAM/eam.hpp"
+#include "libfly/potential/ROT/dimer.hpp"
 #include "libfly/system/SoA.hpp"
 #include "libfly/system/hessian.hpp"
 #include "libfly/system/property.hpp"
@@ -59,6 +60,8 @@ namespace fly::potential {
     template <typename Potential, typename... Args>
     using Hessian = decltype(std::declval<Potential>().hessian(std::declval<Args>()...));
 
+    using variant = std::variant<EAM, Dimer>;
+
     // clang-format on
   public:
     /**
@@ -66,7 +69,7 @@ namespace fly::potential {
      *
      * @param args Forwarded to ``std::variant``'s constructor.
      */
-    template <typename... Args, typename = std::enable_if_t<std::is_constructible_v<std::variant<EAM>, Args&&...>>>
+    template <typename... Args, typename = std::enable_if_t<std::is_constructible_v<variant, Args&&...>>>
     explicit Generic(Args&&... args) : m_pot(std::forward<Args>(args)...) {}
 
     /**
@@ -86,7 +89,7 @@ namespace fly::potential {
      * a cut-off equal or greater than this.
      */
     auto r_cut() const noexcept -> double {
-      return visit(m_pot, [](auto const& pot) -> double { return pot.r_cut(); });
+      return ::fly::visit(m_pot, [](auto const& pot) -> double { return pot.r_cut(); });
     }
 
     /**
@@ -101,7 +104,7 @@ namespace fly::potential {
      */
     template <typename... Ts>
     auto energy(system::SoA<Ts...> const& in, neigh::List const& nl, int threads = 1) -> double {
-      return visit(m_pot, [&, threads](auto& pot) -> double {
+      return ::fly::visit(m_pot, [&, threads](auto& pot) -> double {
         if constexpr (is_detected_v<Energy, decltype(pot), system::SoA<Ts...> const&, neigh::List const&, int>) {
           return pot.energy(in, nl, threads);
         } else {
@@ -122,7 +125,7 @@ namespace fly::potential {
      */
     template <typename... T, typename... U>
     auto gradient(system::SoA<T...>& out, system::SoA<U...> const& in, neigh::List const& nl, int threads = 1) -> void {
-      return visit(m_pot, [&](auto& pot) {
+      return ::fly::visit(m_pot, [&](auto& pot) {
         if constexpr (is_detected_v<Gradient, decltype(pot), system::SoA<T...>&, system::SoA<U...> const&, neigh::List const&, int>) {
           pot.gradient(out, in, nl, threads);
         } else {
@@ -144,7 +147,7 @@ namespace fly::potential {
      */
     template <typename... Ts>
     auto hessian(system::Hessian& out, system::SoA<Ts...> const& in, neigh::List const& nl, int threads = 1) -> void {
-      return visit(m_pot, [&](auto& pot) {
+      return ::fly::visit(m_pot, [&](auto& pot) {
         if constexpr (is_detected_v<Hessian, decltype(pot), system::Hessian&, system::SoA<Ts...> const&, neigh::List const&, int>) {
           pot.hessian(in, out, nl, threads);
         } else {
@@ -153,8 +156,16 @@ namespace fly::potential {
       });
     }
 
+    /**
+     * @brief Visit the underlying std::variant with the ``visitor``.
+     */
+    template <typename F>
+    auto visit(F&& visitor) -> decltype(auto) {
+      return ::fly::visit(m_pot, std::forward<F>(visitor));
+    }
+
   private:
-    std::variant<EAM> m_pot;
+    variant m_pot;
   };
 
 }  // namespace fly::potential

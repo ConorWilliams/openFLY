@@ -25,10 +25,10 @@ namespace fly::potential {
 
   double Dimer::r_cut() const noexcept { return m_wrapped->r_cut() + m_opt.delta_r * 2; }
 
-  double Dimer::eff_gradient(system::SoA<PotentialGradient&, Axis&> out,
-                             system::SoA<TypeID const&, Frozen const&, Axis const&> in,
-                             neigh::List& nl,
-                             int num_threads) {
+  double Dimer::gradient(system::SoA<PotentialGradient&, Axis&> out,
+                         system::SoA<TypeID const&, Frozen const&, Axis const&> in,
+                         neigh::List const& nl,
+                         int num_threads) {
     //
     verify(in.size() == out.size(), "Effective gradient size mismatch in={} out={}", in.size(), out.size());
 
@@ -52,7 +52,7 @@ namespace fly::potential {
 
     m_delta[del_] = -m_opt.delta_r * out[ax_];
 
-    nl.update(m_delta);
+    const_cast<neigh::List&>(nl).update(m_delta);
 
     using std::swap;  // ADL
 
@@ -60,7 +60,7 @@ namespace fly::potential {
 
     m_wrapped->gradient(m_g1, in, nl, num_threads);  // Gradient at end (g1)
 
-    double curv = [&] {
+    m_curv = [&] {
       for (int i = 0;; i++) {
         m_delta_g[del_] = m_g1[g_] - m_g0[g_];
         m_delta_g[del_] -= gdot(m_delta_g[del_], out[ax_]) * out[ax_];  // Torque
@@ -75,7 +75,7 @@ namespace fly::potential {
         double c_x0 = gdot(m_g1[g_] - m_g0[g_], out[ax_]) / m_opt.delta_r;
         double theta_1 = -0.5 * std::atan(b_1 / std::abs(c_x0));  // Trial rotation angle
 
-        if (std::abs(theta_1) < m_opt.theta_tol || i == m_opt.iter_max_rot) {
+        if (std::abs(theta_1) < m_opt.theta_tol || (i >= m_opt.iter_max_rot && c_x0 < 0) || i > 10 * m_opt.iter_max_rot) {
           return c_x0;
         } else {
           // Trial rotation
@@ -84,7 +84,7 @@ namespace fly::potential {
           m_delta[del_] = -m_opt.delta_r * m_axisp[ax_];  // Temporarily store next m_delta_prev into m_delta
           swap(m_delta, m_delta_prev);                    // Now put it in the correct place
           m_delta[del_] = m_delta_prev[del_] - m_delta[del_];
-          nl.update(m_delta);
+          const_cast<neigh::List&>(nl).update(m_delta);
 
           m_wrapped->gradient(m_g1p, in, nl, num_threads);  // Gradient at primed end (g1p)
 
@@ -118,16 +118,16 @@ namespace fly::potential {
       }
     }();
 
-    m_delta[del_] = -m_delta_prev[del_];  // Flip to reverse last.
-    nl.update(m_delta);                   // Reset neighbour lists to input state.
+    m_delta[del_] = -m_delta_prev[del_];           // Flip to reverse last.
+    const_cast<neigh::List&>(nl).update(m_delta);  // Reset neighbour lists to input state.
 
-    if (!m_opt.relax_in_convex && curv > 0) {
+    if (!m_opt.relax_in_convex && m_curv > 0) {
       out[g_] = -gdot(m_g0[g_], out[ax_]) * out[ax_];
     } else {
       out[g_] = m_g0[g_] - 2 * gdot(m_g0[g_], out[ax_]) * out[ax_];
     }
 
-    return curv;
+    return m_curv;
   }
 
 }  // namespace fly::potential

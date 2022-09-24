@@ -40,7 +40,8 @@ namespace fly::potential {
   /**
    * @brief Dimer is a potential adaptor.
    *
-   * Wraps a potential and inverts the component of the gradient parallel to the minimum mode.
+   * Wraps a potential and inverts the component of the gradient parallel to the minimum mode. This allows a minimiser to act as a
+   * saddle point searcher.
    */
   class Dimer {
   public:
@@ -95,21 +96,39 @@ namespace fly::potential {
      *
      * Assumes the neighbour list are ready, force on frozen atoms will be zero.
      *
+     * \rst
+     *
+     * This function does actually modify neighbour but returns it to an identical state after it is done hence:
+     *
+     * .. warning::
+     *    It is **not safe** to call multiple versions of this function concurrently with the same neighbour list.
+     *
+     * \endrst
+     *
      * @param in Per-atom input properties
      * @param out Write effective gradient and final axis orientation here.
      * @param nl Neighbour list (in ready state i.e. neigh::List::update() or neigh::List::rebuild() called).
      * @param threads Number of openMP threads to use.
      * @return The approximate curvature of the wrapped potential along the output Axis.
      */
-    auto eff_gradient(system::SoA<PotentialGradient&, Axis&> out,
-                      system::SoA<TypeID const&, Frozen const&, Axis const&> in,
-                      neigh::List& nl,
-                      int threads = 1) -> double;
+    auto gradient(system::SoA<PotentialGradient&, Axis&> out,
+                  system::SoA<TypeID const&, Frozen const&, Axis const&> in,
+                  neigh::List const& nl,
+                  int threads = 1) -> double;
+
+    /**
+     * @brief Fetch the curvature.
+     *
+     * This fetches a cached version of the last call to ``gradient()``.
+     */
+    double curv() const noexcept { return m_curv; }
 
   private:
     Options m_opt;
     minimise::StepLBFGS m_core;
     std::unique_ptr<potential::Generic> m_wrapped;
+
+    double m_curv;
 
     system::SoA<Delta> m_delta;       // Store displacement for updates
     system::SoA<Delta> m_delta_prev;  // Store previous displacement for updates

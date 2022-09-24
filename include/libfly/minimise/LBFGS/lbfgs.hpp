@@ -96,6 +96,16 @@ namespace fly::minimise {
     LBFGS(Options const &opt, system::Box const &box) : m_opt{opt}, m_core{opt.n}, m_box{box} {}
 
     /**
+     * @brief Return codes for ``minimise()``.
+     *
+     */
+    enum Exit : int {
+      success = 0,    ///< Found minimum.
+      positive_curv,  ///< In positive curvature region for too long (must be using a Dimer as the potential).
+      iter_max,       ///< Exceeded the maximum number of iterations.
+    };
+
+    /**
      * @brief Find the nearest local minimum of a potential.
      *
      * \rst
@@ -110,18 +120,16 @@ namespace fly::minimise {
      * @param in Inputs required by potential and at-least Position.
      * @param pot Potential to minimise.
      * @param num_threads Number of openMP threads to use.
-     * @return true If a local minimum was found.
-     * @return false If no local minimum was found.
+     * @return Exit Status code detailing why minimisation stopped.
      */
+
     template <typename... P1, typename... P2>
-    auto minimise(system::SoA<P1...> &out, system::SoA<P2...> const &in, potential::Generic &pot, int num_threads = 1) -> bool {
+    auto minimise(system::SoA<P1...> &out, system::SoA<P2...> const &in, potential::Generic &pot, int num_threads = 1) -> Exit {
       // Check inputs
 
       verify(in.size() == out.size(), "LBFGS minimizer inputs size mismatch, in={} out={}", in.size(), out.size());
 
-      // Clear history from previous runs;
-
-      m_core.clear();
+      m_core.clear();  // Clear history from previous runs.
 
       double skin = std::max(std::pow(m_opt.skin_frac, 1. / 3.) - 1, 0.0) * pot.r_cut();
 
@@ -161,19 +169,16 @@ namespace fly::minimise {
         }
 
         if (m_opt.fout) {
-          m_opt.fout->commit([&] {
-            (m_opt.fout->write(P1{}, out), ...);
-            ;  //< Write the positions of the atoms.
-          });
+          m_opt.fout->commit([&] { (m_opt.fout->write(P1{}, out), ...); });
         }
 
         if (mag_g < m_opt.f2norm * m_opt.f2norm) {
-          return true;
+          return success;
         } else if (convex_count >= m_opt.convex_max) {
           if (m_opt.debug) {
             fmt::print("LBFGS: Early exit - curvature\n");
           }
-          return false;
+          return positive_curv;
         }
 
         auto &Hg = m_core.newton_step<Position, PotentialGradient>(out, out);
@@ -217,7 +222,7 @@ namespace fly::minimise {
         }
       }
 
-      return false;
+      return iter_max;
     }
 
   private:

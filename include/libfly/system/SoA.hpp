@@ -197,7 +197,7 @@ namespace fly::system {
      *
      * \endrst
      */
-    SoA& operator=(SoA const&) = default;
+    [[deprecated("Assignment to references will be removed, ref-semantics too unexpected")]] SoA& operator=(SoA const&) = default;
 
     /**
      * @brief Defaulted move assignment operator.
@@ -208,7 +208,7 @@ namespace fly::system {
      *
      * \endrst
      */
-    SoA& operator=(SoA&&) = default;
+    [[deprecated("Assignment to references will be removed, ref-semantics too unexpected")]] SoA& operator=(SoA&&) = default;
 
     /**
      * @brief Assign to a SoA with with different properties .
@@ -226,7 +226,7 @@ namespace fly::system {
      * \endrst
      */
     template <typename T, typename = std::enable_if_t<different_SoA_v<T>>>
-    SoA& operator=(T&& other) {
+    [[deprecated("Assignment to references will be removed, ref-semantics too unexpected")]] SoA& operator=(T&& other) {
       (static_cast<void>(static_cast<detail::Adaptor<Pr>&>(*this) = std::forward<T>(other)), ...);
       return *this;
     }

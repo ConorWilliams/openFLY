@@ -45,7 +45,7 @@ namespace fly::potential {
 
     out[ax_] = in[ax_];
 
-    //
+    // Reset LBFGS history
     m_core.clear();
 
     m_wrapped->gradient(m_g0, in, nl, num_threads);  // Gradient at centre (g0)

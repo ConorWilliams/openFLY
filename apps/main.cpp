@@ -75,7 +75,7 @@ int main() {
   minimise::LBFGS::Options opt;
 
   opt.debug = true;
-  //   opt.fout = &fout;
+  opt.fout = &fout;
 
   minimise::LBFGS minimiser(opt, cell.box());
 
@@ -88,7 +88,7 @@ int main() {
 
   bool done = timeit("Minimise", [&] { return minimiser.minimise(cell, cell, pot, omp_get_max_threads()); });
 
-  fmt::print("FoundMin?={}\n", done);
+  fmt::print("FoundMin?={}\n", !done);
 
   //   /////////////////////////////////////////////////
 
@@ -102,7 +102,7 @@ int main() {
 
   std::random_device dev;
 
-  Xoshiro rng({0, 0, 1, 1});
+  Xoshiro rng({0, 0, 1, 3});
 
   saddle::perturb(dcell, rng, dcell.box(), dcell(r_, 113), dcell, 4, 0.6);
 
@@ -114,6 +114,7 @@ int main() {
   potential::Dimer::Options opt2;
 
   opt2.debug = true;
+  //   opt2.relax_in_convex = false;
 
   potential::Generic dimer{
       potential::Dimer{
@@ -122,14 +123,22 @@ int main() {
       },
   };
 
-  bool sp = timeit("FindSP", [&] { return minimiser.minimise(dcell, dcell, dimer, omp_get_max_threads()); });
+  fly::system::SoA<Position, Axis> init{dcell};
+
+  bool sp = timeit("warmup", [&] { return minimiser.minimise(dcell, dcell, dimer, omp_get_max_threads()); });
+
+  for (size_t i = 0; i < 0; i++) {
+    dcell[r_] = init[r_];
+    dcell[ax_] = init[ax_];
+    sp = timeit("FindSP", [&] { return minimiser.minimise(dcell, dcell, dimer, omp_get_max_threads()); });
+  }
 
   fout.commit([&] {
     fout.write(fly::r_, dcell);  //< Write the position of the SP.
     fout.write(fly::ax_, dcell);
   });
 
-  fmt::print("FoundSP?={}\n", sp);
+  fmt::print("FoundSP?={}\n", !sp);
 
   return 0;
 }

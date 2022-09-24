@@ -22,7 +22,7 @@
 #include "libfly/utility/random.hpp"
 
 /**
- * \file perturb.hpp
+ * \file find_sp.hpp
  *
  * @brief Utility for perturbing a supercell.
  */
@@ -30,26 +30,31 @@
 namespace fly::saddle {
 
   /**
-   * @brief Provide a random perturbation to every atom within rcut of centre.
+   * @brief
    *
-   * Uses the minimum image distance to determine distance from centre. The perturbation is Gaussian
-   * in each coordinate axis and has standard deviation stddev. An envelope function will linearly
-   * decrease the size of each atoms perturbation based off its distance to the centre.
-   *
-   * @param out
+   * @tparam F
    * @param urbg
-   * @param box
-   * @param centre
-   * @param cell
-   * @param rcut
-   * @param stddev
+   * @param in
+   * @param minimiser
+   * @param pot
    */
-  void perturb(system::SoA<Position&, Axis&> out,
-               Xoshiro& urbg,
-               system::Box const& box,
-               Position::matrix_t const& centre,
-               system::SoA<Position const&, Frozen const&> cell,
-               double rcut,
-               double stddev);
+  template <typename F>
+  void find_connected_min(Xoshiro& urbg, system::SoA<Position const&, Frozen const&> in, F& minimiser, potential::Generic& pot) {
+    //
+    // Store working
+    system::SoA<Position, Frozen const&, Axis, PotentialGradient> probe(in.size());
+
+    dcell[r_] = cell[r_];
+    dcell[fzn_] = cell[fzn_];
+    dcell[id_] = cell[id_];
+    dcell[ax_] = 1;
+    dcell[ax_] /= gnorm(dcell[ax_]);
+
+    //
+    potential::Generic dimer{potential::Dimer{
+        {},
+        pot,
+    }};
+  }
 
 }  // namespace fly::saddle

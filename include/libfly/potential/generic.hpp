@@ -118,15 +118,18 @@ namespace fly::potential {
      *
      * Can assume the neighbour list are ready, force on frozen atoms must be zero.
      *
+     * This function is some-what generalised, allows output of additional per-atom quantities and does not requires a ``const
+     * neigh::List``. This allows for more generic concepts of a potential.
+     *
      * @param out Result is written here.
      * @param in Per-atom data used by potential for computation.
      * @param nl Neighbour list (in ready state i.e. neigh::List::update() or neigh::List::rebuild() called).
      * @param threads Number of openMP threads to use.
      */
     template <typename... T, typename... U>
-    auto gradient(system::SoA<T...>& out, system::SoA<U...> const& in, neigh::List const& nl, int threads = 1) -> void {
+    auto gradient(system::SoA<T...>& out, system::SoA<U...> const& in, neigh::List& nl, int threads = 1) -> void {
       return ::fly::visit(m_pot, [&](auto& pot) {
-        if constexpr (is_detected_v<Gradient, decltype(pot), system::SoA<T...>&, system::SoA<U...> const&, neigh::List const&, int>) {
+        if constexpr (is_detected_v<Gradient, decltype(pot), system::SoA<T...>&, system::SoA<U...> const&, neigh::List&, int>) {
           pot.gradient(out, in, nl, threads);
         } else {
           throw error("Generic potential {}, does not support .gradient(...) of this system.", m_pot.index());

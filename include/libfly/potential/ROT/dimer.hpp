@@ -98,10 +98,7 @@ namespace fly::potential {
      *
      * \rst
      *
-     * This function does actually modify neighbour but returns it to an identical state after it is done hence:
-     *
-     * .. warning::
-     *    It is **not safe** to call multiple versions of this function concurrently with the same neighbour list.
+     * This function does actually modify neighbour but returns it to an identical state after it is done.
      *
      * \endrst
      *
@@ -113,7 +110,7 @@ namespace fly::potential {
      */
     auto gradient(system::SoA<PotentialGradient&, Axis&> out,
                   system::SoA<TypeID const&, Frozen const&, Axis const&> in,
-                  neigh::List const& nl,
+                  neigh::List& nl,
                   int threads = 1) -> double;
 
     /**

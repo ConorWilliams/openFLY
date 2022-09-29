@@ -100,9 +100,9 @@ namespace fly::minimise {
      *
      */
     enum Exit : int {
-      success = 0,    ///< Found minimum.
-      positive_curv,  ///< In positive curvature region for too long (must be using a Dimer as the potential).
-      iter_max,       ///< Exceeded the maximum number of iterations.
+      success = 0,         ///< Found minimum.
+      positive_curv = -1,  ///< In positive curvature region for too long (must be using a Dimer as the potential).
+      iter_max = -2,       ///< Exceeded the maximum number of iterations.
     };
 
     /**

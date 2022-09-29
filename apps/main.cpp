@@ -17,6 +17,7 @@
 #include "libfly/neigh/sort.hpp"
 #include "libfly/potential/ROT/dimer.hpp"
 #include "libfly/potential/generic.hpp"
+#include "libfly/saddle//find.hpp"
 #include "libfly/saddle/perturb.hpp"
 #include "libfly/system/SoA.hpp"
 #include "libfly/system/atom.hpp"

@@ -27,7 +27,7 @@ namespace fly::potential {
 
   double Dimer::gradient(system::SoA<PotentialGradient&, Axis&> out,
                          system::SoA<TypeID const&, Frozen const&, Axis const&> in,
-                         neigh::List const& nl,
+                         neigh::List& nl,
                          int num_threads) {
     //
     verify(in.size() == out.size(), "Effective gradient size mismatch in={} out={}", in.size(), out.size());
@@ -52,7 +52,7 @@ namespace fly::potential {
 
     m_delta[del_] = -m_opt.delta_r * out[ax_];
 
-    const_cast<neigh::List&>(nl).update(m_delta);
+    nl.update(m_delta);
 
     using std::swap;  // ADL
 
@@ -84,7 +84,7 @@ namespace fly::potential {
           m_delta[del_] = -m_opt.delta_r * m_axisp[ax_];  // Temporarily store next m_delta_prev into m_delta
           swap(m_delta, m_delta_prev);                    // Now put it in the correct place
           m_delta[del_] = m_delta_prev[del_] - m_delta[del_];
-          const_cast<neigh::List&>(nl).update(m_delta);
+          nl.update(m_delta);
 
           m_wrapped->gradient(m_g1p, in, nl, num_threads);  // Gradient at primed end (g1p)
 
@@ -118,8 +118,8 @@ namespace fly::potential {
       }
     }();
 
-    m_delta[del_] = -m_delta_prev[del_];           // Flip to reverse last.
-    const_cast<neigh::List&>(nl).update(m_delta);  // Reset neighbour lists to input state.
+    m_delta[del_] = -m_delta_prev[del_];  // Flip to reverse last.
+    nl.update(m_delta);                   // Reset neighbour lists to input state.
 
     if (!m_opt.relax_in_convex && m_curv > 0) {
       out[g_] = -gdot(m_g0[g_], out[ax_]) * out[ax_];

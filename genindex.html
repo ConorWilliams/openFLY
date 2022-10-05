@@ -183,6 +183,7 @@
 <li class="toctree-l2"><a class="reference internal" href="api/neighbour.html">Neighbours</a></li>
 <li class="toctree-l2"><a class="reference internal" href="api/potential.html">Potentials</a></li>
 <li class="toctree-l2"><a class="reference internal" href="api/minimise.html">Minimisers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/saddle.html">Saddle-point searching</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="ChangeLog-stub.html">Changelog</a></li>
@@ -365,21 +366,11 @@
 </li>
         <li><a href="api/minimise.html#_CPPv4N3fly8minimise5LBFGSE">fly::minimise::LBFGS (C++ class)</a>
 </li>
-        <li><a href="api/minimise.html#_CPPv4N3fly8minimise5LBFGS4ExitE">fly::minimise::LBFGS::Exit (C++ enum)</a>
-</li>
-        <li><a href="api/minimise.html#_CPPv4N3fly8minimise5LBFGS4Exit8iter_maxE">fly::minimise::LBFGS::Exit::iter_max (C++ enumerator)</a>
-</li>
-        <li><a href="api/minimise.html#_CPPv4N3fly8minimise5LBFGS4Exit13positive_curvE">fly::minimise::LBFGS::Exit::positive_curv (C++ enumerator)</a>
-</li>
-        <li><a href="api/minimise.html#_CPPv4N3fly8minimise5LBFGS4Exit7successE">fly::minimise::LBFGS::Exit::success (C++ enumerator)</a>
-</li>
         <li><a href="api/minimise.html#_CPPv4N3fly8minimise5LBFGS5LBFGSERK7OptionsRKN6system3BoxE">fly::minimise::LBFGS::LBFGS (C++ function)</a>
 </li>
-        <li><a href="api/minimise.html#_CPPv4IDpDpEN3fly8minimise5LBFGS8minimiseE4ExitRN6system3SoAIDp2P1EERKN6system3SoAIDp2P2EERN9potential7GenericEi">fly::minimise::LBFGS::minimise (C++ function)</a>
+        <li><a href="api/minimise.html#_CPPv4N3fly8minimise5LBFGS8minimiseEN6system3SoAIR8PositionR17PotentialGradientEEN6system3SoAIRK8PositionRK6TypeIDRK6FrozenEERN9potential7GenericEi">fly::minimise::LBFGS::minimise (C++ function)</a>
 </li>
         <li><a href="api/minimise.html#_CPPv4N3fly8minimise5LBFGS7OptionsE">fly::minimise::LBFGS::Options (C++ struct)</a>
-</li>
-        <li><a href="api/minimise.html#_CPPv4N3fly8minimise5LBFGS7Options10convex_maxE">fly::minimise::LBFGS::Options::convex_max (C++ member)</a>
 </li>
         <li><a href="api/minimise.html#_CPPv4N3fly8minimise5LBFGS7Options5debugE">fly::minimise::LBFGS::Options::debug (C++ member)</a>
 </li>
@@ -443,36 +434,10 @@
 </li>
         <li><a href="api/potential.html#_CPPv4NK3fly9potential7DataEAM1vEN6TypeID8scalar_tEN6TypeID8scalar_tE">fly::potential::DataEAM::v (C++ function)</a>
 </li>
-        <li><a href="api/potential.html#_CPPv4N3fly9potential5DimerE">fly::potential::Dimer (C++ class)</a>
-</li>
-        <li><a href="api/potential.html#_CPPv4NK3fly9potential5Dimer4curvEv">fly::potential::Dimer::curv (C++ function)</a>
-</li>
-        <li><a href="api/potential.html#_CPPv4N3fly9potential5Dimer5DimerERK5Dimer">fly::potential::Dimer::Dimer (C++ function)</a>, <a href="api/potential.html#_CPPv4N3fly9potential5Dimer5DimerERK7OptionsRKN9potential7GenericE">[1]</a>, <a href="api/potential.html#_CPPv4N3fly9potential5Dimer5DimerERR5Dimer">[2]</a>
-</li>
-        <li><a href="api/potential.html#_CPPv4N3fly9potential5Dimer8gradientEN6system3SoAIR17PotentialGradientR4AxisEEN6system3SoAIRK6TypeIDRK6FrozenRK4AxisEERN5neigh4ListEi">fly::potential::Dimer::gradient (C++ function)</a>
-</li>
-        <li><a href="api/potential.html#_CPPv4N3fly9potential5Dimer7OptionsE">fly::potential::Dimer::Options (C++ struct)</a>
-</li>
-        <li><a href="api/potential.html#_CPPv4N3fly9potential5Dimer7Options5debugE">fly::potential::Dimer::Options::debug (C++ member)</a>
-</li>
-        <li><a href="api/potential.html#_CPPv4N3fly9potential5Dimer7Options7delta_rE">fly::potential::Dimer::Options::delta_r (C++ member)</a>
-</li>
-        <li><a href="api/potential.html#_CPPv4N3fly9potential5Dimer7Options12iter_max_rotE">fly::potential::Dimer::Options::iter_max_rot (C++ member)</a>
-</li>
-        <li><a href="api/potential.html#_CPPv4N3fly9potential5Dimer7Options1nE">fly::potential::Dimer::Options::n (C++ member)</a>
-</li>
-        <li><a href="api/potential.html#_CPPv4N3fly9potential5Dimer7Options15relax_in_convexE">fly::potential::Dimer::Options::relax_in_convex (C++ member)</a>
-</li>
-        <li><a href="api/potential.html#_CPPv4N3fly9potential5Dimer7Options9theta_tolE">fly::potential::Dimer::Options::theta_tol (C++ member)</a>
-</li>
-        <li><a href="api/potential.html#_CPPv4NK3fly9potential5Dimer5r_cutEv">fly::potential::Dimer::r_cut (C++ function)</a>
-</li>
         <li><a href="api/potential.html#_CPPv4N3fly9potential3EAME">fly::potential::EAM (C++ class)</a>
 </li>
         <li><a href="api/potential.html#_CPPv4N3fly9potential3EAM3EAMERKN6system7TypeMapIEENSt10shared_ptrIK7DataEAMEE">fly::potential::EAM::EAM (C++ function)</a>
 </li>
-    </ul></td>
-    <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="api/potential.html#_CPPv4N3fly9potential3EAM6energyEN6system3SoAIRK6TypeIDRK6FrozenEERKN5neigh4ListEi">fly::potential::EAM::energy (C++ function)</a>
 </li>
         <li><a href="api/potential.html#_CPPv4N3fly9potential3EAM8gradientEN6system3SoAIR17PotentialGradientEEN6system3SoAIRK6TypeIDRK6FrozenEERKN5neigh4ListEi">fly::potential::EAM::gradient (C++ function)</a>
@@ -483,23 +448,85 @@
 </li>
         <li><a href="api/potential.html#_CPPv4N3fly9potential7GenericE">fly::potential::Generic (C++ class)</a>
 </li>
-        <li><a href="api/potential.html#_CPPv4IDpEN3fly9potential7Generic6energyEdRKN6system3SoAIDp2TsEERKN5neigh4ListEi">fly::potential::Generic::energy (C++ function)</a>
+        <li><a href="api/potential.html#_CPPv4N3fly9potential7Generic6energyEN6system3SoAIRK6TypeIDRK6FrozenEERKN5neigh4ListEi">fly::potential::Generic::energy (C++ function)</a>
 </li>
         <li><a href="api/potential.html#_CPPv4IDp0EN3fly9potential7Generic7GenericEDpRR4Args">fly::potential::Generic::Generic (C++ function)</a>, <a href="api/potential.html#_CPPv4N3fly9potential7Generic7GenericERK7Generic">[1]</a>, <a href="api/potential.html#_CPPv4N3fly9potential7Generic7GenericERR7Generic">[2]</a>
 </li>
-        <li><a href="api/potential.html#_CPPv4IDpDpEN3fly9potential7Generic8gradientEvRN6system3SoAIDp1TEERKN6system3SoAIDp1UEERN5neigh4ListEi">fly::potential::Generic::gradient (C++ function)</a>
+        <li><a href="api/potential.html#_CPPv4N3fly9potential7Generic8gradientEN6system3SoAIR17PotentialGradientEEN6system3SoAIRK6TypeIDRK6FrozenEERKN5neigh4ListEi">fly::potential::Generic::gradient (C++ function)</a>
 </li>
-        <li><a href="api/potential.html#_CPPv4IDpEN3fly9potential7Generic7hessianEvRN6system7HessianERKN6system3SoAIDp2TsEERKN5neigh4ListEi">fly::potential::Generic::hessian (C++ function)</a>
+        <li><a href="api/potential.html#_CPPv4N3fly9potential7Generic7hessianERN6system7HessianEN6system3SoAIRK6TypeIDRK6FrozenEERKN5neigh4ListEi">fly::potential::Generic::hessian (C++ function)</a>
 </li>
         <li><a href="api/potential.html#_CPPv4NK3fly9potential7Generic5r_cutEv">fly::potential::Generic::r_cut (C++ function)</a>
-</li>
-        <li><a href="api/potential.html#_CPPv4I0EN3fly9potential7Generic5visitEDcRR1F">fly::potential::Generic::visit (C++ function)</a>
 </li>
         <li><a href="api/utility.html#_CPPv4I0_iEN3fly12product_scanENSt11enable_if_tINSt15is_arithmetic_vI1TEEN5Eigen5ArrayI1T1NXL1EEEEEEN5Eigen5ArrayI1T1NXL1EEEE">fly::product_scan (C++ function)</a>
 </li>
         <li><a href="api/utility.html#_CPPv4I0EN3fly13remove_cref_tE">fly::remove_cref_t (C++ type)</a>
 </li>
         <li><a href="api/utility.html#_CPPv4N3fly12RuntimeErrorE">fly::RuntimeError (C++ struct)</a>
+</li>
+        <li><a href="api/saddle.html#_CPPv4N3fly6saddle5DimerE">fly::saddle::Dimer (C++ class)</a>
+</li>
+        <li><a href="api/saddle.html#_CPPv4N3fly6saddle5Dimer5DimerERK5Dimer">fly::saddle::Dimer::Dimer (C++ function)</a>, <a href="api/saddle.html#_CPPv4N3fly6saddle5Dimer5DimerERK7OptionsRKN5Rotor7OptionsERKN6system3BoxE">[1]</a>, <a href="api/saddle.html#_CPPv4N3fly6saddle5Dimer5DimerERR5Dimer">[2]</a>
+</li>
+        <li><a href="api/saddle.html#_CPPv4N3fly6saddle5Dimer4ExitE">fly::saddle::Dimer::Exit (C++ enum)</a>
+</li>
+        <li><a href="api/saddle.html#_CPPv4N3fly6saddle5Dimer4Exit4failE">fly::saddle::Dimer::Exit::fail (C++ enumerator)</a>
+</li>
+        <li><a href="api/saddle.html#_CPPv4N3fly6saddle5Dimer4Exit8iter_maxE">fly::saddle::Dimer::Exit::iter_max (C++ enumerator)</a>
+</li>
+        <li><a href="api/saddle.html#_CPPv4N3fly6saddle5Dimer4Exit7successE">fly::saddle::Dimer::Exit::success (C++ enumerator)</a>
+</li>
+        <li><a href="api/saddle.html#_CPPv4N3fly6saddle5Dimer7OptionsE">fly::saddle::Dimer::Options (C++ struct)</a>
+</li>
+        <li><a href="api/saddle.html#_CPPv4N3fly6saddle5Dimer7Options10convex_maxE">fly::saddle::Dimer::Options::convex_max (C++ member)</a>
+</li>
+        <li><a href="api/saddle.html#_CPPv4N3fly6saddle5Dimer7Options5debugE">fly::saddle::Dimer::Options::debug (C++ member)</a>
+</li>
+        <li><a href="api/saddle.html#_CPPv4N3fly6saddle5Dimer7Options6f2normE">fly::saddle::Dimer::Options::f2norm (C++ member)</a>
+</li>
+        <li><a href="api/saddle.html#_CPPv4N3fly6saddle5Dimer7Options4foutE">fly::saddle::Dimer::Options::fout (C++ member)</a>
+</li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/saddle.html#_CPPv4N3fly6saddle5Dimer7Options10grow_trustE">fly::saddle::Dimer::Options::grow_trust (C++ member)</a>
+</li>
+        <li><a href="api/saddle.html#_CPPv4N3fly6saddle5Dimer7Options9max_trustE">fly::saddle::Dimer::Options::max_trust (C++ member)</a>
+</li>
+        <li><a href="api/saddle.html#_CPPv4N3fly6saddle5Dimer7Options9min_trustE">fly::saddle::Dimer::Options::min_trust (C++ member)</a>
+</li>
+        <li><a href="api/saddle.html#_CPPv4N3fly6saddle5Dimer7Options1nE">fly::saddle::Dimer::Options::n (C++ member)</a>
+</li>
+        <li><a href="api/saddle.html#_CPPv4N3fly6saddle5Dimer7Options8proj_tolE">fly::saddle::Dimer::Options::proj_tol (C++ member)</a>
+</li>
+        <li><a href="api/saddle.html#_CPPv4N3fly6saddle5Dimer7Options12shrink_trustE">fly::saddle::Dimer::Options::shrink_trust (C++ member)</a>
+</li>
+        <li><a href="api/saddle.html#_CPPv4N3fly6saddle5Dimer7Options9skin_fracE">fly::saddle::Dimer::Options::skin_frac (C++ member)</a>
+</li>
+        <li><a href="api/saddle.html#_CPPv4N3fly6saddle5Dimer4stepEN6system3SoAIR8PositionR4AxisEEN6system3SoAIRK8PositionRK4AxisRK6TypeIDRK6FrozenEERN9potential7GenericEii">fly::saddle::Dimer::step (C++ function)</a>
+</li>
+        <li><a href="api/saddle.html#_CPPv4N3fly6saddle7perturbEN6system3SoAIR8PositionR4AxisEER7XoshiroRKN6system3BoxERKN8Position8matrix_tEN6system3SoAIRK8PositionRK6FrozenEEdd">fly::saddle::perturb (C++ function)</a>
+</li>
+        <li><a href="api/saddle.html#_CPPv4N3fly6saddle5RotorE">fly::saddle::Rotor (C++ class)</a>
+</li>
+        <li><a href="api/saddle.html#_CPPv4N3fly6saddle5Rotor12eff_gradientEN6system3SoAIR17PotentialGradientEEN6system3SoAIR4AxisEEN6system3SoAIRK6TypeIDRK6FrozenEERN9potential7GenericERN5neigh4ListEi">fly::saddle::Rotor::eff_gradient (C++ function)</a>
+</li>
+        <li><a href="api/saddle.html#_CPPv4N3fly6saddle5Rotor7OptionsE">fly::saddle::Rotor::Options (C++ struct)</a>
+</li>
+        <li><a href="api/saddle.html#_CPPv4N3fly6saddle5Rotor7Options5debugE">fly::saddle::Rotor::Options::debug (C++ member)</a>
+</li>
+        <li><a href="api/saddle.html#_CPPv4N3fly6saddle5Rotor7Options7delta_rE">fly::saddle::Rotor::Options::delta_r (C++ member)</a>
+</li>
+        <li><a href="api/saddle.html#_CPPv4N3fly6saddle5Rotor7Options12iter_max_rotE">fly::saddle::Rotor::Options::iter_max_rot (C++ member)</a>
+</li>
+        <li><a href="api/saddle.html#_CPPv4N3fly6saddle5Rotor7Options1nE">fly::saddle::Rotor::Options::n (C++ member)</a>
+</li>
+        <li><a href="api/saddle.html#_CPPv4N3fly6saddle5Rotor7Options15relax_in_convexE">fly::saddle::Rotor::Options::relax_in_convex (C++ member)</a>
+</li>
+        <li><a href="api/saddle.html#_CPPv4N3fly6saddle5Rotor7Options9theta_tolE">fly::saddle::Rotor::Options::theta_tol (C++ member)</a>
+</li>
+        <li><a href="api/saddle.html#_CPPv4NK3fly6saddle5Rotor5r_cutERKN9potential7GenericE">fly::saddle::Rotor::r_cut (C++ function)</a>
+</li>
+        <li><a href="api/saddle.html#_CPPv4N3fly6saddle5Rotor5RotorERK5Rotor">fly::saddle::Rotor::Rotor (C++ function)</a>, <a href="api/saddle.html#_CPPv4N3fly6saddle5Rotor5RotorERK7Options">[1]</a>, <a href="api/saddle.html#_CPPv4N3fly6saddle5Rotor5RotorERR5Rotor">[2]</a>
 </li>
         <li><a href="api/utility.html#_CPPv4I00EN3fly9safe_castENSt11enable_if_tIXaaNSt13is_integral_vI1REENSt13is_integral_vI1TEEE1REE1T">fly::safe_cast (C++ function)</a>
 </li>
@@ -678,6 +705,8 @@
         <li><a href="api/utility.html#_CPPv4N3fly3VecE">fly::Vec (C++ type)</a>
 </li>
         <li><a href="api/utility.html#_CPPv4IDpEN3fly6verifyEvbN3fmt13format_stringIDp4ArgsEEDpRR4Args">fly::verify (C++ function)</a>
+</li>
+        <li><a href="api/utility.html#_CPPv4I00EN3fly5visitEDcRR1VRR1F">fly::visit (C++ function)</a>
 </li>
         <li><a href="api/utility.html#_CPPv4I0EN3fly4xiseENSt13common_type_tINSt9ptrdiff_tENSt13make_signed_tIDTcldt1c4sizeEEEEEERK1C">fly::xise (C++ function)</a>
 </li>

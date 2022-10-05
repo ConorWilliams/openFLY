@@ -3,7 +3,7 @@
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
-<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Todo!" href="todo.html" /><link rel="prev" title="Minimisers" href="api/minimise.html" />
+<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Todo!" href="todo.html" /><link rel="prev" title="Saddle-point searching" href="api/saddle.html" />
 
     <link rel="shortcut icon" href="_static/favicon.ico"/><meta name="generator" content="sphinx-5.2.3, furo 2022.09.29"/>
         <title>Changelog - OpenFLY documentation</title>
@@ -185,6 +185,7 @@
 <li class="toctree-l2"><a class="reference internal" href="api/neighbour.html">Neighbours</a></li>
 <li class="toctree-l2"><a class="reference internal" href="api/potential.html">Potentials</a></li>
 <li class="toctree-l2"><a class="reference internal" href="api/minimise.html">Minimisers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/saddle.html">Saddle-point searching</a></li>
 </ul>
 </li>
 <li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Changelog</a></li>
@@ -238,7 +239,8 @@
 <section id="added">
 <h3>Added<a class="headerlink" href="#added" title="Permalink to this heading">#</a></h3>
 <ul class="simple">
-<li><p>New <code class="docutils literal notranslate"><span class="pre">Dimer</span></code> potential adaptor.</p></li>
+<li><p>New <code class="docutils literal notranslate"><span class="pre">Dimer</span></code> saddle-point finder.</p></li>
+<li><p>New <code class="docutils literal notranslate"><span class="pre">Rotor</span></code> class.</p></li>
 <li><p>New <code class="docutils literal notranslate"><span class="pre">perturb()</span></code> function</p></li>
 </ul>
 </section>
@@ -246,12 +248,14 @@
 <h3>Changed<a class="headerlink" href="#changed" title="Permalink to this heading">#</a></h3>
 <ul class="simple">
 <li><p>Generalised <code class="docutils literal notranslate"><span class="pre">StepLBFGS</span></code>’s <code class="docutils literal notranslate"><span class="pre">.newton_step()</span></code>.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">Generic</span></code> potential API + constructor changes + new <code class="docutils literal notranslate"><span class="pre">visit()</span></code> method.</p></li>
-<li><p>Generalised <code class="docutils literal notranslate"><span class="pre">LBFGS</span></code> minimise API.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Generic</span></code> potential API + constructor changes</p></li>
 </ul>
 </section>
 <section id="removed">
 <h3>Removed<a class="headerlink" href="#removed" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">LBFGS</span></code> no longer has special handling for dimer classes.</p></li>
+</ul>
 </section>
 <section id="bugfixes">
 <h3>Bugfixes<a class="headerlink" href="#bugfixes" title="Permalink to this heading">#</a></h3>
@@ -403,14 +407,14 @@
               </div>
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
             </a>
-          <a class="prev-page" href="api/minimise.html">
+          <a class="prev-page" href="api/saddle.html">
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
               <div class="page-info">
                 <div class="context">
                   <span>Previous</span>
                 </div>
                 
-                <div class="title">Minimisers</div>
+                <div class="title">Saddle-point searching</div>
                 
               </div>
             </a>

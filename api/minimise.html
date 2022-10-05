@@ -3,7 +3,7 @@
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
-<link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="Changelog" href="../ChangeLog-stub.html" /><link rel="prev" title="Potentials" href="potential.html" />
+<link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="Saddle-point searching" href="saddle.html" /><link rel="prev" title="Potentials" href="potential.html" />
 
     <link rel="shortcut icon" href="../_static/favicon.ico"/><meta name="generator" content="sphinx-5.2.3, furo 2022.09.29"/>
         <title>Minimisers - OpenFLY documentation</title>
@@ -185,6 +185,7 @@
 <li class="toctree-l2"><a class="reference internal" href="neighbour.html">Neighbours</a></li>
 <li class="toctree-l2"><a class="reference internal" href="potential.html">Potentials</a></li>
 <li class="toctree-l2 current current-page"><a class="current reference internal" href="#">Minimisers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="saddle.html">Saddle-point searching</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../ChangeLog-stub.html">Changelog</a></li>
@@ -314,34 +315,6 @@ from the current position <span class="math notranslate nohighlight">\(x\)</span
 <span id="_CPPv3N3fly8minimise5LBFGSE"></span><span id="_CPPv2N3fly8minimise5LBFGSE"></span><span id="fly::minimise::LBFGS"></span><span class="target" id="classfly_1_1minimise_1_1LBFGS"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">LBFGS</span></span></span><a class="headerlink" href="#_CPPv4N3fly8minimise5LBFGSE" title="Permalink to this definition">#</a><br /></dt>
 <dd><p>A minimiser that uses the <a class="reference internal" href="#classfly_1_1minimise_1_1LBFGS"><span class="std std-ref">LBFGS</span></a> algorithm. </p>
 <div class="breathe-sectiondef docutils container">
-<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-types">Public Types</p>
-<dl class="cpp enum">
-<dt class="sig sig-object cpp" id="_CPPv4N3fly8minimise5LBFGS4ExitE">
-<span id="_CPPv3N3fly8minimise5LBFGS4ExitE"></span><span id="_CPPv2N3fly8minimise5LBFGS4ExitE"></span><span class="target" id="classfly_1_1minimise_1_1LBFGS_1ac6ef0d51fba09161459008967482e4b8"></span><span class="k"><span class="pre">enum</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Exit</span></span></span><a class="headerlink" href="#_CPPv4N3fly8minimise5LBFGS4ExitE" title="Permalink to this definition">#</a><br /></dt>
-<dd><p>Return codes for <code class="docutils literal notranslate"><a class="reference internal" href="#classfly_1_1minimise_1_1LBFGS_1a08798dcd9881526e485483a7932afdc5"><span class="std std-ref"><span class="pre">minimise()</span></span></a></code>. </p>
-<p><em>Values:</em></p>
-<dl class="cpp enumerator">
-<dt class="sig sig-object cpp" id="_CPPv4N3fly8minimise5LBFGS4Exit7successE">
-<span id="_CPPv3N3fly8minimise5LBFGS4Exit7successE"></span><span id="_CPPv2N3fly8minimise5LBFGS4Exit7successE"></span><span class="target" id="classfly_1_1minimise_1_1LBFGS_1ac6ef0d51fba09161459008967482e4b8a32f54451f0b2982debd52b48a7f9b5ff"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">success</span></span></span><a class="headerlink" href="#_CPPv4N3fly8minimise5LBFGS4Exit7successE" title="Permalink to this definition">#</a><br /></dt>
-<dd><p>Found minimum. </p>
-</dd></dl>
-
-<dl class="cpp enumerator">
-<dt class="sig sig-object cpp" id="_CPPv4N3fly8minimise5LBFGS4Exit13positive_curvE">
-<span id="_CPPv3N3fly8minimise5LBFGS4Exit13positive_curvE"></span><span id="_CPPv2N3fly8minimise5LBFGS4Exit13positive_curvE"></span><span class="target" id="classfly_1_1minimise_1_1LBFGS_1ac6ef0d51fba09161459008967482e4b8aba9dee910e975ec8e9d9bc419b9ce6f7"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">positive_curv</span></span></span><a class="headerlink" href="#_CPPv4N3fly8minimise5LBFGS4Exit13positive_curvE" title="Permalink to this definition">#</a><br /></dt>
-<dd><p>In positive curvature region for too long (must be using a Dimer as the potential). </p>
-</dd></dl>
-
-<dl class="cpp enumerator">
-<dt class="sig sig-object cpp" id="_CPPv4N3fly8minimise5LBFGS4Exit8iter_maxE">
-<span id="_CPPv3N3fly8minimise5LBFGS4Exit8iter_maxE"></span><span id="_CPPv2N3fly8minimise5LBFGS4Exit8iter_maxE"></span><span class="target" id="classfly_1_1minimise_1_1LBFGS_1ac6ef0d51fba09161459008967482e4b8a35b011d87efecf5fe2da095e235b8b51"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">iter_max</span></span></span><a class="headerlink" href="#_CPPv4N3fly8minimise5LBFGS4Exit8iter_maxE" title="Permalink to this definition">#</a><br /></dt>
-<dd><p>Exceeded the maximum number of iterations. </p>
-</dd></dl>
-
-</dd></dl>
-
-</div>
-<div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4N3fly8minimise5LBFGS5LBFGSERK7OptionsRKN6system3BoxE">
@@ -358,8 +331,8 @@ from the current position <span class="math notranslate nohighlight">\(x\)</span
 </dd></dl>
 
 <dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4IDpDpEN3fly8minimise5LBFGS8minimiseE4ExitRN6system3SoAIDp2P1EERKN6system3SoAIDp2P2EERN9potential7GenericEi">
-<span id="_CPPv3IDpDpEN3fly8minimise5LBFGS8minimiseERN6system3SoAIDp2P1EERKN6system3SoAIDp2P2EERN9potential7GenericEi"></span><span id="_CPPv2IDpDpEN3fly8minimise5LBFGS8minimiseERN6system3SoAIDp2P1EERKN6system3SoAIDp2P2EERN9potential7GenericEi"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="sig-name descname"><span class="n"><span class="pre">P1</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="sig-name descname"><span class="n"><span class="pre">P2</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classfly_1_1minimise_1_1LBFGS_1a08798dcd9881526e485483a7932afdc5"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">auto</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">minimise</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">system</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="system.html#_CPPv4IDpEN3fly6system3SoAE" title="fly::system::SoA"><span class="n"><span class="pre">SoA</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4IDpDpEN3fly8minimise5LBFGS8minimiseE4ExitRN6system3SoAIDp2P1EERKN6system3SoAIDp2P2EERN9potential7GenericEi" title="fly::minimise::LBFGS::minimise::P1"><span class="n"><span class="pre">P1</span></span></a><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">out</span></span>, <span class="n"><span class="pre">system</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="system.html#_CPPv4IDpEN3fly6system3SoAE" title="fly::system::SoA"><span class="n"><span class="pre">SoA</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4IDpDpEN3fly8minimise5LBFGS8minimiseE4ExitRN6system3SoAIDp2P1EERKN6system3SoAIDp2P2EERN9potential7GenericEi" title="fly::minimise::LBFGS::minimise::P2"><span class="n"><span class="pre">P2</span></span></a><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">in</span></span>, <span class="n"><span class="pre">potential</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="potential.html#_CPPv4N3fly9potential7GenericE" title="fly::potential::Generic"><span class="n"><span class="pre">Generic</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">pot</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">num_threads</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">1</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="o"><span class="pre">-&gt;</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N3fly8minimise5LBFGS4ExitE" title="fly::minimise::LBFGS::Exit"><span class="n"><span class="pre">Exit</span></span></a><a class="headerlink" href="#_CPPv4IDpDpEN3fly8minimise5LBFGS8minimiseE4ExitRN6system3SoAIDp2P1EERKN6system3SoAIDp2P2EERN9potential7GenericEi" title="Permalink to this definition">#</a><br /></dt>
+<dt class="sig sig-object cpp" id="_CPPv4N3fly8minimise5LBFGS8minimiseEN6system3SoAIR8PositionR17PotentialGradientEEN6system3SoAIRK8PositionRK6TypeIDRK6FrozenEERN9potential7GenericEi">
+<span id="_CPPv3N3fly8minimise5LBFGS8minimiseEN6system3SoAIR8PositionR17PotentialGradientEEN6system3SoAIRK8PositionRK6TypeIDRK6FrozenEERN9potential7GenericEi"></span><span id="_CPPv2N3fly8minimise5LBFGS8minimiseEN6system3SoAIR8PositionR17PotentialGradientEEN6system3SoAIRK8PositionRK6TypeIDRK6FrozenEERN9potential7GenericEi"></span><span id="fly::minimise::LBFGS::minimise__system::SoA:PositionR.PotentialGradientR:.system::SoA:PositionCR.TypeIDCR.FrozenCR:.potential::GenericR.i"></span><span class="target" id="classfly_1_1minimise_1_1LBFGS_1a3b74922d203d36bd19bb6f42d339900d"></span><span class="kt"><span class="pre">auto</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">minimise</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">system</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="system.html#_CPPv4IDpEN3fly6system3SoAE" title="fly::system::SoA"><span class="n"><span class="pre">SoA</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">Position</span></span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="n"><span class="pre">PotentialGradient</span></span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">out</span></span>, <span class="n"><span class="pre">system</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="system.html#_CPPv4IDpEN3fly6system3SoAE" title="fly::system::SoA"><span class="n"><span class="pre">SoA</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">Position</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="n"><span class="pre">TypeID</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="n"><span class="pre">Frozen</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">in</span></span>, <span class="n"><span class="pre">potential</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="potential.html#_CPPv4N3fly9potential7GenericE" title="fly::potential::Generic"><span class="n"><span class="pre">Generic</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">pot</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">num_threads</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">1</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="o"><span class="pre">-&gt;</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><a class="headerlink" href="#_CPPv4N3fly8minimise5LBFGS8minimiseEN6system3SoAIR8PositionR17PotentialGradientEEN6system3SoAIRK8PositionRK6TypeIDRK6FrozenEERN9potential7GenericEi" title="Permalink to this definition">#</a><br /></dt>
 <dd><p>Find the nearest local minimum of a potential. </p>
 <p><div class="admonition-todo admonition" id="id1">
 <p class="admonition-title">Todo</p>
@@ -389,12 +362,6 @@ bottleneck (require profiling in real workload) consider working on this.</p>
 <dd><p>Used to configure the minimiser. </p>
 <div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
-<dl class="cpp var">
-<dt class="sig sig-object cpp" id="_CPPv4N3fly8minimise5LBFGS7Options10convex_maxE">
-<span id="_CPPv3N3fly8minimise5LBFGS7Options10convex_maxE"></span><span id="_CPPv2N3fly8minimise5LBFGS7Options10convex_maxE"></span><span id="fly::minimise::LBFGS::Options::convex_max__double"></span><span class="target" id="structfly_1_1minimise_1_1LBFGS_1_1Options_1a65281acb18c65efaeb1b7ecc4f8a0e03"></span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">convex_max</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">3</span></span><a class="headerlink" href="#_CPPv4N3fly8minimise5LBFGS7Options10convex_maxE" title="Permalink to this definition">#</a><br /></dt>
-<dd><p>If minimising a dimer and convex_max steps with +Ve curvature exit. </p>
-</dd></dl>
-
 <dl class="cpp var">
 <dt class="sig sig-object cpp" id="_CPPv4N3fly8minimise5LBFGS7Options5debugE">
 <span id="_CPPv3N3fly8minimise5LBFGS7Options5debugE"></span><span id="_CPPv2N3fly8minimise5LBFGS7Options5debugE"></span><span id="fly::minimise::LBFGS::Options::debug__b"></span><span class="target" id="structfly_1_1minimise_1_1LBFGS_1_1Options_1aec59b6b4f7a4901261fbad3ee4b84e18"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">debug</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">false</span></span><a class="headerlink" href="#_CPPv4N3fly8minimise5LBFGS7Options5debugE" title="Permalink to this definition">#</a><br /></dt>
@@ -477,12 +444,12 @@ bottleneck (require profiling in real workload) consider working on this.</p>
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="../ChangeLog-stub.html">
+          <a class="next-page" href="saddle.html">
               <div class="page-info">
                 <div class="context">
                   <span>Next</span>
                 </div>
-                <div class="title">Changelog</div>
+                <div class="title">Saddle-point searching</div>
               </div>
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
             </a>

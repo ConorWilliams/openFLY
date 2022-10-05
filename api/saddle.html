@@ -1,0 +1,655 @@
+<!doctype html>
+<html class="no-js" lang="en">
+  <head><meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+<link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="Changelog" href="../ChangeLog-stub.html" /><link rel="prev" title="Minimisers" href="minimise.html" />
+
+    <link rel="shortcut icon" href="../_static/favicon.ico"/><meta name="generator" content="sphinx-5.2.3, furo 2022.09.29"/>
+        <title>Saddle-point searching - OpenFLY documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?digest=d81277517bee4d6b0349d71bb2661d4890b5617c" />
+    <link rel="stylesheet" type="text/css" href="../_static/tabs.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?digest=30d1aed668e5c3a91c3e3bf6a60b675221979f0e" />
+    <link rel="stylesheet" type="text/css" href="../_static/openfly.css" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #eeffcc;
+  --color-code-foreground: black;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-half" viewBox="0 0 24 24">
+    <title>Auto light/dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-shadow">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M13 12h5" />
+      <path d="M13 15h4" />
+      <path d="M13 18h1" />
+      <path d="M13 9h4" />
+      <path d="M13 6h1" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc">
+<label class="overlay sidebar-overlay" for="__navigation">
+  <div class="visually-hidden">Hide navigation sidebar</div>
+</label>
+<label class="overlay toc-overlay" for="__toc">
+  <div class="visually-hidden">Hide table of contents sidebar</div>
+</label>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <div class="visually-hidden">Toggle site navigation sidebar</div>
+        <i class="icon"><svg><use href="#svg-menu"></use></svg></i>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="../index.html"><div class="brand">OpenFLY  documentation</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle">
+          <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+          <svg class="theme-icon-when-auto"><use href="#svg-sun-half"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <div class="visually-hidden">Toggle table of contents sidebar</div>
+        <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="../index.html">
+  
+  <div class="sidebar-logo-container">
+    <img class="sidebar-logo only-light" src="../_static/fly_light.svg" alt="Light Logo"/>
+    <img class="sidebar-logo only-dark" src="../_static/fly_dark.svg" alt="Dark Logo"/>
+  </div>
+  
+  
+</a><form class="sidebar-search-container" method="get" action="../search.html" role="search">
+  <input class="sidebar-search" placeholder=Search name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <ul class="current">
+<li class="toctree-l1 has-children"><a class="reference internal" href="../user.html">User guide</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../user/building.html">Building</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../user/quickstart.html">Quickstart</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../user/overview.html">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../user/config.html">Config file</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../programmer.html">Programmer guide</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../programmer/structure.html">Project Structure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../programmer/libfly.html">Using libFLY</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../programmer/hacking.html">Hacking</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current has-children"><a class="reference internal" href="../api.html">Library API reference</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="utility.html">Utility</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="system.html">System</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="crystal_systems.html">Crystal systems</a></li>
+<li class="toctree-l3"><a class="reference internal" href="crystal_systems.html#hypergrid">Hypergrid</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="io.html">Input/Output (IO)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="neighbour.html">Neighbours</a></li>
+<li class="toctree-l2"><a class="reference internal" href="potential.html">Potentials</a></li>
+<li class="toctree-l2"><a class="reference internal" href="minimise.html">Minimisers</a></li>
+<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">Saddle-point searching</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../ChangeLog-stub.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../todo.html">Todo!</a></li>
+</ul>
+
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          <div class="edit-this-page">
+  <a class="muted-link" href="https://github.com/ConorWilliams/openFLY/edit/main/docs/api/saddle.rst" title="Edit this page">
+    <svg aria-hidden="true" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+      <path d="M4 20h4l10.5 -10.5a1.5 1.5 0 0 0 -4 -4l-10.5 10.5v4" />
+      <line x1="13.5" y1="6.5" x2="17.5" y2="10.5" />
+    </svg>
+    <span class="visually-hidden">Edit this page</span>
+  </a>
+</div><div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle">
+              <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+              <svg class="theme-icon-when-auto"><use href="#svg-sun-half"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <div class="visually-hidden">Toggle table of contents sidebar</div>
+            <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+          </label>
+        </div>
+        <article role="main">
+          <section id="saddle-point-searching">
+<h1>Saddle-point searching<a class="headerlink" href="#saddle-point-searching" title="Permalink to this heading">#</a></h1>
+<p>Directory: <code class="docutils literal notranslate"><span class="pre">libfly/saddle</span></code></p>
+<p>The <code class="docutils literal notranslate"><span class="pre">saddle</span></code> folder contains a collection of utilities for saddle-point finding. Everything is contained within the namespace <code class="docutils literal notranslate"><span class="pre">fly::saddle</span></code>.</p>
+<p>A (strictly first-order) saddle-point is a stationary point where the Hessian matrix has exactly one negative eigenvalue.</p>
+<section id="dimer">
+<h2>Dimer<a class="headerlink" href="#dimer" title="Permalink to this heading">#</a></h2>
+<p>File: <code class="docutils literal notranslate"><span class="pre">libfly/saddle/dimer.hpp</span></code></p>
+<p>Saddle-point finding with the dimer method. </p>
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv4N3fly6saddle5DimerE">
+<span id="_CPPv3N3fly6saddle5DimerE"></span><span id="_CPPv2N3fly6saddle5DimerE"></span><span id="fly::saddle::Dimer"></span><span class="target" id="classfly_1_1saddle_1_1Dimer"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Dimer</span></span></span><a class="headerlink" href="#_CPPv4N3fly6saddle5DimerE" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Saddle point locator. </p>
+<p>A dimer is two images of a system. These images have a centre point and a unit axis. The images are (conceptually) located <code class="docutils literal notranslate"><span class="pre">delta_r</span></code> in the plus/minus directions along the axis.</p>
+<p>This implementation uses the superlinear dimer method to find saddle-points. This alternates optimizing the orientation of the dimer along the minimum eigen-mode then translating the dimer along an effective potential to find the SP. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-types">Public Types</p>
+<dl class="cpp enum">
+<dt class="sig sig-object cpp" id="_CPPv4N3fly6saddle5Dimer4ExitE">
+<span id="_CPPv3N3fly6saddle5Dimer4ExitE"></span><span id="_CPPv2N3fly6saddle5Dimer4ExitE"></span><span class="target" id="classfly_1_1saddle_1_1Dimer_1a8b8dbc0bccbc7a7f7f272624df0fa33d"></span><span class="k"><span class="pre">enum</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Exit</span></span></span><a class="headerlink" href="#_CPPv4N3fly6saddle5Dimer4ExitE" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Return codes for <code class="docutils literal notranslate"><a class="reference internal" href="#classfly_1_1saddle_1_1Dimer_1a912fb712cd6a4df32effd2826fdaed0c"><span class="std std-ref"><span class="pre">step()</span></span></a></code>`. </p>
+<p><em>Values:</em></p>
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N3fly6saddle5Dimer4Exit7successE">
+<span id="_CPPv3N3fly6saddle5Dimer4Exit7successE"></span><span id="_CPPv2N3fly6saddle5Dimer4Exit7successE"></span><span class="target" id="classfly_1_1saddle_1_1Dimer_1a8b8dbc0bccbc7a7f7f272624df0fa33da76284ef6a4736a8cd48a252993b31f2c"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">success</span></span></span><a class="headerlink" href="#_CPPv4N3fly6saddle5Dimer4Exit7successE" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Found saddle-point. </p>
+</dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N3fly6saddle5Dimer4Exit4failE">
+<span id="_CPPv3N3fly6saddle5Dimer4Exit4failE"></span><span id="_CPPv2N3fly6saddle5Dimer4Exit4failE"></span><span class="target" id="classfly_1_1saddle_1_1Dimer_1a8b8dbc0bccbc7a7f7f272624df0fa33da0f46c0eba080b5b72f8d1fbcb6ef6c77"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">fail</span></span></span><a class="headerlink" href="#_CPPv4N3fly6saddle5Dimer4Exit4failE" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Failed: stuck in +curvature region. </p>
+</dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N3fly6saddle5Dimer4Exit8iter_maxE">
+<span id="_CPPv3N3fly6saddle5Dimer4Exit8iter_maxE"></span><span id="_CPPv2N3fly6saddle5Dimer4Exit8iter_maxE"></span><span class="target" id="classfly_1_1saddle_1_1Dimer_1a8b8dbc0bccbc7a7f7f272624df0fa33da8a7046895fe29e2ed2ff1bf644724597"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">iter_max</span></span></span><a class="headerlink" href="#_CPPv4N3fly6saddle5Dimer4Exit8iter_maxE" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Exceeded the maximum number of iterations but in -curvature region. </p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3fly6saddle5Dimer5DimerERR5Dimer">
+<span id="_CPPv3N3fly6saddle5Dimer5DimerERR5Dimer"></span><span id="_CPPv2N3fly6saddle5Dimer5DimerERR5Dimer"></span><span id="fly::saddle::Dimer::Dimer__DimerRR"></span><span class="target" id="classfly_1_1saddle_1_1Dimer_1a0acbc708e879eff9e622c64d4f47e688"></span><span class="sig-name descname"><span class="n"><span class="pre">Dimer</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N3fly6saddle5Dimer5DimerERR5Dimer" title="fly::saddle::Dimer::Dimer"><span class="n"><span class="pre">Dimer</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><a class="headerlink" href="#_CPPv4N3fly6saddle5Dimer5DimerERR5Dimer" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Move construct a new <a class="reference internal" href="#classfly_1_1saddle_1_1Dimer"><span class="std std-ref">Dimer</span></a> object. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3fly6saddle5Dimer5DimerERK5Dimer">
+<span id="_CPPv3N3fly6saddle5Dimer5DimerERK5Dimer"></span><span id="_CPPv2N3fly6saddle5Dimer5DimerERK5Dimer"></span><span id="fly::saddle::Dimer::Dimer__DimerCR"></span><span class="target" id="classfly_1_1saddle_1_1Dimer_1a3c0c6ec3267452e0f2e52bd83a045522"></span><span class="sig-name descname"><span class="n"><span class="pre">Dimer</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N3fly6saddle5Dimer5DimerERK5Dimer" title="fly::saddle::Dimer::Dimer"><span class="n"><span class="pre">Dimer</span></span></a><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><a class="headerlink" href="#_CPPv4N3fly6saddle5Dimer5DimerERK5Dimer" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Copy construct a new <a class="reference internal" href="#classfly_1_1saddle_1_1Dimer"><span class="std std-ref">Dimer</span></a> object. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3fly6saddle5Dimer5DimerERK7OptionsRKN5Rotor7OptionsERKN6system3BoxE">
+<span id="_CPPv3N3fly6saddle5Dimer5DimerERK7OptionsRKN5Rotor7OptionsERKN6system3BoxE"></span><span id="_CPPv2N3fly6saddle5Dimer5DimerERK7OptionsRKN5Rotor7OptionsERKN6system3BoxE"></span><span id="fly::saddle::Dimer::Dimer__OptionsCR.Rotor::OptionsCR.system::BoxCR"></span><span class="target" id="classfly_1_1saddle_1_1Dimer_1a7d67e5c0050fb96dc02a522703e60cf1"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Dimer</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N3fly6saddle5Dimer7OptionsE" title="fly::saddle::Dimer::Options"><span class="n"><span class="pre">Options</span></span></a><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">opt</span></span>, <a class="reference internal" href="#_CPPv4N3fly6saddle5RotorE" title="fly::saddle::Rotor"><span class="n"><span class="pre">Rotor</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N3fly6saddle5Rotor7OptionsE" title="fly::saddle::Rotor::Options"><span class="n"><span class="pre">Options</span></span></a><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">r_opt</span></span>, <span class="n"><span class="pre">system</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="system.html#_CPPv4N3fly6system3BoxE" title="fly::system::Box"><span class="n"><span class="pre">Box</span></span></a><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">box</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3fly6saddle5Dimer5DimerERK7OptionsRKN5Rotor7OptionsERKN6system3BoxE" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Construct a new <a class="reference internal" href="#classfly_1_1saddle_1_1Dimer"><span class="std std-ref">Dimer</span></a> object. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>opt</strong> – <a class="reference internal" href="#structfly_1_1saddle_1_1Dimer_1_1Options"><span class="std std-ref">Options</span></a> for translations pass. </p></li>
+<li><p><strong>r_opt</strong> – <a class="reference internal" href="#structfly_1_1saddle_1_1Dimer_1_1Options"><span class="std std-ref">Options</span></a> for rotation pass. </p></li>
+<li><p><strong>box</strong> – Description of simulation space. </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3fly6saddle5Dimer4stepEN6system3SoAIR8PositionR4AxisEEN6system3SoAIRK8PositionRK4AxisRK6TypeIDRK6FrozenEERN9potential7GenericEii">
+<span id="_CPPv3N3fly6saddle5Dimer4stepEN6system3SoAIR8PositionR4AxisEEN6system3SoAIRK8PositionRK4AxisRK6TypeIDRK6FrozenEERN9potential7GenericEii"></span><span id="_CPPv2N3fly6saddle5Dimer4stepEN6system3SoAIR8PositionR4AxisEEN6system3SoAIRK8PositionRK4AxisRK6TypeIDRK6FrozenEERN9potential7GenericEii"></span><span id="fly::saddle::Dimer::step__system::SoA:PositionR.AxisR:.system::SoA:PositionCR.AxisCR.TypeIDCR.FrozenCR:.potential::GenericR.i.i"></span><span class="target" id="classfly_1_1saddle_1_1Dimer_1a912fb712cd6a4df32effd2826fdaed0c"></span><span class="kt"><span class="pre">auto</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">step</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">system</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="system.html#_CPPv4IDpEN3fly6system3SoAE" title="fly::system::SoA"><span class="n"><span class="pre">SoA</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">Position</span></span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="n"><span class="pre">Axis</span></span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">out</span></span>, <span class="n"><span class="pre">system</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="system.html#_CPPv4IDpEN3fly6system3SoAE" title="fly::system::SoA"><span class="n"><span class="pre">SoA</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">Position</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="n"><span class="pre">Axis</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="n"><span class="pre">TypeID</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="n"><span class="pre">Frozen</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">in</span></span>, <span class="n"><span class="pre">potential</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="potential.html#_CPPv4N3fly9potential7GenericE" title="fly::potential::Generic"><span class="n"><span class="pre">Generic</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">pot</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">max_steps</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">num_threads</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">1</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="o"><span class="pre">-&gt;</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N3fly6saddle5Dimer4ExitE" title="fly::saddle::Dimer::Exit"><span class="n"><span class="pre">Exit</span></span></a><a class="headerlink" href="#_CPPv4N3fly6saddle5Dimer4stepEN6system3SoAIR8PositionR4AxisEEN6system3SoAIRK8PositionRK4AxisRK6TypeIDRK6FrozenEERN9potential7GenericEii" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Advance the dimer towards a saddle-point. </p>
+<p>Performs at most <code class="docutils literal notranslate"><span class="pre">max_step</span></code> translation steps. The translation uses the LBFGS algorithm with a trust-radius limited step size and an early-exit condition if the curvature is positive for too long.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>out</strong> – Final position and axis orientation written here. </p></li>
+<li><p><strong>in</strong> – Initial position, axis and per-particle data forwarded to potential. </p></li>
+<li><p><strong>pot</strong> – Potential energy function. </p></li>
+<li><p><strong>max_steps</strong> – Maximum number of steps before returning. </p></li>
+<li><p><strong>num_threads</strong> – Number of openMP threads to use. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Exit-code. </p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv4N3fly6saddle5Dimer7OptionsE">
+<span id="_CPPv3N3fly6saddle5Dimer7OptionsE"></span><span id="_CPPv2N3fly6saddle5Dimer7OptionsE"></span><span id="fly::saddle::Dimer::Options"></span><span class="target" id="structfly_1_1saddle_1_1Dimer_1_1Options"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Options</span></span></span><a class="headerlink" href="#_CPPv4N3fly6saddle5Dimer7OptionsE" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Configure the dimers internal translation minimisation pass. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N3fly6saddle5Dimer7Options10convex_maxE">
+<span id="_CPPv3N3fly6saddle5Dimer7Options10convex_maxE"></span><span id="_CPPv2N3fly6saddle5Dimer7Options10convex_maxE"></span><span id="fly::saddle::Dimer::Options::convex_max__double"></span><span class="target" id="structfly_1_1saddle_1_1Dimer_1_1Options_1af2b87465be720e06e3a2477d01dac9d9"></span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">convex_max</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">3</span></span><a class="headerlink" href="#_CPPv4N3fly6saddle5Dimer7Options10convex_maxE" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>If <code class="docutils literal notranslate"><span class="pre">convex_max</span></code> steps with +Ve curvature then exit early. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N3fly6saddle5Dimer7Options5debugE">
+<span id="_CPPv3N3fly6saddle5Dimer7Options5debugE"></span><span id="_CPPv2N3fly6saddle5Dimer7Options5debugE"></span><span id="fly::saddle::Dimer::Options::debug__b"></span><span class="target" id="structfly_1_1saddle_1_1Dimer_1_1Options_1a882bfe212b273b0420747b268eee3af0"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">debug</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">false</span></span><a class="headerlink" href="#_CPPv4N3fly6saddle5Dimer7Options5debugE" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Print out debug info. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N3fly6saddle5Dimer7Options6f2normE">
+<span id="_CPPv3N3fly6saddle5Dimer7Options6f2normE"></span><span id="_CPPv2N3fly6saddle5Dimer7Options6f2normE"></span><span id="fly::saddle::Dimer::Options::f2norm__double"></span><span class="target" id="structfly_1_1saddle_1_1Dimer_1_1Options_1a271b351e6a2139c324a9a3e9e6938df4"></span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">f2norm</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">1e-5</span></span><a class="headerlink" href="#_CPPv4N3fly6saddle5Dimer7Options6f2normE" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Force convergence criterion (eV/Angstroms). </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N3fly6saddle5Dimer7Options4foutE">
+<span id="_CPPv3N3fly6saddle5Dimer7Options4foutE"></span><span id="_CPPv2N3fly6saddle5Dimer7Options4foutE"></span><span id="fly::saddle::Dimer::Options::fout__io::BinaryFileP"></span><span class="target" id="structfly_1_1saddle_1_1Dimer_1_1Options_1aac083e1f11ca0473a5d513a1d7c7bbc9"></span><span class="n"><span class="pre">io</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="io.html#_CPPv4N3fly2io10BinaryFileE" title="fly::io::BinaryFile"><span class="n"><span class="pre">BinaryFile</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">fout</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">nullptr</span></span><a class="headerlink" href="#_CPPv4N3fly6saddle5Dimer7Options4foutE" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>If provided at each frame of the translation <code class="docutils literal notranslate"><span class="pre">out</span></code> will be written to this file. </p>
+<p>It is the users responsibility to ensure the lifetime of <code class="docutils literal notranslate"><span class="pre">fout</span></code> is at least as long as the lifetime of the <code class="docutils literal notranslate"><span class="pre">LBFGS</span></code> object and ensure only a single <code class="docutils literal notranslate"><span class="pre">LBFGS</span></code> object writes to <code class="docutils literal notranslate"><span class="pre">fout</span></code> at any one time. This really only exist for debugging purposes… </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N3fly6saddle5Dimer7Options10grow_trustE">
+<span id="_CPPv3N3fly6saddle5Dimer7Options10grow_trustE"></span><span id="_CPPv2N3fly6saddle5Dimer7Options10grow_trustE"></span><span id="fly::saddle::Dimer::Options::grow_trust__double"></span><span class="target" id="structfly_1_1saddle_1_1Dimer_1_1Options_1a23a45b838b5e56cc163cbd4e7d84c436"></span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">grow_trust</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">1.5</span></span><a class="headerlink" href="#_CPPv4N3fly6saddle5Dimer7Options10grow_trustE" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Trust radius expansion rate. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N3fly6saddle5Dimer7Options9max_trustE">
+<span id="_CPPv3N3fly6saddle5Dimer7Options9max_trustE"></span><span id="_CPPv2N3fly6saddle5Dimer7Options9max_trustE"></span><span id="fly::saddle::Dimer::Options::max_trust__double"></span><span class="target" id="structfly_1_1saddle_1_1Dimer_1_1Options_1af6c43c9bea3cf11186099fcaffe5b568"></span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">max_trust</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0.5</span></span><a class="headerlink" href="#_CPPv4N3fly6saddle5Dimer7Options9max_trustE" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Maximum trust radius e.g max steps size (Angstroms). </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N3fly6saddle5Dimer7Options9min_trustE">
+<span id="_CPPv3N3fly6saddle5Dimer7Options9min_trustE"></span><span id="_CPPv2N3fly6saddle5Dimer7Options9min_trustE"></span><span id="fly::saddle::Dimer::Options::min_trust__double"></span><span class="target" id="structfly_1_1saddle_1_1Dimer_1_1Options_1ae9d6378ec6d405f054bff775b28a210a"></span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">min_trust</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0.05</span></span><a class="headerlink" href="#_CPPv4N3fly6saddle5Dimer7Options9min_trustE" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Minimum trust radius e.g initial step size (Angstroms). </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N3fly6saddle5Dimer7Options1nE">
+<span id="_CPPv3N3fly6saddle5Dimer7Options1nE"></span><span id="_CPPv2N3fly6saddle5Dimer7Options1nE"></span><span id="fly::saddle::Dimer::Options::n__i"></span><span class="target" id="structfly_1_1saddle_1_1Dimer_1_1Options_1a0c200d0cd8240ff02e17d7241b415ad0"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">n</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">10</span></span><a class="headerlink" href="#_CPPv4N3fly6saddle5Dimer7Options1nE" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>L-BFGS core translation-history size. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N3fly6saddle5Dimer7Options8proj_tolE">
+<span id="_CPPv3N3fly6saddle5Dimer7Options8proj_tolE"></span><span id="_CPPv2N3fly6saddle5Dimer7Options8proj_tolE"></span><span id="fly::saddle::Dimer::Options::proj_tol__double"></span><span class="target" id="structfly_1_1saddle_1_1Dimer_1_1Options_1a36bb34b8f64131f23b0f4e697759ee5b"></span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">proj_tol</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><a class="headerlink" href="#_CPPv4N3fly6saddle5Dimer7Options8proj_tolE" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Trust tolerance, set larger to reduce trust radius change. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N3fly6saddle5Dimer7Options12shrink_trustE">
+<span id="_CPPv3N3fly6saddle5Dimer7Options12shrink_trustE"></span><span id="_CPPv2N3fly6saddle5Dimer7Options12shrink_trustE"></span><span id="fly::saddle::Dimer::Options::shrink_trust__double"></span><span class="target" id="structfly_1_1saddle_1_1Dimer_1_1Options_1abf17bbfeb95df240d73b0afb4c3cb360"></span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">shrink_trust</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0.5</span></span><a class="headerlink" href="#_CPPv4N3fly6saddle5Dimer7Options12shrink_trustE" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Trust radius contraction rate. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N3fly6saddle5Dimer7Options9skin_fracE">
+<span id="_CPPv3N3fly6saddle5Dimer7Options9skin_fracE"></span><span id="_CPPv2N3fly6saddle5Dimer7Options9skin_fracE"></span><span id="fly::saddle::Dimer::Options::skin_frac__double"></span><span class="target" id="structfly_1_1saddle_1_1Dimer_1_1Options_1a103971a69242e6b16871763effc37c9e"></span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">skin_frac</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">1.1</span></span><a class="headerlink" href="#_CPPv4N3fly6saddle5Dimer7Options9skin_fracE" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Used to determine the skin size. </p>
+<p>The skin thickness is determined such that the expected number of neighbours is skin_frac * (num_neighbours if no skin used). Hence skin_frac must be larger than one. Neighbour lists are built less often when skin_frac is higher but there will be more more non-neighbours in neighbour lists. </p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="rotor">
+<h2>Rotor<a class="headerlink" href="#rotor" title="Permalink to this heading">#</a></h2>
+<p>File: <code class="docutils literal notranslate"><span class="pre">libfly/saddle/rotor.hpp</span></code></p>
+<p>Class to orient a dimer. </p>
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv4N3fly6saddle5RotorE">
+<span id="_CPPv3N3fly6saddle5RotorE"></span><span id="_CPPv2N3fly6saddle5RotorE"></span><span id="fly::saddle::Rotor"></span><span class="target" id="classfly_1_1saddle_1_1Rotor"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Rotor</span></span></span><a class="headerlink" href="#_CPPv4N3fly6saddle5RotorE" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Orients a dimer to align it with the minimum eigen-mode. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3fly6saddle5Rotor5RotorERK7Options">
+<span id="_CPPv3N3fly6saddle5Rotor5RotorERK7Options"></span><span id="_CPPv2N3fly6saddle5Rotor5RotorERK7Options"></span><span id="fly::saddle::Rotor::Rotor__OptionsCR"></span><span class="target" id="classfly_1_1saddle_1_1Rotor_1a56569c7d9389867686da072c2fe80baf"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">explicit</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Rotor</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N3fly6saddle5Rotor7OptionsE" title="fly::saddle::Rotor::Options"><span class="n"><span class="pre">Options</span></span></a><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">opt</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3fly6saddle5Rotor5RotorERK7Options" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Construct a new <a class="reference internal" href="#classfly_1_1saddle_1_1Rotor"><span class="std std-ref">Rotor</span></a> object. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>opt</strong> – <a class="reference internal" href="#structfly_1_1saddle_1_1Rotor_1_1Options"><span class="std std-ref">Options</span></a> for rotor minimisation pass. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3fly6saddle5Rotor5RotorERR5Rotor">
+<span id="_CPPv3N3fly6saddle5Rotor5RotorERR5Rotor"></span><span id="_CPPv2N3fly6saddle5Rotor5RotorERR5Rotor"></span><span id="fly::saddle::Rotor::Rotor__RotorRR"></span><span class="target" id="classfly_1_1saddle_1_1Rotor_1a0162b870a4276335fae1cb8394a6e72d"></span><span class="sig-name descname"><span class="n"><span class="pre">Rotor</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N3fly6saddle5Rotor5RotorERR5Rotor" title="fly::saddle::Rotor::Rotor"><span class="n"><span class="pre">Rotor</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><a class="headerlink" href="#_CPPv4N3fly6saddle5Rotor5RotorERR5Rotor" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Move construct a new <a class="reference internal" href="#classfly_1_1saddle_1_1Rotor"><span class="std std-ref">Rotor</span></a> object. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3fly6saddle5Rotor5RotorERK5Rotor">
+<span id="_CPPv3N3fly6saddle5Rotor5RotorERK5Rotor"></span><span id="_CPPv2N3fly6saddle5Rotor5RotorERK5Rotor"></span><span id="fly::saddle::Rotor::Rotor__RotorCR"></span><span class="target" id="classfly_1_1saddle_1_1Rotor_1a6d90421d3b6e059b679bacacae1fe673"></span><span class="sig-name descname"><span class="n"><span class="pre">Rotor</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N3fly6saddle5Rotor5RotorERK5Rotor" title="fly::saddle::Rotor::Rotor"><span class="n"><span class="pre">Rotor</span></span></a><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><a class="headerlink" href="#_CPPv4N3fly6saddle5Rotor5RotorERK5Rotor" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Copy construct a new <a class="reference internal" href="#classfly_1_1saddle_1_1Rotor"><span class="std std-ref">Rotor</span></a> object. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3fly6saddle5Rotor12eff_gradientEN6system3SoAIR17PotentialGradientEEN6system3SoAIR4AxisEEN6system3SoAIRK6TypeIDRK6FrozenEERN9potential7GenericERN5neigh4ListEi">
+<span id="_CPPv3N3fly6saddle5Rotor12eff_gradientEN6system3SoAIR17PotentialGradientEEN6system3SoAIR4AxisEEN6system3SoAIRK6TypeIDRK6FrozenEERN9potential7GenericERN5neigh4ListEi"></span><span id="_CPPv2N3fly6saddle5Rotor12eff_gradientEN6system3SoAIR17PotentialGradientEEN6system3SoAIR4AxisEEN6system3SoAIRK6TypeIDRK6FrozenEERN9potential7GenericERN5neigh4ListEi"></span><span id="fly::saddle::Rotor::eff_gradient__system::SoA:PotentialGradientR:.system::SoA:AxisR:.system::SoA:TypeIDCR.FrozenCR:.potential::GenericR.neigh::ListR.i"></span><span class="target" id="classfly_1_1saddle_1_1Rotor_1a1ee611c049068344d4810c5145523bca"></span><span class="kt"><span class="pre">auto</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">eff_gradient</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">system</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="system.html#_CPPv4IDpEN3fly6system3SoAE" title="fly::system::SoA"><span class="n"><span class="pre">SoA</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">PotentialGradient</span></span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">out</span></span>, <span class="n"><span class="pre">system</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="system.html#_CPPv4IDpEN3fly6system3SoAE" title="fly::system::SoA"><span class="n"><span class="pre">SoA</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">Axis</span></span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">inout</span></span>, <span class="n"><span class="pre">system</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="system.html#_CPPv4IDpEN3fly6system3SoAE" title="fly::system::SoA"><span class="n"><span class="pre">SoA</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">TypeID</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="n"><span class="pre">Frozen</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">in</span></span>, <span class="n"><span class="pre">potential</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="potential.html#_CPPv4N3fly9potential7GenericE" title="fly::potential::Generic"><span class="n"><span class="pre">Generic</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">pot</span></span>, <span class="n"><span class="pre">neigh</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="neighbour.html#_CPPv4N3fly5neigh4ListE" title="fly::neigh::List"><span class="n"><span class="pre">List</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">nl</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">threads</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">1</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="o"><span class="pre">-&gt;</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><a class="headerlink" href="#_CPPv4N3fly6saddle5Rotor12eff_gradientEN6system3SoAIR17PotentialGradientEEN6system3SoAIR4AxisEEN6system3SoAIRK6TypeIDRK6FrozenEERN9potential7GenericERN5neigh4ListEi" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Compute the effective potential’s gradient. </p>
+<p>This is achieved by inverting the component of the gradient parallel to the minimum eigen-mode of the potential. The dimer is rotated using the LBFGS algorithm to make it align with the minimum eigen-mode.</p>
+<p>Assumes the neighbour list is ready, force on frozen atoms will be zero.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This function does actually modify neighbour but returns it to an identical state after it is done. It guarantees not to call
+<code class="docutils literal notranslate"><span class="pre">neigh::List::rebuild()</span></code>.</p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>in</strong> – Per-atom input properties </p></li>
+<li><p><strong>out</strong> – Write effective gradient here. </p></li>
+<li><p><strong>inout</strong> – The axis input and output. </p></li>
+<li><p><strong>nl</strong> – Neighbour list (in ready state i.e. <a class="reference internal" href="neighbour.html#classfly_1_1neigh_1_1List_1a89efa6e7fff008bfdd016acbe6a9ede3"><span class="std std-ref">neigh::List::update()</span></a> or <a class="reference internal" href="neighbour.html#classfly_1_1neigh_1_1List_1a4d5b423b46d3c6fd5506c3771aefc45e"><span class="std std-ref">neigh::List::rebuild()</span></a> called) configured with a cut-off at least <code class="docutils literal notranslate"><a class="reference internal" href="#classfly_1_1saddle_1_1Rotor_1a5201561c65d5af8601bd7ec096249158"><span class="std std-ref"><span class="pre">r_cut()</span></span></a></code>. </p></li>
+<li><p><strong>pot</strong> – The potential energy function. </p></li>
+<li><p><strong>threads</strong> – Number of openMP threads to use. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The approximate curvature of the wrapped potential along the output <a class="reference internal" href="system.html#structfly_1_1builtin__properties_1_1Axis"><span class="std std-ref">Axis</span></a>. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK3fly6saddle5Rotor5r_cutERKN9potential7GenericE">
+<span id="_CPPv3NK3fly6saddle5Rotor5r_cutERKN9potential7GenericE"></span><span id="_CPPv2NK3fly6saddle5Rotor5r_cutERKN9potential7GenericE"></span><span id="fly::saddle::Rotor::r_cut__potential::GenericCRC"></span><span class="target" id="classfly_1_1saddle_1_1Rotor_1a5201561c65d5af8601bd7ec096249158"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">auto</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">r_cut</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">potential</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="potential.html#_CPPv4N3fly9potential7GenericE" title="fly::potential::Generic"><span class="n"><span class="pre">Generic</span></span></a><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">pot</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="k"><span class="pre">noexcept</span></span><a class="headerlink" href="#_CPPv4NK3fly6saddle5Rotor5r_cutERKN9potential7GenericE" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Compute the cut-off radius. </p>
+<p>This is the cut-off that <code class="docutils literal notranslate"><span class="pre">nl</span></code> in call to <code class="docutils literal notranslate"><span class="pre">eff_grad()</span></code> with potential <code class="docutils literal notranslate"><span class="pre">pot</span></code> must be configured with.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>pot</strong> – Potential that <code class="docutils literal notranslate"><span class="pre">eff_grad()</span></code> will be called with. </p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>auto A slightly larger cut-off that enables <code class="docutils literal notranslate"><span class="pre">eff_grad</span></code> to displace atoms a little without rebuilding the nl. </p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv4N3fly6saddle5Rotor7OptionsE">
+<span id="_CPPv3N3fly6saddle5Rotor7OptionsE"></span><span id="_CPPv2N3fly6saddle5Rotor7OptionsE"></span><span id="fly::saddle::Rotor::Options"></span><span class="target" id="structfly_1_1saddle_1_1Rotor_1_1Options"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Options</span></span></span><a class="headerlink" href="#_CPPv4N3fly6saddle5Rotor7OptionsE" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Configure the dimers rotation minimisation pass. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N3fly6saddle5Rotor7Options5debugE">
+<span id="_CPPv3N3fly6saddle5Rotor7Options5debugE"></span><span id="_CPPv2N3fly6saddle5Rotor7Options5debugE"></span><span id="fly::saddle::Rotor::Options::debug__b"></span><span class="target" id="structfly_1_1saddle_1_1Rotor_1_1Options_1a8a913c12ec7226532bece666ae0ed999"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">debug</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">false</span></span><a class="headerlink" href="#_CPPv4N3fly6saddle5Rotor7Options5debugE" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Print out debug info. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N3fly6saddle5Rotor7Options7delta_rE">
+<span id="_CPPv3N3fly6saddle5Rotor7Options7delta_rE"></span><span id="_CPPv2N3fly6saddle5Rotor7Options7delta_rE"></span><span id="fly::saddle::Rotor::Options::delta_r__double"></span><span class="target" id="structfly_1_1saddle_1_1Rotor_1_1Options_1ad4c0b27ac7dc868a40779e575b91fe56"></span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">delta_r</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0.001</span></span><a class="headerlink" href="#_CPPv4N3fly6saddle5Rotor7Options7delta_rE" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Half dimer length. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N3fly6saddle5Rotor7Options12iter_max_rotE">
+<span id="_CPPv3N3fly6saddle5Rotor7Options12iter_max_rotE"></span><span id="_CPPv2N3fly6saddle5Rotor7Options12iter_max_rotE"></span><span id="fly::saddle::Rotor::Options::iter_max_rot__i"></span><span class="target" id="structfly_1_1saddle_1_1Rotor_1_1Options_1af48f8d0af3a94123540da6b08b3839f2"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">iter_max_rot</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">20</span></span><a class="headerlink" href="#_CPPv4N3fly6saddle5Rotor7Options12iter_max_rotE" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Maximum number of iterations during rotation minimization. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N3fly6saddle5Rotor7Options1nE">
+<span id="_CPPv3N3fly6saddle5Rotor7Options1nE"></span><span id="_CPPv2N3fly6saddle5Rotor7Options1nE"></span><span id="fly::saddle::Rotor::Options::n__i"></span><span class="target" id="structfly_1_1saddle_1_1Rotor_1_1Options_1acca797a3ab92e2b4c6768e8a96126256"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">n</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">6</span></span><a class="headerlink" href="#_CPPv4N3fly6saddle5Rotor7Options1nE" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>L-BFGS core rotation-history size. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N3fly6saddle5Rotor7Options15relax_in_convexE">
+<span id="_CPPv3N3fly6saddle5Rotor7Options15relax_in_convexE"></span><span id="_CPPv2N3fly6saddle5Rotor7Options15relax_in_convexE"></span><span id="fly::saddle::Rotor::Options::relax_in_convex__b"></span><span class="target" id="structfly_1_1saddle_1_1Rotor_1_1Options_1aff7363dfeda4e85ff9fb20f58c77d93a"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">relax_in_convex</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">true</span></span><a class="headerlink" href="#_CPPv4N3fly6saddle5Rotor7Options15relax_in_convexE" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>If true when convex we return only the component parallel to the min mode. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N3fly6saddle5Rotor7Options9theta_tolE">
+<span id="_CPPv3N3fly6saddle5Rotor7Options9theta_tolE"></span><span id="_CPPv2N3fly6saddle5Rotor7Options9theta_tolE"></span><span id="fly::saddle::Rotor::Options::theta_tol__double"></span><span class="target" id="structfly_1_1saddle_1_1Rotor_1_1Options_1adb5202e1eb8cbea2beef2833cd640e86"></span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">theta_tol</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">2</span></span><span class="w"> </span><span class="o"><span class="pre">*</span></span><span class="w"> </span><span class="n"><span class="pre">M_PI</span></span><span class="w"> </span><span class="o"><span class="pre">/</span></span><span class="w"> </span><span class="m"><span class="pre">360.</span></span><a class="headerlink" href="#_CPPv4N3fly6saddle5Rotor7Options9theta_tolE" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>(Rad) rotation convergence criterion. </p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="perturb">
+<h2>Perturb<a class="headerlink" href="#perturb" title="Permalink to this heading">#</a></h2>
+<p>File: <code class="docutils literal notranslate"><span class="pre">libfly/saddle/perturb.hpp</span></code></p>
+<p>Utility for perturbing a supercell. </p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3fly6saddle7perturbEN6system3SoAIR8PositionR4AxisEER7XoshiroRKN6system3BoxERKN8Position8matrix_tEN6system3SoAIRK8PositionRK6FrozenEEdd">
+<span id="_CPPv3N3fly6saddle7perturbEN6system3SoAIR8PositionR4AxisEER7XoshiroRKN6system3BoxERKN8Position8matrix_tEN6system3SoAIRK8PositionRK6FrozenEEdd"></span><span id="_CPPv2N3fly6saddle7perturbEN6system3SoAIR8PositionR4AxisEER7XoshiroRKN6system3BoxERKN8Position8matrix_tEN6system3SoAIRK8PositionRK6FrozenEEdd"></span><span id="fly::saddle::perturb__system::SoA:PositionR.AxisR:.XoshiroR.system::BoxCR.Position::matrix_tCR.system::SoA:PositionCR.FrozenCR:.double.double"></span><span class="target" id="perturb_8hpp_1a7c5a8be3ecf20c2acaea64b1f567c2a1"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">fly</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">saddle</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">perturb</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">system</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="system.html#_CPPv4IDpEN3fly6system3SoAE" title="fly::system::SoA"><span class="n"><span class="pre">SoA</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">Position</span></span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="n"><span class="pre">Axis</span></span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">out</span></span>, <a class="reference internal" href="utility.html#_CPPv4N3fly7XoshiroE" title="fly::Xoshiro"><span class="n"><span class="pre">Xoshiro</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">urbg</span></span>, <span class="n"><span class="pre">system</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="system.html#_CPPv4N3fly6system3BoxE" title="fly::system::Box"><span class="n"><span class="pre">Box</span></span></a><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">box</span></span>, <span class="n"><span class="pre">Position</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">matrix_t</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">centre</span></span>, <span class="n"><span class="pre">system</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="system.html#_CPPv4IDpEN3fly6system3SoAE" title="fly::system::SoA"><span class="n"><span class="pre">SoA</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">Position</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="n"><span class="pre">Frozen</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">cell</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">r_cut</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">stddev</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3fly6saddle7perturbEN6system3SoAIR8PositionR4AxisEER7XoshiroRKN6system3BoxERKN8Position8matrix_tEN6system3SoAIRK8PositionRK6FrozenEEdd" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Provide a random perturbation to every atom within r_cut of a point. </p>
+<p>Uses the minimum image distance to determine distance from centre. The perturbation is Gaussian in each coordinate axis and has standard deviation <code class="docutils literal notranslate"><span class="pre">stddev</span></code>. An envelope function will linearly decrease the size of each atoms perturbation based off its distance to the centre. The axis will be normalised as appropriate. <a class="reference internal" href="system.html#structfly_1_1builtin__properties_1_1Frozen"><span class="std std-ref">Frozen</span></a> atoms will not be perturbed.</p>
+<p><div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>This function uses an expensive method for computing the minimum image convention. If calling this many times on the same
+initial condition it may be more efficient to compute and re-use a neighbour list.</p>
+</div>
+</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>out</strong> – Output the perturbed state and randomised axis here. </p></li>
+<li><p><strong>urbg</strong> – Random number generator. </p></li>
+<li><p><strong>box</strong> – Simulation space. </p></li>
+<li><p><strong>centre</strong> – Origin of perturbation. </p></li>
+<li><p><strong>cell</strong> – Input parameters. </p></li>
+<li><p><strong>r_cut</strong> – All atoms within <code class="docutils literal notranslate"><span class="pre">r_cut</span></code> of <code class="docutils literal notranslate"><span class="pre">centre</span></code> will be perturbed. </p></li>
+<li><p><strong>stddev</strong> – Standard deviation of Gaussian perturbations. </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+</section>
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          <a class="next-page" href="../ChangeLog-stub.html">
+              <div class="page-info">
+                <div class="context">
+                  <span>Next</span>
+                </div>
+                <div class="title">Changelog</div>
+              </div>
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+            </a>
+          <a class="prev-page" href="minimise.html">
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title">Minimisers</div>
+                
+              </div>
+            </a>
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2022, ConorWilliams
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            <div class="icons">
+              <a class="muted-link " href="https://github.com/ConorWilliams/openFLY" aria-label="GitHub">
+                <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 16 16">
+                    <path fill-rule="evenodd" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8z"></path>
+                </svg>
+            </a>
+              
+            </div>
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">Saddle-point searching</a><ul>
+<li><a class="reference internal" href="#dimer">Dimer</a></li>
+<li><a class="reference internal" href="#rotor">Rotor</a></li>
+<li><a class="reference internal" href="#perturb">Perturb</a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </div>
+</div><script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinx_highlight.js"></script>
+    <script src="../_static/scripts/furo.js"></script>
+    <script src="../_static/tabs.js"></script>
+    <script src="../_static/clipboard.min.js"></script>
+    <script src="../_static/copybutton.js"></script>
+    </body>
+</html>

@@ -52,17 +52,3 @@ File: ``libfly/potential/EAM/eam.hpp``
 
 
 
-Dimer
----------------------
-
-File: ``libfly/potential/ROT/dimer.hpp``
-
-.. doxygenfile:: libfly/potential/ROT/dimer.hpp
-    :sections: briefdescription detaileddescription
-
-.. doxygenclass:: fly::potential::Dimer
-    :members:
-    :undoc-members:
-
-
-

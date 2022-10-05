@@ -1,6 +1,18 @@
+// Copyright © 2020 Conor Williams <conorwilliams@outlook.com>
 
+// SPDX-License-Identifier: GPL-3.0-or-later
 
-#include "libfly/potential/ROT/dimer.hpp"
+// This file is part of openFLY.
+
+// OpenFLY is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License
+// as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+
+// OpenFLY is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
+// warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+
+// You should have received a copy of the GNU General Public License along with openFLY. If not, see <https://www.gnu.org/licenses/>.
+
+#include "libfly/saddle/rotor.hpp"
 
 #include <cmath>
 #include <cstddef>
@@ -13,24 +25,17 @@
 #include "libfly/system/property.hpp"
 #include "libfly/utility/core.hpp"
 
-namespace fly::potential {
+namespace fly::saddle {
 
-  Dimer::Dimer(Options const& opt, potential::Generic const& to_wrap)
-      : m_opt(opt), m_core(opt.n), m_wrapped(std::make_unique<potential::Generic>(to_wrap)) {}
-
-  Dimer::Dimer(Dimer const& other)
-      : m_opt{other.m_opt}, m_core(m_opt.n), m_wrapped(std::make_unique<potential::Generic>(*other.m_wrapped)) {}
-
-  Dimer::Dimer(Dimer&& other) noexcept : m_opt{other.m_opt}, m_core(std::move(other.m_core)), m_wrapped(std::move(other.m_wrapped)) {}
-
-  double Dimer::r_cut() const noexcept { return m_wrapped->r_cut() + m_opt.delta_r * 2; }
-
-  double Dimer::gradient(system::SoA<PotentialGradient&, Axis&> out,
-                         system::SoA<TypeID const&, Frozen const&, Axis const&> in,
-                         neigh::List& nl,
-                         int num_threads) {
+  auto Rotor::eff_gradient(system::SoA<PotentialGradient &> out,
+                           system::SoA<Axis &> inout,
+                           system::SoA<TypeID const &, Frozen const &> in,
+                           potential::Generic &pot,
+                           neigh::List &nl,
+                           int num_threads) -> double {
     //
     verify(in.size() == out.size(), "Effective gradient size mismatch in={} out={}", in.size(), out.size());
+    verify(inout.size() == out.size(), "Axis gradient size mismatch inout={} out={}", inout.size(), out.size());
 
     m_delta.destructive_resize(in.size());       // Store displacement for updates
     m_delta_prev.destructive_resize(in.size());  // Store previous displacement for updates
@@ -43,14 +48,12 @@ namespace fly::potential {
 
     m_delta_g.destructive_resize(in.size());  // Gradient difference
 
-    out[ax_] = in[ax_];
-
     // Reset LBFGS history
     m_core.clear();
 
-    m_wrapped->gradient(m_g0, in, nl, num_threads);  // Gradient at centre (g0)
+    pot.gradient(m_g0, in, nl, num_threads);  // Gradient at centre (g0)
 
-    m_delta[del_] = -m_opt.delta_r * out[ax_];
+    m_delta[del_] = -m_opt.delta_r * inout[ax_];
 
     nl.update(m_delta);
 
@@ -58,35 +61,35 @@ namespace fly::potential {
 
     swap(m_delta, m_delta_prev);
 
-    m_wrapped->gradient(m_g1, in, nl, num_threads);  // Gradient at end (g1)
+    pot.gradient(m_g1, in, nl, num_threads);  // Gradient at end (g1)
 
-    m_curv = [&] {
+    double m_curv = [&] {
       for (int i = 0;; i++) {
         m_delta_g[del_] = m_g1[g_] - m_g0[g_];
-        m_delta_g[del_] -= gdot(m_delta_g[del_], out[ax_]) * out[ax_];  // Torque
+        m_delta_g[del_] -= gdot(m_delta_g[del_], inout[ax_]) * inout[ax_];  // Torque
 
         // Use lbfgs to find rotation plane
-        auto& theta = m_core.newton_step<Axis, Delta>(out, m_delta_g);
+        auto &theta = m_core.newton_step<Axis, Delta>(inout, m_delta_g);
 
-        theta[del_] -= gdot(theta[del_], out[ax_]) * out[ax_];  // Ortho
-        theta[del_] *= 1 / gnorm(theta[del_]);                  //      normalization
+        theta[del_] -= gdot(theta[del_], inout[ax_]) * inout[ax_];  // Ortho
+        theta[del_] *= 1 / gnorm(theta[del_]);                      //      normalization
 
         double b_1 = gdot(m_g1[g_] - m_g0[g_], theta[del_]) / m_opt.delta_r;
-        double c_x0 = gdot(m_g1[g_] - m_g0[g_], out[ax_]) / m_opt.delta_r;
+        double c_x0 = gdot(m_g1[g_] - m_g0[g_], inout[ax_]) / m_opt.delta_r;
         double theta_1 = -0.5 * std::atan(b_1 / std::abs(c_x0));  // Trial rotation angle
 
         if (std::abs(theta_1) < m_opt.theta_tol || (i >= m_opt.iter_max_rot && c_x0 < 0) || i > 10 * m_opt.iter_max_rot) {
           return c_x0;
         } else {
           // Trial rotation
-          m_axisp[ax_] = out[ax_] * std::cos(theta_1) + theta[del_] * std::sin(theta_1);
+          m_axisp[ax_] = inout[ax_] * std::cos(theta_1) + theta[del_] * std::sin(theta_1);
 
           m_delta[del_] = -m_opt.delta_r * m_axisp[ax_];  // Temporarily store next m_delta_prev into m_delta
           swap(m_delta, m_delta_prev);                    // Now put it in the correct place
           m_delta[del_] = m_delta_prev[del_] - m_delta[del_];
           nl.update(m_delta);
 
-          m_wrapped->gradient(m_g1p, in, nl, num_threads);  // Gradient at primed end (g1p)
+          pot.gradient(m_g1p, in, nl, num_threads);  // Gradient at primed end (g1p)
 
           double c_x1 = gdot(m_g1p[g_] - m_g0[g_], m_axisp[ax_]) / m_opt.delta_r;
           double a_1 = (c_x0 - c_x1 + b_1 * sin(2 * theta_1)) / (1 - std::cos(2 * theta_1));
@@ -97,7 +100,7 @@ namespace fly::potential {
             theta_min += M_PI / 2;
           }
 
-          out[ax_] = out[ax_] * std::cos(theta_min) + theta[del_] * std::sin(theta_min);
+          inout[ax_] = inout[ax_] * std::cos(theta_min) + theta[del_] * std::sin(theta_min);
 
           // Interpolate force at new rotation
           m_g1[g_] = (std::sin(theta_1 - theta_min) / std::sin(theta_1)) * m_g1[g_]
@@ -108,11 +111,11 @@ namespace fly::potential {
             fmt::print("\tDimer: i={:<4} theta={:f} curv={:f}\n",
                        i,
                        std::abs(theta_min),
-                       gdot(m_g1[g_] - m_g0[g_], out[ax_]) / m_opt.delta_r);
+                       gdot(m_g1[g_] - m_g0[g_], inout[ax_]) / m_opt.delta_r);
           }
 
           if (std::abs(theta_min) < m_opt.theta_tol) {
-            return gdot(m_g1[g_] - m_g0[g_], out[ax_]) / m_opt.delta_r;
+            return gdot(m_g1[g_] - m_g0[g_], inout[ax_]) / m_opt.delta_r;
           }
         }
       }
@@ -122,12 +125,12 @@ namespace fly::potential {
     nl.update(m_delta);                   // Reset neighbour lists to input state.
 
     if (!m_opt.relax_in_convex && m_curv > 0) {
-      out[g_] = -gdot(m_g0[g_], out[ax_]) * out[ax_];
+      out[g_] = -gdot(m_g0[g_], inout[ax_]) * inout[ax_];
     } else {
-      out[g_] = m_g0[g_] - 2 * gdot(m_g0[g_], out[ax_]) * out[ax_];
+      out[g_] = m_g0[g_] - 2 * gdot(m_g0[g_], inout[ax_]) * inout[ax_];
     }
 
     return m_curv;
   }
 
-}  // namespace fly::potential
+}  // namespace fly::saddle

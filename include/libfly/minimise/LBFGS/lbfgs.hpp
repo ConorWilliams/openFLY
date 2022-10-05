@@ -74,8 +74,6 @@ namespace fly::minimise {
       double grow_trust = 1.5;
       /** @brief Trust radius contraction rate. */
       double shrink_trust = 0.5;
-      /** @brief If minimising a dimer and convex_max steps with +Ve curvature exit. */
-      double convex_max = 3;
       /** @brief Print out debug info. */
       bool debug = false;
       /**
@@ -96,16 +94,6 @@ namespace fly::minimise {
     LBFGS(Options const &opt, system::Box const &box) : m_opt{opt}, m_core{opt.n}, m_box{box} {}
 
     /**
-     * @brief Return codes for ``minimise()``.
-     *
-     */
-    enum Exit : int {
-      success = 0,         ///< Found minimum.
-      positive_curv = -1,  ///< In positive curvature region for too long (must be using a Dimer as the potential).
-      iter_max = -2,       ///< Exceeded the maximum number of iterations.
-    };
-
-    /**
      * @brief Find the nearest local minimum of a potential.
      *
      * \rst
@@ -122,108 +110,10 @@ namespace fly::minimise {
      * @param num_threads Number of openMP threads to use.
      * @return Exit Status code detailing why minimisation stopped.
      */
-
-    template <typename... P1, typename... P2>
-    auto minimise(system::SoA<P1...> &out, system::SoA<P2...> const &in, potential::Generic &pot, int num_threads = 1) -> Exit {
-      // Check inputs
-
-      verify(in.size() == out.size(), "LBFGS minimizer inputs size mismatch, in={} out={}", in.size(), out.size());
-
-      m_core.clear();  // Clear history from previous runs.
-
-      double skin = std::max(std::pow(m_opt.skin_frac, 1. / 3.) - 1, 0.0) * pot.r_cut();
-
-      if (m_opt.debug) {
-        fmt::print("LBFGS: threads = {}\n", num_threads);
-        fmt::print("LBFGS: Skin = {}\n", skin);
-      }
-
-      // Avoid floating point comparison warnings.
-      constexpr std::equal_to<> eq;
-
-      if (double r_cut = pot.r_cut() + skin; !eq(std::exchange(m_r_cut, r_cut), r_cut) || !m_nl) {
-        m_nl = neigh::List(m_box, r_cut);
-
-        if (m_opt.debug) {
-          fmt::print("LBFGS: Reallocating neigh list\n");
-        }
-      }
-
-      out[r_] = in[r_];  // Initialise out = in;
-
-      m_nl->rebuild(out, num_threads);
-
-      pot.gradient(out, in, *m_nl, num_threads);
-
-      double trust = m_opt.min_trust;
-
-      double acc = 0;
-      double convex_count = 0;
-
-      for (int i = 0; i < m_opt.iter_max; ++i) {
-        //
-        double mag_g = gnorm_sq(out[g_]);
-
-        if (m_opt.debug) {
-          fmt::print("LBFGS: i={:<4} trust={:f} acc={:f} norm(g)={:e} rebuild={}\n", i, trust, acc, std::sqrt(mag_g), eq(acc, 0.0));
-        }
-
-        if (m_opt.fout) {
-          m_opt.fout->commit([&] { (m_opt.fout->write(P1{}, out), ...); });
-        }
-
-        if (mag_g < m_opt.f2norm * m_opt.f2norm) {
-          return success;
-        } else if (convex_count >= m_opt.convex_max) {
-          if (m_opt.debug) {
-            fmt::print("LBFGS: Early exit - curvature\n");
-          }
-          return positive_curv;
-        }
-
-        auto &Hg = m_core.newton_step<Position, PotentialGradient>(out, out);
-
-        ASSERT(gdot(out[g_], Hg[del_]) > 0, "Ascent direction in lbfgs", 0);
-
-        // Limit step size.
-        Hg[del_] *= std::min(1.0, trust / gnorm(Hg[del_]));
-
-        // Add distance of most displaced atom
-        acc += std::sqrt((Hg[del_] * Hg[del_]).colwise().sum().maxCoeff());
-
-        // Update positions in real space
-        out[r_] -= Hg[del_];
-
-        if (acc > 0.5 * skin) {
-          m_nl->rebuild(out, num_threads);
-          acc = 0;
-        } else {
-          m_nl->update(Hg);
-        }
-
-        pot.gradient(out, in, *m_nl, num_threads);
-
-        pot.visit([&](auto const &underlying) {
-          if constexpr (std::is_same_v<remove_cref_t<decltype(underlying)>, potential::Dimer>) {
-            if (underlying.curv() > 0) {
-              convex_count += 1;
-            } else {
-              convex_count = 0;
-            }
-          }
-        });
-
-        double proj = gdot(out[g_], Hg[del_]);
-
-        if (proj < -m_opt.proj_tol) {
-          trust = std::max(m_opt.min_trust, m_opt.shrink_trust * trust);
-        } else if (proj > m_opt.proj_tol) {
-          trust = std::min(m_opt.max_trust, m_opt.grow_trust * trust);
-        }
-      }
-
-      return iter_max;
-    }
+    auto minimise(system::SoA<Position &, PotentialGradient &> out,
+                  system::SoA<Position const &, TypeID const &, Frozen const &> in,
+                  potential::Generic &pot,
+                  int num_threads = 1) -> bool;
 
   private:
     Options m_opt;

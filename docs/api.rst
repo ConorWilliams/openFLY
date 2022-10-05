@@ -14,6 +14,7 @@ Welcome to the libFLY API reference this serves as information for developers to
    api/neighbour.rst
    api/potential.rst
    api/minimise.rst
+   api/saddle.rst
    
 
 

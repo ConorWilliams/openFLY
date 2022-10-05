@@ -15,9 +15,9 @@
 #include "libfly/minimise/LBFGS/lbfgs.hpp"
 #include "libfly/neigh/list.hpp"
 #include "libfly/neigh/sort.hpp"
-#include "libfly/potential/ROT/dimer.hpp"
 #include "libfly/potential/generic.hpp"
 #include "libfly/saddle//find.hpp"
+#include "libfly/saddle/dimer.hpp"
 #include "libfly/saddle/perturb.hpp"
 #include "libfly/system/SoA.hpp"
 #include "libfly/system/atom.hpp"
@@ -73,12 +73,7 @@ int main() {
 
   //   WORK
 
-  minimise::LBFGS::Options opt;
-
-  opt.debug = true;
-  opt.fout = &fout;
-
-  minimise::LBFGS minimiser(opt, cell.box());
+  minimise::LBFGS minimiser({}, cell.box());
 
   potential::Generic pot{
       potential::EAM{
@@ -103,7 +98,7 @@ int main() {
 
   std::random_device dev;
 
-  Xoshiro rng({0, 0, 1, 3});
+  Xoshiro rng({0, 0, 1, dev()});
 
   saddle::perturb(dcell, rng, dcell.box(), dcell(r_, 113), dcell, 4, 0.6);
 
@@ -112,26 +107,30 @@ int main() {
     fout.write(fly::ax_, dcell);
   });
 
-  potential::Dimer::Options opt2;
+  saddle::Dimer::Options opt1;
+
+  opt1.debug = true;
+  opt1.fout = &fout;
+
+  saddle::Rotor::Options opt2;
 
   opt2.debug = true;
   //   opt2.relax_in_convex = false;
 
-  potential::Generic dimer{
-      potential::Dimer{
-          opt2,
-          pot,
-      },
+  saddle::Dimer dimer{
+      opt1,
+      opt2,
+      dcell.box(),
   };
 
   fly::system::SoA<Position, Axis> init{dcell};
 
-  bool sp = timeit("warmup", [&] { return minimiser.minimise(dcell, dcell, dimer, omp_get_max_threads()); });
+  bool sp = timeit("warmup", [&] { return dimer.step(dcell, dcell, pot, 10000, omp_get_max_threads()); });
 
   for (size_t i = 0; i < 0; i++) {
     dcell[r_] = init[r_];
     dcell[ax_] = init[ax_];
-    sp = timeit("FindSP", [&] { return minimiser.minimise(dcell, dcell, dimer, omp_get_max_threads()); });
+    sp = timeit("FindSP", [&] { return dimer.step(dcell, dcell, pot, 10000, omp_get_max_threads()); });
   }
 
   fout.commit([&] {

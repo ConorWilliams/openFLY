@@ -23,7 +23,6 @@
 
 #include "libfly/neigh/list.hpp"
 #include "libfly/potential/EAM/eam.hpp"
-#include "libfly/potential/ROT/dimer.hpp"
 #include "libfly/system/SoA.hpp"
 #include "libfly/system/hessian.hpp"
 #include "libfly/system/property.hpp"
@@ -34,12 +33,7 @@
  *
  * @brief Generic potential energy class.
  *
- * In libFLY potentials have concrete implementations to cut-down compile times. Potentials get info about atoms via a ``SoA``. This
- * allows potentials to slice generic supercells while remaining concrete. However, a traditional virtual interface for potentials
- * would overly constrain the input to potentials (e.g what about a potential that needs a different per-atom property e.g. charge).
- * Hence, the generic potential interface accepts generic ``SoA``s, if the ``SoA`` can be statically sliced to the potential's desired
- * input then this computation occurs otherwise, an error is thrown at run-time. This delaying of errors until run-time enables a
- * single variant-like class to store a set of potentials that do not share a common interface.
+ * Potentials get info about atoms via a ``SoA``. This allows potentials to slice generic supercells while remaining concrete.
  */
 
 namespace fly::potential {
@@ -60,7 +54,7 @@ namespace fly::potential {
     template <typename Potential, typename... Args>
     using Hessian = decltype(std::declval<Potential>().hessian(std::declval<Args>()...));
 
-    using variant = std::variant<EAM, Dimer>;
+    using variant = std::variant<EAM>;
 
     // clang-format on
   public:
@@ -98,14 +92,14 @@ namespace fly::potential {
      * Can assume the neighbour list are ready.
      *
      * @param in Per-atom data used by potential for computation.
-     * @param nl Neighbour list (in ready state i.e. neigh::List::update() or neigh::List::rebuild() called).
+     * @param nl Neighbour list (in ready state i.e. neigh::List::update() or neigh::List::rebuild() called) configured with a cut-off
+     * at least ``r_cut()``.
      * @param threads Number of openMP threads to use.
-     * @return double The potential energy of the system of atoms.
+     * @return The potential energy of the system of atoms.
      */
-    template <typename... Ts>
-    auto energy(system::SoA<Ts...> const& in, neigh::List const& nl, int threads = 1) -> double {
+    auto energy(system::SoA<TypeID const&, Frozen const&> in, neigh::List const& nl, int threads = 1) -> double {
       return ::fly::visit(m_pot, [&, threads](auto& pot) -> double {
-        if constexpr (is_detected_v<Energy, decltype(pot), system::SoA<Ts...> const&, neigh::List const&, int>) {
+        if constexpr (is_detected_v<Energy, decltype(pot), decltype(in), decltype(nl), decltype(threads)>) {
           return pot.energy(in, nl, threads);
         } else {
           throw error("Generic potential {}, does not support .energy(...) of this system.", m_pot.index());
@@ -118,18 +112,19 @@ namespace fly::potential {
      *
      * Can assume the neighbour list are ready, force on frozen atoms must be zero.
      *
-     * This function is some-what generalised, allows output of additional per-atom quantities and does not requires a ``const
-     * neigh::List``. This allows for more generic concepts of a potential.
      *
      * @param out Result is written here.
      * @param in Per-atom data used by potential for computation.
-     * @param nl Neighbour list (in ready state i.e. neigh::List::update() or neigh::List::rebuild() called).
+     * @param nl Neighbour list (in ready state i.e. neigh::List::update() or neigh::List::rebuild() called) configured with a cut-off
+     * at least ``r_cut()``.
      * @param threads Number of openMP threads to use.
      */
-    template <typename... T, typename... U>
-    auto gradient(system::SoA<T...>& out, system::SoA<U...> const& in, neigh::List& nl, int threads = 1) -> void {
-      return ::fly::visit(m_pot, [&](auto& pot) {
-        if constexpr (is_detected_v<Gradient, decltype(pot), system::SoA<T...>&, system::SoA<U...> const&, neigh::List&, int>) {
+    auto gradient(system::SoA<PotentialGradient&> out,
+                  system::SoA<TypeID const&, Frozen const&> in,
+                  neigh::List const& nl,
+                  int threads = 1) -> void {
+      return ::fly::visit(m_pot, [&, threads](auto& pot) {
+        if constexpr (is_detected_v<Gradient, decltype(pot), decltype(out), decltype(in), decltype(nl), decltype(threads)>) {
           pot.gradient(out, in, nl, threads);
         } else {
           throw error("Generic potential {}, does not support .gradient(...) of this system.", m_pot.index());
@@ -143,28 +138,20 @@ namespace fly::potential {
      * Can assume the neighbour list are ready. The resulting hessian must be m by m and only include contributions from the m active
      * atoms. As hessian matrices are always symmetric this function is only required to compute the lower diagonal portion.
      *
-     * @param in er-atom data used by potential for computation.
+     * @param in Per-atom data used by hessian for computation.
      * @param out Hessian matrix to write output to.
-     * @param nl Neighbour list (in ready state i.e. neigh::List::update() or neigh::List::rebuild() called).
+     * @param nl Neighbour list (in ready state i.e. neigh::List::update() or neigh::List::rebuild() called) configured with a cut-off
+     * at least ``r_cut()``.
      * @param threads Number of openMP threads to use.
      */
-    template <typename... Ts>
-    auto hessian(system::Hessian& out, system::SoA<Ts...> const& in, neigh::List const& nl, int threads = 1) -> void {
+    auto hessian(system::Hessian& out, system::SoA<TypeID const&, Frozen const&> in, neigh::List const& nl, int threads = 1) -> void {
       return ::fly::visit(m_pot, [&](auto& pot) {
-        if constexpr (is_detected_v<Hessian, decltype(pot), system::Hessian&, system::SoA<Ts...> const&, neigh::List const&, int>) {
-          pot.hessian(in, out, nl, threads);
+        if constexpr (is_detected_v<Hessian, decltype(pot), decltype(out), decltype(in), decltype(nl), decltype(threads)>) {
+          pot.hessian(out, in, nl, threads);
         } else {
           throw error("Generic potential {}, does not support .hessian(...) of this system.", m_pot.index());
         }
       });
-    }
-
-    /**
-     * @brief Visit the underlying std::variant with the ``visitor``.
-     */
-    template <typename F>
-    auto visit(F&& visitor) -> decltype(auto) {
-      return ::fly::visit(m_pot, std::forward<F>(visitor));
     }
 
   private:

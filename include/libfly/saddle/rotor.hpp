@@ -20,33 +20,26 @@
 
 #include "libfly/minimise/LBFGS/lbfgs_core.hpp"
 #include "libfly/neigh/list.hpp"
+#include "libfly/potential/generic.hpp"
 #include "libfly/system/SoA.hpp"
 #include "libfly/system/property.hpp"
 #include "libfly/utility/core.hpp"
 
 /**
- * \file dimer.hpp
+ * \file rotor.hpp
  *
- * @brief A second-order potential.
+ * @brief Class to orient a dimer.
  */
 
-namespace fly::potential {
+namespace fly::saddle {
 
   /**
-   * @brief Forward declare.
+   * @brief Orients a dimer to align it with the minimum eigen-mode.
    */
-  class Generic;
-
-  /**
-   * @brief Dimer is a potential adaptor.
-   *
-   * Wraps a potential and inverts the component of the gradient parallel to the minimum mode. This allows a minimiser to act as a
-   * saddle point searcher.
-   */
-  class Dimer {
+  class Rotor {
   public:
     /**
-     * @brief Configure the dimers internal minimisation pass.
+     * @brief Configure the dimers rotation minimisation pass.
      */
     struct Options {
       /** @brief L-BFGS core rotation-history size. */
@@ -64,68 +57,67 @@ namespace fly::potential {
     };
 
     /**
-     * @brief Construct a new Dimer object.
+     * @brief Construct a new Rotor object.
      *
-     * @param opt Options for minimisation pass.
-     * @param to_wrap Potential to wrap.
+     * @param opt Options for rotor minimisation pass.
      */
-    Dimer(Options const& opt, potential::Generic const& to_wrap);
+    explicit Rotor(Options const &opt) : m_opt(opt), m_core(opt.n) {}
 
     /**
-     * @brief Copy construct a new Dimer object.
+     * @brief Copy construct a new Rotor object.
      */
-    Dimer(Dimer const&);
+    Rotor(Rotor const &) = default;
 
     /**
-     * @brief Move construct a new Dimer object.
+     * @brief Move construct a new Rotor object.
      */
-    Dimer(Dimer&&) noexcept;
-
-    /**
-     * @brief Get this potentials cut-off radius that the neighbour lists should be configured for.
-     *
-     * This is the wrapped potentials cut-off plus two times delta_r, this means we can displace every atom by delta_r during the
-     * minimisation pass and the not need to rebuild the neighbour lists.
-     */
-    double r_cut() const noexcept;
+    Rotor(Rotor &&) = default;
 
     /**
      * @brief Compute the effective potential's gradient.
      *
-     * This is achieved by inverting the component of the gradient parallel to the minimum eigen-mode of the wrapped potential. The
+     * This is achieved by inverting the component of the gradient parallel to the minimum eigen-mode of the potential. The dimer is
+     * rotated using the LBFGS algorithm to make it align with the minimum eigen-mode.
      *
-     * Assumes the neighbour list are ready, force on frozen atoms will be zero.
+     * Assumes the neighbour list is ready, force on frozen atoms will be zero.
      *
      * \rst
      *
-     * This function does actually modify neighbour but returns it to an identical state after it is done.
+     * .. note::
+     *    This function does actually modify neighbour but returns it to an identical state after it is done. It guarantees not to call
+     *    ``neigh::List::rebuild()``.
      *
      * \endrst
      *
      * @param in Per-atom input properties
-     * @param out Write effective gradient and final axis orientation here.
-     * @param nl Neighbour list (in ready state i.e. neigh::List::update() or neigh::List::rebuild() called).
+     * @param out Write effective gradient here.
+     * @param inout The axis input and output.
+     * @param nl Neighbour list (in ready state i.e. neigh::List::update() or neigh::List::rebuild() called) configured with a cut-off
+     * at least ``r_cut()``.
+     * @param pot The potential energy function.
      * @param threads Number of openMP threads to use.
      * @return The approximate curvature of the wrapped potential along the output Axis.
      */
-    auto gradient(system::SoA<PotentialGradient&, Axis&> out,
-                  system::SoA<TypeID const&, Frozen const&, Axis const&> in,
-                  neigh::List& nl,
-                  int threads = 1) -> double;
+    auto eff_gradient(system::SoA<PotentialGradient &> out,
+                      system::SoA<Axis &> inout,
+                      system::SoA<TypeID const &, Frozen const &> in,
+                      potential::Generic &pot,
+                      neigh::List &nl,
+                      int threads = 1) -> double;
 
     /**
-     * @brief Fetch the curvature.
+     * @brief Compute the cut-off radius.
      *
-     * This fetches a cached version of the last call to ``gradient()``.
+     * This is the cut-off that ``nl`` in call to ``eff_grad()`` with potential ``pot`` must be configured with.
+     *
+     * @param pot Potential that ``eff_grad()`` will be called with.
+     * @return auto A slightly larger cut-off that enables ``eff_grad`` to displace atoms a little without rebuilding the nl.
      */
-    double curv() const noexcept { return m_curv; }
+    auto r_cut(potential::Generic const &pot) const noexcept { return pot.r_cut() + m_opt.delta_r * 2; }
 
   private:
     Options m_opt;
     minimise::StepLBFGS m_core;
-    std::unique_ptr<potential::Generic> m_wrapped;
-
-    double m_curv;
 
     system::SoA<Delta> m_delta;       // Store displacement for updates
     system::SoA<Delta> m_delta_prev;  // Store previous displacement for updates
@@ -139,4 +131,4 @@ namespace fly::potential {
     system::SoA<Delta> m_delta_g;  // Gradient difference
   };
 
-}  // namespace fly::potential
+}  // namespace fly::saddle

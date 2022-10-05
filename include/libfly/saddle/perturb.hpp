@@ -30,26 +30,33 @@
 namespace fly::saddle {
 
   /**
-   * @brief Provide a random perturbation to every atom within rcut of centre.
+   * @brief Provide a random perturbation to every atom within r_cut of a point.
    *
-   * Uses the minimum image distance to determine distance from centre. The perturbation is Gaussian
-   * in each coordinate axis and has standard deviation stddev. An envelope function will linearly
-   * decrease the size of each atoms perturbation based off its distance to the centre.
+   * Uses the minimum image distance to determine distance from centre. The perturbation is Gaussian in each coordinate axis and has
+   * standard deviation ``stddev``. An envelope function will linearly decrease the size of each atoms perturbation based off its
+   * distance to the centre. The axis will be normalised as appropriate. Frozen atoms will not be perturbed.
    *
-   * @param out
-   * @param urbg
-   * @param box
-   * @param centre
-   * @param cell
-   * @param rcut
-   * @param stddev
+   * \rst
+   * .. tip::
+   *    This function uses an expensive method for computing the minimum image convention. If calling this many times on the same
+   *    initial condition it may be more efficient to compute and re-use a neighbour list.
+   *
+   * \endrst
+   *
+   * @param out Output the perturbed state and randomised axis here.
+   * @param urbg Random number generator.
+   * @param box Simulation space.
+   * @param centre Origin of perturbation.
+   * @param cell Input parameters.
+   * @param r_cut All atoms within ``r_cut`` of ``centre`` will be perturbed.
+   * @param stddev Standard deviation of Gaussian perturbations.
    */
   void perturb(system::SoA<Position&, Axis&> out,
                Xoshiro& urbg,
                system::Box const& box,
                Position::matrix_t const& centre,
                system::SoA<Position const&, Frozen const&> cell,
-               double rcut,
+               double r_cut,
                double stddev);
 
 }  // namespace fly::saddle

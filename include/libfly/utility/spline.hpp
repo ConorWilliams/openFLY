@@ -107,7 +107,9 @@ namespace fly {
 
       auto i = static_cast<std::size_t>(x * m_inv_dx);
 
-      // Could clamp this value:  i = std::min(i, m_spines.size() - 1)
+      // Could clamp this value:  
+      
+      i = std::min(i, m_spines.size() - 1);
 
       ASSERT(i < m_spines.size(), "x={} is outside tabulated region with i={}, len={}", x, i, m_spines.size());
 

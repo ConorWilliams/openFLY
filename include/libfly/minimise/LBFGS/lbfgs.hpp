@@ -54,7 +54,7 @@ namespace fly::minimise {
       /** @brief Number of steps before exit with failure. */
       int iter_max = 2000;
       /** @brief Force convergence criterion (eV/Angstroms). */
-      double f2norm = 1e-5;
+      double f2norm = 1e-6;
       /**
        * @brief Used to determine the skin size.
        *

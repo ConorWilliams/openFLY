@@ -80,6 +80,8 @@ Changed
 - Unified minimiser, saddle finder and dimer return codes to follow C conventions (truthy on failure);
 - De-generalised ``SoA``'s converting constructors to allow implicit casts.
 - Read methods on ``BinaryFile`` are ``const``.
+- ``LBFGS`` force tolerance default tightened.
+- ``Spline`` clamps interval.
 
 Bugfixes
 ~~~~~~~~

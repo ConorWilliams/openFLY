@@ -49,7 +49,7 @@ namespace fly::saddle {
       /** @brief Half dimer length. */
       double delta_r = 0.001;
       /** @brief (Rad) rotation convergence criterion. */
-      double theta_tol = 2 * M_PI / 360.;
+      double theta_tol = 1 * M_PI / 360.;
       /** @brief If true when convex we return only the component parallel to the min mode. */
       bool relax_in_convex = true;
       /** @brief Print out debug info. */

@@ -60,20 +60,20 @@ int main() {
 
   system::Supercell cell = supercell_from<Position, Frozen, PotentialGradient, Axis>("data/xyz/V1-unrelaxed.gsd", 0);
 
-  system::Supercell old = cell;
+//   system::Supercell old = cell;
 
-  cell.destructive_resize(old.size() + 1);
+//   cell.destructive_resize(old.size() + 1);
 
-  for (int i = 0; i < old.size(); i++) {
-    cell(r_, i) = old(r_, i);
-    cell(id_, i) = old(id_, i);
-  }
+//   for (int i = 0; i < old.size(); i++) {
+//     cell(r_, i) = old(r_, i);
+//     cell(id_, i) = old(id_, i);
+//   }
 
-  cell(r_, old.size()) = Vec{2.4, 1.4, 1.4};
+//   cell(r_, old.size()) = Vec{0.4, 1.4, 1.4};
 
-  cell(id_, old.size()) = 1;
+//   cell(id_, old.size()) = 1;
 
-  cell[fzn_] = false;
+//   cell[fzn_] = false;
 
   //   auto cell = make_super();
 
@@ -88,7 +88,7 @@ int main() {
 
   //   WORK
 
-  minimise::LBFGS minimiser({.debug = true, .fout = &fout}, cell.box());
+  minimise::LBFGS minimiser({.debug = false, .fout = nullptr}, cell.box());
 
   potential::Generic pot{
       potential::EAM{
@@ -113,33 +113,22 @@ int main() {
 
   std::random_device dev;
 
-  Xoshiro rng({0, 0, 1, dev()});
+  Xoshiro rng({0, 0, 1, 1});
 
-  //   saddle::perturb(dcell, rng, dcell.box(), dcell(r_, 113), dcell, 6, 0.5);
+    saddle::perturb(dcell, rng, dcell.box(), dcell(r_, 113), dcell, 6, 0.5);
 
   fout.commit([&] {
     fout.write(fly::r_, dcell);  //< Write the positions of perturbed the atoms.
-    // fout.write(fly::ax_, dcell);
   });
 
-  saddle::Dimer::Options opt1;
-
-  opt1.debug = true;
-  opt1.fout = &fout;
-
-  saddle::Rotor::Options opt2;
-
-  opt2.debug = true;
-  //   opt2.relax_in_convex = false;
-
   saddle::Dimer dimer{
-      opt1,
-      opt2,
+      {.debug = true, .fout = &fout},
+      {.debug = true},
       dcell.box(),
   };
 
   saddle::MasterFinder finder{{
-                                  .stddev = 0.4,
+                                  .stddev = 0.6,
                                   .num_threads = omp_get_max_threads(),
                                   .debug = true,
                                   .fout = &fout,
@@ -149,13 +138,13 @@ int main() {
                               minimiser,
                               dimer};
 
-  finder.find_all(dcell.box(), {113}, dcell);
+//   finder.find_all(dcell.box(), {113}, dcell);  // 685
 
-  exit(1);
+//   exit(1);
 
-  //   fly::system::SoA<Position, Axis> init{dcell};
+    fly::system::SoA<Position, Axis> init{dcell};
 
-  //   bool sp = timeit("warmup", [&] { return dimer.step(dcell, dcell, pot, 10000, omp_get_max_threads()); });
+    bool sp = timeit("warmup", [&] { return dimer.step(dcell, dcell, pot, 10000, omp_get_max_threads()); });
 
   //   for (size_t i = 0; i < 1; i++) {
   //     dcell[r_] = init[r_];

@@ -60,11 +60,11 @@ namespace fly::saddle {
        *
        * The initial system randomly perturbed to produce a starting-point for saddle-point finding. The perturbation is Gaussian in
        * each coordinate axis with standard deviation ``stddev``. An envelope function will linearly decrease the size of each atoms
-       * perturbation based off its distance to a central atom. Only atoms closer than ''r_pert'' will be perturbed.
+       * perturbation based off its distance to a central atom. Only atoms closer than ``r_pert`` will be perturbed.
        */
       double r_pert = 4;
       /**
-       * @brief The standard deviation of the random perturbations, see ''r_pert''.
+       * @brief The standard deviation of the random perturbations, see ``r_pert``.
        */
       double stddev = 0.6;
       /**
@@ -74,7 +74,7 @@ namespace fly::saddle {
       /**
        * @brief Tolerance for basins to be considered distinct.
        */
-      double basin_tol = 0.1;
+      double basin_tol = 0.25;
 
       /**
        * @brief Tolerance for stationary points to be considered distinct.
@@ -83,19 +83,24 @@ namespace fly::saddle {
       /**
        * @brief Number of openMP threads to dispatch saddle-point finding to.
        */
-      int num_threads = 4;
+      int num_threads = 1;
       /**
        * @brief Maximum number of searches per environment.
        */
-      int max_searches = 50;
+      int max_searches = 75;
       /**
        * @brief Maximum number of consecutive failed searches per environment.
        */
-      int max_failed_searches = 10;
+      int max_failed_searches = 50;
+
+      /**
+       * @brief Number of simultaneous SP searches per new environment.
+       */
+      int batch_size = 10;
       /**
        * @brief Fraction of distance between initial position and SP that dimer is displaced along its axis before minimisation.
        */
-      double nudge_frac = 0.1;
+      double nudge_frac = 0.02;
       /**
        * @brief Print out debugging info.
        */
@@ -147,24 +152,97 @@ namespace fly::saddle {
       neigh::List nl{box, m_opt.r_pert};
 
       nl.rebuild(in, m_opt.num_threads);
+
+      std::vector<std::vector<Pathway>> mechs(unknown.size());
+
       //
 #pragma omp parallel
 #pragma omp single nowait
       {
-        for (int index : unknown) {
-#pragma omp task untied default(none) firstprivate(index) shared(in, nl)
-          {
+        for (std::size_t j = 0; j < mechs.size(); ++j) {
             //
+            int index = unknown[j];
+          
+#pragma omp task untied default(none) firstprivate(index, j) shared(in, nl, mechs)
+          {
+            std::vector<std::optional<Pathway>> batch(safe_cast<std::size_t>(m_opt.batch_size));
 
-            std::optional<Pathway> p = find_one(in, nl, index);
+            int tot = 0;
+            int fail = 0;
 
-            // thread().dimer.step();
+            while (tot < m_opt.max_searches && fail < m_opt.max_failed_searches) {
+              //  Do batch_size SP searches
+              for (std::size_t i = 0; i < batch.size(); i++) {
+#pragma omp task untied default(none) firstprivate(index, i) shared(in, nl, batch)
+                {
+          
+                  batch[i] = find_one(in, nl, index);
+                
+                }
+              }
+
+#pragma omp taskwait
+              // Process batch
+              for (std::optional<Pathway>& elem : batch) {
+                if (elem && push_if_new( mechs[j], std::move(*elem))) {
+                  fail = 0;
+                } else {
+                  fail++;
+                }
+              }
+
+              tot += m_opt.batch_size;
+
+              if(m_opt.debug){
+                fmt::print("FINDER: Found {} mech(s) at {}: fail={}, tot={}\n",  mechs[j].size(), index, fail, tot);
+              }
+            }
           }
         }
       }
-    }  // namespace fly::saddle
+
+    if(m_opt.fout){
+        for(auto&& m : mechs){
+            for(auto && v : m){
+                m_opt.fout->commit([&]{
+                    m_opt.fout->write(r_, v.rev);
+                });
+                m_opt.fout->commit([&]{
+                    m_opt.fout->write(r_, v.sp);
+                });
+                  m_opt.fout->commit([&]{
+                    m_opt.fout->write(r_, v.fwd);
+                });
+
+                if(m_opt.debug){
+                    neigh::List nl2{box, thread().pot.r_cut()};
+
+                    nl2.rebuild(v.rev,  m_opt.num_threads);
+
+                    double E0 = thread().pot.energy(in, nl2, m_opt.num_threads); 
+
+                    nl2.rebuild(v.sp,  m_opt.num_threads);
+
+                    double Esp = thread().pot.energy(in, nl2, m_opt.num_threads); 
+
+                    fmt::print("Delta={}eV\n", Esp - E0);
+                }
+            }
+        }
+    }
+
+    }  
 
   private:
+    struct Pathway {
+      system::SoA<Position> rev;
+      system::SoA<Position> sp;
+      system::SoA<Position> fwd;
+
+      template <typename T, typename U, typename V>
+      Pathway(T&& t, U&& u, V&& v) : rev(std::forward<T>(t)), sp(std::forward<U>(u)), fwd(std::forward<V>(v)) {}
+    };
+
     struct ThreadData {
       potential::Generic pot;
       minimise::LBFGS min;
@@ -175,6 +253,37 @@ namespace fly::saddle {
     std::vector<ThreadData> m_data;
 
     Options m_opt;
+
+    // Returns true if managed to push.
+     bool push_if_new(std::vector<Pathway> & found, Pathway&& maybe) const noexcept {
+        for(Pathway const & elem : found){
+
+            double dsp = gnorm(elem.sp[r_] - maybe.sp[r_]); // SP displacement vector.
+            double dfwd = gnorm(elem.fwd[r_] - maybe.fwd[r_]); // FWD displacement vector.
+
+            if (m_opt.debug)
+            {
+                fmt::print("FINDER: dsp={} dfwd={}\n", dsp, dfwd);
+            }
+
+            // fmt::print("Range: {}\n", (elem.sp[r_] - maybe.sp[r_]).head(25));
+            Eigen::Index maxRow;
+            auto mm = (elem.sp[r_] - maybe.sp[r_]).abs().maxCoeff(&maxRow);
+            fmt::print("I max = {} @ {}, {}\n", mm, maxRow, maxRow /3);
+
+            if(dsp < m_opt.basin_tol && dfwd < m_opt.basin_tol){
+                if (m_opt.debug)
+                {
+                    fmt::print("FINDER: Found same SP as before\n");
+                }
+                return false;
+            }
+        }
+
+        found.push_back(std::move(maybe));
+
+        return true;
+    }
 
     // Find the indices of minimally and maximally separated atoms.
     static std::pair<int, int> min_max(system::SoA<Position const&> a, system::SoA<Position const&> b) {
@@ -205,14 +314,7 @@ namespace fly::saddle {
       return {min, max};
     }
 
-    struct Pathway {
-      system::SoA<Position> rev;
-      system::SoA<Position> sp;
-      system::SoA<Position> fwd;
 
-      template <typename T, typename U, typename V>
-      Pathway(T&& t, U&& u, V&& v) : rev(std::forward<T>(t)), sp(std::forward<U>(u)), fwd(std::forward<V>(v)) {}
-    };
 
     std::optional<Pathway> find_one(system::SoA<Position const&, Frozen const&, TypeID const&> in, neigh::List const& nl, int index) {
       //
@@ -242,9 +344,9 @@ namespace fly::saddle {
       }
 
       if (double dr = gnorm(in(r_, min) - walker(r_, min)); dr > m_opt.freeze_tol) {
-        throw error("Trying to freeze an atom {} that displaced {}", min, dr);
+        throw error("FINDER: Trying to freeze an atom {} that displaced {}", min, dr);
       } else if (m_opt.debug) {
-        fmt::print("Freezing atom #{}\n", min);
+        fmt::print("FINDER: Freezing atom #{}\n", min);
       }
 
       double disp = gnorm(walker[r_] - in[r_]);
@@ -280,33 +382,40 @@ namespace fly::saddle {
 
       if (i2r > m_opt.basin_tol) {
         if (m_opt.debug) {
-          fmt::print("Mech starting {}A from initial is unlinked\n", i2r);
+          fmt::print("FINDER: Mech starting {}A from initial is unlinked\n", i2r);
         }
         return {};
       }
 
       if (double r2f = gnorm(fwd[r_] - rev[r_]); r2f < m_opt.basin_tol) {
         if (m_opt.debug) {
-          fmt::print("Mech total displacement={} => converged back to initial\n", r2f);
+          fmt::print("FINDER: Mech total displacement={} => converged back to initial\n", r2f);
         }
         return {};
       }
 
       if (double r2w = gnorm(rev[r_] - walker[r_]); r2w < m_opt.stationary_tol) {
         if (m_opt.debug) {
-          fmt::print("Min->Sp displacement={}\n", r2w);
+          fmt::print("FINDER: Min->Sp displacement={}\n", r2w);
         }
         return {};
       }
 
       if (double w2f = gnorm(fwd[r_] - walker[r_]); w2f < m_opt.stationary_tol) {
         if (m_opt.debug) {
-          fmt::print("Sp->Min displacement={}\n", w2f);
+          fmt::print("FINDER: Sp->Min displacement={}\n", w2f);
         }
         return {};
       }
 
-      return Pathway(rev, walker, fwd);
+     
+
+      walker[r_] = in[r_] + walker[r_] - rev[r_];
+      fwd[r_] = in[r_] + fwd[r_] - rev[r_];
+
+      //
+
+      return Pathway(in, walker, fwd);
     }
 
     auto perturb(system::SoA<Position&, Axis&, Frozen const&> inout, int centre, neigh::List const& nl) -> void {
@@ -345,7 +454,7 @@ namespace fly::saddle {
     MasterFinder(MasterFinder const&) { fmt::print("copy\n"); }
 
     ThreadData& thread() {
-      fmt::print("thread {} accesses its data\n", omp_get_thread_num());
+      //   fmt::print("thread {} accesses its data\n", omp_get_thread_num());
       return m_data[safe_cast<std::size_t>(omp_get_thread_num())];
     }
 

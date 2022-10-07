@@ -531,34 +531,127 @@
 </dd></dl>
 
 </section>
-<section id="perturb">
-<h2>Perturb<a class="headerlink" href="#perturb" title="Permalink to this heading">#</a></h2>
-<p>File: <code class="docutils literal notranslate"><span class="pre">libfly/saddle/perturb.hpp</span></code></p>
-<p>Utility for perturbing a supercell. </p>
+<section id="master-saddle-point-finder">
+<h2>Master saddle-point finder<a class="headerlink" href="#master-saddle-point-finder" title="Permalink to this heading">#</a></h2>
+<p>File: <code class="docutils literal notranslate"><span class="pre">libfly/saddle/find.hpp</span></code></p>
+<p>Class to coordinate a group of saddle-point searches. </p>
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv4N3fly6saddle12MasterFinderE">
+<span id="_CPPv3N3fly6saddle12MasterFinderE"></span><span id="_CPPv2N3fly6saddle12MasterFinderE"></span><span id="fly::saddle::MasterFinder"></span><span class="target" id="classfly_1_1saddle_1_1MasterFinder"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">MasterFinder</span></span></span><a class="headerlink" href="#_CPPv4N3fly6saddle12MasterFinderE" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Coordinate saddle-point searches on a node. </p>
+<p>The <code class="docutils literal notranslate"><a class="reference internal" href="#classfly_1_1saddle_1_1MasterFinder"><span class="std std-ref"><span class="pre">MasterFinder</span></span></a></code> coordinates saddle-point finding for a set of openMP threads, typically one <code class="docutils literal notranslate"><a class="reference internal" href="#classfly_1_1saddle_1_1MasterFinder"><span class="std std-ref"><span class="pre">MasterFinder</span></span></a></code> should be instantiated per compute node. Each <code class="docutils literal notranslate"><a class="reference internal" href="#classfly_1_1saddle_1_1MasterFinder"><span class="std std-ref"><span class="pre">MasterFinder</span></span></a></code> stores all the threads reusable objects: minimiser, prng, etc. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
 <dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4N3fly6saddle7perturbEN6system3SoAIR8PositionR4AxisEER7XoshiroRKN6system3BoxERKN8Position8matrix_tEN6system3SoAIRK8PositionRK6FrozenEEdd">
-<span id="_CPPv3N3fly6saddle7perturbEN6system3SoAIR8PositionR4AxisEER7XoshiroRKN6system3BoxERKN8Position8matrix_tEN6system3SoAIRK8PositionRK6FrozenEEdd"></span><span id="_CPPv2N3fly6saddle7perturbEN6system3SoAIR8PositionR4AxisEER7XoshiroRKN6system3BoxERKN8Position8matrix_tEN6system3SoAIRK8PositionRK6FrozenEEdd"></span><span id="fly::saddle::perturb__system::SoA:PositionR.AxisR:.XoshiroR.system::BoxCR.Position::matrix_tCR.system::SoA:PositionCR.FrozenCR:.double.double"></span><span class="target" id="perturb_8hpp_1a7c5a8be3ecf20c2acaea64b1f567c2a1"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">fly</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">saddle</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">perturb</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">system</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="system.html#_CPPv4IDpEN3fly6system3SoAE" title="fly::system::SoA"><span class="n"><span class="pre">SoA</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">Position</span></span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="n"><span class="pre">Axis</span></span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">out</span></span>, <a class="reference internal" href="utility.html#_CPPv4N3fly7XoshiroE" title="fly::Xoshiro"><span class="n"><span class="pre">Xoshiro</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">urbg</span></span>, <span class="n"><span class="pre">system</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="system.html#_CPPv4N3fly6system3BoxE" title="fly::system::Box"><span class="n"><span class="pre">Box</span></span></a><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">box</span></span>, <span class="n"><span class="pre">Position</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">matrix_t</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">centre</span></span>, <span class="n"><span class="pre">system</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="system.html#_CPPv4IDpEN3fly6system3SoAE" title="fly::system::SoA"><span class="n"><span class="pre">SoA</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">Position</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="n"><span class="pre">Frozen</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">cell</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">r_cut</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">stddev</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3fly6saddle7perturbEN6system3SoAIR8PositionR4AxisEER7XoshiroRKN6system3BoxERKN8Position8matrix_tEN6system3SoAIRK8PositionRK6FrozenEEdd" title="Permalink to this definition">#</a><br /></dt>
-<dd><p>Provide a random perturbation to every atom within r_cut of a point. </p>
-<p>Uses the minimum image distance to determine distance from centre. The perturbation is Gaussian in each coordinate axis and has standard deviation <code class="docutils literal notranslate"><span class="pre">stddev</span></code>. An envelope function will linearly decrease the size of each atoms perturbation based off its distance to the centre. The axis will be normalised as appropriate. <a class="reference internal" href="system.html#structfly_1_1builtin__properties_1_1Frozen"><span class="std std-ref">Frozen</span></a> atoms will not be perturbed.</p>
-<p><div class="admonition tip">
-<p class="admonition-title">Tip</p>
-<p>This function uses an expensive method for computing the minimum image convention. If calling this many times on the same
-initial condition it may be more efficient to compute and re-use a neighbour list.</p>
-</div>
-</p>
+<dt class="sig sig-object cpp" id="_CPPv4N3fly6saddle12MasterFinder12MasterFinderERK7OptionsRKN9potential7GenericERKN8minimise5LBFGSERKN6saddle5DimerE">
+<span id="_CPPv3N3fly6saddle12MasterFinder12MasterFinderERK7OptionsRKN9potential7GenericERKN8minimise5LBFGSERKN6saddle5DimerE"></span><span id="_CPPv2N3fly6saddle12MasterFinder12MasterFinderERK7OptionsRKN9potential7GenericERKN8minimise5LBFGSERKN6saddle5DimerE"></span><span id="fly::saddle::MasterFinder::MasterFinder__OptionsCR.potential::GenericCR.minimise::LBFGSCR.saddle::DimerCR"></span><span class="target" id="classfly_1_1saddle_1_1MasterFinder_1af8658d44cec8fffab272492040681661"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">MasterFinder</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N3fly6saddle12MasterFinder7OptionsE" title="fly::saddle::MasterFinder::Options"><span class="n"><span class="pre">Options</span></span></a><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">opt</span></span>, <span class="n"><span class="pre">potential</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="potential.html#_CPPv4N3fly9potential7GenericE" title="fly::potential::Generic"><span class="n"><span class="pre">Generic</span></span></a><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">pot</span></span>, <span class="n"><span class="pre">minimise</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="minimise.html#_CPPv4N3fly8minimise5LBFGSE" title="fly::minimise::LBFGS"><span class="n"><span class="pre">LBFGS</span></span></a><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">min</span></span>, <span class="n"><span class="pre">saddle</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N3fly6saddle5DimerE" title="fly::saddle::Dimer"><span class="n"><span class="pre">Dimer</span></span></a><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">dimer</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3fly6saddle12MasterFinder12MasterFinderERK7OptionsRKN9potential7GenericERKN8minimise5LBFGSERKN6saddle5DimerE" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Construct a new Master Finder object to manage <code class="docutils literal notranslate"><span class="pre">opt.num_threads</span></code> openMP threads. </p>
+<p>This will create <code class="docutils literal notranslate"><span class="pre">opt.num_threads</span></code> copies of each of the input parameters, one for each thread.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>out</strong> – Output the perturbed state and randomised axis here. </p></li>
-<li><p><strong>urbg</strong> – Random number generator. </p></li>
-<li><p><strong>box</strong> – Simulation space. </p></li>
-<li><p><strong>centre</strong> – Origin of perturbation. </p></li>
-<li><p><strong>cell</strong> – Input parameters. </p></li>
-<li><p><strong>r_cut</strong> – All atoms within <code class="docutils literal notranslate"><span class="pre">r_cut</span></code> of <code class="docutils literal notranslate"><span class="pre">centre</span></code> will be perturbed. </p></li>
-<li><p><strong>stddev</strong> – Standard deviation of Gaussian perturbations. </p></li>
+<li><p><strong>opt</strong> – The configuration options. </p></li>
+<li><p><strong>pot</strong> – The potential to use for minimisations and SP searches. </p></li>
+<li><p><strong>min</strong> – The minimiser to relax either side of a SP. </p></li>
+<li><p><strong>dimer</strong> – Used to find SPs. </p></li>
 </ul>
 </dd>
 </dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3fly6saddle12MasterFinder8find_allERKN6system3BoxERKNSt6vectorIiEEN6system3SoAIRK8PositionRK6FrozenRK6TypeIDEE">
+<span id="_CPPv3N3fly6saddle12MasterFinder8find_allERKN6system3BoxERKNSt6vectorIiEEN6system3SoAIRK8PositionRK6FrozenRK6TypeIDEE"></span><span id="_CPPv2N3fly6saddle12MasterFinder8find_allERKN6system3BoxERKNSt6vectorIiEEN6system3SoAIRK8PositionRK6FrozenRK6TypeIDEE"></span><span id="fly::saddle::MasterFinder::find_all__system::BoxCR.std::vector:i:CR.system::SoA:PositionCR.FrozenCR.TypeIDCR:"></span><span class="target" id="classfly_1_1saddle_1_1MasterFinder_1a7c40ba189b7a67af008d4081ea9b9b39"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">find_all</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">system</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="system.html#_CPPv4N3fly6system3BoxE" title="fly::system::Box"><span class="n"><span class="pre">Box</span></span></a><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">box</span></span>, <span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">int</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">unknown</span></span>, <span class="n"><span class="pre">system</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="system.html#_CPPv4IDpEN3fly6system3SoAE" title="fly::system::SoA"><span class="n"><span class="pre">SoA</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">Position</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="n"><span class="pre">Frozen</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="n"><span class="pre">TypeID</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">in</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3fly6saddle12MasterFinder8find_allERKN6system3BoxERKNSt6vectorIiEEN6system3SoAIRK8PositionRK6FrozenRK6TypeIDEE" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Find all the mechanisms centred on the <code class="docutils literal notranslate"><span class="pre">unknown</span></code> atoms. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>box</strong> – Description of the simulation space. </p></li>
+<li><p><strong>unknown</strong> – List of indices of the atoms which the mechanisms must be centred on. </p></li>
+<li><p><strong>in</strong> – Description of system to search in. </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv4N3fly6saddle12MasterFinder7OptionsE">
+<span id="_CPPv3N3fly6saddle12MasterFinder7OptionsE"></span><span id="_CPPv2N3fly6saddle12MasterFinder7OptionsE"></span><span id="fly::saddle::MasterFinder::Options"></span><span class="target" id="structfly_1_1saddle_1_1MasterFinder_1_1Options"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Options</span></span></span><a class="headerlink" href="#_CPPv4N3fly6saddle12MasterFinder7OptionsE" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Configure the saddle-point finding algorithm. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N3fly6saddle12MasterFinder7Options9basin_tolE">
+<span id="_CPPv3N3fly6saddle12MasterFinder7Options9basin_tolE"></span><span id="_CPPv2N3fly6saddle12MasterFinder7Options9basin_tolE"></span><span id="fly::saddle::MasterFinder::Options::basin_tol__double"></span><span class="target" id="structfly_1_1saddle_1_1MasterFinder_1_1Options_1a7fcbd0f1134269d7cf8e3cfded29ed77"></span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">basin_tol</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0.1</span></span><a class="headerlink" href="#_CPPv4N3fly6saddle12MasterFinder7Options9basin_tolE" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Tolerance for basins to be considered distinct. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N3fly6saddle12MasterFinder7Options5debugE">
+<span id="_CPPv3N3fly6saddle12MasterFinder7Options5debugE"></span><span id="_CPPv2N3fly6saddle12MasterFinder7Options5debugE"></span><span id="fly::saddle::MasterFinder::Options::debug__b"></span><span class="target" id="structfly_1_1saddle_1_1MasterFinder_1_1Options_1ab4ba73a96d2561ffabfe0212c7b8ee23"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">debug</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">false</span></span><a class="headerlink" href="#_CPPv4N3fly6saddle12MasterFinder7Options5debugE" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Print out debugging info. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N3fly6saddle12MasterFinder7Options4foutE">
+<span id="_CPPv3N3fly6saddle12MasterFinder7Options4foutE"></span><span id="_CPPv2N3fly6saddle12MasterFinder7Options4foutE"></span><span id="fly::saddle::MasterFinder::Options::fout__io::BinaryFileP"></span><span class="target" id="structfly_1_1saddle_1_1MasterFinder_1_1Options_1a6e4d23571156fd83bf55c3773cb35f95"></span><span class="n"><span class="pre">io</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="io.html#_CPPv4N3fly2io10BinaryFileE" title="fly::io::BinaryFile"><span class="n"><span class="pre">BinaryFile</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">fout</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">nullptr</span></span><a class="headerlink" href="#_CPPv4N3fly6saddle12MasterFinder7Options4foutE" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>If provided write debugging data here. </p>
+<p>It is the users responsibility to ensure the lifetime of <code class="docutils literal notranslate"><span class="pre">fout</span></code> is at least as long as the lifetime of the this object and ensure only a single thread writes to <code class="docutils literal notranslate"><span class="pre">fout</span></code> at any one time. This really only exist for debugging purposes… </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N3fly6saddle12MasterFinder7Options10freeze_tolE">
+<span id="_CPPv3N3fly6saddle12MasterFinder7Options10freeze_tolE"></span><span id="_CPPv2N3fly6saddle12MasterFinder7Options10freeze_tolE"></span><span id="fly::saddle::MasterFinder::Options::freeze_tol__double"></span><span class="target" id="structfly_1_1saddle_1_1MasterFinder_1_1Options_1ae9121e82c4ef5a380534185b8308de6f"></span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">freeze_tol</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0.01</span></span><a class="headerlink" href="#_CPPv4N3fly6saddle12MasterFinder7Options10freeze_tolE" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Tolerance for minimally displaced atom to be frozen (to remove translational error accumulation). </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N3fly6saddle12MasterFinder7Options19max_failed_searchesE">
+<span id="_CPPv3N3fly6saddle12MasterFinder7Options19max_failed_searchesE"></span><span id="_CPPv2N3fly6saddle12MasterFinder7Options19max_failed_searchesE"></span><span id="fly::saddle::MasterFinder::Options::max_failed_searches__i"></span><span class="target" id="structfly_1_1saddle_1_1MasterFinder_1_1Options_1a668a0d6864abefd56883eb51c3612e9a"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">max_failed_searches</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">10</span></span><a class="headerlink" href="#_CPPv4N3fly6saddle12MasterFinder7Options19max_failed_searchesE" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Maximum number of consecutive failed searches per environment. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N3fly6saddle12MasterFinder7Options12max_searchesE">
+<span id="_CPPv3N3fly6saddle12MasterFinder7Options12max_searchesE"></span><span id="_CPPv2N3fly6saddle12MasterFinder7Options12max_searchesE"></span><span id="fly::saddle::MasterFinder::Options::max_searches__i"></span><span class="target" id="structfly_1_1saddle_1_1MasterFinder_1_1Options_1aa59dfdab82878c053284e5366e9f0acd"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">max_searches</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">50</span></span><a class="headerlink" href="#_CPPv4N3fly6saddle12MasterFinder7Options12max_searchesE" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Maximum number of searches per environment. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N3fly6saddle12MasterFinder7Options10nudge_fracE">
+<span id="_CPPv3N3fly6saddle12MasterFinder7Options10nudge_fracE"></span><span id="_CPPv2N3fly6saddle12MasterFinder7Options10nudge_fracE"></span><span id="fly::saddle::MasterFinder::Options::nudge_frac__double"></span><span class="target" id="structfly_1_1saddle_1_1MasterFinder_1_1Options_1ab038afb1ef18493a8804c55ac790a29c"></span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nudge_frac</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0.1</span></span><a class="headerlink" href="#_CPPv4N3fly6saddle12MasterFinder7Options10nudge_fracE" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Fraction of distance between initial position and SP that dimer is displaced along its axis before minimisation. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N3fly6saddle12MasterFinder7Options11num_threadsE">
+<span id="_CPPv3N3fly6saddle12MasterFinder7Options11num_threadsE"></span><span id="_CPPv2N3fly6saddle12MasterFinder7Options11num_threadsE"></span><span id="fly::saddle::MasterFinder::Options::num_threads__i"></span><span class="target" id="structfly_1_1saddle_1_1MasterFinder_1_1Options_1ab43338750ea010251a7d1749803633cf"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">num_threads</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">4</span></span><a class="headerlink" href="#_CPPv4N3fly6saddle12MasterFinder7Options11num_threadsE" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Number of openMP threads to dispatch saddle-point finding to. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N3fly6saddle12MasterFinder7Options6r_pertE">
+<span id="_CPPv3N3fly6saddle12MasterFinder7Options6r_pertE"></span><span id="_CPPv2N3fly6saddle12MasterFinder7Options6r_pertE"></span><span id="fly::saddle::MasterFinder::Options::r_pert__double"></span><span class="target" id="structfly_1_1saddle_1_1MasterFinder_1_1Options_1a704f4b6d8fecc162bc0d9893a5549957"></span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">r_pert</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">4</span></span><a class="headerlink" href="#_CPPv4N3fly6saddle12MasterFinder7Options6r_pertE" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>The cut-off radius of the random perturbation (centred on an atom). </p>
+<p>The initial system randomly perturbed to produce a starting-point for saddle-point finding. The perturbation is Gaussian in each coordinate axis with standard deviation <code class="docutils literal notranslate"><span class="pre">stddev</span></code>. An envelope function will linearly decrease the size of each atoms perturbation based off its distance to a central atom. Only atoms closer than ‘’r_pert’’ will be perturbed. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N3fly6saddle12MasterFinder7Options14stationary_tolE">
+<span id="_CPPv3N3fly6saddle12MasterFinder7Options14stationary_tolE"></span><span id="_CPPv2N3fly6saddle12MasterFinder7Options14stationary_tolE"></span><span id="fly::saddle::MasterFinder::Options::stationary_tol__double"></span><span class="target" id="structfly_1_1saddle_1_1MasterFinder_1_1Options_1afee896c091c552b5d9904a6cd03cf80d"></span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">stationary_tol</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N3fly6saddle12MasterFinder7Options9basin_tolE" title="fly::saddle::MasterFinder::Options::basin_tol"><span class="n"><span class="pre">basin_tol</span></span></a><span class="w"> </span><span class="o"><span class="pre">/</span></span><span class="w"> </span><span class="m"><span class="pre">2</span></span><a class="headerlink" href="#_CPPv4N3fly6saddle12MasterFinder7Options14stationary_tolE" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Tolerance for stationary points to be considered distinct. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N3fly6saddle12MasterFinder7Options6stddevE">
+<span id="_CPPv3N3fly6saddle12MasterFinder7Options6stddevE"></span><span id="_CPPv2N3fly6saddle12MasterFinder7Options6stddevE"></span><span id="fly::saddle::MasterFinder::Options::stddev__double"></span><span class="target" id="structfly_1_1saddle_1_1MasterFinder_1_1Options_1abb32e4c4215af5814ec1dd2949a1aeaa"></span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">stddev</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0.6</span></span><a class="headerlink" href="#_CPPv4N3fly6saddle12MasterFinder7Options6stddevE" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>The standard deviation of the random perturbations, see ‘’r_pert’’. </p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
 </dd></dl>
 
 </section>
@@ -629,7 +722,7 @@ initial condition it may be more efficient to compute and re-use a neighbour lis
 <li><a class="reference internal" href="#">Saddle-point searching</a><ul>
 <li><a class="reference internal" href="#dimer">Dimer</a></li>
 <li><a class="reference internal" href="#rotor">Rotor</a></li>
-<li><a class="reference internal" href="#perturb">Perturb</a></li>
+<li><a class="reference internal" href="#master-saddle-point-finder">Master saddle-point finder</a></li>
 </ul>
 </li>
 </ul>

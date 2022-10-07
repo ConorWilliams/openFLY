@@ -35,15 +35,26 @@ File: ``libfly/saddle/rotor.hpp``
     :undoc-members:
 
 
-Perturb
-------------------
+.. Perturb
+.. ------------------
 
-File: ``libfly/saddle/perturb.hpp``
+.. File: ``libfly/saddle/perturb.hpp``
 
-.. doxygenfile:: libfly/saddle/perturb.hpp
+.. .. doxygenfile:: libfly/saddle/perturb.hpp
+..     :sections: briefdescription detaileddescription
+
+.. .. doxygenfunction:: fly::saddle::perturb
+
+Master saddle-point finder
+----------------------------
+
+File: ``libfly/saddle/find.hpp``
+
+.. doxygenfile:: libfly/saddle/find.hpp
     :sections: briefdescription detaileddescription
 
-.. doxygenfunction:: fly::saddle::perturb
-
+.. doxygenclass:: fly::saddle::MasterFinder
+    :members:
+    :undoc-members:
 
 

@@ -64,6 +64,7 @@ Added
 - New ``xize`` utility function.
 - New ``LBFGS`` class.
 - New ``Hessian`` class.
+- New ``MasterFinder`` class.
 - ``Frozen`` property has a tag to enable GSD IO.
 - ``SoA`` has a new rebind method. 
 
@@ -76,6 +77,7 @@ Changed
 - ``SoA``'s converting constructors are now SFINE friendly.
 - ``SoA``'s base classes are now public.
 - ``TypeMap``'s converting constructor is now SFINE friendly.
+- Unified minimiser, saddle finder and dimer return codes to follow C conventions (truthy on failure);
 - De-generalised ``SoA``'s converting constructors to allow implicit casts.
 - Read methods on ``BinaryFile`` are ``const``.
 

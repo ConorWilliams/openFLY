@@ -184,6 +184,42 @@ namespace fly::system {
       // corresponding base slice. The unnamed template parameter is a dummy to distinguish this from the implicit version.
     }
 
+    //   private:
+    //     template <typename Head, typename... Tail>
+    //     static constexpr Head&& first(Head&& head, Tail const&...) noexcept {
+    //       return std::forward<Head>(head);
+    //     }
+
+    //     template <typename T>
+    //     using add_ref = std::conditional_t<std::is_reference_v<T>, T, T const&>;
+
+    //   public:
+    //     /**
+    //      * @brief Construct a SoA specifying a source for each property.
+    //      *
+    //      * @param args The ith source initializes the ith property.
+    //      */
+    //     template <bool Cond = (sizeof...(Pr) > 0), typename = std::enable_if_t<Cond>>
+    //     explicit SoA(SoA<add_ref<Pr>>... args) : detail::Adaptor<Pr>(args)..., m_size(first(args...).size()) {
+    //       // T -> SoA<T const&>
+    //       // T& -> SoA<T&>
+    //       // T const & -> SoA<T const &>
+    //       ASSERT(((args.size() == m_size) && ...), "SoA constructed from different sizes", 0);
+    //     }
+
+    //     /**
+    //      * @brief Construct a SoA specifying a source for each property.
+    //      *
+    //      * @param args The ith source initializes the ith property.
+    //      */
+    //     template <typename... T, typename = std::enable_if_t<(sizeof...(T) > 1 && sizeof...(T) == sizeof...(Pr))>>
+    //     explicit SoA(T&&... args) : detail::Adaptor<Pr>(std::forward<T>(args))..., m_size(first(args...).size()) {
+    //       // T -> SoA<T const&>
+    //       // T& -> SoA<T&>
+    //       // T const & -> SoA<T const &>
+    //       ASSERT(((args.size() == m_size) && ...), "SoA constructed from different sizes", 0);
+    //     }
+
     /**
      * @brief Defaulted copy assignment operator.
      *

@@ -108,7 +108,7 @@ namespace fly::minimise {
      * @param in Inputs required by potential and at-least Position.
      * @param pot Potential to minimise.
      * @param num_threads Number of openMP threads to use.
-     * @return Exit Status code detailing why minimisation stopped.
+     * @return False if converged to a minima.
      */
     auto minimise(system::SoA<Position &, PotentialGradient &> out,
                   system::SoA<Position const &, TypeID const &, Frozen const &> in,

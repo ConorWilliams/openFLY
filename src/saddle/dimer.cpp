@@ -79,7 +79,7 @@ namespace fly::saddle {
       if (m_opt.fout) {
         m_opt.fout->commit([&] {
           m_opt.fout->write(r_, out);
-          m_opt.fout->write(ax_, out);
+          //   m_opt.fout->write(ax_, out);
         });
       }
 

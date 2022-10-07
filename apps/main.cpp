@@ -60,6 +60,21 @@ int main() {
 
   system::Supercell cell = supercell_from<Position, Frozen, PotentialGradient, Axis>("data/xyz/V1-unrelaxed.gsd", 0);
 
+  system::Supercell old = cell;
+
+  cell.destructive_resize(old.size() + 1);
+
+  for (int i = 0; i < old.size(); i++) {
+    cell(r_, i) = old(r_, i);
+    cell(id_, i) = old(id_, i);
+  }
+
+  cell(r_, old.size()) = Vec{2.4, 1.4, 1.4};
+
+  cell(id_, old.size()) = 1;
+
+  cell[fzn_] = false;
+
   //   auto cell = make_super();
 
   // IO
@@ -73,7 +88,7 @@ int main() {
 
   //   WORK
 
-  minimise::LBFGS minimiser({}, cell.box());
+  minimise::LBFGS minimiser({.debug = true, .fout = &fout}, cell.box());
 
   potential::Generic pot{
       potential::EAM{
@@ -100,11 +115,11 @@ int main() {
 
   Xoshiro rng({0, 0, 1, dev()});
 
-  saddle::perturb(dcell, rng, dcell.box(), dcell(r_, 113), dcell, 4, 0.6);
+  //   saddle::perturb(dcell, rng, dcell.box(), dcell(r_, 113), dcell, 6, 0.5);
 
   fout.commit([&] {
     fout.write(fly::r_, dcell);  //< Write the positions of perturbed the atoms.
-    fout.write(fly::ax_, dcell);
+    // fout.write(fly::ax_, dcell);
   });
 
   saddle::Dimer::Options opt1;
@@ -123,22 +138,37 @@ int main() {
       dcell.box(),
   };
 
-  fly::system::SoA<Position, Axis> init{dcell};
+  saddle::MasterFinder finder{{
+                                  .stddev = 0.4,
+                                  .num_threads = omp_get_max_threads(),
+                                  .debug = true,
+                                  .fout = &fout,
 
-  bool sp = timeit("warmup", [&] { return dimer.step(dcell, dcell, pot, 10000, omp_get_max_threads()); });
+                              },
+                              pot,
+                              minimiser,
+                              dimer};
 
-  for (size_t i = 0; i < 0; i++) {
-    dcell[r_] = init[r_];
-    dcell[ax_] = init[ax_];
-    sp = timeit("FindSP", [&] { return dimer.step(dcell, dcell, pot, 10000, omp_get_max_threads()); });
-  }
+  finder.find_all(dcell.box(), {113}, dcell);
 
-  fout.commit([&] {
-    fout.write(fly::r_, dcell);  //< Write the position of the SP.
-    fout.write(fly::ax_, dcell);
-  });
+  exit(1);
 
-  fmt::print("FoundSP?={}\n", !sp);
+  //   fly::system::SoA<Position, Axis> init{dcell};
+
+  //   bool sp = timeit("warmup", [&] { return dimer.step(dcell, dcell, pot, 10000, omp_get_max_threads()); });
+
+  //   for (size_t i = 0; i < 1; i++) {
+  //     dcell[r_] = init[r_];
+  //     dcell[ax_] = init[ax_];
+  //     sp = timeit("FindSP", [&] { return dimer.step(dcell, dcell, pot, 10000, omp_get_max_threads()); });
+  //   }
+
+  //   fout.commit([&] {
+  //     fout.write(fly::r_, dcell);  //< Write the position of the SP.
+  //     fout.write(fly::ax_, dcell);
+  //   });
+
+  //   fmt::print("FoundSP?={}\n", !sp);
 
   return 0;
 }

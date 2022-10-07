@@ -77,7 +77,7 @@ namespace fly::minimise {
       }
 
       if (mag_g < m_opt.f2norm * m_opt.f2norm) {
-        return true;
+        return false;
       }
 
       auto &Hg = m_core.newton_step<Position, PotentialGradient>(out, out);
@@ -111,7 +111,7 @@ namespace fly::minimise {
       }
     }
 
-    return false;
+    return true;
   }
 
 }  // namespace fly::minimise

@@ -151,6 +151,9 @@ namespace fly::system::detail {
     // Cannot construct from a const view.
     Adaptor(Adaptor<T const&> other) = delete;
 
+    // For consistency with Adaptor<T>
+    explicit Adaptor(Eigen::Index) : Adaptor() {}
+
     Adaptor& operator=(Adaptor const&) = default;
 
     Adaptor& operator=(Adaptor&&) = default;
@@ -171,6 +174,7 @@ namespace fly::system::detail {
      */
     constexpr typename T::matrix_ref_t operator()(T, Eigen::Index i) const {
       //
+      ASSERT(m_data_ptr, "Dereferencing an empty view adaptor.", 0);
       ASSERT(i >= 0 && i < m_data_ptr->size() / T::size(), "Index {} is !< {}", i, m_data_ptr->size() / T::size());
 
       if constexpr (T::is_1x1) {
@@ -214,6 +218,9 @@ namespace fly::system::detail {
     // If constructing from am owning Adaptor then take address of their m_data property, no explicit for construction of a view.
     Adaptor(Adaptor<T> const& other) : m_data_ptr(&other.m_data) {}
 
+    // For consistency with Adaptor<T>
+    explicit Adaptor(Eigen::Index) : Adaptor() {}
+
     Adaptor& operator=(Adaptor const&) = default;
 
     Adaptor& operator=(Adaptor&&) = default;
@@ -235,6 +242,7 @@ namespace fly::system::detail {
      */
     constexpr typename T::matrix_cref_t operator()(T, Eigen::Index i) const {
       //
+      ASSERT(m_data_ptr, "Dereferencing an empty view adaptor.", 0);
       ASSERT(i >= 0 && i < m_data_ptr->size() / T::size(), "Index {} is !< {}", i, m_data_ptr->size() / T::size());
 
       if constexpr (T::is_1x1) {

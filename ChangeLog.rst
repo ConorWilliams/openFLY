@@ -65,6 +65,7 @@ Added
 - New ``LBFGS`` class.
 - New ``Hessian`` class.
 - ``Frozen`` property has a tag to enable GSD IO.
+- ``SoA`` has a new rebind method. 
 
 
 Changed
@@ -129,7 +130,7 @@ Meta
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
 - vcpkg + gsd are now submodules so all dependencies are tracked by Dependabot!
-- Many documentation engancements.
+- Many documentation enhancements.
 
 Version 0.2.0
 --------------------------------

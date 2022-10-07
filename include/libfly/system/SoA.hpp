@@ -105,15 +105,11 @@ namespace fly::system {
      * @brief Construct a new SoA containing 'size' atoms.
      *
      * \rst
-     *
-     * Only SFINE enabled if this SoA owns all its arrays.
-     *
      * .. warning::
-     *    New atoms are uninitialized.
+     *    New atoms are uninitialized, non-owning SoA's contain ``nullptr``.
      * \endrst
      */
-    template <bool OwnsAll = owns_all>
-    explicit SoA(Eigen::Index size, std::enable_if_t<OwnsAll>* = 0) : detail::Adaptor<Pr>(size)..., m_size(size) {}
+    explicit SoA(Eigen::Index size) : detail::Adaptor<Pr>(size)..., m_size(size) {}
 
   private:
     /**
@@ -197,7 +193,7 @@ namespace fly::system {
      *
      * \endrst
      */
-    [[deprecated("Assignment to references will be removed, ref-semantics too unexpected")]] SoA& operator=(SoA const&) = default;
+    SoA& operator=(SoA const&) = default;
 
     /**
      * @brief Defaulted move assignment operator.
@@ -208,7 +204,7 @@ namespace fly::system {
      *
      * \endrst
      */
-    [[deprecated("Assignment to references will be removed, ref-semantics too unexpected")]] SoA& operator=(SoA&&) = default;
+    SoA& operator=(SoA&&) = default;
 
     /**
      * @brief Assign to a SoA with with different properties .
@@ -226,9 +222,26 @@ namespace fly::system {
      * \endrst
      */
     template <typename T, typename = std::enable_if_t<different_SoA_v<T>>>
-    [[deprecated("Assignment to references will be removed, ref-semantics too unexpected")]] SoA& operator=(T&& other) {
+    SoA& operator=(T&& other) {
+      m_size = other.m_size();
       (static_cast<void>(static_cast<detail::Adaptor<Pr>&>(*this) = std::forward<T>(other)), ...);
       return *this;
+    }
+
+    /**
+     * @brief Rebind a reference property to point at ''other''.
+     *
+     * @param other Property tag
+     * @return void
+     */
+    template <typename T, typename U>
+    auto rebind(T, U const& other) -> std::enable_if_t<(std::is_same_v<T&, Pr> || ...) || (std::is_same_v<T const&, Pr> || ...)> {
+      ASSERT(size() == other.size(), "rebinding to a differently sized SoA: {} != {}", size(), other.size());
+      if constexpr ((std::is_same_v<T&, Pr> || ...)) {
+        static_cast<detail::Adaptor<T&>&>(*this) = other;
+      } else {
+        static_cast<detail::Adaptor<T const&>&>(*this) = other;
+      }
     }
 
     // Inherit operators

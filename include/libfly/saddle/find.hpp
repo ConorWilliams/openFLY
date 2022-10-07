@@ -37,13 +37,16 @@
 /**
  * \file find.hpp
  *
- * @brief Utility for perturbing a supercell.
+ * @brief Class to coordinate a group of saddle-point searches.
  */
 
 namespace fly::saddle {
 
   /**
-   * @brief a
+   * @brief Coordinate saddle-point searches on a node.
+   *
+   * The ``MasterFinder`` coordinates saddle-point finding for a set of openMP threads, typically one ``MasterFinder`` should be
+   * instantiated per compute node. Each ``MasterFinder`` stores all the threads reusable objects: minimiser, prng, etc.
    *
    */
   class MasterFinder {
@@ -99,7 +102,7 @@ namespace fly::saddle {
       bool debug = false;
 
       /**
-       * @brief If provided write data
+       * @brief If provided write debugging data here.
        *
        * It is the users responsibility to ensure the lifetime of ``fout`` is at least as long as the lifetime of the this object
        * and ensure only a single thread writes to ``fout`` at any one time. This really only exist for debugging purposes...
@@ -108,12 +111,14 @@ namespace fly::saddle {
     };
 
     /**
-     * @brief Construct a new Master Finder object
+     * @brief Construct a new Master Finder object to manage ``opt.num_threads`` openMP threads.
      *
-     * @param opt
-     * @param pot
-     * @param min
-     * @param dimer
+     * This will create ``opt.num_threads`` copies of each of the input parameters, one for each thread.
+     *
+     * @param opt The configuration options.
+     * @param pot The potential to use for minimisations and SP searches.
+     * @param min The minimiser to relax either side of a SP.
+     * @param dimer Used to find SPs.
      */
     MasterFinder(Options const& opt, potential::Generic const& pot, minimise::LBFGS const& min, saddle::Dimer const& dimer)
         : m_opt{opt} {
@@ -129,11 +134,11 @@ namespace fly::saddle {
     }
 
     /**
-     * @brief s
+     * @brief Find all the mechanisms centred on the ``unknown`` atoms.
      *
-     * @param box
-     * @param unknown
-     * @param in
+     * @param box Description of the simulation space.
+     * @param unknown List of indices of the atoms which the mechanisms must be centred on.
+     * @param in Description of system to search in.
      */
     void find_all(system::Box const& box,
                   std::vector<int> const& unknown,
@@ -219,7 +224,9 @@ namespace fly::saddle {
 
       perturb(walker, index, nl);
 
-      if (thread().dimer.step(walker, walker, thread().pot, 1000, 1)) {
+      ThreadData& thr = thread();
+
+      if (thr.dimer.step(walker, walker, thr.pot, 1000, 1)) {
         return {};
       }
 
@@ -248,14 +255,14 @@ namespace fly::saddle {
       fwd(fzn_, min) = true;  // Freeze minimally displaced atom.
       fwd.rebind(id_, in);
 
-      if (thread().min.minimise(fwd, fwd, thread().pot, 1)) {
+      if (thr.min.minimise(fwd, fwd, thr.pot, 1)) {
         return {};
       }
 
       system::SoA<Position, PotentialGradient, Frozen, TypeID const&> rev = fwd;
       rev[r_] = walker[r_] - walker[ax_] * disp * m_opt.nudge_frac;
 
-      if (thread().min.minimise(rev, rev, thread().pot, 1)) {
+      if (thr.min.minimise(rev, rev, thr.pot, 1)) {
         return {};
       }
 

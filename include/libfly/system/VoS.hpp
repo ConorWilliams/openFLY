@@ -60,12 +60,12 @@ namespace fly::system {
     using vector::emplace_back;
 
     /**
-     * @brief Provides an emplace_back with explicit ``matrix_t`` parameters.
+     * @brief Provides an emplace_back with explicit ``matrix_t const&`` parameters.
      */
     decltype(auto) emplace_back(typename T::matrix_t const &...args) { return vector::emplace_back(args...); }
 
     /**
-     * @brief Provides an emplace_back with explicit ``matrix_t`` parameters.
+     * @brief Provides an emplace_back with explicit ``matrix_t &&`` parameters.
      */
     decltype(auto) emplace_back(typename T::matrix_t &&...args) { return vector::emplace_back(std::move(args)...); }
   };

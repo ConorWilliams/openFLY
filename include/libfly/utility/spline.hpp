@@ -54,6 +54,13 @@ namespace fly {
     /**
      * @brief Interpolate tabulated function.
      *
+     * \rst
+     *
+     * .. warning::
+     *    This silently clamps ``x`` inside the tabulated region.
+     *
+     * \endrst
+     *
      * @param x Point to interpolate ``f``.
      * @return ``f(x)`` The interpolated value of the function at ``x``.
      */
@@ -64,6 +71,13 @@ namespace fly {
 
     /**
      * @brief Interpolate tabulated function's gradient.
+     *
+     * \rst
+     *
+     * .. warning::
+     *    This silently clamps ``x`` inside the tabulated region.
+     *
+     * \endrst
      *
      * @param x Point to interpolate ``f'``.
      * @return ``f'(x)`` The interpolated gradient of the function at ``x``.
@@ -77,6 +91,9 @@ namespace fly {
      * @brief Interpolate tabulated function's second derivative.
      *
      * \rst
+     *
+     * .. warning::
+     *    This silently clamps ``x`` inside the tabulated region.
      *
      * .. note::
      *    This may not be continuous or smooth.
@@ -105,13 +122,9 @@ namespace fly {
       //
       ASSERT(x >= 0, "x={}, not less than zero", x);
 
-      auto i = static_cast<std::size_t>(x * m_inv_dx);
+      auto i = std::min(static_cast<std::size_t>(x * m_inv_dx), m_spines.size() - 1);
 
-      // Could clamp this value:  
-      
-      i = std::min(i, m_spines.size() - 1);
-
-      ASSERT(i < m_spines.size(), "x={} is outside tabulated region with i={}, len={}", x, i, m_spines.size());
+      //   ASSERT(i < m_spines.size(), "x={} is outside tabulated region with i={}, len={}", x, i, m_spines.size());
 
       return {x - static_cast<double>(i) * m_dx, m_spines[i]};
     }

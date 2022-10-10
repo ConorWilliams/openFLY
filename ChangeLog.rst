@@ -14,10 +14,28 @@ Changelog
 .. Meta 
 .. ~~~~
 
-.. Version is specified in vcpkg.json, index.rst and version.hpp
-
 Unreleased
 -------------------------------
+Added
+~~~~~
+Changed
+~~~~~~~
+Removed
+~~~~~~~
+Bugfixes
+~~~~~~~~
+Meta 
+~~~~
+
+
+.. Version is specified in vcpkg.json, index.rst and version.hpp
+
+Version 0.5.0
+-------------------------------
+
+This release introduce saddle-point finding and min->sp->min pathway finding. The concept of a generic potential was made more concrete to prevent a template explosion.
+
+
 Added
 ~~~~~
 
@@ -33,6 +51,7 @@ Changed
 - Generalised ``StepLBFGS``'s ``.newton_step()``.
 - ``Generic`` potential API + constructor changes
 - Unified minimiser, saddle finder and dimer return codes to follow C conventions (truthy on failure);
+- ``Spline`` methods clamp input.
 
 Removed
 ~~~~~~~
@@ -45,15 +64,11 @@ Bugfixes
 - Const-corrected ``Generic::gradient``.
 - Padded spline with terminator to fix-up floating point rounding errors.
 
-Meta 
-~~~~
-
 
 Version 0.4.0
 --------------
 
 This release introduces generic potentials and the first concrete potential into openFLY, EAM. The EAM implementation includes support for analytic Hessians and is fully openMP parallelised. Additionally, an efficient parallel implementation of the LBFGS minimiser is included.
-
 
 Added
 ~~~~~
@@ -68,8 +83,6 @@ Added
 - New ``LBFGS`` class.
 - New ``Hessian`` class.
 - ``Frozen`` property has a tag to enable GSD IO.
-
-
 
 Changed
 ~~~~~~~
@@ -88,7 +101,6 @@ Bugfixes
 ~~~~~~~~
 
 - Box (Ortho and Triclinic, valid bounds now include zero).
-
 
 Version 0.3.0
 ------------------------

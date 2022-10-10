@@ -96,7 +96,7 @@ namespace fly::saddle {
       /**
        * @brief Number of simultaneous SP searches per new environment.
        */
-      int batch_size = 10;
+      int batch_size = std::min(max_failed_searches, num_threads);
       /**
        * @brief Fraction of distance between initial position and SP that dimer is displaced along its axis before minimisation.
        */

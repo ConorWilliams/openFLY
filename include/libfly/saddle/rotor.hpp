@@ -28,7 +28,7 @@
 /**
  * \file rotor.hpp
  *
- * @brief Class to orient a dimer.
+ * @brief Class to orient a dimer, exposes part of the ``Dimer`` classes implementation for re-use.
  */
 
 namespace fly::saddle {

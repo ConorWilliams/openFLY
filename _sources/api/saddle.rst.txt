@@ -8,6 +8,21 @@ The ``saddle`` folder contains a collection of utilities for saddle-point findin
 A (strictly first-order) saddle-point is a stationary point where the Hessian matrix has exactly one negative eigenvalue.
 
 
+Master saddle-point finder
+----------------------------
+
+File: ``libfly/saddle/find.hpp``
+
+.. doxygenfile:: libfly/saddle/find.hpp
+    :sections: briefdescription detaileddescription
+
+.. doxygenclass:: fly::saddle::MasterFinder
+    :members:
+    :undoc-members:
+
+
+
+
 Dimer
 ---------------------
 
@@ -44,17 +59,5 @@ File: ``libfly/saddle/rotor.hpp``
 ..     :sections: briefdescription detaileddescription
 
 .. .. doxygenfunction:: fly::saddle::perturb
-
-Master saddle-point finder
-----------------------------
-
-File: ``libfly/saddle/find.hpp``
-
-.. doxygenfile:: libfly/saddle/find.hpp
-    :sections: briefdescription detaileddescription
-
-.. doxygenclass:: fly::saddle::MasterFinder
-    :members:
-    :undoc-members:
 
 

@@ -242,6 +242,8 @@
 <li><p>New <code class="docutils literal notranslate"><span class="pre">Dimer</span></code> saddle-point finder.</p></li>
 <li><p>New <code class="docutils literal notranslate"><span class="pre">Rotor</span></code> class.</p></li>
 <li><p>New <code class="docutils literal notranslate"><span class="pre">perturb()</span></code> function</p></li>
+<li><p>New <code class="docutils literal notranslate"><span class="pre">MasterFinder</span></code> class.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">SoA</span></code> has a new rebind method.</p></li>
 </ul>
 </section>
 <section id="changed">
@@ -249,6 +251,7 @@
 <ul class="simple">
 <li><p>Generalised <code class="docutils literal notranslate"><span class="pre">StepLBFGS</span></code>’s <code class="docutils literal notranslate"><span class="pre">.newton_step()</span></code>.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">Generic</span></code> potential API + constructor changes</p></li>
+<li><p>Unified minimiser, saddle finder and dimer return codes to follow C conventions (truthy on failure);</p></li>
 </ul>
 </section>
 <section id="removed">
@@ -283,9 +286,7 @@
 <li><p>New <code class="docutils literal notranslate"><span class="pre">xize</span></code> utility function.</p></li>
 <li><p>New <code class="docutils literal notranslate"><span class="pre">LBFGS</span></code> class.</p></li>
 <li><p>New <code class="docutils literal notranslate"><span class="pre">Hessian</span></code> class.</p></li>
-<li><p>New <code class="docutils literal notranslate"><span class="pre">MasterFinder</span></code> class.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">Frozen</span></code> property has a tag to enable GSD IO.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">SoA</span></code> has a new rebind method.</p></li>
 </ul>
 </section>
 <section id="id2">
@@ -296,9 +297,10 @@
 <li><p><code class="docutils literal notranslate"><span class="pre">SoA</span></code>’s converting constructors are now SFINE friendly.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">SoA</span></code>’s base classes are now public.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">TypeMap</span></code>’s converting constructor is now SFINE friendly.</p></li>
-<li><p>Unified minimiser, saddle finder and dimer return codes to follow C conventions (truthy on failure);</p></li>
 <li><p>De-generalised <code class="docutils literal notranslate"><span class="pre">SoA</span></code>’s converting constructors to allow implicit casts.</p></li>
 <li><p>Read methods on <code class="docutils literal notranslate"><span class="pre">BinaryFile</span></code> are <code class="docutils literal notranslate"><span class="pre">const</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">LBFGS</span></code> force tolerance default tightened.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Spline</span></code> clamps interval.</p></li>
 </ul>
 </section>
 <section id="id3">

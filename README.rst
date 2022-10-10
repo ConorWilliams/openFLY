@@ -15,9 +15,9 @@
    </p>
 
 
-   <h2 align="center">
+   <p align="center">
       The framework for on-the-fly kinetic Monte Carlo simulations.
-   </h2>
+   </p>
 
    <p align="center">
         <a href="https://conorwilliams.github.io/openFLY/">Welcome to the documentation</a>

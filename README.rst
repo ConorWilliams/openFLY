@@ -20,7 +20,7 @@
    </p>
 
    <p align="center">
-        <a href="https://conorwilliams.github.io/openFLY/">Welcome to the documentation</a>
+        <a href="https://conorwilliams.github.io/openFLY/">Welcome to the documentation!</a>
    </p>   
 
 

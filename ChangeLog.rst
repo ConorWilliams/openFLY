@@ -18,6 +18,10 @@ Unreleased
 -------------------------------
 Added
 ~~~~~
+
+- New geometry functions: ``centroid()``, `` rmsd()``, `` grmsd()``.
+- New ``ortho_onto()`` function.
+
 Changed
 ~~~~~~~
 Removed

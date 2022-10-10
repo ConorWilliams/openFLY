@@ -60,20 +60,20 @@ int main() {
 
   system::Supercell cell = supercell_from<Position, Frozen, PotentialGradient, Axis>("data/xyz/V1-unrelaxed.gsd", 0);
 
-//   system::Supercell old = cell;
+  //   system::Supercell old = cell;
 
-//   cell.destructive_resize(old.size() + 1);
+  //   cell.destructive_resize(old.size() + 1);
 
-//   for (int i = 0; i < old.size(); i++) {
-//     cell(r_, i) = old(r_, i);
-//     cell(id_, i) = old(id_, i);
-//   }
+  //   for (int i = 0; i < old.size(); i++) {
+  //     cell(r_, i) = old(r_, i);
+  //     cell(id_, i) = old(id_, i);
+  //   }
 
-//   cell(r_, old.size()) = Vec{0.4, 1.4, 1.4};
+  //   cell(r_, old.size()) = Vec{0.4, 1.4, 1.4};
 
-//   cell(id_, old.size()) = 1;
+  //   cell(id_, old.size()) = 1;
 
-//   cell[fzn_] = false;
+  //   cell[fzn_] = false;
 
   //   auto cell = make_super();
 
@@ -113,17 +113,17 @@ int main() {
 
   std::random_device dev;
 
-  Xoshiro rng({0, 0, 1, 1});
+  //   Xoshiro rng({0, 0, 1, 1});
 
-    saddle::perturb(dcell, rng, dcell.box(), dcell(r_, 113), dcell, 6, 0.5);
+  //     saddle::perturb(dcell, rng, dcell.box(), dcell(r_, 113), dcell, 6, 0.5);
 
   fout.commit([&] {
     fout.write(fly::r_, dcell);  //< Write the positions of perturbed the atoms.
   });
 
   saddle::Dimer dimer{
-      {.debug = true, .fout = &fout},
-      {.debug = true},
+      {.f2norm = 1e-9},  //{.debug = true, .fout = &fout},
+      {},                //{.debug = true},
       dcell.box(),
   };
 
@@ -138,13 +138,13 @@ int main() {
                               minimiser,
                               dimer};
 
-//   finder.find_all(dcell.box(), {113}, dcell);  // 685
+  finder.find_pathways(dcell.box(), {113}, dcell);  // 685, 98
 
-//   exit(1);
+  exit(1);
 
-    fly::system::SoA<Position, Axis> init{dcell};
+  // fly::system::SoA<Position, Axis> init{dcell};
 
-    bool sp = timeit("warmup", [&] { return dimer.step(dcell, dcell, pot, 10000, omp_get_max_threads()); });
+  // bool sp = timeit("warmup", [&] { return dimer.step(dcell, dcell, pot, 10000, omp_get_max_threads()); });
 
   //   for (size_t i = 0; i < 1; i++) {
   //     dcell[r_] = init[r_];

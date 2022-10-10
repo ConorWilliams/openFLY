@@ -34,7 +34,10 @@
 /**
  * \file lbfgs.hpp
  *
- * @brief ...
+ * @brief Find local minima of a potential energy surface using the Limited-memory BFGS method (LBFGS).
+ *
+ * The LBFGS algorithm stores a portion of the history of a pathway through phase-space as it move towards a local minimum. This
+ * history is used to approximate the inverse hessian which is then used to compute the approximate newton step towards the minimum.
  */
 
 namespace fly::minimise {
@@ -42,7 +45,6 @@ namespace fly::minimise {
   /**
    * @brief A minimiser that uses the LBFGS algorithm.
    */
-
   class LBFGS {
   public:
     /**

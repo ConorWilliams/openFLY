@@ -24,12 +24,15 @@ Added
 - New ``Dimer`` saddle-point finder.
 - New ``Rotor`` class.
 - New ``perturb()`` function
+- New ``MasterFinder`` class.
+- ``SoA`` has a new rebind method. 
 
 Changed
 ~~~~~~~
 
 - Generalised ``StepLBFGS``'s ``.newton_step()``.
 - ``Generic`` potential API + constructor changes
+- Unified minimiser, saddle finder and dimer return codes to follow C conventions (truthy on failure);
 
 Removed
 ~~~~~~~
@@ -64,9 +67,8 @@ Added
 - New ``xize`` utility function.
 - New ``LBFGS`` class.
 - New ``Hessian`` class.
-- New ``MasterFinder`` class.
 - ``Frozen`` property has a tag to enable GSD IO.
-- ``SoA`` has a new rebind method. 
+
 
 
 Changed
@@ -77,7 +79,6 @@ Changed
 - ``SoA``'s converting constructors are now SFINE friendly.
 - ``SoA``'s base classes are now public.
 - ``TypeMap``'s converting constructor is now SFINE friendly.
-- Unified minimiser, saddle finder and dimer return codes to follow C conventions (truthy on failure);
 - De-generalised ``SoA``'s converting constructors to allow implicit casts.
 - Read methods on ``BinaryFile`` are ``const``.
 - ``LBFGS`` force tolerance default tightened.

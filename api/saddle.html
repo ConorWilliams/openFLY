@@ -181,8 +181,8 @@
 <li class="toctree-l3"><a class="reference internal" href="crystal_systems.html#hypergrid">Hypergrid</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="io.html">Input/Output (IO)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="neighbour.html">Neighbours</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io.html">Input/Output (IO)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="potential.html">Potentials</a></li>
 <li class="toctree-l2"><a class="reference internal" href="minimise.html">Minimisers</a></li>
 <li class="toctree-l2 current current-page"><a class="current reference internal" href="#">Saddle-point searching</a></li>
@@ -295,7 +295,7 @@
 
 <dl class="cpp var">
 <dt class="sig sig-object cpp" id="_CPPv4N3fly6saddle12MasterFinder7Options10batch_sizeE">
-<span id="_CPPv3N3fly6saddle12MasterFinder7Options10batch_sizeE"></span><span id="_CPPv2N3fly6saddle12MasterFinder7Options10batch_sizeE"></span><span id="fly::saddle::MasterFinder::Options::batch_size__i"></span><span class="target" id="structfly_1_1saddle_1_1MasterFinder_1_1Options_1a66677d4a458edecb1a05f662e5afe22d"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">batch_size</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">10</span></span><a class="headerlink" href="#_CPPv4N3fly6saddle12MasterFinder7Options10batch_sizeE" title="Permalink to this definition">#</a><br /></dt>
+<span id="_CPPv3N3fly6saddle12MasterFinder7Options10batch_sizeE"></span><span id="_CPPv2N3fly6saddle12MasterFinder7Options10batch_sizeE"></span><span id="fly::saddle::MasterFinder::Options::batch_size__i"></span><span class="target" id="structfly_1_1saddle_1_1MasterFinder_1_1Options_1a66677d4a458edecb1a05f662e5afe22d"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">batch_size</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">min</span></span><span class="p"><span class="pre">(</span></span><a class="reference internal" href="#_CPPv4N3fly6saddle12MasterFinder7Options19max_failed_searchesE" title="fly::saddle::MasterFinder::Options::max_failed_searches"><span class="n"><span class="pre">max_failed_searches</span></span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N3fly6saddle12MasterFinder7Options11num_threadsE" title="fly::saddle::MasterFinder::Options::num_threads"><span class="n"><span class="pre">num_threads</span></span></a><span class="p"><span class="pre">)</span></span><a class="headerlink" href="#_CPPv4N3fly6saddle12MasterFinder7Options10batch_sizeE" title="Permalink to this definition">#</a><br /></dt>
 <dd><p>Number of simultaneous SP searches per new environment. </p>
 </dd></dl>
 
@@ -590,7 +590,7 @@
 <section id="rotor">
 <h2>Rotor<a class="headerlink" href="#rotor" title="Permalink to this heading">#</a></h2>
 <p>File: <code class="docutils literal notranslate"><span class="pre">libfly/saddle/rotor.hpp</span></code></p>
-<p>Class to orient a dimer. </p>
+<p>Class to orient a dimer, exposes part of the <code class="docutils literal notranslate"><span class="pre">Dimer</span></code> classes implementation for re-use. </p>
 <dl class="cpp class">
 <dt class="sig sig-object cpp" id="_CPPv4N3fly6saddle5RotorE">
 <span id="_CPPv3N3fly6saddle5RotorE"></span><span id="_CPPv2N3fly6saddle5RotorE"></span><span id="fly::saddle::Rotor"></span><span class="target" id="classfly_1_1saddle_1_1Rotor"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Rotor</span></span></span><a class="headerlink" href="#_CPPv4N3fly6saddle5RotorE" title="Permalink to this definition">#</a><br /></dt>

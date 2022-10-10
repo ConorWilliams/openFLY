@@ -181,8 +181,8 @@
 <li class="toctree-l3"><a class="reference internal" href="crystal_systems.html#hypergrid">Hypergrid</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="io.html">Input/Output (IO)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="neighbour.html">Neighbours</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io.html">Input/Output (IO)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="potential.html">Potentials</a></li>
 <li class="toctree-l2"><a class="reference internal" href="minimise.html">Minimisers</a></li>
 <li class="toctree-l2"><a class="reference internal" href="saddle.html">Saddle-point searching</a></li>
@@ -1026,6 +1026,10 @@ that is large enough for any parallel application, and it passes all tests we ar
 <dt class="sig sig-object cpp" id="_CPPv4NK3fly6Spline1fEd">
 <span id="_CPPv3NK3fly6Spline1fEd"></span><span id="_CPPv2NK3fly6Spline1fEd"></span><span id="fly::Spline::f__doubleC"></span><span class="target" id="classfly_1_1Spline_1a8a9d47bcf24df4181a34b04cf616cc24"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">auto</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">f</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">x</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="o"><span class="pre">-&gt;</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><a class="headerlink" href="#_CPPv4NK3fly6Spline1fEd" title="Permalink to this definition">#</a><br /></dt>
 <dd><p>Interpolate tabulated function. </p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>This silently clamps <code class="docutils literal notranslate"><span class="pre">x</span></code> inside the tabulated region.</p>
+</div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>x</strong> – Point to interpolate <code class="docutils literal notranslate"><span class="pre">f</span></code>. </p>
@@ -1040,6 +1044,10 @@ that is large enough for any parallel application, and it passes all tests we ar
 <dt class="sig sig-object cpp" id="_CPPv4NK3fly6Spline2fpEd">
 <span id="_CPPv3NK3fly6Spline2fpEd"></span><span id="_CPPv2NK3fly6Spline2fpEd"></span><span id="fly::Spline::fp__doubleC"></span><span class="target" id="classfly_1_1Spline_1a5909607ca86d0016b414f2d921615f17"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">fp</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">x</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK3fly6Spline2fpEd" title="Permalink to this definition">#</a><br /></dt>
 <dd><p>Interpolate tabulated function’s gradient. </p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>This silently clamps <code class="docutils literal notranslate"><span class="pre">x</span></code> inside the tabulated region.</p>
+</div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>x</strong> – Point to interpolate <code class="docutils literal notranslate"><span class="pre">f'</span></code>. </p>
@@ -1057,6 +1065,10 @@ that is large enough for any parallel application, and it passes all tests we ar
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>This may not be continuous or smooth.</p>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>This silently clamps <code class="docutils literal notranslate"><span class="pre">x</span></code> inside the tabulated region.</p>
 </div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>

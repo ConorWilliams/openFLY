@@ -168,6 +168,16 @@ namespace fly {
     // Custom
 
     /**
+     * @brief  Tag type for an atom's colour.
+     *
+     * Colour is an abstract property, atoms with the same colour are interchangeable in geometry contexts. For example, a frozen and
+     * non frozen Fe atom must have different colours.
+     */
+    struct Colour : system::Property<int> {
+      static constexpr char const* tag = "log/particles/colour";  ///< GSD chunk label.
+    };
+
+    /**
      * @brief Tag type for atom's index i.e. position in some array.
      */
     struct Index : system::Property<Eigen::Index> {
@@ -253,6 +263,11 @@ namespace fly {
      * @brief Velocity literal.
      */
     inline constexpr Velocity v_;
+
+    /**
+     * @brief Colour literal.
+     */
+    inline constexpr Colour col_;
 
     /**
      * @brief Index literal.

@@ -17,6 +17,7 @@
 #include <fmt/core.h>
 
 #include <catch2/catch_test_macros.hpp>
+#include <optional>
 #include <random>
 
 #include "libfly/system/VoS.hpp"
@@ -109,5 +110,72 @@ TEST_CASE("ortho_onto", "[env]") {
     REQUIRE(gnorm(Op - O) < 1e-8);
 
     //
+  }
+}
+
+void make_centroid_origin(system::VoS<Position, Colour>& x) {
+  //
+  Vec com = env::centroid(x);
+
+  for (auto& elem : x) {
+    elem[r_] -= com;
+  }
+
+  REQUIRE(near(gnorm(env::centroid(x)), 0.0));
+}
+
+// Generate a random set of n atoms in a ball.
+system::VoS<Position, Colour> rand_geo(Xoshiro& rng, int num_atoms) {
+  //
+  double rad = 5;
+
+  std::uniform_real_distribution<> uni(-rad, rad);
+
+  system::VoS<Position, Colour> out;
+
+  out.emplace_back(Vec::Zero(), 0);
+
+  while (out.size() < num_atoms) {
+    //
+    Vec p = Vec::NullaryExpr([&uni, &rng] { return uni(rng); });
+
+    if (gnorm(p) < rad) {  // Rejection sampling.
+      out.emplace_back(p, 0);
+    }
+  }
+
+  make_centroid_origin(out);
+
+  return out;
+}
+
+TEST_CASE("for_equiv_perms one", "[env]") {
+  //
+
+  std::random_device dev;
+
+  Xoshiro rng({dev(), dev(), dev(), dev()});
+
+  system::VoS<Position, Colour> ref = rand_geo(rng, 10);
+
+  for (int i = 0; i < 1000; i++) {
+    //
+    Mat O = random_ortho(rng);
+
+    system::VoS<Position, Colour> mut = ref;
+
+    for (auto& elem : mut) {
+      elem[r_] = O * elem[r_];
+    }
+
+    std::optional<Mat> info = {};
+
+    env::for_equiv_perms(mut, ref, 1e-10, 1, [&](Mat const& Op, double) {
+      info = Op;
+      return false;
+    });
+    //
+    REQUIRE(info);
+    REQUIRE(gnorm(*info - O.transpose()) < 1e-10);
   }
 }

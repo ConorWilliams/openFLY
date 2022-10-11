@@ -19,8 +19,11 @@ Unreleased
 Added
 ~~~~~
 
-- New geometry functions: ``centroid()``, `` rmsd()``, `` grmsd()``.
+- New geometry functions: ``centroid()``, `` rmsd()``, `` grmsd(), for_equiv_perms()``.
 - New ``ortho_onto()`` function.
+- New ``Colour`` property.
+- New ``Geometry`` class.
+
 
 Changed
 ~~~~~~~

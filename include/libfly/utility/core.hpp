@@ -213,6 +213,27 @@ namespace fly {
 
   namespace detail {
 
+    template <typename From, typename To, typename = void>
+    struct is_narrowing_conversion_impl : std::true_type {};
+
+    template <typename From, typename To>
+    struct is_narrowing_conversion_impl<From, To, std::void_t<decltype(To{std::declval<From>()})>> : std::false_type {};
+
+  }  // namespace detail
+
+  /**
+   * @brief Check if a numerical conversion is narrowing.
+   *
+   * Leverages brace initialisation, adapted from: https://stackoverflow.com/a/67603594
+   *
+   * @tparam From The source type.
+   * @tparam To The target type.
+   */
+  template <typename From, typename To>
+  inline constexpr bool is_narrowing_conversion_v = detail::is_narrowing_conversion_impl<From, To>::value;
+
+  namespace detail {
+
     template <typename T, typename...>
     struct First {
       using type = T;

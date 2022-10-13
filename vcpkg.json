@@ -13,6 +13,10 @@
         {
             "name": "span-lite",
             "version>=": "0.10.3"
+        },
+        {
+            "name": "xxhash",
+            "version>=": "0.8.1"
         }
     ],
     "default-features": [],

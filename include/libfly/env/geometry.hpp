@@ -305,7 +305,7 @@ namespace fly::env {
     std::optional<GeoInfo> permute_onto(system::VoS<Ts...> const &other, double delta) {
       std::optional<GeoInfo> res = std::nullopt;
 
-      for_equiv_perms(other, delta, 1, *this, [&res](Mat const &O, double rmsd) {
+      for_equiv_perms(*this, other, delta, 1, [&res](Mat const &O, double rmsd) {
         res = GeoInfo{O, rmsd};
         return true;  // First match accepted
       });
@@ -332,7 +332,7 @@ namespace fly::env {
         scratch_best = &tmp;
       }
 
-      for_equiv_perms(other, delta)(1, *this, [&](Mat const &O, double rmsd) {
+      for_equiv_perms(*this, other, delta, 1, [&](Mat const &O, double rmsd) {
         if (!res || res->rmsd < rmsd) {
           res = GeoInfo{O, rmsd};  // Cache best info.
           scratch_best = *this;    // Copy best so far into scratch.

@@ -2,6 +2,11 @@ Local environments
 ======================
 
 
+Directory: ``libfly/env``
+
+The ``env`` folder contains routines working with local environments. Everything is contained within the namespace ``fly::env``. The local environment (LE) of an atom is the set of atoms within some neighbourhood.
+
+
 Geometry
 ----------------
 
@@ -29,5 +34,18 @@ Geometry class
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 .. doxygenclass:: fly::env::Geometry
+    :members:
+    :undoc-members:
+
+
+Local class
+--------------------------
+
+File: ``libfly/env/local.hpp``
+
+.. doxygenfile:: libfly/env/local.hpp
+    :sections: briefdescription detaileddescription
+
+.. doxygenclass:: fly::env::Local
     :members:
     :undoc-members:

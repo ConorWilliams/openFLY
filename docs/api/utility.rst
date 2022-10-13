@@ -87,6 +87,9 @@ Meta programming
 
 .. doxygentypedef:: detected_or_t
 
+-------------------
+
+.. doxygenvariable:: is_narrowing_conversion_v
 
 Small functions
 ~~~~~~~~~~~~~~~~~~~~~~

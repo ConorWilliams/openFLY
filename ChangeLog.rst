@@ -23,7 +23,10 @@ Added
 - New ``ortho_onto()`` function.
 - New ``Colour`` property.
 - New ``Geometry`` class.
-
+- New ``Local`` class.
+- New property ``Hash``.
+- New meta programming utility ``is_narrowing_conversion_v``.
+- New internal graph class.
 
 Changed
 ~~~~~~~
@@ -33,7 +36,7 @@ Bugfixes
 ~~~~~~~~
 Meta 
 ~~~~
-
+- New dependencies Nauty and xxHash
 
 .. Version is specified in vcpkg.json, index.rst and version.hpp
 

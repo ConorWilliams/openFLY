@@ -54,9 +54,10 @@ include(ExternalProject)
 find_package(OpenMP REQUIRED)
 
 # All managed by vcpkg
-find_package(fmt REQUIRED)
-find_package(Eigen3 REQUIRED)
-find_package(span-lite REQUIRED)
+find_package(fmt CONFIG REQUIRED)
+find_package(Eigen3 CONFIG REQUIRED)
+find_package(span-lite CONFIG REQUIRED)
+find_package(xxHash CONFIG REQUIRED)
 
 # Ancient voodoo
 ExternalProject_Add(
@@ -88,22 +89,21 @@ target_include_directories(Nauty INTERFACE
     ${CMAKE_BINARY_DIR}/nauty/src
 )
 
-target_link_libraries(libFLY PRIVATE Nauty)
+target_link_libraries(libFLY PRIVATE Nauty xxHash::xxhash)
 
 target_link_libraries(libFLY PUBLIC Eigen3::Eigen fmt::fmt nonstd::span-lite OpenMP::OpenMP_CXX)
 
 # Declare executable
 add_executable(openFLY apps/main.cpp)
-
 add_executable(openfly::exe ALIAS openFLY)
-
 set_target_properties(openFLY PROPERTIES OUTPUT_NAME openfly)
-
 target_compile_features(openFLY PRIVATE cxx_std_17)
-
 target_link_libraries(openFLY PRIVATE libFLY)
-
 target_link_libraries(openFLY PRIVATE fmt::fmt)
+
+add_executable(geoFLY apps/geo.cpp)
+target_compile_features(geoFLY PRIVATE cxx_std_17)
+target_link_libraries(geoFLY PRIVATE libFLY Nauty)
 
 # Dev mode
 if(FLY_DEVELOPER_MODE)

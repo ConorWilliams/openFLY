@@ -37,7 +37,7 @@ message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
 file(GLOB_RECURSE FLY_SOURCES_C CONFIGURE_DEPENDS "${PROJECT_SOURCE_DIR}/src/*.c")
 file(GLOB_RECURSE FLY_SOURCES_CPP CONFIGURE_DEPENDS "${PROJECT_SOURCE_DIR}/src/*.cpp")
 
-# Declare the lib
+# Declare the lib, Manually include GSD here as its cmake is not for consumption
 add_library(libFLY OBJECT${FLY_SOURCES_C} ${FLY_SOURCES_CPP} "${PROJECT_SOURCE_DIR}/external/gsd/gsd/gsd.c")
 
 target_include_directories(libFLY PUBLIC "$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>")
@@ -47,12 +47,49 @@ target_include_directories(libFLY PRIVATE "$<BUILD_INTERFACE:${PROJECT_SOURCE_DI
 
 target_compile_features(libFLY PUBLIC cxx_std_17)
 
+# Link libraries
+include(ExternalProject)
+
+# System
+find_package(OpenMP REQUIRED)
+
+# All managed by vcpkg
 find_package(fmt REQUIRED)
 find_package(Eigen3 REQUIRED)
 find_package(span-lite REQUIRED)
-find_package(OpenMP REQUIRED)
 
-# target_link_libraries(libFLY PRIVATE )
+# Ancient voodoo
+ExternalProject_Add(
+    nauty
+    URL "https://pallini.di.uniroma1.it/nauty27r4.tar.gz"
+    URL_HASH "SHA256=b810c85a6fe299f3b4c9f24aaf929cac7f9546c2f35c20e1dd0adbc7408848a6"
+    PREFIX ${CMAKE_BINARY_DIR}/nauty
+    CONFIGURE_COMMAND ${CMAKE_BINARY_DIR}/nauty/src/nauty/configure CC=${CMAKE_C_COMPILER}
+    BUILD_COMMAND make -j4
+    TEST_COMMAND make checks
+    INSTALL_COMMAND ""
+    BUILD_IN_SOURCE 1
+    LOG_CONFIGURE ON
+    LOG_DOWNLOAD ON
+    LOG_INSTALL ON
+    LOG_BUILD ON
+    LOG_TEST ON
+    LOG_OUTPUT_ON_FAILURE ON
+)
+
+add_library(Nauty STATIC IMPORTED ${CMAKE_BINARY_DIR}/nauty/src/nauty/nauty.a)
+
+set_target_properties(Nauty PROPERTIES
+    IMPORTED_LOCATION ${CMAKE_BINARY_DIR}/nauty/src/nauty/nauty.a
+)
+
+# Key headers are: "nauty/nauty.h", "nauty/nautinv.h", "nauty/naututil.h", "nauty/nausparse.h"
+target_include_directories(Nauty INTERFACE
+    ${CMAKE_BINARY_DIR}/nauty/src
+)
+
+target_link_libraries(libFLY PRIVATE Nauty)
+
 target_link_libraries(libFLY PUBLIC Eigen3::Eigen fmt::fmt nonstd::span-lite OpenMP::OpenMP_CXX)
 
 # Declare executable
@@ -71,9 +108,7 @@ target_link_libraries(openFLY PRIVATE fmt::fmt)
 # Dev mode
 if(FLY_DEVELOPER_MODE)
     include(CTest)
-
     add_subdirectory(tests)
-
     add_subdirectory(examples)
 endif()
 

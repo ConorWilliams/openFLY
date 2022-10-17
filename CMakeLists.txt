@@ -61,7 +61,7 @@ find_package(xxHash CONFIG REQUIRED)
 
 # Ancient voodoo
 ExternalProject_Add(
-    nauty_external
+    nauty
     URL "https://pallini.di.uniroma1.it/nauty27r4.tar.gz"
     URL_HASH "SHA256=b810c85a6fe299f3b4c9f24aaf929cac7f9546c2f35c20e1dd0adbc7408848a6"
     PREFIX ${CMAKE_BINARY_DIR}/nauty
@@ -89,7 +89,7 @@ target_include_directories(Nauty INTERFACE
     ${CMAKE_BINARY_DIR}/nauty/src
 )
 
-add_dependencies(Nauty nauty_external)
+add_dependencies(Nauty nauty)
 
 target_link_libraries(libFLY PRIVATE Nauty xxHash::xxhash)
 

@@ -65,7 +65,7 @@ ExternalProject_Add(
     URL "https://pallini.di.uniroma1.it/nauty27r4.tar.gz"
     URL_HASH "SHA256=b810c85a6fe299f3b4c9f24aaf929cac7f9546c2f35c20e1dd0adbc7408848a6"
     PREFIX ${CMAKE_BINARY_DIR}/nauty
-    CONFIGURE_COMMAND ${CMAKE_BINARY_DIR}/nauty/src/nauty/configure
+    CONFIGURE_COMMAND ${CMAKE_BINARY_DIR}/nauty/src/nauty/configure --enable-tls
     BUILD_COMMAND make -j4
     TEST_COMMAND make checks
     INSTALL_COMMAND ""

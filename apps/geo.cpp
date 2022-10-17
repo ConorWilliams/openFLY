@@ -78,37 +78,46 @@ int main() {
 
   cell(r_, 113) += Vec{1, 1, 1};
 
-  double r_env = 5.2;
+  //   double r_env = 5.2;
 
-  neigh::List nl(cell.box(), r_env);
+  //   neigh::List nl(cell.box(), r_env);
 
-  nl.rebuild(cell, omp_get_max_threads());
+  //   nl.rebuild(cell, omp_get_max_threads());
 
-  //   env::Local le1;
+  //   //   env::Local le1;
 
-  Vector<env::Local> les(cell.size());
+  //   Vector<env::Local> les(cell.size());
 
-  std::map<std::size_t, std::size_t> mp;
+  //   std::map<std::size_t, std::size_t> mp;
 
-  int count = 0;
+  //   int count = 0;
 
-  for (int i = 0; i < cell.size(); i++) {
-    les[i].rebuild(i, cell, nl, cell.map().num_types(), r_env, 3);
+  //   for (int i = 0; i < cell.size(); i++) {
+  //     les[i].rebuild(i, cell, nl, cell.map().num_types(), r_env, 3);
 
-    auto h = les[i].key();
+  //     auto h = les[i].key();
 
-    if (mp.count(h) == 0) {
-      mp[h] = count++;
-    }
+  //     if (mp.count(h) == 0) {
+  //       mp[h] = count++;
+  //     }
 
-    cell(hash_, i) = mp[h];
+  //     cell(hash_, i) = mp[h];
+  //   }
+
+  //   timeit("build all        ", [&] {
+  // #pragma omp parallel for num_threads(omp_get_max_threads()) schedule(static)
+  //     for (int i = 0; i < cell.size(); i++) {
+  //       les[i].rebuild(i, cell, nl, cell.map().num_types(), r_env, 3);
+  //     }
+  //   });
+
+  env::LocalList ll({}, cell.box(), int(cell.map().num_types()));
+
+  timeit("ll.rebuild() warm", [&] { ll.rebuild(cell, omp_get_max_threads()); });
+
+  for (size_t i = 0; i < 5; i++) {
+    timeit("ll.rebuild()     ", [&] { ll.rebuild(cell, omp_get_max_threads()); });
   }
-
-  timeit("build all", [&] {
-    for (int i = 0; i < cell.size(); i++) {
-      les[i].rebuild(i, cell, nl, cell.map().num_types(), r_env, 3);
-    }
-  });
 
   // IO
 

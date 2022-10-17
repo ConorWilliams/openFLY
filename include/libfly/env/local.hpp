@@ -24,7 +24,9 @@
 
 #include "libfly/env/geometry.hpp"
 #include "libfly/neigh/list.hpp"
+#include "libfly/system/SoA.hpp"
 #include "libfly/system/VoS.hpp"
+#include "libfly/system/box.hpp"
 #include "libfly/system/property.hpp"
 #include "libfly/system/typemap.hpp"
 #include "libfly/utility/core.hpp"
@@ -41,7 +43,41 @@
 namespace fly::env {
 
   /**
-   * @brief A local environment is a (localised) geometry augmented with a key and a fingerprint.
+   * @brief An ordered representation of the intra-atomic distances in a Geometry.
+   */
+  class Fingerprint {
+  public:
+    /**
+     * @brief A fast test to see if two local environments **may** be equivalent.
+     *
+     * Explicitly, for the LE this fingerprint represents, this function must return ``true`` if the LE is able to be
+     * ``permute_onto()`` other with the same ``delta``.
+     *
+     *
+     * @param other The other fingerprint.
+     * @param delta The tolerance for the equivalence.
+     * @return ``true`` If two local environments **may** be equivalent.
+     * @return ``false``  If two local environments are not equivalent.
+     */
+    auto equiv(Fingerprint const& other, double delta) const -> bool;
+
+    /**
+     * @brief Get the smallest intra-atomic separation in this environment.
+     */
+    auto r_min() const -> double {
+      ASSERT(!m_r_0j.empty() && !m_r_ij.empty(), "Not enough atoms for r_min!", 0);
+      return std::min(m_r_0j[0], m_r_ij[0]);
+    }
+
+  private:
+    friend class Local;
+
+    std::vector<double> m_r_0j;
+    std::vector<double> m_r_ij;
+  };
+
+  /**
+   * @brief A local environment is a (localised) geometry augmented with a key and a ``Fingerprint``.
    *
    * Here localised means the centroid is the origin.
    *
@@ -58,48 +94,16 @@ namespace fly::env {
     using Key = std::size_t;
 
     /**
-     * @brief An ordered representation of the intra-atomic distances in this Geometry.
-     */
-    class Fingerprint {
-    public:
-      /**
-       * @brief A fast test to see if two local environments **may** be equivalent.
-       *
-       * Explicitly, for the LE this fingerprint represents, this function must return ``true`` if the LE is able to be
-       * ``permute_onto()`` other with the same ``delta``.
-       *
-       *
-       * @param other The other fingerprint.
-       * @param delta The tolerance for the equivalence.
-       * @return ``true`` If two local environments **may** be equivalent.
-       * @return ``false``  If two local environments are not equivalent.
-       */
-      bool equiv(Fingerprint const& other, double delta) const;
-
-      /**
-       * @brief Get the smallest intra-atomic separation in this environment.
-       */
-      double r_min() const {
-        ASSERT(!m_r_0j.empty() && !m_r_ij.empty(), "Not enough atoms for r_min!", 0);
-        return std::min(m_r_0j[0], m_r_ij[0]);
-      }
-
-    private:
-      friend class Local;
-
-      std::vector<double> m_r_0j;
-      std::vector<double> m_r_ij;
-    };
-
-    /**
      * @brief Get a constant reference to the discrete key.
+     *
+     * This is a hash of the canonical graph + atom colours.
      */
-    Key const& key() const noexcept { return m_key; }
+    auto key() const noexcept -> Key const& { return m_key; }
 
     /**
      * @brief Get a constant reference to the fingerprint.
      */
-    Fingerprint const& fingerprint() const noexcept { return m_fingerprint; }
+    auto fingerprint() const noexcept -> Fingerprint const& { return m_fingerprint; }
 
     /**
      * @brief Rebuild this local environment.
@@ -113,65 +117,65 @@ namespace fly::env {
      * @param nl A neighbour list in the ready state.
      * @param r_env Radius of the local environment.
      * @param r_edge Maximum distance for atoms to be considered connected in neighbour graph.
-     * @param num_types The total number of types in ``atoms``.
+     * @param num_types The total number of possible types in ``atoms``, equal to ``TypeMap<...>::num_types()``.
      */
-    void rebuild(int ix,
+    auto rebuild(int ix,
                  system::SoA<TypeID const&, Frozen const&> atoms,
                  neigh::List const& nl,
                  Eigen::Index num_types,
                  double r_env,
-                 double r_edge);
+                 double r_edge) -> void;
 
   private:
     Key m_key;
     Fingerprint m_fingerprint;
-
-    void build_geo(int i,
-                   system::SoA<TypeID const&, Frozen const&> atoms,
-                   neigh::List const& nl,
-                   Eigen::Index num_types,
-                   double r_env);
   };
 
-  //   /**
-  //    * @brief This class builds and stores a list of local environments from a SimCell.
-  //    */
-  //   class EnvCell {
-  //   public:
-  //     struct Options {
-  //       /** @brief Radius of environment. */
-  //       double r_env;
-  //     };
+  /**
+   * @brief This class builds and stores a list of local environments from a system.
+   */
+  class LocalList {
+  public:
+    /**
+     * @brief Used to configure the ``LocalList``.
+     */
+    struct Options {
+      /** @brief Radius of a local environment. */
+      double r_env = 5.2;
+      /** @brief Maximum distance for atoms to be considered connected in the canonisation neighbour graph. */
+      double r_edge = 3.0;
+    };
 
-  //     /**
-  //      * @brief Construct a new Env Cell object.
-  //      */
-  //     EnvCell(Options const& opt, OrthoSimBox const& box) : m_nl(box, opt.r_env){};
+    /**
+     * @brief Construct a new Env Cell object.
+     */
+    LocalList(Options const& opt, system::Box const& box, int num_types) : m_opt{opt}, m_nl(box, opt.r_env), m_num_types(num_types){};
 
-  //     /**
-  //      * @brief Get the number of Environments in the cell.
-  //      */
-  //     std::size_t size() const noexcept { return m_envs.size(); }
+    /**
+     * @brief Get the number of Environments in the cell.
+     */
+    auto size() const noexcept -> std::size_t { return m_envs.size(); }
 
-  //     /**
-  //      * @brief Get the ith local environment
-  //      */
-  //     Local const& operator[](std::size_t i) const noexcept { return m_envs[i]; }
+    /**
+     * @brief Get the ``i``th local environment
+     */
+    auto operator[](std::size_t i) const noexcept -> Local const& { return m_envs[i]; }
 
-  //     /**
-  //      * @brief Get the ith local environment
-  //      */
-  //     Local& operator[](std::size_t i) noexcept { return m_envs[i]; }
+    /**
+     * @brief Get the ``i``th local environment
+     */
+    auto operator[](std::size_t i) noexcept -> Local& { return m_envs[i]; }
 
-  //     /**
-  //      * @brief Construct the local environemnts around all the atom.
-  //      */
-  //     void rebuild(SimCell const& atoms, std::size_t num_threads);
+    /**
+     * @brief Construct the local environments around all the atoms.
+     */
+    auto rebuild(system::SoA<Position const&, TypeID const&, Frozen const&> const& info, int num_threads) -> void;
 
-  //   private:
-  //     std::vector<Local> m_envs;
-
-  //     neighbour::List m_nl;
-  //   };
+  private:
+    std::vector<Local> m_envs;
+    Options m_opt;
+    neigh::List m_nl;
+    int m_num_types;
+  };
 
 }  // namespace fly::env

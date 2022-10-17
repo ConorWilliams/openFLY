@@ -18,7 +18,8 @@ Unreleased
 -------------------------------
 Added
 ~~~~~
-
+- New ``Catalogue`` class.
+- New ``Fingerprint`` class.
 - New geometry functions: ``centroid()``, `` rmsd()``, `` grmsd(), for_equiv_perms()``.
 - New ``ortho_onto()`` function.
 - New ``Colour`` property.

@@ -30,7 +30,7 @@
 
 namespace fly::env {
 
-  bool Local::Fingerprint::equiv(Fingerprint const &other, double delta) const {
+  bool Fingerprint::equiv(Fingerprint const &other, double delta) const {
     if (m_r_0j.size() != other.m_r_0j.size()) {
       return false;
     }
@@ -94,6 +94,18 @@ namespace fly::env {
 
     for (auto &elem : *this) {
       elem[r_] -= shift;
+    }
+  }
+
+  void LocalList::rebuild(system::SoA<Position const &, TypeID const &, Frozen const &> const &info, int num_threads) {
+    //
+    m_nl.rebuild(info, num_threads);
+
+    m_envs.resize(size_t(info.size()));
+
+#pragma omp parallel for num_threads(num_threads) schedule(static)
+    for (int i = 0; i < info.size(); i++) {
+      m_envs[size_t(i)].rebuild(i, info, m_nl, m_num_types, m_opt.r_env, m_opt.r_edge);
     }
   }
 

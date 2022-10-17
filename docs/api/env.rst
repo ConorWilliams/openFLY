@@ -38,7 +38,7 @@ Geometry class
     :undoc-members:
 
 
-Local class
+Local 
 --------------------------
 
 File: ``libfly/env/local.hpp``
@@ -46,6 +46,25 @@ File: ``libfly/env/local.hpp``
 .. doxygenfile:: libfly/env/local.hpp
     :sections: briefdescription detaileddescription
 
+Fingerprints
+~~~~~~~~~~~~~~~~~~
+
+.. doxygenclass:: fly::env::Fingerprint
+    :members:
+    :undoc-members:
+
+
+Local class
+~~~~~~~~~~~~~~~~~~
+
 .. doxygenclass:: fly::env::Local
     :members:
     :undoc-members:
+
+LocalList class
+~~~~~~~~~~~~~~~~~~
+
+.. doxygenclass:: fly::env::LocalList
+    :members:
+    :undoc-members:
+

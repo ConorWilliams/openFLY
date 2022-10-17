@@ -43,7 +43,7 @@ namespace fly::env {
   /**
    * @brief A local environment is a (localised) geometry augmented with a key and a fingerprint.
    *
-   * Here localised means the first atom is the central (i.e. fixed) atom and the centroid is the origin.
+   * Here localised means the centroid is the origin.
    *
    * The key is discrete representation of this topology.
    * The fingerprint is a continuous representation that is cheap(ish)ly comparable.
@@ -80,8 +80,8 @@ namespace fly::env {
        * @brief Get the smallest intra-atomic separation in this environment.
        */
       double r_min() const {
-        ASSERT(!m_r_ij.empty(), "Not enough atoms for r_min!", 0);
-        return m_r_ij[0];
+        ASSERT(!m_r_0j.empty() && !m_r_ij.empty(), "Not enough atoms for r_min!", 0);
+        return std::min(m_r_0j[0], m_r_ij[0]);
       }
 
     private:
@@ -104,14 +104,18 @@ namespace fly::env {
     /**
      * @brief Rebuild this local environment.
      *
-     * @param i The index of the atom to centre this LE on.
+     * This function extracts the atoms in the neighbourhood of atom ``ix`` to build the local environment. It constructs a discrete
+     * representation, encoding the colours of the atoms and the structure of the graph built from the geometry. Additionally it
+     * constructs two continuous fingerprints: one based on the distance from the centre; one based on the intra-atomic distances.
+     *
+     * @param ix The index of the atom to centre this LE on.
      * @param atoms The per-atom quantities required.
      * @param nl A neighbour list in the ready state.
      * @param r_env Radius of the local environment.
      * @param r_edge Maximum distance for atoms to be considered connected in neighbour graph.
      * @param num_types The total number of types in ``atoms``.
      */
-    void rebuild(int i,
+    void rebuild(int ix,
                  system::SoA<TypeID const&, Frozen const&> atoms,
                  neigh::List const& nl,
                  Eigen::Index num_types,

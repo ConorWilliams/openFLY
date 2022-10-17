@@ -57,6 +57,11 @@ namespace fly::system {
     using vector = Vector<Atom<T...>>;
 
   public:
+    /**
+     * @brief The underlying atom type.
+     */
+    using atom_t = Atom<T...>;
+
     using vector::emplace_back;
 
     /**

@@ -74,9 +74,9 @@ int main() {
       },
   };
 
-  bool done = timeit("Minimise", [&] { return minimiser.minimise(cell, cell, pot, omp_get_max_threads()); });
+  fmt::print("FoundMin?={}\n", !timeit("Minimise", [&] { return minimiser.minimise(cell, cell, pot, omp_get_max_threads()); }));
 
-  fmt::print("FoundMin?={}\n", !done);
+  cell(r_, 113) += Vec{1, 1, 1};
 
   double r_env = 5.2;
 
@@ -103,6 +103,12 @@ int main() {
 
     cell(hash_, i) = mp[h];
   }
+
+  timeit("build all", [&] {
+    for (int i = 0; i < cell.size(); i++) {
+      les[i].rebuild(i, cell, nl, cell.map().num_types(), r_env, 3);
+    }
+  });
 
   // IO
 

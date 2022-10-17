@@ -61,69 +61,40 @@ namespace fly::env {
                       Eigen::Index num_types,
                       double r_env,
                       double r_edge) {
-    // // Reuses our storage
-    // this->clear();
-    // m_fingerprint.m_r_0j.clear();
-    // m_fingerprint.m_r_ij.clear();
+    // Reuses our storage
+    this->clear();
+    m_fingerprint.m_r_0j.clear();
+    m_fingerprint.m_r_ij.clear();
 
-    // //
-    // std::vector<int> offsets(safe_cast<std::size_t>(2 * num_types), 0);
+    // Add central atom
+    this->emplace_back({0, 0, 0}, to_colour_idx(atoms(id_, ix), atoms(fzn_, ix)), ix);
 
-    // // Add central atom
-    // this->emplace_back({0, 0, 0}, to_colour_idx(atoms(id_, ix), atoms(fzn_, ix)), ix);
+    // Build the local environment and m_r_0j
+    nl.for_neighbours(ix, r_env, [&](auto n, double r, Vec const &dr) {
+      this->emplace_back(dr, to_colour_idx(atoms(id_, n), atoms(fzn_, n)), n);
+      m_fingerprint.m_r_0j.push_back(r);
+    });
+    std::sort(m_fingerprint.m_r_0j.begin(), m_fingerprint.m_r_0j.end());  // Done
 
-    // // Build the local environment and m_r_0j
-    // nl.for_neighbours(ix, r_env, [&](auto n, double r, Vec const &dr) {
-    //   //
-    //   int col = to_colour_idx(atoms(id_, n), atoms(fzn_, n));
+    // Build r_ij part of the fingerprint i != 0, j < i
 
-    //   this->emplace_back(dr, col, n);
-
-    //   m_fingerprint.m_r_0j.push_back(r);
-
-    //   ASSERT(col < 2 * num_types, "Colour out of bounds, {}", atoms(id_, n));
-
-    //   offsets[safe_cast<std::size_t>(col)]++;
-    // });
-
-    // std::sort(m_fingerprint.m_r_0j.begin(), m_fingerprint.m_r_0j.end());  // Done
-
-    // Graph initial(safe_cast<int>(size()));
-
-    // // Build r_ij part of the fingerprint and fill out the graph
-
-    // for (int i = 0; i < size(); i++) {
-    //   for (int j = 0; j < i; j++) {
-    //     //
-    //     double r = gnorm((*this)[i][r_] - (*this)[j][r_]);
-
-    //     if (r < r_edge) {
-    //       initial.make_edge(i, j);
-    //     }
-    //     m_fingerprint.m_r_ij.push_back(r);
-    //   }
-    // }
-
-    // std::sort(m_fingerprint.m_r_ij.begin(), m_fingerprint.m_r_ij.end());  // Done
+    for (int i = 1; i < size(); i++) {
+      for (int j = 1; j < i; j++) {
+        m_fingerprint.m_r_ij.push_back(gnorm((*this)[i][r_] - (*this)[j][r_]));
+      }
+    }
+    std::sort(m_fingerprint.m_r_ij.begin(), m_fingerprint.m_r_ij.end());  // Done
 
     // // Build the key from the graph.
 
-    // Graph::label_t labels;
+    m_key = canon_hash(*this, r_edge, 2 * size_t(num_types));
 
-    // Graph canon = initial.canon(labels);
+    // Set COM == 0,0,0
+    Vec shift = centroid(*this);
 
-    // static_assert(!is_narrowing_conversion_v<XXH64_hash_t, std::size_t>, "Hash is too big");
-
-    // XXH64_hash_t hash = XXH64(colour_counts.data(), colour_counts.size() * sizeof(int), 0);
-
-    // m_key = hash ^ canon.hash();
-
-    // // Set COM == 0,0,0
-    // Vec shift = centroid(*this);
-
-    // for (auto &elem : *this) {
-    //   elem[r_] -= shift;
-    // }
+    for (auto &elem : *this) {
+      elem[r_] -= shift;
+    }
   }
 
 }  // namespace fly::env

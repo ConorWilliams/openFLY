@@ -14,12 +14,18 @@
 
 #include "libfly/env/local.hpp"
 
-#include <catch2/catch_test_macros.hpp>
+#include <fmt/core.h>
 
+#include <catch2/catch_test_macros.hpp>
+#include <random>
+
+#include "libfly/env/geometry.hpp"
 #include "libfly/system/box.hpp"
 #include "libfly/system/property.hpp"
 #include "libfly/system/supercell.hpp"
 #include "libfly/system/typemap.hpp"
+#include "libfly/utility/core.hpp"
+#include "libfly/utility/random.hpp"
 
 using namespace fly;
 
@@ -37,11 +43,23 @@ static system::VoS<Position> hypercube() {
   return x;
 }
 
-TEST_CASE("Local", "[env]") {
-  //
-  system::TypeMap<> map(1);
+/**
+ * @brief get a supercell
+ *
+ * All atoms are the same type and not frozen.
+ * There are two types (A and B).
+ *
+ * Atoms are on the corners of a hypercube with side length 1.
+ *
+ * The box is cubic and non periodic 10 x 10 x ...
+ *
+ * @return auto
+ */
+static auto build_hc_cell() {
+  system::TypeMap<> map(2);
 
-  map.set(0, tp_, "Null");
+  map.set(0, tp_, "A");
+  map.set(1, tp_, "B");
 
   system::Box box(10 * Mat::Identity(), Arr<bool>::Constant(false));
 
@@ -56,6 +74,35 @@ TEST_CASE("Local", "[env]") {
     cell(r_, i) = cube[i][r_];
   }
 
+  return cell;
+}
+
+// static auto box() {
+//   system::TypeMap<> map(2);
+
+//   map.set(0, tp_, "A");
+//   map.set(1, tp_, "B");
+
+//   system::Box box(10 * Mat::Identity(), Arr<bool>::Constant(false));
+
+//   auto cell = system::make_supercell<Position, Frozen>(box, map, 4);
+
+//   cell[fzn_] = false;
+//   cell[id_] = 0;
+
+//   cell(r_, 0) = Vec{0, 0, 0};
+//   cell(r_, 1) = Vec{1, 0, 0};
+//   cell(r_, 2) = Vec{0, 1, 0};
+//   cell(r_, 3) = Vec{1, 1, 0};
+
+//   return cell;
+// }
+
+TEST_CASE("Local", "[env]") {
+  //
+
+  system::Supercell cell = build_hc_cell();
+
   neigh::List nl(cell.box(), 5.2);
 
   nl.rebuild(cell, omp_get_max_threads());
@@ -64,19 +111,30 @@ TEST_CASE("Local", "[env]") {
 
   le1.rebuild(0, cell, nl, cell.map().num_types(), 5.2, 1.1);
 
-  REQUIRE(le1.size() == cell.size());
+  fmt::print("LE1:\n");
+  for (auto&& elem : le1) {
+    fmt::print("{}\n", elem[r_]);
+  }
+
+  //   REQUIRE(le1.size() == cell.size());
 
   env::Local le2;
 
   le2.rebuild(3, cell, nl, cell.map().num_types(), 5.2, 1.1);
 
+  fmt::print("LE2:\n");
+  for (auto&& elem : le2) {
+    fmt::print("{}\n", elem[r_]);
+  }
+
   double delta = 0.1;
 
   REQUIRE(le1.fingerprint().equiv(le2.fingerprint(), delta));
-
-  std::optional res = le1.permute_onto(le2, delta);
-
-  REQUIRE(res);
-  REQUIRE(res->rmsd < 1e-10);
   REQUIRE(le2.key() == le1.key());
+
+  Mat O = env::ortho_onto(le1, le2);
+
+  double rmsd = env::grmsd(O, le1, le2);
+
+  REQUIRE(rmsd < 1e-10);
 }

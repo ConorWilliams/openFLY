@@ -38,7 +38,7 @@ file(GLOB_RECURSE FLY_SOURCES_C CONFIGURE_DEPENDS "${PROJECT_SOURCE_DIR}/src/*.c
 file(GLOB_RECURSE FLY_SOURCES_CPP CONFIGURE_DEPENDS "${PROJECT_SOURCE_DIR}/src/*.cpp")
 
 # Declare the lib, Manually include GSD here as its cmake is not for consumption
-add_library(libFLY OBJECT${FLY_SOURCES_C} ${FLY_SOURCES_CPP} "${PROJECT_SOURCE_DIR}/external/gsd/gsd/gsd.c")
+add_library(libFLY OBJECT ${FLY_SOURCES_C} ${FLY_SOURCES_CPP} "${PROJECT_SOURCE_DIR}/external/gsd/gsd/gsd.c")
 
 target_include_directories(libFLY PUBLIC "$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>")
 

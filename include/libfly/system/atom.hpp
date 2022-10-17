@@ -38,6 +38,8 @@ namespace fly::system {
     public:
       static_assert(std::is_empty_v<Tag>, "Property tag types are required to be empty");
 
+      AtomMem() = default;
+
       AtomMem(AtomMem&&) noexcept = default;
 
       AtomMem(AtomMem const&) = default;
@@ -82,6 +84,11 @@ namespace fly::system {
    */
   template <typename... T>
   struct Atom : detail::AtomMem<T>... {
+    /**
+     * @brief Default construct a new Atom object.
+     */
+    Atom() = default;
+
     /**
      * @brief Copy construct a new Atom object.
      */

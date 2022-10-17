@@ -26,6 +26,8 @@ Added
 - New ``Local`` class.
 - New property ``Hash``.
 - New meta programming utility ``is_narrowing_conversion_v``.
+- ``Atom`` has a default constructor.
+- ``VoS::atom_t`` exposes the underlying atom type. 
 - New internal graph class.
 
 Changed

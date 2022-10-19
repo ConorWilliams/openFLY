@@ -16,6 +16,7 @@
 
 #include <fmt/core.h>
 
+#include <algorithm>
 #include <catch2/catch_test_macros.hpp>
 #include <optional>
 #include <random>
@@ -149,6 +150,29 @@ system::VoS<Position, Colour> rand_geo(Xoshiro& rng, int num_atoms) {
   return out;
 }
 
+TEST_CASE("center geo", "[env]") {
+  //
+  std::random_device dev;
+
+  double rad = 5;
+
+  std::uniform_real_distribution uni(-rad, rad);
+
+  Xoshiro rng({dev(), dev(), dev(), dev()});
+
+  for (int i = 0; i < 1000; i++) {
+    env::Geometry<> geo;
+
+    for (size_t j = 0; j < 10; j++) {
+      geo.emplace_back(Vec::NullaryExpr([&uni, &rng] { return uni(rng); }), {});
+    }
+
+    geo.centre();
+
+    REQUIRE(gnorm(centroid(geo)) < 1e-10);
+  }
+}
+
 TEST_CASE("for_equiv_perms one", "[env]") {
   //
 
@@ -167,6 +191,8 @@ TEST_CASE("for_equiv_perms one", "[env]") {
     for (auto& elem : mut) {
       elem[r_] = O * elem[r_];
     }
+
+    std::shuffle(mut.begin() + 1, mut.end(), rng);
 
     std::optional<Mat> info = {};
 

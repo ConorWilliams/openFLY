@@ -20,11 +20,11 @@ Added
 ~~~~~
 - New ``Catalogue`` class.
 - New ``Fingerprint`` class.
+- New ``canon_hash()`` function.
 - New geometry functions: ``centroid()``, `` rmsd()``, `` grmsd(), for_equiv_perms()``.
 - New ``ortho_onto()`` function.
 - New ``Colour`` property.
 - New ``Geometry`` class.
-- New ``Local`` class.
 - New property ``Hash``.
 - New meta programming utility ``is_narrowing_conversion_v``.
 - ``Atom`` has a default constructor.

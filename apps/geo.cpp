@@ -14,6 +14,7 @@
 #include <variant>
 #include <vector>
 
+#include "libfly/env/catalogue.hpp"
 #include "libfly/io/gsd.hpp"
 #include "libfly/minimise/LBFGS/lbfgs.hpp"
 #include "libfly/neigh/list.hpp"
@@ -58,10 +59,12 @@ system::Supercell<system::TypeMap<>, Ts...> supercell_from(std::string_view fnam
   return out_cell;
 }
 
-#include "libfly/env/local.hpp"
+#include "libfly/env/heuristics.hpp"
 
 int main() {
   system::Supercell cell = supercell_from<Position, Frozen, PotentialGradient, Axis, Hash>("data/xyz/V1-unrelaxed.gsd", 0);
+
+  cell[hash_] = 0;
 
   //   Minimise.
 
@@ -76,61 +79,39 @@ int main() {
 
   fmt::print("FoundMin?={}\n", !timeit("Minimise", [&] { return minimiser.minimise(cell, cell, pot, omp_get_max_threads()); }));
 
-  cell(r_, 113) += Vec{1, 1, 1};
+  env::Catalogue cat({.delta_max = 1e-5, .debug = false});
 
-  //   double r_env = 5.2;
+  std::vector o1 = timeit("cat 0", [&] { return cat.rebuild(cell, omp_get_max_threads()); });
 
-  //   neigh::List nl(cell.box(), r_env);
+  fmt::print("Cat has {} buckets and {} envs found {} new\n", cat.num_keys(), cat.size(), o1.size());
 
-  //   nl.rebuild(cell, omp_get_max_threads());
+  //   o1 = timeit("cat 1", [&] { return cat.rebuild(cell, omp_get_max_threads()); });
 
-  //   //   env::Local le1;
+  //   fmt::print("Cat has {} buckets and {} envs found {} new\n", cat.num_keys(), cat.size(), o1.size());
 
-  //   Vector<env::Local> les(cell.size());
+  //   timeit("cat 2", [&] { return cat.rebuild(cell, omp_get_max_threads()); });
 
-  //   std::map<std::size_t, std::size_t> mp;
-
-  //   int count = 0;
-
-  //   for (int i = 0; i < cell.size(); i++) {
-  //     les[i].rebuild(i, cell, nl, cell.map().num_types(), r_env, 3);
-
-  //     auto h = les[i].key();
-
-  //     if (mp.count(h) == 0) {
-  //       mp[h] = count++;
-  //     }
-
-  //     cell(hash_, i) = mp[h];
-  //   }
-
-  //   timeit("build all        ", [&] {
-  // #pragma omp parallel for num_threads(omp_get_max_threads()) schedule(static)
-  //     for (int i = 0; i < cell.size(); i++) {
-  //       les[i].rebuild(i, cell, nl, cell.map().num_types(), r_env, 3);
-  //     }
-  //   });
-
-  env::LocalList ll({}, cell.box(), int(cell.map().num_types()));
-
-  timeit("ll.rebuild() warm", [&] { ll.rebuild(cell, omp_get_max_threads()); });
-
-  for (size_t i = 0; i < 5; i++) {
-    timeit("ll.rebuild()     ", [&] { ll.rebuild(cell, omp_get_max_threads()); });
+  for (int i = 0; i < cell.size(); i++) {
+    cell(hash_, i) = cat.get_ref(i).cat_index();
   }
 
-  // IO
+  for (size_t i = 0; i < 5; i++) {
+    o1 = timeit("cat iter", [&] { return cat.rebuild(cell, omp_get_max_threads()); });
+    fmt::print("Cat has {} buckets and {} envs found {} new\n", cat.num_keys(), cat.size(), o1.size());
+  }
 
-  fly::io::BinaryFile fout("geo.gsd", fly::io::create);
+  // IO //
 
-  fout.commit([&] {
-    fout.write(cell.box());                                                 //< Write the box to frame 0.
-    fout.write(cell.map());                                                 //< Write the map to frame 0.
-    fout.write("particles/N", fly::safe_cast<std::uint32_t>(cell.size()));  //< Write the number of atoms to frame 0.
-    fout.write(fly::id_, cell);                                             //< Write the TypeID's of the atoms to frame 0.
-    fout.write(fly::r_, cell);                                              //< Write the TypeID's of the atoms to frame 0.
-    fout.write(fly::hash_, cell);                                           //< Write the TypeID's of the atoms to frame 0.
-  });
+  //   fly::io::BinaryFile fout("geo.gsd", fly::io::create);
+
+  //   fout.commit([&] {
+  //     fout.write(cell.box());                                                 //< Write the box to frame 0.
+  //     fout.write(cell.map());                                                 //< Write the map to frame 0.
+  //     fout.write("particles/N", fly::safe_cast<std::uint32_t>(cell.size()));  //< Write the number of atoms to frame 0.
+  //     fout.write(fly::id_, cell);                                             //< Write the TypeID's of the atoms to frame 0.
+  //     fout.write(fly::r_, cell);                                              //< Write the TypeID's of the atoms to frame 0.
+  //     fout.write(fly::hash_, cell);                                           //< Write the TypeID's of the atoms to frame 0.
+  //   });
 
   return 0;
 }

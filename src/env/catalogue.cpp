@@ -14,58 +14,186 @@
 
 #include "libfly/env/catalogue.hpp"
 
+#include <algorithm>
+#include <cstddef>
+#include <vector>
+
+#include "libfly/env/geometry.hpp"
+#include "libfly/env/heuristics.hpp"
+#include "libfly/utility/core.hpp"
+
 namespace fly::env {
 
-  std::optional<Catalogue::Pointer> Catalogue::canon_find(Local& mut) {
-    // "it" always points to valid bucket (possibly empty)
-    auto [it, inserted] = m_cat.try_emplace(mut.key());
+  // Map id and frozen to a colour.
+  int to_colour_idx(TypeID::scalar_t id, Frozen::scalar_t frz) { return safe_cast<int>(2 * id + static_cast<TypeID::scalar_t>(frz)); }
 
-    if (!inserted) {
-      // Existing key, must search bucket for explicit match
-      auto match = std::find_if(it->second.begin(), it->second.end(), [&](Env& ref) {
-        //
-        double r_min = std::min(mut.fingerprint().r_min(), ref.fingerprint.r_min());
+  std::vector<int> Catalogue::rebuild_impl(system::SoA<Position const &, TypeID const &, Frozen const &> const &info,
+                                           int num_types,
+                                           int num_threads) {
+    // Prepare memory.
+    m_real.resize(std::size_t(info.size()));
 
-        double delta = std::min(0.4 * ref.delta_mod * r_min, m_opt.delta_max);
+    // Prep neigh list.
+    m_nl->rebuild(info, num_threads);
 
-        // Test if fuzzy keys match (fast)
-        if (!ref.fingerprint.equiv(mut.fingerprint(), delta * m_opt.overfuzz)) {
-          return false;
-        }
+    Geometry<Index> scratch;
 
-        if (mut.permute_onto(ref, delta)) {
-          ref.freq += 1;
-          return true;
-        } else {
-          return false;
-        }
+#pragma omp parallel for num_threads(num_threads) firstprivate(scratch) schedule(static)
+    for (int i = 0; i < info.size(); i++) {
+      //
+      RelEnv &env = m_real[std::size_t(i)];
+      // Reuse space.
+      env.geo.clear();
+
+      // Build geometries
+
+      // Centre not included by for_neigh.
+      env.geo.emplace_back({0, 0, 0}, to_colour_idx(info(id_, i), info(fzn_, i)), i);
+
+      m_nl->for_neighbours(i, m_opt.r_env, [&](auto n, double, Vec const &dr) {
+        env.geo.emplace_back(dr, to_colour_idx(info(id_, n), info(fzn_, n)), n);
       });
+      // Make origin centroid.
+      env.geo.centre();
+      // Make fingerprint.
+      env.f.rebuild(env.geo);
+      //
+      env.hash = canon_hash(env.geo, m_opt.r_edge, safe_cast<std::size_t>(2 * num_types), &scratch);
+    }
 
-      // If found a match, return it
-      if (match != it->second.end()) {
-        return Pointer(it, match - it->second.begin());
+    // Make sure every hash is in the map.
+    for (auto const &elem : m_real) {
+      m_cat.try_emplace(elem.hash);
+    }
+
+    bool flag = false;
+
+    // Find in catalogue, optimising for
+#pragma omp parallel for num_threads(num_threads) schedule(static)
+    for (std::size_t i = 0; i < m_real.size(); i++) {
+      if (std::optional ptr = canon_find(m_real[i])) {
+        m_real[i].ptr = ptr;
+      } else {
+#pragma omp atomic write
+        flag = true;
+        if (m_opt.debug) {
+          fmt::print("CAT: environment around {} is new\n", i);
+        }
       }
     }
 
-    return std::nullopt;
+    bool missing;
+
+#pragma omp atomic read
+    missing = flag;
+
+    if (!missing) {
+      if (m_opt.debug) {
+        fmt::print("CAT: No new environments\n");
+      }
+      return {};
+    }
+
+    // Now must operate single threaded.
+    std::vector<int> new_idx;
+
+    struct Pair {
+      Pointer ptr;
+      std::size_t hash;
+    };
+
+    std::vector<Pair> new_ptrs;
+
+    // Insert missing
+    for (std::size_t i = 0; i < m_real.size(); i++) {
+      if (!m_real[i].ptr) {
+        //
+        auto it = std::find_if(new_ptrs.begin(), new_ptrs.end(), [&](Pair const &ref) {
+          return m_real[i].hash == ref.hash && canon_equiv(m_real[i], *(ref.ptr));
+          //
+        });
+
+        if (it == new_ptrs.end()) {
+          // New environment.
+          [[maybe_unused]] auto new_hash = canon_hash(m_real[i].geo, m_opt.r_edge, safe_cast<std::size_t>(2 * num_types), &scratch);
+          ASSERT(new_hash == m_real[i].hash, "Hash has changed unexpectedly, {}!={}", new_hash, m_real[i].hash);
+
+          m_real[i].ptr = insert(m_real[i]);
+          new_idx.push_back(int(i));
+          new_ptrs.push_back({*m_real[i].ptr, m_real[i].hash});
+
+          if (m_opt.debug) {
+            fmt::print("CAT: Unknown at {} is new\n", i);
+          }
+
+        } else {
+          // New environment equivalent to other new environment.
+          m_real[i].ptr = it->ptr;
+
+          if (m_opt.debug) {
+            fmt::print("CAT: Unknown at {} is a duplicate new\n", i);
+          }
+        }
+        //
+      }
+    }
+
+    if (m_opt.debug) {
+      fmt::print("CAT: found {} new environments\n", new_idx.size());
+    }
+
+    // Update frequencies
+    for (auto const &elem : m_real) {
+      ASSERT(elem.ptr, "Null pointer in catalogue\n", 0);
+      (**elem.ptr).m_freq++;
+    }
+
+    return new_idx;
   }
 
-  Catalogue::Pointer Catalogue::insert(Local& env) {
+  std::optional<Catalogue::Pointer> Catalogue::canon_find(Catalogue::RelEnv &env) {
+    // "it" always points to valid bucket (possibly empty)
+    auto it = m_cat.find(env.hash);
+
+    ASSERT(it != m_cat.end(), "Catalogue missing key!", 0);
+
+    // Existing key, must search bucket for explicit match
+    auto match = std::find_if(it->second.begin(), it->second.end(), [&](Env const &ref) { return canon_equiv(env, ref); });
+
+    // If found a match, return it
+    if (match != it->second.end()) {
+      return Pointer(it, match - it->second.begin());
+    } else {
+      return {};
+    }
+  }
+
+  Catalogue::Pointer Catalogue::insert(Catalogue::RelEnv &env) {
     //
 
     ASSERT(!canon_find(env), "Environment already in catalogue.", 0);
 
-    auto [it, inserted] = m_cat.try_emplace(env.key());
+    auto it = m_cat.find(env.hash);
 
-    auto& new_ref = it->second.emplace_back(env.fingerprint());
+    ASSERT(it != m_cat.end(), "Catalogue missing key!", 0);
 
-    for (auto&& elem : env) {
-      new_ref.emplace_back(elem[r_], elem[col_]);
-    }
-
-    m_size++;
+    it->second.emplace_back(Env{env.geo, env.f, m_size++});
 
     return {it, xise(it->second) - 1};
+  }
+
+  bool Catalogue::canon_equiv(Catalogue::RelEnv &mut, Env const &ref) const {
+    //
+    double r_min = std::min(mut.f.r_min(), ref.m_finger.r_min());
+
+    double delta = std::min(0.4 * ref.m_delta_mod * r_min, m_opt.delta_max);
+
+    // Test if fuzzy keys match (fast)
+    if (!ref.m_finger.equiv(mut.f, delta * m_opt.overfuzz)) {
+      return false;
+    }
+
+    return static_cast<bool>(mut.geo.permute_onto(ref, delta));
   }
 
 }  // namespace fly::env

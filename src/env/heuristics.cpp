@@ -1,5 +1,3 @@
-#pragma once
-
 // Copyright © 2020 Conor Williams <conorwilliams@outlook.com>
 
 // SPDX-License-Identifier: GPL-3.0-or-later
@@ -14,13 +12,14 @@
 
 // You should have received a copy of the GNU General Public License along with openFLY. If not, see <https://www.gnu.org/licenses/>.
 
+#include "libfly/env/heuristics.hpp"
+
 #include <algorithm>
 #include <array>
 #include <cstddef>
 #include <vector>
 
 #include "libfly/env/geometry.hpp"
-#include "libfly/env/local.hpp"
 #include "libfly/system/VoS.hpp"
 #include "libfly/utility/core.hpp"
 
@@ -33,6 +32,28 @@
 #include "nauty/nauty.h"
 
 namespace fly::env {
+
+  bool Fingerprint::equiv(Fingerprint const& other, double delta) const {
+    if (m_r_0j.size() != other.m_r_0j.size()) {
+      return false;
+    }
+
+    for (std::size_t i = 0; i < m_r_0j.size(); i++) {
+      if (std::abs(m_r_0j[i] - other.m_r_0j[i]) > delta * M_SQRT2) {
+        return false;
+      }
+    }
+
+    ASSERT(m_r_ij.size() == other.m_r_ij.size(), "Secondary distances should match {}!={}", m_r_ij.size(), other.m_r_ij.size());
+
+    for (std::size_t i = 0; i < m_r_ij.size(); i++) {
+      if (std::abs(m_r_ij[i] - other.m_r_ij[i]) > delta * M_SQRT2) {
+        return false;
+      }
+    }
+
+    return true;
+  }
 
   class AdjMat {
   public:
@@ -131,11 +152,15 @@ namespace fly::env {
     return offsets;
   }
 
-  /**
-   * @brief Re-order a geometry into its graph-canonical order and produce a hash of its colour + graph-topology.
-   */
-  template <typename... T>
-  XXH64_hash_t canon_hash(Geometry<T...>& geo, double r_edge, std::size_t c_max) {
+  std::size_t canon_hash(Geometry<Index>& geo, double r_edge, std::size_t c_max, Geometry<Index>* scratch) {
+    //
+    Geometry<Index> tmp;
+
+    if (!scratch) {
+      tmp.resize(geo.size());
+      scratch = &tmp;
+    }
+
     //
     ASSERT(geo.size() <= MAXN, "Graph with {} nodes is too big, limit={}", geo.size(), MAXN);
 
@@ -229,11 +254,16 @@ namespace fly::env {
 
     ASSERT(lab[0] == 0, "Colouring has failed lab[0]={}", lab[0]);
 
-    Geometry buff(geo);
+    scratch->resize(geo.size());
 
     for (int i = 0; i < geo.size(); i++) {
-      geo[i] = buff[lab[std::size_t(i)]];
+      (*scratch)[i] = geo[lab[std::size_t(i)]];
     }
+
+    using std::swap;
+    swap(geo, *scratch);
+
+    static_assert(!is_narrowing_conversion_v<XXH64_hash_t, std::size_t>, "XXH64_hash_t does not fit in std::size_t");
 
     return XXH64(canon.data(), size_t(mat.m()) * size_t(mat.n()) * sizeof(graph), c_hash);
   }

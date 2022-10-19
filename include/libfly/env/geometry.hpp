@@ -279,13 +279,25 @@ namespace fly::env {
    * @brief A Geometry models a local distribution of periodically resolved Atoms.
    *
    * The distribution of atoms is centred on the first atom, i.e. the first atom cannot move and is always fixed during permutation
-   * operations.
+   * operations and the centroid of the geometry is the origin.
    *
    * A Geometry is a ``fly::system::VoS``  with the default properties Position and Colour.
    */
   template <typename... Pr>
   class Geometry : public system::VoS<Position, Colour, Pr...> {
   public:
+    /**
+     * @brief Shift the origin to the centroid of the atoms.
+     */
+    void centre() noexcept {
+      //
+      Vec shift = centroid(*this);
+
+      for (auto &elem : *this) {
+        elem[r_] -= shift;
+      }
+    }
+
     /**
      * @brief Returned by permutation methods, contains extra info about the permutation.
      */

@@ -34,10 +34,7 @@
 /**
  * \file heuristics.hpp
  *
- * @brief Local environments.
- *
- * The local environment (LE) of an atom is the set of atoms within some neighbourhood. It is assumed in OLKMC that the mechanisms
- * accessible to an atom are completely contained-within and solely a-function-of its LE.
+ * @brief Utilities for quickly comparing local environments without resorting to a full ``Geometry::permute_onto()``.
  */
 
 namespace fly::env {
@@ -45,9 +42,9 @@ namespace fly::env {
   /**
    * @brief Reorder a geometry into a canonical order and produce a hash encoding the colours and topology of the geometry.
    *
-   * This functions builds a graph based representation of the geometry encoding atoms as coloured joined with edges if the atoms are
-   * closer than ``r_edge``. This graph is then canonised using the nauty library (see: https://pallini.di.uniroma1.it/) and a hash
-   * derived from its canonical adjacency matrix.
+   * This functions builds a graph based representation of the geometry, encoding atoms as coloured nodes joined with edges if the
+   * atoms are closer than ``r_edge``. This graph is then canonised using the nauty library (see: https://pallini.di.uniroma1.it/) and
+   * a hash is derived from the canonical adjacency matrix.
    *
    * @param geo The geometry to be reordered.
    * @param r_edge The edge length used to determine if atoms in the geometry are bonded in the graph representation.

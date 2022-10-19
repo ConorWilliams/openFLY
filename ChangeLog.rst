@@ -18,6 +18,7 @@ Unreleased
 -------------------------------
 Added
 ~~~~~
+- New ``LocalMech`` classes (incomplete).
 - New ``Catalogue`` class.
 - New ``Fingerprint`` class.
 - New ``canon_hash()`` function.

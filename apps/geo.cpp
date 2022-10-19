@@ -79,7 +79,7 @@ int main() {
 
   fmt::print("FoundMin?={}\n", !timeit("Minimise", [&] { return minimiser.minimise(cell, cell, pot, omp_get_max_threads()); }));
 
-  env::Catalogue cat({.delta_max = 1e-5, .debug = false});
+  env::Catalogue cat({.delta_max = 500, .debug = false});
 
   std::vector o1 = timeit("cat 0", [&] { return cat.rebuild(cell, omp_get_max_threads()); });
 
@@ -102,16 +102,16 @@ int main() {
 
   // IO //
 
-  //   fly::io::BinaryFile fout("geo.gsd", fly::io::create);
+  fly::io::BinaryFile fout("geo.gsd", fly::io::create);
 
-  //   fout.commit([&] {
-  //     fout.write(cell.box());                                                 //< Write the box to frame 0.
-  //     fout.write(cell.map());                                                 //< Write the map to frame 0.
-  //     fout.write("particles/N", fly::safe_cast<std::uint32_t>(cell.size()));  //< Write the number of atoms to frame 0.
-  //     fout.write(fly::id_, cell);                                             //< Write the TypeID's of the atoms to frame 0.
-  //     fout.write(fly::r_, cell);                                              //< Write the TypeID's of the atoms to frame 0.
-  //     fout.write(fly::hash_, cell);                                           //< Write the TypeID's of the atoms to frame 0.
-  //   });
+  fout.commit([&] {
+    fout.write(cell.box());                                                 //< Write the box to frame 0.
+    fout.write(cell.map());                                                 //< Write the map to frame 0.
+    fout.write("particles/N", fly::safe_cast<std::uint32_t>(cell.size()));  //< Write the number of atoms to frame 0.
+    fout.write(fly::id_, cell);                                             //< Write the TypeID's of the atoms to frame 0.
+    fout.write(fly::r_, cell);                                              //< Write the TypeID's of the atoms to frame 0.
+    fout.write(fly::hash_, cell);                                           //< Write the TypeID's of the atoms to frame 0.
+  });
 
   return 0;
 }

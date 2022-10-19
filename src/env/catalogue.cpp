@@ -177,7 +177,7 @@ namespace fly::env {
 
     ASSERT(it != m_cat.end(), "Catalogue missing key!", 0);
 
-    it->second.emplace_back(Env{env.geo, env.f, m_size++});
+    it->second.emplace_back(Env{env.geo, env.f, m_size++, m_opt.delta_max});
 
     return {it, xise(it->second) - 1};
   }
@@ -186,7 +186,7 @@ namespace fly::env {
     //
     double r_min = std::min(mut.f.r_min(), ref.m_finger.r_min());
 
-    double delta = std::min(0.4 * ref.m_delta_mod * r_min, m_opt.delta_max);
+    double delta = std::min(0.4 * r_min, ref.m_delta_max);
 
     // Test if fuzzy keys match (fast)
     if (!ref.m_finger.equiv(mut.f, delta * m_opt.overfuzz)) {

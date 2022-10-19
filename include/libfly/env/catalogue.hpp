@@ -27,75 +27,23 @@
 #include "libfly/env/heuristics.hpp"
 #include "libfly/neigh/list.hpp"
 #include "libfly/system/box.hpp"
+#include "libfly/system/mechanisms.hpp"
 #include "libfly/system/supercell.hpp"
 #include "libfly/utility/core.hpp"
+
+/**
+ * \file catalogue.hpp
+ *
+ * @brief Classes responsible for mapping local environments to mechanisms.
+ */
 
 namespace fly::env {
 
   /**
-   * @brief The representation of a mechanism containing the the displacements of the atoms in a Local environment.
-   */
-  struct Mechanism : system::VoS<Delta> {
-    double delta_fwd;  ///< The forward energy barrier.
-  };
-
-  /**
-   * @brief The representation of a local environment in the catalogue.
-   */
-  struct Env : private Geometry<> {
-  public:
-    /**
-     * @brief Fetch the reference geometry this environment represents.
-     */
-    auto ref_geo() const -> Geometry<> const& { return *this; }
-
-    /**
-     * @brief Get a vector of the ``Mechanism``s centred on this environment.
-     *
-     * Pre-condition, set_mechs() must have been called on this ``Env``.
-     */
-    auto get_mechs() const -> std::vector<Mechanism> const& {
-      ASSERT(!m_mechs.empty(), "Environment has not been completed", 0);
-      return m_mechs;
-    }
-
-    /**
-     * @brief Set the vector of ``Mechanism``s.
-     *
-     * Pre-condition, this may only be called once.
-     */
-    auto set_mech(std::vector<Mechanism>&& m) -> void {
-      verify(m_mechs.empty(), "We already have {} mechanisms, set_mech() should only be called once.", m_mechs.size());
-      verify(std::all_of(m.begin(), m.end(), [s = this->size()](auto const& x) { return x.size() == s; }), "Wrong number of atoms.");
-      m_mechs = std::move(m);
-    }
-
-    /**
-     * @brief Get the index (unique to this environment) in the catalogue.
-     */
-    auto cat_index() const noexcept -> int { return m_index; }
-
-  private:
-    friend class Catalogue;
-
-    Fingerprint m_finger;              ///< The fingerprint of this environment.
-    std::vector<Mechanism> m_mechs{};  ///< The mechanisms accessible, centred on this environment.
-    int m_freq = 0;                    ///< The number of times this environment has been discovered.
-    int m_index;                       ///< The unique index in the catalogue.
-    double m_delta_mod = 1;            ///< The tolerance modifier for this environment.
-
-    /**
-     * @brief Construct a new ``Env`` object.
-     */
-    explicit Env(Geometry<Index> const& geo, Fingerprint const& f, int index) : m_finger(f), m_index(index) {
-      for (auto const& elem : geo) {
-        this->emplace_back(elem[r_], elem[col_]);
-      }
-    }
-  };
-
-  /**
-   * @brief The Catalogue is a mapping from ``Local`` environments to mechanisms.
+   * @brief The Catalogue is a mapping from ``Geometry`` to local environments and mechanisms.
+   *
+   * The Catalogue is responsible for building geometries from a ``Supercell`` and associating them with equivalent, historically-seen
+   * geometries via a three step matching process detailed in ``Catalogue::rebuild()``.
    */
   class Catalogue {
   public:
@@ -103,9 +51,9 @@ namespace fly::env {
      * @brief Used to configure the catalogue.
      */
     struct Options {
-      /** @brief Maximum difference in L2 norm between LEs for them to be considered the same. */
+      /** @brief Initial maximum difference in L2 norm between LEs for them to be considered the same. */
       double delta_max = 0.5;
-      /** @brief Smaller to decrease false positives but, values < 1.0 introduce false negatives. */
+      /** @brief Smaller to decrease false positives during fingerprint equivalence but, values < 1.0 introduce false negatives. */
       double overfuzz = 0.5;
       /** @brief Radius of a local environment. */
       double r_env = 5.2;
@@ -116,18 +64,84 @@ namespace fly::env {
     };
 
     /**
+     * @brief The representation of a local environment in the catalogue.
+     */
+    struct Env : private Geometry<> {
+    public:
+      /**
+       * @brief Fetch the reference geometry this environment represents.
+       */
+      auto ref_geo() const -> Geometry<> const& { return *this; }
+
+      /**
+       * @brief Get a vector of the ``system::LocalMech``s centred on this environment.
+       *
+       * Pre-condition, set_mechs() must have been called on this ``Env``.
+       */
+      auto get_mechs() const -> std::vector<system::LocalMech> const& {
+        ASSERT(!m_mechs.empty(), "Environment has not been completed", 0);
+        return m_mechs;
+      }
+
+      /**
+       * @brief Set the vector of ``system::LocalMech``s.
+       *
+       * Pre-condition, this may only be called once.
+       */
+      auto set_mech(std::vector<system::LocalMech>&& m) -> void {
+        verify(m_mechs.empty(), "We already have {} mechanisms, set_mech() should only be called once.", m_mechs.size());
+        verify(std::all_of(m.begin(), m.end(), [s = this->size()](auto const& x) { return x.size() == s; }), "Wrong number of atoms.");
+        m_mechs = std::move(m);
+      }
+
+      /**
+       * @brief Get the index (unique to this environment) in the catalogue.
+       */
+      auto cat_index() const noexcept -> int { return m_index; }
+
+    private:
+      friend class Catalogue;
+
+      Fingerprint m_finger;                      ///< The fingerprint of this environment.
+      std::vector<system::LocalMech> m_mechs{};  ///< The mechanisms accessible, centred on this environment.
+      int m_freq = 0;                            ///< The number of times this environment has been discovered.
+      int m_index;                               ///< The unique index in the catalogue.
+      double m_delta_max;                        ///< The maximum value norm for environments to be considered equivilent.
+
+      /**
+       * @brief Construct a new ``Env`` object.
+       */
+      explicit Env(Geometry<Index> const& geo, Fingerprint const& f, int index, double del)
+          : m_finger(f), m_index(index), m_delta_max(del) {
+        for (auto const& elem : geo) {
+          this->emplace_back(elem[r_], elem[col_]);
+        }
+      }
+    };
+
+    /**
      * @brief Construct a new Catalogue object.
      */
     explicit Catalogue(Options const& opt) : m_opt(opt) {}
 
     /**
-     * @brief
+     * @brief Build the geometries and associate them with equivalent, historically-seen geometries.
      *
-     * @tparam Map
-     * @tparam T
-     * @param cell
-     * @param num_threads
-     * @return std::vector<int>
+     * \rst
+     *
+     * This occurs via a three step matching process:
+     *
+     * 1. The new geometries are canonised (based on their graph representation) and a discrete key generated.
+     * 2. Geometries with equal discrete keys are compared for equivalence of their fingerprints.
+     * 3. If they are equivalent under (2) they are compared for equivalence via ``geometry::permute_onto()``.
+     *
+     * Any new geometries that have not been encountered before are inserted into the catalogue and the index of the atom atom which
+     * the unknown geometry is centred on is returned.
+     *
+     * This process is deterministic, providing none of the reference geometries are modified (allowing new ones to be inserted) the
+     * same match will always be returned.
+     *
+     * \endrst
      */
     template <typename Map, typename... T>
     auto rebuild(system::Supercell<Map, T...> const& cell, int num_threads = 1) -> std::vector<int> {
@@ -142,7 +156,7 @@ namespace fly::env {
     }
 
     /**
-     * @brief Get the number of environments in the catalogue.
+     * @brief Get the number of local environments in the catalogue.
      */
     int size() const noexcept { return m_size; }
 
@@ -152,12 +166,12 @@ namespace fly::env {
     std::size_t num_keys() const noexcept { return m_cat.size(); }
 
     /**
-     * @brief Get a view of the (indexed) geometry in canonical order around atom ``i``.
+     * @brief Get a view of the (indexed) geometry, in canonical order, around atom ``i``.
      */
     auto get_geo(int i) const noexcept -> Geometry<Index> const& { return m_real[std::size_t(i)].geo; }
 
     /**
-     * @brief Get the reference geometry stored in the catalogue.
+     * @brief Get the reference geometry stored in the catalogue that is equivalent to the geometry around atom ``i``.
      */
     auto get_ref(int i) noexcept -> Env& { return **(m_real[std::size_t(i)].ptr); }
 

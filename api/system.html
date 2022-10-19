@@ -182,7 +182,7 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="neighbour.html">Neighbours</a></li>
-<li class="toctree-l2"><a class="reference internal" href="env.html">Local environments</a></li>
+<li class="toctree-l2"><a class="reference internal" href="env.html">Environments</a></li>
 <li class="toctree-l2"><a class="reference internal" href="io.html">Input/Output (IO)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="potential.html">Potentials</a></li>
 <li class="toctree-l2"><a class="reference internal" href="minimise.html">Minimisers</a></li>
@@ -1359,6 +1359,27 @@ distance.</p>
 </dd></dl>
 
 </section>
+<section id="mechanisms">
+<h2>Mechanisms<a class="headerlink" href="#mechanisms" title="Permalink to this heading">#</a></h2>
+<p>File: <code class="docutils literal notranslate"><span class="pre">libfly/system/mechanisms.hpp</span></code></p>
+<p>Representations of mechanisms. </p>
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv4N3fly6system9LocalMechE">
+<span id="_CPPv3N3fly6system9LocalMechE"></span><span id="_CPPv2N3fly6system9LocalMechE"></span><span id="fly::system::LocalMech"></span><span class="target" id="classfly_1_1system_1_1LocalMech"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">LocalMech</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><span class="n"><span class="pre">fly</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">system</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4IDpEN3fly6system3VoSE" title="fly::system::VoS"><span class="n"><span class="pre">VoS</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">Delta</span></span><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4N3fly6system9LocalMechE" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>A representation of a local mechanism containing the the displacements of the atoms in a LE. </p>
+<p><a class="reference internal" href="#structfly_1_1builtin__properties_1_1Frozen"><span class="std std-ref">Frozen</span></a> atoms must have a displacement equal to <code class="docutils literal notranslate"><span class="pre">Vec::Zero()</span></code>. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N3fly6system9LocalMech9delta_fwdE">
+<span id="_CPPv3N3fly6system9LocalMech9delta_fwdE"></span><span id="_CPPv2N3fly6system9LocalMech9delta_fwdE"></span><span id="fly::system::LocalMech::delta_fwd__double"></span><span class="target" id="classfly_1_1system_1_1LocalMech_1a09087d43d5a27e8692ce8000cf09afb0"></span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">delta_fwd</span></span></span><a class="headerlink" href="#_CPPv4N3fly6system9LocalMech9delta_fwdE" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>The forward energy barrier. </p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+</section>
 <section id="hessians">
 <h2>Hessians<a class="headerlink" href="#hessians" title="Permalink to this heading">#</a></h2>
 <p>File: <code class="docutils literal notranslate"><span class="pre">libfly/system/hessian.hpp</span></code></p>
@@ -1497,6 +1518,7 @@ distance.</p>
 </ul>
 </li>
 <li><a class="reference internal" href="#supercells">Supercells</a></li>
+<li><a class="reference internal" href="#mechanisms">Mechanisms</a></li>
 <li><a class="reference internal" href="#hessians">Hessians</a></li>
 </ul>
 </li>

@@ -1,4 +1,4 @@
-OpenFLY 0.5.x-dev
+OpenFLY 0.6.x-dev
 ===================================
 
 .. toctree::

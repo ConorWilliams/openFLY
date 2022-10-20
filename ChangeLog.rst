@@ -18,7 +18,30 @@ Unreleased
 -------------------------------
 Added
 ~~~~~
+
 - New ``LocalMech`` classes (incomplete).
+
+Changed
+~~~~~~~
+Removed
+~~~~~~~
+Bugfixes
+~~~~~~~~
+Meta 
+~~~~
+
+.. Version is specified in vcpkg.json, docs/index.rst and libfly/utility/version.hpp
+
+
+Version 0.6.0
+-------------------------------
+
+This release introduces local environments, the catalogue and implementation of our invariant and tolerant matching algorithm.
+
+
+Added
+~~~~~
+
 - New ``Catalogue`` class.
 - New ``Fingerprint`` class.
 - New ``canon_hash()`` function.
@@ -32,17 +55,10 @@ Added
 - ``VoS::atom_t`` exposes the underlying atom type. 
 - New internal graph class.
 
-Changed
-~~~~~~~
-Removed
-~~~~~~~
-Bugfixes
-~~~~~~~~
 Meta 
 ~~~~
 - New dependencies Nauty and xxHash
 
-.. Version is specified in vcpkg.json, index.rst and version.hpp
 
 Version 0.5.0
 -------------------------------

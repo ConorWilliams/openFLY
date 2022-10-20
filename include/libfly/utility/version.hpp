@@ -21,5 +21,5 @@
  */
 
 #define FLY_VERSION_MAJOR 0  ///< The major version umber.
-#define FLY_VERSION_MINOR 5  ///< The minor version umber.
+#define FLY_VERSION_MINOR 6  ///< The minor version umber.
 #define FLY_VERSION_PATCH 0  ///< The patch umber.

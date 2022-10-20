@@ -33,10 +33,10 @@ auto count_sym(Set const& ref, double delta) -> int {
     // If we "return true" then exploration of permutations terminates.
     // If we "return false" then exploration of permutations continues.
 
-    // Here we are counting all the permutations so we will return true.
+    // Here we are counting all the permutations so we will return false.
     count++;
 
-    return true;
+    return false;
   });
 
   return count;  // The number of approximate symmetries that ref has.

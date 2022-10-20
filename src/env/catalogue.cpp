@@ -24,9 +24,6 @@
 
 namespace fly::env {
 
-  // Map id and frozen to a colour.
-  int to_colour_idx(TypeID::scalar_t id, Frozen::scalar_t frz) { return safe_cast<int>(2 * id + static_cast<TypeID::scalar_t>(frz)); }
-
   std::vector<int> Catalogue::rebuild_impl(system::SoA<Position const &, TypeID const &, Frozen const &> const &info,
                                            int num_types,
                                            int num_threads) {
@@ -42,19 +39,9 @@ namespace fly::env {
     for (int i = 0; i < info.size(); i++) {
       //
       RelEnv &env = m_real[std::size_t(i)];
-      // Reuse space.
-      env.geo.clear();
 
       // Build geometries
-
-      // Centre not included by for_neigh.
-      env.geo.emplace_back({0, 0, 0}, to_colour_idx(info(id_, i), info(fzn_, i)), i);
-
-      m_nl->for_neighbours(i, m_opt.r_env, [&](auto n, double, Vec const &dr) {
-        env.geo.emplace_back(dr, to_colour_idx(info(id_, n), info(fzn_, n)), n);
-      });
-      // Make origin centroid.
-      env.geo.centre();
+      rebuild_geo_from_nl(i, env.geo, info, *m_nl, m_opt.r_env);
       // Make fingerprint.
       env.f.rebuild(env.geo);
       //
@@ -195,5 +182,11 @@ namespace fly::env {
 
     return static_cast<bool>(mut.geo.permute_onto(ref, delta));
   }
+
+  //   void Catalogue::crunch_pathways(system::SoA<Position const &, Frozen const &> cell,
+  //                                   std::vector<typename saddle::MasterFinder::PathGroup> const &pathways) {
+  //     for (auto &&pg : pathways) {
+  //     }
+  //   }
 
 }  // namespace fly::env

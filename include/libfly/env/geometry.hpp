@@ -26,6 +26,8 @@
 #include <utility>
 #include <vector>
 
+#include "libfly/neigh/list.hpp"
+#include "libfly/system/SoA.hpp"
 #include "libfly/system/VoS.hpp"
 #include "libfly/system/property.hpp"
 #include "libfly/utility/core.hpp"
@@ -361,5 +363,35 @@ namespace fly::env {
       return res;
     }
   };
+
+  /**
+   * @brief Compute the colour of an atom by mixing the TypeID and Frozen properties.
+   *
+   * Colour is an integer from: 0,1,..., ``num_types`` - 1
+   */
+  inline auto to_colour(TypeID::scalar_t id, Frozen::scalar_t frz) -> Colour::scalar_t {
+    return safe_cast<Colour::scalar_t>(2 * id + static_cast<TypeID::scalar_t>(frz));
+  }
+
+  /**
+   * @brief (re)Build a geometry containing the local environment surrounding atom ``i``.
+   */
+  inline auto rebuild_geo_from_nl(int i,
+                                  Geometry<Index> &geo,
+                                  system::SoA<TypeID const &, Frozen const &> const &info,
+                                  neigh::List const &nl,
+                                  double r_env) {
+    // Reuse space.
+    geo.clear();
+    // Centre not included by for_neigh.
+    geo.emplace_back({0, 0, 0}, to_colour(info(id_, i), info(fzn_, i)), i);
+    // Other atoms
+    nl.for_neighbours(i, r_env, [&](auto n, double, Vec const &dr) {
+      geo.emplace_back(dr, to_colour(info(id_, n), info(fzn_, n)), n);
+      //
+    });
+    // Make origin centroid.
+    geo.centre();
+  }
 
 }  // namespace fly::env

@@ -26,6 +26,9 @@
 #include "libfly/env/geometry.hpp"
 #include "libfly/env/heuristics.hpp"
 #include "libfly/neigh/list.hpp"
+#include "libfly/potential/generic.hpp"
+#include "libfly/saddle/find.hpp"
+#include "libfly/system/SoA.hpp"
 #include "libfly/system/box.hpp"
 #include "libfly/system/mechanisms.hpp"
 #include "libfly/system/supercell.hpp"
@@ -84,17 +87,6 @@ namespace fly::env {
       }
 
       /**
-       * @brief Set the vector of ``system::LocalMech``s.
-       *
-       * Pre-condition, this may only be called once.
-       */
-      auto set_mech(std::vector<system::LocalMech>&& m) -> void {
-        verify(m_mechs.empty(), "We already have {} mechanisms, set_mech() should only be called once.", m_mechs.size());
-        verify(std::all_of(m.begin(), m.end(), [s = this->size()](auto const& x) { return x.size() == s; }), "Wrong number of atoms.");
-        m_mechs = std::move(m);
-      }
-
-      /**
        * @brief Get the index (unique to this environment) in the catalogue.
        */
       auto cat_index() const noexcept -> int { return m_index; }
@@ -116,6 +108,23 @@ namespace fly::env {
         for (auto const& elem : geo) {
           this->emplace_back(elem[r_], elem[col_]);
         }
+      }
+
+      /**
+       * @brief Set the vector of ``system::LocalMech``s.
+       *
+       * Pre-condition, this may only be called once.
+       */
+      auto set_mech(std::vector<system::LocalMech>&& m) -> void {
+        verify(m_mechs.empty(), "We already have {} mechanisms, set_mech() should only be called once.", m_mechs.size());
+        verify(std::all_of(m.begin(),
+                           m.end(),
+                           [s = this->size()](system::LocalMech const& x) {
+                             //
+                             return x.delta_sp.size() == s && x.delta_fwd.size() == s;
+                           }),
+               "Wrong number of atoms.");
+        m_mechs = std::move(m);
       }
     };
 
@@ -154,6 +163,14 @@ namespace fly::env {
       }
       return rebuild_impl(cell, cell.map().num_types(), num_threads);
     }
+
+    /**
+     * @brief Convert the pathways into mechanisms and store them in the catalogue.
+     *
+     * This requires that this function is called following a call to ``rebuild()`` (with the same cell).
+     */
+    auto crunch_pathways(system::SoA<Position const&, Frozen const&> cell,
+                         std::vector<typename saddle::MasterFinder::PathGroup> const& pathways) -> void;
 
     /**
      * @brief Get the number of local environments in the catalogue.

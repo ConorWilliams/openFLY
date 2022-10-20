@@ -267,6 +267,7 @@ namespace fly::saddle {
     for (int i = 0; i < in.size(); i++) {
       if (!in(fzn_, i)) {
         fwd(r_, i) += drift;
+        dimer(r_, i) += drift;
         rev(r_, i) += drift;
       }
     }

@@ -18,6 +18,7 @@
 // You should have received a copy of the GNU General Public License along with
 // openFLY. If not, see <https://www.gnu.org/licenses/>.
 
+#include "libfly/system/SoA.hpp"
 #include "libfly/system/VoS.hpp"
 #include "libfly/system/property.hpp"
 #include "libfly/utility/core.hpp"
@@ -35,9 +36,15 @@ namespace fly::system {
    *
    * Frozen atoms must have a displacement equal to ``Vec::Zero()``.
    */
-  class LocalMech : public system::VoS<Delta> {
+  class LocalMech {
   public:
-    double delta_fwd;  ///< The forward energy barrier.
+    double barrier;       ///< Energy barrier (eSp - e0).
+    double delta;         ///< Energy change (eF - e0).
+    double kinetic_pre;   ///< Arrhenius pre factor.
+    double capture_frac;  ///< norm(delta_fwd in local) / norm(delta_fwd in global)
+
+    system::VoS<Delta> delta_sp;   ///< Displacement vectors from initial to saddle-point.
+    system::VoS<Delta> delta_fwd;  ///< Displacement vectors from initial to final.
   };
 
 }  // namespace fly::system

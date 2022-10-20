@@ -22,6 +22,7 @@
 #include "libfly/potential/generic.hpp"
 #include "libfly/saddle//find.hpp"
 #include "libfly/saddle/dimer.hpp"
+#include "libfly/saddle/find2.hpp"
 #include "libfly/saddle/perturb.hpp"
 #include "libfly/system/SoA.hpp"
 #include "libfly/system/atom.hpp"
@@ -49,7 +50,7 @@ system::Supercell<system::TypeMap<>, Ts...> supercell_from(std::string_view fnam
   auto read = [&](auto property) {
     try {
       file.read_to(frame, property, out_cell);
-    } catch (fly::RuntimeError const& err) {
+    } catch (fly::RuntimeError const &err) {
       fmt::print("Ignoring error, what(): {}\n", err.what());
     }
   };
@@ -81,26 +82,15 @@ int main() {
 
   env::Catalogue cat({.delta_max = 500, .debug = false});
 
-  std::vector o1 = timeit("cat 0", [&] { return cat.rebuild(cell, omp_get_max_threads()); });
+  std::vector ix = timeit("cat.rebuild()", [&] { return cat.rebuild(cell, omp_get_max_threads()); });
 
-  fmt::print("Cat has {} buckets and {} envs found {} new\n", cat.num_keys(), cat.size(), o1.size());
+  for (auto &&elem : ix) {
+    fmt::print("New env @{}\n", elem);
+  }
 
-  //   o1 = timeit("cat 1", [&] { return cat.rebuild(cell, omp_get_max_threads()); });
-
-  //   fmt::print("Cat has {} buckets and {} envs found {} new\n", cat.num_keys(), cat.size(), o1.size());
-
-  //   timeit("cat 2", [&] { return cat.rebuild(cell, omp_get_max_threads()); });
-
-  for (int i = 0; i < cell.size(); i++) {
+  for (int i = 0; i < cell.size(); ++i) {
     cell(hash_, i) = cat.get_ref(i).cat_index();
   }
-
-  for (size_t i = 0; i < 5; i++) {
-    o1 = timeit("cat iter", [&] { return cat.rebuild(cell, omp_get_max_threads()); });
-    fmt::print("Cat has {} buckets and {} envs found {} new\n", cat.num_keys(), cat.size(), o1.size());
-  }
-
-  // IO //
 
   fly::io::BinaryFile fout("geo.gsd", fly::io::create);
 
@@ -112,6 +102,54 @@ int main() {
     fout.write(fly::r_, cell);                                              //< Write the TypeID's of the atoms to frame 0.
     fout.write(fly::hash_, cell);                                           //< Write the TypeID's of the atoms to frame 0.
   });
+
+  // ////////////////////// find 2 ////////////////////////
+
+  fly::io::BinaryFile dout("finder.gsd", fly::io::create);
+
+  dout.write(cell.box());                                                 //< Write the box to frame 0.
+  dout.write(cell.map());                                                 //< Write the map to frame 0.
+  dout.write("particles/N", fly::safe_cast<std::uint32_t>(cell.size()));  //< Write the number of atoms to frame 0.
+  dout.write(fly::id_, cell);
+
+  std::vector<env::Geometry<Index>> tmp;
+
+  for (auto const &elem : ix) {
+    tmp.push_back(cat.get_geo(elem));
+  }
+
+  saddle::Dimer dimer{
+      {},//{.debug = true, .fout = &dout},
+      {},  //{.debug = true},
+      cell.box(),
+  };
+
+  saddle::Master mast{
+      {.num_threads = omp_get_max_threads(), .debug = true, .fout = &dout},
+      cell.box(),
+      pot,
+      minimiser,
+      dimer,
+  };
+
+  mast.find_mechs({cat.get_geo(2)}, cell);
+
+  exit(0);
+
+  // ////////////////////// find ds ////////////////////////
+
+
+
+  saddle::MasterFinder finder{
+      {.num_threads = omp_get_max_threads(), .debug = true, .fout = &dout},  // no box
+      pot,                                                                   // no box
+      minimiser,                                                             // has box
+      dimer,                                                                 // has box
+  };
+
+  finder.find_pathways(cell.box(), {2}, cell);
+
+  /////////////////////////// IO ///////////////////////////
 
   return 0;
 }

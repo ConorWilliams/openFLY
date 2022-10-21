@@ -79,11 +79,13 @@ namespace fly::env {
    *
    * \endrst
    *
-   * @param x Set of atoms with the Position property.
-   * @param y Set of atoms with the Position property.
+   * @tparam Pr The distance-like vector property to use as atomic position.
+   *
+   * @param x Set of atoms with the ``Pr`` property.
+   * @param y Set of atoms with the ``Pr`` property.
    * @param M Transformation matrix.
    */
-  template <typename E, typename... M1, typename... M2>
+  template <typename Pr = Position, typename E, typename... M1, typename... M2>
   auto grmsd(E const &M, system::VoS<M1...> const &x, system::VoS<M2...> const &y) -> double {
     //
     ASSERT(x.size() == y.size(), "Sizes must match, {}!={}!", x.size(), y.size());
@@ -91,7 +93,7 @@ namespace fly::env {
     double sum_sq = 0;
 
     for (int i = 0; i < x.size(); ++i) {
-      sum_sq += gnorm_sq(y[i][r_] - M * x[i][r_]);
+      sum_sq += gnorm_sq(y[i][Pr{}] - M * x[i][Pr{}]);
     }
 
     return std::sqrt(sum_sq);
@@ -110,12 +112,14 @@ namespace fly::env {
    *
    * \endrst
    *
-   * @param x Set of atoms with the Position property.
-   * @param y Set of atoms with the Position property.
+   * @tparam Pr The distance-like vector property to use as atomic position.
+   *
+   * @param x Set of atoms with the ``Pr`` property.
+   * @param y Set of atoms with the ``Pr`` property.
    */
-  template <typename... M1, typename... M2>
+  template <typename Pr = Position, typename... M1, typename... M2>
   auto rmsd(system::VoS<M1...> const &x, system::VoS<M2...> const &y) -> double {
-    return grmsd(Mat::Identity(), x, y);
+    return grmsd<Pr>(Mat::Identity(), x, y);
   }
 
   /**

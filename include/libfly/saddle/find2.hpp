@@ -15,6 +15,7 @@
 // You should have received a copy of the GNU General Public License along with openFLY. If not, see https :  //
 // www.gnu.org/licenses/>.
 
+#include <fmt/core.h>
 #include <omp.h>
 
 #include <cmath>
@@ -77,7 +78,10 @@ namespace fly::saddle {
        * @brief Tolerance for basins to be considered distinct.
        */
       double basin_tol = 0.25;
-
+      /**
+       * @brief Tolerance for mechanisms to be considered distinct.
+       */
+      double mech_tol = 0.1;
       /**
        * @brief Tolerance for stationary points to be considered distinct.
        */
@@ -145,6 +149,57 @@ namespace fly::saddle {
       }
     }
 
+  private:
+    /**
+     * @brief True if mech has been seen before.
+     */
+    bool is_new_mech(system::LocalMech const& maybe, std::vector<system::LocalMech> const& hist) const {
+      // All searches have been around same atom hence orientation is fixed.
+      for (system::LocalMech const& m : hist) {
+        //
+        double d_sp = env::rmsd<Delta>(maybe.delta_sp, m.delta_sp);
+        double d_fwd = env::rmsd<Delta>(maybe.delta_fwd, m.delta_fwd);
+
+        if (m_opt.debug) {
+          fmt::print("FINDER: sp={}, end={}\n", d_sp, d_fwd);
+        }
+
+        if (d_sp < m_opt.mech_tol) {
+          verify(d_fwd < m_opt.mech_tol, "Same sp, different final");
+          return false;
+        }
+      }
+      return true;
+    }
+
+    void append_syms(std::vector<std::pair<Mat, std::vector<Index::scalar_t>>> const& syms,
+                     system::LocalMech const& new_mech,
+                     std::vector<system::LocalMech>& mechs) const {
+      //
+      system::LocalMech mech = new_mech;
+
+      int count = 0;
+      //
+      for (auto const& [O, perm] : syms) {
+        for (std::size_t i = 0; i < perm.size(); ++i) {
+          mech.delta_sp[Eigen::Index(i)][del_].noalias() = O * new_mech.delta_sp[perm[i]][del_];
+          mech.delta_fwd[Eigen::Index(i)][del_].noalias() = O * new_mech.delta_fwd[perm[i]][del_];
+        }
+
+        fmt::print("try push new\n");
+
+        if (is_new_mech(mech, mechs)) {
+          mechs.push_back(mech);
+          ++count;
+        }
+      }
+
+      if (m_opt.debug) {
+        fmt::print("FINDER: Added {} mechs related by symmetry\n", count);
+      }
+    }
+
+  public:
     /**
      * @brief Find all the mechanisms centred on the ``unknown`` atoms.
      *
@@ -169,7 +224,7 @@ namespace fly::saddle {
           {
             auto N = safe_cast<std::size_t>(m_opt.batch_size);
 
-            std::vector<std::optional<system::LocalMech>> mechs(N);           // Batched
+            std::vector<std::optional<system::LocalMech>> mechs(N);  // Batched
 
             int tot = 0;
             int fail = 0;
@@ -189,10 +244,10 @@ namespace fly::saddle {
 #pragma omp taskwait
               // Process batch
               for (std::size_t i = 0; i < N; i++) {
-                if (mechs[i]) {
-                  // SPS succeed.
-                  geo_data[j].mechs.push_back(std::move(*mechs[i]));
-                  fail = 0;
+                if (mechs[i] && is_new_mech(*mechs[i], geo_data[j].mechs)) {
+                  //   geo_data[j].mechs.push_back(std::move(*mechs[i]));
+                  append_syms(geo_data[j].tr, *mechs[i], geo_data[j].mechs);
+                  fail = 100000;
                 } else {
                   fail++;
                 }
@@ -201,42 +256,40 @@ namespace fly::saddle {
               tot += m_opt.batch_size;
 
               if (m_opt.debug) {
-                fmt::print("FINDER: Found {} mech(s) at {}: fail={}, tot={}\n", geo_data[j].mechs.size(), geo_data[j].centre, fail, tot);
+                fmt::print(
+                    "FINDER: Found {} mech(s) at {}: fail={}, tot={}\n", geo_data[j].mechs.size(), geo_data[j].centre, fail, tot);
               }
             }
           }
         }
       }
 
+      //   Output
+      if (m_opt.fout) {
+        for (std::size_t i = 0; i < geo_data.size(); ++i) {
+          for (auto&& mech : geo_data[i].mechs) {
+            system::SoA<Position> outer(in);
 
-    //   Output
-    if (m_opt.fout) {
-      for (std::size_t i = 0; i < geo_data.size(); ++i) {
-        for (auto&& mech : geo_data[i].mechs) {
-          
-          system::SoA<Position> outer(in);
-          
-          m_opt.fout->commit([&] { m_opt.fout->write(r_, outer); });
+            m_opt.fout->commit([&] { m_opt.fout->write(r_, outer); });
 
-          for(int j = 0; j < mech.delta_sp.size(); ++j){
-             outer(r_, geos[i][j][i_]) += mech.delta_sp[j][del_];
+            for (int j = 0; j < mech.delta_sp.size(); ++j) {
+              outer(r_, geos[i][j][i_]) += mech.delta_sp[j][del_];
+            }
+
+            m_opt.fout->commit([&] { m_opt.fout->write(r_, outer); });
+
+            outer[r_] = in[r_];
+
+            for (int j = 0; j < mech.delta_fwd.size(); ++j) {
+              outer(r_, geos[i][j][i_]) += mech.delta_fwd[j][del_];
+            }
+
+            m_opt.fout->commit([&] { m_opt.fout->write(r_, outer); });
+
+            fmt::print("Delta={}eV\n", mech.barrier);
           }
-        
-          m_opt.fout->commit([&] { m_opt.fout->write(r_, outer); });
-
-        outer[r_] = in[r_];
-
-          for(int j = 0; j < mech.delta_fwd.size(); ++j){
-             outer(r_, geos[i][j][i_]) += mech.delta_fwd[j][del_];
-          }
-    
-          m_opt.fout->commit([&] { m_opt.fout->write(r_, outer); });
-
-          fmt::print("Delta={}eV\n", mech.barrier);
         }
       }
-    }
-
     }
 
   private:
@@ -282,6 +335,10 @@ namespace fly::saddle {
 
         env::Geometry copy = geos[i];
 
+        for (int j = 0; j < copy.size(); j++) {
+          copy[j][i_] = j;
+        }
+
         double delta = r_min * 0.1;
 
         env::for_equiv_perms(copy, geos[i], delta, 1, [&](fly::Mat const& O, double) {
@@ -297,6 +354,10 @@ namespace fly::saddle {
           return false;
         });
 
+        // for (auto&& [mat, perm] : out_data[0].tr) {
+        //   fmt::print("{}\n", perm);
+        // }
+
         if (m_opt.debug) {
           fmt::print("Env @{} has {} symmetries @tol={}\n", out_data[i].centre, out_data[i].tr.size(), delta);
         }
@@ -306,33 +367,33 @@ namespace fly::saddle {
     }
 
     // Find the indices of minimally and maximally separated atoms.
-    static  std::pair<int, int> min_max(system::SoA<Position const&> a, system::SoA<Position const&> b) {
-    //
-    ASSERT(a.size() > 0, "Input has only {} atoms?", a.size());
-    ASSERT(a.size() == b.size(), "min_max inputs are different lengths {} != {}", a.size(), b.size());
-
-    int min = 0;
-    int max = 0;
-
-    double r_min = std::numeric_limits<double>::max();
-    double r_max = 0;
-
-    for (int i = 0; i < a.size(); i++) {
+    static std::pair<int, int> min_max(system::SoA<Position const&> a, system::SoA<Position const&> b) {
       //
-      double r = gnorm_sq(a(r_, i) - b(r_, i));
+      ASSERT(a.size() > 0, "Input has only {} atoms?", a.size());
+      ASSERT(a.size() == b.size(), "min_max inputs are different lengths {} != {}", a.size(), b.size());
 
-      if (r < r_min) {
-        min = i;
-        r_min = r;
+      int min = 0;
+      int max = 0;
+
+      double r_min = std::numeric_limits<double>::max();
+      double r_max = 0;
+
+      for (int i = 0; i < a.size(); i++) {
+        //
+        double r = gnorm_sq(a(r_, i) - b(r_, i));
+
+        if (r < r_min) {
+          min = i;
+          r_min = r;
+        }
+        if (r > r_max) {
+          max = i;
+          r_max = r;
+        }
       }
-      if (r > r_max) {
-        max = i;
-        r_max = r;
-      }
+
+      return {min, max};
     }
-
-    return {min, max};
-  }
 
     bool find_sp(system::SoA<Position&, Axis&, Frozen const&, TypeID const&> dimer) {
       //
@@ -351,14 +412,12 @@ namespace fly::saddle {
       system::SoA<Position> fwd;
     };
 
-    
-
     /**
      * @brief Given a saddle point produce a min->sp->min pathway
      */
-    std::optional<Pathway> find_path(system::SoA<Position const&, Axis const&, Frozen const&, TypeID const&> dimer,
-                                     system::SoA<Position const&> in,
-                                     Index::scalar_t centre) {
+    std::optional<Pathway> do_adj_min(system::SoA<Position const&, Axis const&, Frozen const&, TypeID const&> dimer,
+                                      system::SoA<Position const&> in,
+                                      Index::scalar_t centre) {
       // Check sp centred on centre and freeze an atom.
 
       auto [min, max] = min_max(dimer, in);
@@ -443,8 +502,7 @@ namespace fly::saddle {
      * @param dimer_in_out Perturbed dimer as input and output.
      * @param geo Centred of perturbation.
      */
-    std::optional<system::LocalMech> find_one(
-                                              system::SoA<Position const&, Frozen const&, TypeID const&> in,
+    std::optional<system::LocalMech> find_one(system::SoA<Position const&, Frozen const&, TypeID const&> in,
                                               system::SoA<Position&, Axis&> dimer_in_out,
                                               env::Geometry<Index> const& geo) {
       // Saddle search
@@ -456,11 +514,11 @@ namespace fly::saddle {
       dimer.rebind(fzn_, in);
       dimer.rebind(id_, in);
 
-      if(!find_sp(dimer)){
+      if (!find_sp(dimer)) {
         return {};
       }
 
-      std::optional path = find_path(dimer, in, geo[0][i_]);
+      std::optional path = do_adj_min(dimer, in, geo[0][i_]);
 
       if (!path) {
         return {};
@@ -529,6 +587,10 @@ namespace fly::saddle {
       }
 
       mech.capture_frac = std::sqrt(sum_sq) / gnorm(fwd[r_] - rev[r_]);
+
+      if (m_opt.debug) {
+        fmt::print("FINDER: found mech ΔE={} f={}, \n", mech.barrier, mech.capture_frac);
+      }
 
       return mech;
     }

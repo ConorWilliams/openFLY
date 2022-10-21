@@ -14,20 +14,46 @@
 
 #include "libfly/saddle/dimer.hpp"
 
+#include <cmath>
+#include <limits>
+
 #include "libfly/io/gsd.hpp"
+#include "libfly/utility/core.hpp"
 
 namespace fly::saddle {
 
+  static double com_norm(system::SoA<Position const &> a, system::SoA<Position const &> b) {
+    //
+    Vec com_a = Vec::Zero();
+    Vec com_b = Vec::Zero();
+
+    ASSERT(a.size() == b.size(), "Size miss-match {}!={}", a.size(), b.size());
+
+    for (int i = 0; i < a.size(); i++) {
+      com_a += a(r_, i);
+      com_b += b(r_, i);
+    }
+
+    Vec drift = (com_a - com_b) / a.size();
+
+    double sum = 0;
+
+    for (int i = 0; i < a.size(); i++) {
+      sum += gnorm_sq(a(r_, i) - drift - b(r_, i));
+    }
+
+    return std::sqrt(sum);
+  }
+
   auto Dimer::step(system::SoA<Position &, Axis &> out,
                    system::SoA<Position const &, Axis const &, TypeID const &, Frozen const &> in,
+                   system::SoA<Position const &> in_min,
                    potential::Generic &pot,
-                   int max_steps,
+                   std::vector<system::SoA<Position>> const &hist_sp,
                    int num_threads) -> Exit {
     // Check inputs
 
     verify(in.size() == out.size(), "Dimer stepper inputs size mismatch, in={} out={}", in.size(), out.size());
-
-    verify(max_steps > 0, "Doing {} steps with Dimer is probably a mistake?", max_steps);
 
     m_eff_grad.destructive_resize(in.size());
 
@@ -62,7 +88,7 @@ namespace fly::saddle {
     double acc = 0;
     double convex_count = 0;
 
-    for (int i = 0; i < max_steps; ++i) {
+    for (int i = 0; i < m_opt.max_steps; ++i) {
       //
       double mag_g = gnorm_sq(m_eff_grad[g_]);
 
@@ -77,10 +103,7 @@ namespace fly::saddle {
       }
 
       if (m_opt.fout) {
-        m_opt.fout->commit([&] {
-          m_opt.fout->write(r_, out);
-          //   m_opt.fout->write(ax_, out);
-        });
+        m_opt.fout->commit([&] { m_opt.fout->write(r_, out); });
       }
 
       if (mag_g < m_opt.f2norm * m_opt.f2norm) {
@@ -90,6 +113,26 @@ namespace fly::saddle {
           fmt::print("Dimer: Early exit - curvature\n");
         }
         return fail;
+      }
+
+      if (i % 8 == 0) {
+        double ctheta = -1;
+        double l2 = std::numeric_limits<double>::max();
+
+        for (auto const &sp : hist_sp) {
+          l2 = std::min(l2, gnorm(out[r_] - sp[r_]));
+
+          double dt = gdot(out[r_] - in_min[r_], sp[r_] - in_min[r_]);
+
+          double sn = gnorm(sp[r_] - in_min[r_]);
+          double on = gnorm(out[r_] - in_min[r_]);
+
+          ctheta = std::max(ctheta, dt / (sn * on));
+        }
+
+        if (!hist_sp.empty()) {
+          fmt::print("i = {}, norm={}, cos(θ)={}, θ={}\n", i, l2, ctheta, std::acos(ctheta) / (2 * M_PI) * 360);
+        }
       }
 
       auto &Hg = m_core.newton_step<Position, PotentialGradient>(out, m_eff_grad);

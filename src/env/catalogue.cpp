@@ -183,10 +183,4 @@ namespace fly::env {
     return static_cast<bool>(mut.geo.permute_onto(ref, delta));
   }
 
-  //   void Catalogue::crunch_pathways(system::SoA<Position const &, Frozen const &> cell,
-  //                                   std::vector<typename saddle::MasterFinder::PathGroup> const &pathways) {
-  //     for (auto &&pg : pathways) {
-  //     }
-  //   }
-
 }  // namespace fly::env

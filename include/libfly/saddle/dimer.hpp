@@ -51,6 +51,8 @@ namespace fly::saddle {
     struct Options {
       /** @brief L-BFGS core translation-history size. */
       int n = 10;
+      /** @brief Maximum number of steps before failing. */
+      int max_steps = 1000;
       /** @brief Force convergence criterion (eV/Angstroms). */
       double f2norm = 1e-5;
       /**
@@ -123,14 +125,16 @@ namespace fly::saddle {
      * @param out Final position and axis orientation written here.
      * @param in Initial position, axis and per-particle data forwarded to potential.
      * @param pot Potential energy function.
-     * @param max_steps Maximum number of steps before returning.
+     * @param in_min initial minima that dimer is climbing FROM.
+     * @param hist_sp Previously discovered saddle points.
      * @param num_threads Number of openMP threads to use.
      * @return Exit-code.
      */
     auto step(system::SoA<Position &, Axis &> out,
               system::SoA<Position const &, Axis const &, TypeID const &, Frozen const &> in,
+              system::SoA<Position const &> in_min,
               potential::Generic &pot,
-              int max_steps,
+              std::vector<system::SoA<Position>> const &hist_sp,
               int num_threads = 1) -> Exit;
 
   private:

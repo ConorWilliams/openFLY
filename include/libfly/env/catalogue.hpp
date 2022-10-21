@@ -165,14 +165,6 @@ namespace fly::env {
     }
 
     /**
-     * @brief Convert the pathways into mechanisms and store them in the catalogue.
-     *
-     * This requires that this function is called following a call to ``rebuild()`` (with the same cell).
-     */
-    auto crunch_pathways(system::SoA<Position const&, Frozen const&> cell,
-                         std::vector<typename saddle::MasterFinder::PathGroup> const& pathways) -> void;
-
-    /**
      * @brief Get the number of local environments in the catalogue.
      */
     int size() const noexcept { return m_size; }

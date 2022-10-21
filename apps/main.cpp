@@ -127,18 +127,18 @@ int main() {
       dcell.box(),
   };
 
-  saddle::MasterFinder finder{{
-                                  .stddev = 0.6,
-                                  .num_threads = omp_get_max_threads(),
-                                  .debug = true,
-                                  .fout = &fout,
+  //   saddle::MasterFinder finder{{
+  //                                   .stddev = 0.6,
+  //                                   .num_threads = omp_get_max_threads(),
+  //                                   .debug = true,
+  //                                   .fout = &fout,
 
-                              },
-                              pot,
-                              minimiser,
-                              dimer};
+  //                               },
+  //                               pot,
+  //                               minimiser,
+  //                               dimer};
 
-  finder.find_pathways(dcell.box(), {113}, dcell);  // 685, 98
+  //   finder.find_pathways(dcell.box(), {113}, dcell);  // 685, 98
 
   exit(1);
 

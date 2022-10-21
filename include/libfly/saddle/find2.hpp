@@ -172,21 +172,22 @@ namespace fly::saddle {
       return true;
     }
 
-    void append_syms(std::vector<std::pair<Mat, std::vector<Index::scalar_t>>> const& syms,
-                     system::LocalMech const& new_mech,
-                     std::vector<system::LocalMech>& mechs) const {
+    /**
+     * @brief Compute every symmetric version of new_mech (according to syms), if not in mechs append to mechs.
+     */
+    std::size_t append_syms(std::vector<std::pair<Mat, std::vector<Index::scalar_t>>> const& syms,
+                            system::LocalMech const& new_mech,
+                            std::vector<system::LocalMech>& mechs) const {
       //
       system::LocalMech mech = new_mech;
 
-      int count = 0;
+      std::size_t count = 0;
       //
       for (auto const& [O, perm] : syms) {
         for (std::size_t i = 0; i < perm.size(); ++i) {
           mech.delta_sp[Eigen::Index(i)][del_].noalias() = O * new_mech.delta_sp[perm[i]][del_];
           mech.delta_fwd[Eigen::Index(i)][del_].noalias() = O * new_mech.delta_fwd[perm[i]][del_];
         }
-
-        fmt::print("try push new\n");
 
         if (is_new_mech(mech, mechs)) {
           mechs.push_back(mech);
@@ -197,6 +198,20 @@ namespace fly::saddle {
       if (m_opt.debug) {
         fmt::print("FINDER: Added {} mechs related by symmetry\n", count);
       }
+
+      return count;
+    }
+
+    static system::SoA<Position> reconstruct_sp(env::Geometry<Index> const& ref,
+                                                system::LocalMech const& m,
+                                                system::SoA<Position const&> in) {
+      system::SoA<Position> sp(in);
+
+      for (int j = 0; j < m.delta_sp.size(); ++j) {
+        sp(r_, ref[j][i_]) += m.delta_sp[j][del_];
+      }
+
+      return sp;
     }
 
   public:
@@ -221,56 +236,18 @@ namespace fly::saddle {
       {
         for (std::size_t j = 0; j < geo_data.size(); ++j) {
 #pragma omp task untied default(none) firstprivate(j) shared(in, nl_pert, geo_data, geos)
-          {
-            auto N = safe_cast<std::size_t>(m_opt.batch_size);
-
-            std::vector<std::optional<system::LocalMech>> mechs(N);  // Batched
-
-            int tot = 0;
-            int fail = 0;
-
-            while (tot < m_opt.max_searches && fail < m_opt.max_failed_searches) {
-              //  Do batch_size SP searches
-              for (std::size_t i = 0; i < N; i++) {
-#pragma omp task untied default(none) firstprivate(i, j) shared(in, nl_pert, mechs, geos)
-                {
-                  system::SoA<Position, Axis> dimer(in.size());
-                  perturb(dimer, in, geos[j][0][i_], nl_pert);
-                  mechs[i] = find_one(in, dimer, geos[j]);
-                }
-              }
-
-              // Wait for batch
-#pragma omp taskwait
-              // Process batch
-              for (std::size_t i = 0; i < N; i++) {
-                if (mechs[i] && is_new_mech(*mechs[i], geo_data[j].mechs)) {
-                  //   geo_data[j].mechs.push_back(std::move(*mechs[i]));
-                  append_syms(geo_data[j].tr, *mechs[i], geo_data[j].mechs);
-                  fail = 100000;
-                } else {
-                  fail++;
-                }
-              }
-
-              tot += m_opt.batch_size;
-
-              if (m_opt.debug) {
-                fmt::print(
-                    "FINDER: Found {} mech(s) at {}: fail={}, tot={}\n", geo_data[j].mechs.size(), geo_data[j].centre, fail, tot);
-              }
-            }
-          }
+          { find_n(geos[j], geo_data[j], in, nl_pert); }
         }
       }
 
       //   Output
       if (m_opt.fout) {
+        int c = 0;
         for (std::size_t i = 0; i < geo_data.size(); ++i) {
           for (auto&& mech : geo_data[i].mechs) {
             system::SoA<Position> outer(in);
 
-            m_opt.fout->commit([&] { m_opt.fout->write(r_, outer); });
+            // m_opt.fout->commit([&] { m_opt.fout->write(r_, outer); });
 
             for (int j = 0; j < mech.delta_sp.size(); ++j) {
               outer(r_, geos[i][j][i_]) += mech.delta_sp[j][del_];
@@ -284,9 +261,9 @@ namespace fly::saddle {
               outer(r_, geos[i][j][i_]) += mech.delta_fwd[j][del_];
             }
 
-            m_opt.fout->commit([&] { m_opt.fout->write(r_, outer); });
+            // m_opt.fout->commit([&] { m_opt.fout->write(r_, outer); });
 
-            fmt::print("Delta={}eV\n", mech.barrier);
+            fmt::print("f={}, Delta={}eV\n", c++, mech.barrier);
           }
         }
       }
@@ -313,6 +290,68 @@ namespace fly::saddle {
       std::vector<std::pair<Mat, std::vector<Index::scalar_t>>> tr;  // Perm + transformation.
       std::vector<system::LocalMech> mechs;                          // Unique, mechanisms
     };
+
+    // Find all mechs and write to geo_data
+    void find_n(env::Geometry<Index> const& geo,
+                Data& geo_data,
+                system::SoA<Position const&, Frozen const&, TypeID const&> in,
+                neigh::List const& nl_pert) {
+      //
+      auto N = safe_cast<std::size_t>(m_opt.batch_size);
+
+      std::vector<std::optional<system::LocalMech>> mechs(N);  // Batched
+
+      std::vector<system::SoA<Position>> sps_cache;
+
+      int tot = 0;
+      int fail = 0;
+
+      while (tot < m_opt.max_searches && fail < m_opt.max_failed_searches) {
+        //  Do batch_size SP searches
+        for (std::size_t i = 0; i < N; i++) {
+#pragma omp task untied default(none) firstprivate(i) shared(in, nl_pert, mechs, geo, sps_cache, geo_data)
+          {
+            system::SoA<Position, Axis> dimer(in.size());
+            perturb(dimer, in, geo_data.centre, nl_pert);
+            mechs[i] = find_one(in, dimer, geo, sps_cache);
+          }
+        }
+
+        // Wait for batch
+#pragma omp taskwait
+        // Process batch
+        for (std::size_t i = 0; i < N; i++) {
+          if (mechs[i]) {
+            if (is_new_mech(*mechs[i], geo_data.mechs)) {
+              std::size_t num_new = append_syms(geo_data.tr, *mechs[i], geo_data.mechs);
+
+              ASSERT(num_new > 0, "Only found {} but should have had at least 1", num_new);
+
+              for (std::size_t k = geo_data.mechs.size() - num_new; k < geo_data.mechs.size(); k++) {
+                sps_cache.push_back(reconstruct_sp(geo, geo_data.mechs[k], in));
+              }
+
+              fail = 0;
+            } else {
+              if (m_opt.debug) {
+                fmt::print("FINDER: Duplicate mech\n");
+              }
+              fail++;
+            }
+          } else {
+            fail++;
+          }
+        }
+
+        tot += m_opt.batch_size;
+
+        ASSERT(geo_data.mechs.size() == sps_cache.size(), "mechs and sp's are out of step", 0);
+
+        if (m_opt.debug) {
+          fmt::print("FINDER: Found {} mech(s) @{}: fail={}, tot={}\n", geo_data.mechs.size(), geo_data.centre, fail, tot);
+        }
+      }
+    }
 
     std::vector<Data> process_geos(std::vector<env::Geometry<Index>> const& geos) const {
       //
@@ -395,11 +434,13 @@ namespace fly::saddle {
       return {min, max};
     }
 
-    bool find_sp(system::SoA<Position&, Axis&, Frozen const&, TypeID const&> dimer) {
+    bool find_sp(system::SoA<Position&, Axis&, Frozen const&, TypeID const&> dimer,
+                 system::SoA<Position const&> in,
+                 std::vector<system::SoA<Position>> const& hist_sp) {
       //
       ThreadData& thr = thread();
 
-      if (thr.dimer.step(dimer, dimer, thr.pot, 1000, 1)) {
+      if (thr.dimer.step(dimer, dimer, in, thr.pot, hist_sp, 1)) {
         return false;
       };
 
@@ -500,11 +541,13 @@ namespace fly::saddle {
      *
      * @param in Initial basin
      * @param dimer_in_out Perturbed dimer as input and output.
+     * @param hist_sp Previous saddle points.
      * @param geo Centred of perturbation.
      */
     std::optional<system::LocalMech> find_one(system::SoA<Position const&, Frozen const&, TypeID const&> in,
                                               system::SoA<Position&, Axis&> dimer_in_out,
-                                              env::Geometry<Index> const& geo) {
+                                              env::Geometry<Index> const& geo,
+                                              std::vector<system::SoA<Position>> const& hist_sp) {
       // Saddle search
 
       system::SoA<Position&, Axis&, Frozen const&, TypeID const&> dimer(in.size());
@@ -514,7 +557,7 @@ namespace fly::saddle {
       dimer.rebind(fzn_, in);
       dimer.rebind(id_, in);
 
-      if (!find_sp(dimer)) {
+      if (!find_sp(dimer, in, hist_sp)) {
         return {};
       }
 

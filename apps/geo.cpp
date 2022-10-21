@@ -119,7 +119,7 @@ int main() {
   }
 
   saddle::Dimer dimer{
-      {},//{.debug = true, .fout = &dout},
+      {},  //{.debug = true, .fout = &dout},
       {},  //{.debug = true},
       cell.box(),
   };
@@ -133,21 +133,6 @@ int main() {
   };
 
   mast.find_mechs({cat.get_geo(2)}, cell);
-
-  exit(0);
-
-  // ////////////////////// find ds ////////////////////////
-
-
-
-  saddle::MasterFinder finder{
-      {.num_threads = omp_get_max_threads(), .debug = true, .fout = &dout},  // no box
-      pot,                                                                   // no box
-      minimiser,                                                             // has box
-      dimer,                                                                 // has box
-  };
-
-  finder.find_pathways(cell.box(), {2}, cell);
 
   /////////////////////////// IO ///////////////////////////
 

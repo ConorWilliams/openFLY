@@ -53,6 +53,10 @@ namespace fly::saddle {
       int n = 10;
       /** @brief Maximum number of steps before failing. */
       int max_steps = 1000;
+      /** @brief Every ``hist_check_freq`` number of steps will check not converging to known SP. */
+      int hist_check_freq = 5;
+      /** @brief Abort if the cosine of the angle between the dimer and a known SP is greater than this. */
+      double cos_theta_tol = std::cos(10. / 360. * 2 * M_PI);
       /** @brief Force convergence criterion (eV/Angstroms). */
       double f2norm = 1e-5;
       /**
@@ -111,9 +115,10 @@ namespace fly::saddle {
      * @brief Return codes for `step()``.
      */
     enum Exit : int {
-      success = 0,    ///< Found saddle-point.
-      fail = -1,      ///< Failed: stuck in +curvature region.
-      iter_max = -2,  ///< Exceeded the maximum number of iterations but in -curvature region.
+      success = 0,     ///< Found saddle-point.
+      convex = -1,     ///< Failed: stuck in +curvature region.
+      iter_max = -2,   ///< Exceeded the maximum number of iterations but in -curvature region.
+      collision = -3,  ///< Approached a known SP during search.
     };
 
     /**

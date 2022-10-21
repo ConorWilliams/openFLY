@@ -112,10 +112,10 @@ namespace fly::saddle {
         if (m_opt.debug) {
           fmt::print("Dimer: Early exit - curvature\n");
         }
-        return fail;
+        return convex;
       }
 
-      if (i % 8 == 0) {
+      if (i % m_opt.hist_check_freq == 0) {
         double ctheta = -1;
         double l2 = std::numeric_limits<double>::max();
 
@@ -128,10 +128,17 @@ namespace fly::saddle {
           double on = gnorm(out[r_] - in_min[r_]);
 
           ctheta = std::max(ctheta, dt / (sn * on));
+
+          if (ctheta > m_opt.cos_theta_tol) {
+            if (m_opt.debug) {
+              fmt::print("Dimer: Early exit - θ={}\n", std::acos(ctheta) / (2 * M_PI) * 360);
+            }
+            return collision;
+          }
         }
 
-        if (!hist_sp.empty()) {
-          fmt::print("i = {}, norm={}, cos(θ)={}, θ={}\n", i, l2, ctheta, std::acos(ctheta) / (2 * M_PI) * 360);
+        if (m_opt.debug && !hist_sp.empty()) {
+          fmt::print("Dimer: i = {}, norm={}, cos(θ)={}, θ={}\n", i, l2, ctheta, std::acos(ctheta) / (2 * M_PI) * 360);
         }
       }
 

@@ -87,6 +87,10 @@ namespace fly::saddle {
        */
       double stationary_tol = basin_tol / 2;
       /**
+       * @brief Maximum error between reconstructed and relaxed saddle-points.
+       */
+      double sp_relax_tol = 0.5;
+      /**
        * @brief Number of openMP threads to dispatch saddle-point finding to.
        */
       int num_threads = omp_get_max_threads();
@@ -160,9 +164,9 @@ namespace fly::saddle {
         double d_sp = env::rmsd<Delta>(maybe.delta_sp, m.delta_sp);
         double d_fwd = env::rmsd<Delta>(maybe.delta_fwd, m.delta_fwd);
 
-        if (m_opt.debug) {
-          fmt::print("FINDER: sp={}, end={}\n", d_sp, d_fwd);
-        }
+        // if (m_opt.debug) {
+        //   fmt::print("FINDER: sp={}, end={}\n", d_sp, d_fwd);
+        // }
 
         if (d_sp < m_opt.mech_tol) {
           verify(d_fwd < m_opt.mech_tol, "Same sp, different final");
@@ -202,6 +206,7 @@ namespace fly::saddle {
       return count;
     }
 
+    // Reconstruct saddle point according to reference geometry
     static system::SoA<Position> reconstruct_sp(env::Geometry<Index> const& ref,
                                                 system::LocalMech const& m,
                                                 system::SoA<Position const&> in) {
@@ -212,6 +217,46 @@ namespace fly::saddle {
       }
 
       return sp;
+    }
+
+    // Reconstruct saddle point according to geo and relax system to saddle, check we have not constructed a false SP.
+    system::SoA<Position> recon_sp_relax(env::Geometry<Index> const& geo,
+                                         system::LocalMech const& m,
+                                         system::SoA<Position const&, TypeID const&, Frozen const&> in) {
+      //
+      system::SoA<Position> recon = reconstruct_sp(geo, m, in);
+
+      system::SoA<Position, Axis, TypeID const&, Frozen const&> dim(in.size());
+      dim.rebind(id_, in);
+      dim.rebind(fzn_, in);
+      dim[r_] = recon[r_];
+
+      std::normal_distribution<double> dist;
+
+      auto& thr = thread();
+
+      // Axis random and prop_to displacement.
+      for (int j = 0; j < in.size(); ++j) {
+        dim(ax_, j) = Vec::NullaryExpr([&] { return dist(thr.prng); }) * gnorm_sq(recon(r_, j) - in(r_, j));
+      }
+      // ... and randomise.
+      dim[ax_] /= gnorm(dim[ax_]);
+
+      auto err = thr.dimer.step(dim, dim, in, thr.pot, {}, 1);
+      auto lax = gnorm(recon[r_] - dim[r_]);
+
+      if (err || lax > m_opt.sp_relax_tol) {
+#pragma omp critical
+        {
+          if (m_opt.fout) {
+            m_opt.fout->commit([&] { m_opt.fout->write(r_, recon); });
+            m_opt.fout->commit([&] { m_opt.fout->write(r_, dim); });
+          }
+          throw error("Reconstructed saddle relaxing failed with err={} and delta={}", err, lax);
+        }
+      }
+
+      return system::SoA<Position>(std::move(dim));
     }
 
   public:
@@ -241,29 +286,14 @@ namespace fly::saddle {
       }
 
       //   Output
-      if (m_opt.fout) {
+      if (m_opt.fout && m_opt.debug) {
         int c = 0;
         for (std::size_t i = 0; i < geo_data.size(); ++i) {
           for (auto&& mech : geo_data[i].mechs) {
-            system::SoA<Position> outer(in);
+            //
+            m_opt.fout->commit([&] { m_opt.fout->write(r_, reconstruct_sp(geos[i], mech, in)); });
 
-            // m_opt.fout->commit([&] { m_opt.fout->write(r_, outer); });
-
-            for (int j = 0; j < mech.delta_sp.size(); ++j) {
-              outer(r_, geos[i][j][i_]) += mech.delta_sp[j][del_];
-            }
-
-            m_opt.fout->commit([&] { m_opt.fout->write(r_, outer); });
-
-            outer[r_] = in[r_];
-
-            for (int j = 0; j < mech.delta_fwd.size(); ++j) {
-              outer(r_, geos[i][j][i_]) += mech.delta_fwd[j][del_];
-            }
-
-            // m_opt.fout->commit([&] { m_opt.fout->write(r_, outer); });
-
-            fmt::print("f={}, Delta={}eV\n", c++, mech.barrier);
+            fmt::print("FINDER: @{} frame={}, Delta={}eV\n", geo_data[i].centre, c++, mech.barrier);
           }
         }
       }
@@ -299,7 +329,8 @@ namespace fly::saddle {
       //
       auto N = safe_cast<std::size_t>(m_opt.batch_size);
 
-      std::vector<std::optional<system::LocalMech>> mechs(N);  // Batched
+      std::vector<std::optional<system::LocalMech>> mechs(N);         // Batched
+      std::vector dimers(N, system::SoA<Position, Axis>{in.size()});  // Batched
 
       std::vector<system::SoA<Position>> sps_cache;
 
@@ -309,27 +340,32 @@ namespace fly::saddle {
       while (tot < m_opt.max_searches && fail < m_opt.max_failed_searches) {
         //  Do batch_size SP searches
         for (std::size_t i = 0; i < N; i++) {
-#pragma omp task untied default(none) firstprivate(i) shared(in, nl_pert, mechs, geo, sps_cache, geo_data)
+#pragma omp task untied default(none) firstprivate(i) shared(in, nl_pert, mechs, geo, sps_cache, geo_data, dimers)
           {
-            system::SoA<Position, Axis> dimer(in.size());
-            perturb(dimer, in, geo_data.centre, nl_pert);
-            mechs[i] = find_one(in, dimer, geo, sps_cache);
+            perturb(dimers[i], in, geo_data.centre, nl_pert);
+            mechs[i] = find_one(in, dimers[i], geo, sps_cache);
           }
         }
-
-        // Wait for batch
 #pragma omp taskwait
+
         // Process batch
         for (std::size_t i = 0; i < N; i++) {
           if (mechs[i]) {
             if (is_new_mech(*mechs[i], geo_data.mechs)) {
+              //
               std::size_t num_new = append_syms(geo_data.tr, *mechs[i], geo_data.mechs);
 
               ASSERT(num_new > 0, "Only found {} but should have had at least 1", num_new);
 
-              for (std::size_t k = geo_data.mechs.size() - num_new; k < geo_data.mechs.size(); k++) {
-                sps_cache.push_back(reconstruct_sp(geo, geo_data.mechs[k], in));
+              std::size_t n = sps_cache.size();
+
+              sps_cache.resize(n + num_new);
+
+              for (std::size_t k = 0; k < num_new; k++) {
+#pragma omp task untied default(none) firstprivate(n, k, num_new) shared(in, geo, sps_cache, geo_data)
+                { sps_cache[n + k] = (recon_sp_relax(geo, geo_data.mechs[geo_data.mechs.size() - num_new + k], in)); }
               }
+#pragma omp taskwait
 
               fail = 0;
             } else {
@@ -339,13 +375,14 @@ namespace fly::saddle {
               fail++;
             }
           } else {
+            sps_cache.emplace_back(dimers[i]);  // Add failures
             fail++;
           }
         }
 
         tot += m_opt.batch_size;
 
-        ASSERT(geo_data.mechs.size() == sps_cache.size(), "mechs and sp's are out of step", 0);
+        // ASSERT(geo_data.mechs.size() == sps_cache.size(), "mechs and sp's are out of step", 0);
 
         if (m_opt.debug) {
           fmt::print("FINDER: Found {} mech(s) @{}: fail={}, tot={}\n", geo_data.mechs.size(), geo_data.centre, fail, tot);
@@ -398,7 +435,7 @@ namespace fly::saddle {
         // }
 
         if (m_opt.debug) {
-          fmt::print("Env @{} has {} symmetries @tol={}\n", out_data[i].centre, out_data[i].tr.size(), delta);
+          fmt::print("FINDER: Env @{} has {} symmetries @tol={}\n", out_data[i].centre, out_data[i].tr.size(), delta);
         }
       }
 
@@ -440,7 +477,23 @@ namespace fly::saddle {
       //
       ThreadData& thr = thread();
 
-      if (thr.dimer.step(dimer, dimer, in, thr.pot, hist_sp, 1)) {
+      if (auto err = thr.dimer.step(dimer, dimer, in, thr.pot, hist_sp, 1)) {
+        if (m_opt.debug) {
+          switch (err) {
+            case Dimer::collision:
+              fmt::print("FINDER: SPS fail - collision\n");
+              break;
+            case Dimer::iter_max:
+              fmt::print("FINDER: SPS fail - iter_max\n");
+              break;
+            case Dimer::convex:
+              fmt::print("FINDER: SPS fail - convex\n");
+              break;
+            default:
+              ASSERT(false, "Unknown error = {}", err);
+          };
+        }
+
         return false;
       };
 
@@ -629,10 +682,13 @@ namespace fly::saddle {
         sum_sq += gnorm_sq(elem[del_]);
       }
 
-      mech.capture_frac = std::sqrt(sum_sq) / gnorm(fwd[r_] - rev[r_]);
+      double cap = std::sqrt(sum_sq);
+      double tot = gnorm(fwd[r_] - rev[r_]);
+
+      mech.capture_frac = cap / tot;
 
       if (m_opt.debug) {
-        fmt::print("FINDER: found mech ΔE={} f={}, \n", mech.barrier, mech.capture_frac);
+        fmt::print("FINDER: found mech ΔE={} f={}, uncap={}, \n", mech.barrier, mech.capture_frac, tot - cap);
       }
 
       return mech;

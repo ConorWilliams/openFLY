@@ -111,10 +111,15 @@ target_link_libraries(geoFLY PRIVATE libFLY Nauty)
 if(FLY_DEVELOPER_MODE)
     include(CTest)
     add_subdirectory(tests)
-    add_subdirectory(examples)
+
+    option(FLY_SKIP_EXAMPLES "Disable examples" OFF)
+
+    if(NOT FLY_SKIP_EXAMPLES)
+        add_subdirectory(examples)
+    endif()
 endif()
 
-option(FLY_DOCS " Build documentation using ... " OFF)
+option(FLY_DOCS "Build documentation using doxygen and sphinx " OFF)
 
 if(FLY_DOCS)
     add_subdirectory(docs)

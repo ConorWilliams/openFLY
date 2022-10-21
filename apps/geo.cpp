@@ -67,6 +67,8 @@ int main() {
 
   cell[hash_] = 0;
 
+  cell[r_] += 0.2;
+
   //   Minimise.
 
   minimise::LBFGS minimiser({.debug = false, .fout = nullptr}, cell.box());

@@ -22,7 +22,7 @@
 #include "libfly/potential/generic.hpp"
 #include "libfly/saddle//find.hpp"
 #include "libfly/saddle/dimer.hpp"
-#include "libfly/saddle/find2.hpp"
+#include "libfly/saddle/find.hpp"
 #include "libfly/saddle/perturb.hpp"
 #include "libfly/system/SoA.hpp"
 #include "libfly/system/atom.hpp"

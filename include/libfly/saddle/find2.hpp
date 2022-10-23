@@ -32,6 +32,7 @@
 #include "libfly/saddle/dimer.hpp"
 #include "libfly/system/SoA.hpp"
 #include "libfly/system/box.hpp"
+#include "libfly/system/hessian.hpp"
 #include "libfly/system/mechanisms.hpp"
 #include "libfly/system/property.hpp"
 #include "libfly/utility/core.hpp"
@@ -91,17 +92,21 @@ namespace fly::saddle {
        */
       double sp_relax_tol = 0.5;
       /**
+       * @brief Absolute eigen values of the mass-weighted hessian matrix, smaller than this, are considered zero.
+       */
+      double hessian_eigen_zero_tol = 1e-4;
+      /**
        * @brief Number of openMP threads to dispatch saddle-point finding to.
        */
       int num_threads = omp_get_max_threads();
       /**
        * @brief Maximum number of searches per environment.
        */
-      int max_searches = 750;
+      int max_searches = 7500;
       /**
        * @brief Maximum number of consecutive failed searches per environment.
        */
-      int max_failed_searches = 250;
+      int max_failed_searches = 500;
 
       /**
        * @brief Number of simultaneous SP searches per new environment.
@@ -148,7 +153,7 @@ namespace fly::saddle {
       Xoshiro prng({rd(), rd(), rd(), rd()});
 
       for (int i = 0; i < opt.num_threads; i++) {
-        m_data.push_back({pot, min, dimer, prng, {box, pot.r_cut()}});
+        m_data.push_back({pot, min, dimer, prng, {box, pot.r_cut()}, {}});
         prng.long_jump();
       }
     }
@@ -272,13 +277,22 @@ namespace fly::saddle {
 
   public:
     /**
+     * @brief A collection of mechanisms centred on a central atom.
+     */
+    struct Found {
+      Index::scalar_t centre;                ///< The central atom.
+      std::vector<system::LocalMech> mechs;  ///< Mechanisms centred on ``this->centre``.
+    };
+
+    /**
      * @brief Find all the mechanisms centred on the ``unknown`` atoms.
      *
      * @param geos List of indices of the atoms which the mechanisms must be centred on.
      * @param in Description of system to search in.
      *
      */
-    auto find_mechs(std::vector<env::Geometry<Index>> const& geos, system::SoA<Position const&, Frozen const&, TypeID const&> in) {
+    auto find_mechs(std::vector<env::Geometry<Index>> const& geos, system::SoA<Position const&, Frozen const&, TypeID const&> in)
+        -> std::vector<Found> {
       // Step one get the self symmetries of each geometry.
       std::vector<Data> geo_data = process_geos(geos);
 
@@ -286,28 +300,99 @@ namespace fly::saddle {
 
       nl_pert.rebuild(in, m_opt.num_threads);
 
+      m_deg_free = 0;
+
+      for (int i = 0; i < spatial_dims; i++) {
+        if (m_box.periodic(i)) {
+          m_deg_free++;
+        }
+      }
+      for (auto&& elem : in[fzn_]) {
+        if (elem) {
+          m_deg_free = 0;
+          break;
+        }
+      }
+      if (m_opt.debug) {
+        fmt::print("FINDER: Degrees of freedom = {}\n", m_deg_free);
+      }
+
 //
 #pragma omp parallel
 #pragma omp single nowait
       {
         for (std::size_t j = 0; j < geo_data.size(); ++j) {
 #pragma omp task untied default(none) firstprivate(j) shared(in, nl_pert, geo_data, geos)
-          { find_n(geos[j], geo_data[j], in, nl_pert); }
+          find_n(geos[j], geo_data[j], in, nl_pert);
+        }
+      }
+
+      std::vector<Found> out;
+
+      for (auto& elem : geo_data) {
+        if (!elem.mechs.empty()) {
+          out.push_back({elem.centre, std::move(elem.mechs)});
+        }
+      }
+
+      if (!out.empty()) {
+        // Compute pre factors.
+
+        m_data[0].pot_nl.rebuild(in);
+
+        m_data[0].pot.hessian(m_data[0].hess, in, m_data[0].pot_nl);
+
+        system::Hessian::Vector const& freq = m_data[0].hess.eigenvalues();
+
+        ASSERT(freq.size() > m_deg_free, "Only {} normal modes", freq.size());
+
+        for (int i = 0; i < m_deg_free; i++) {
+          verify(std::abs(freq[i]) < m_opt.hessian_eigen_zero_tol, "Master input modes (1)= {}", freq.head(10));
+        }
+
+        verify(freq[m_deg_free] > m_opt.hessian_eigen_zero_tol, "Master input modes (2)= {}", freq.head(10));
+
+        double sum = 0;
+
+        for (int i = m_deg_free; i < freq.size(); i++) {
+          sum += std::log(freq[i]);
+        }
+
+        for (auto& f : out) {
+          for (auto& m : f.mechs) {
+            m.kinetic_pre = std::sqrt(std::exp(sum - m.kinetic_pre) / (2 * M_PI * 1.6605390666050e-27));
+          }
         }
       }
 
       //   Output
-      if (m_opt.fout && m_opt.debug) {
+      if (m_opt.debug) {
+        //
         int c = 1;
-        for (std::size_t i = 0; i < geo_data.size(); ++i) {
-          for (auto&& mech : geo_data[i].mechs) {
-            //
-            m_opt.fout->commit([&] { m_opt.fout->write(r_, reconstruct_sp(geos[i], mech, in)); });
 
-            fmt::print("FINDER: @{} frame={}, Delta={}eV\n", geo_data[i].centre, c++, mech.barrier);
+        for (auto& f : out) {
+          //
+          env::Geometry<Index> const* geo = nullptr;
+
+          for (auto const& elem : geos) {
+            if (elem[0][i_] == f.centre) {
+              geo = &elem;
+              break;
+            }
+          }
+
+          ASSERT(geo, "Cannot locate geo @{}!", f.centre);
+
+          for (auto& mech : f.mechs) {
+            if (m_opt.fout) {
+              m_opt.fout->commit([&] { m_opt.fout->write(r_, reconstruct_sp(*geo, mech, in)); });
+            }
+            fmt::print("FINDER: @{} frame={}, Delta={}eV, A={:e}Hz\n", f.centre, c++, mech.barrier, mech.kinetic_pre);
           }
         }
       }
+
+      return out;
     }
 
   private:
@@ -317,12 +402,15 @@ namespace fly::saddle {
       saddle::Dimer dimer;
       Xoshiro prng;
       neigh::List pot_nl;
+      system::Hessian hess;
     };
 
     std::vector<ThreadData> m_data;
 
     Options m_opt;
     system::Box m_box;
+
+    int m_deg_free;
 
     ///
 
@@ -331,6 +419,26 @@ namespace fly::saddle {
       std::vector<std::pair<Mat, std::vector<Index::scalar_t>>> tr;  // Perm + transformation.
       std::vector<system::LocalMech> mechs;                          // Unique, mechanisms
     };
+
+    static double theta_mech(system::LocalMech const& a, system::LocalMech const& b) {
+      //
+      verify(a.delta_sp.size() == b.delta_sp.size(), "");
+
+      auto n = a.delta_sp.size();
+
+      double ct = 0;
+      double sa = 0;
+      double sb = 0;
+
+      for (int i = 0; i < n; i++) {
+        ct += gdot(a.delta_sp[i][del_], b.delta_sp[i][del_]);
+
+        sa += gnorm_sq(a.delta_sp[i][del_]);
+        sb += gnorm_sq(b.delta_sp[i][del_]);
+      }
+
+      return std::acos(ct / std::sqrt(sa * sb)) / 2 / M_PI * 360.;
+    }
 
     // Find all mechs and write to geo_data
     void find_n(env::Geometry<Index> const& geo,
@@ -358,6 +466,8 @@ namespace fly::saddle {
       while (tot < m_opt.max_searches && fail < m_opt.max_failed_searches) {
         // Abort SPS if the cosine of the angle between the dimer and a known SP is greater than this.
         double theta_tol = ((30 - 5) * std::exp(-0.02 * fail) + 5) / 360. * 2. * M_PI;
+
+        theta_tol = 7. / 360. * 2. * M_PI;
 
         if (m_opt.debug) {
           fmt::print("FINDER: Theta tolerance = {}\n", theta_tol / 2. / M_PI * 360.);
@@ -406,7 +516,7 @@ namespace fly::saddle {
               }
               sps_cache.emplace_back(batch[i].dimer);  // Add failures
             } else if (m_opt.debug) {
-              fmt::print("FINDER: Not adding collision to cache\n");
+              fmt::print("FINDER: Not adding SPS collision/fail to cache\n");
             }
             fail++;
           }
@@ -414,10 +524,19 @@ namespace fly::saddle {
 
         tot += m_opt.batch_size;
 
-        // ASSERT(geo_data.mechs.size() == sps_cache.size(), "mechs and sp's are out of step", 0);
-
         if (m_opt.debug) {
-          fmt::print("FINDER: Found {} mech(s) @{}: fail={}, tot={}\n", geo_data.mechs.size(), geo_data.centre, fail, tot);
+          //
+          double t_min = 180;
+
+          for (auto const& a : geo_data.mechs) {
+            for (auto const& b : geo_data.mechs) {
+              if (&a != &b) {
+                t_min = std::min(t_min, theta_mech(a, b));
+              }
+            }
+          }
+
+          fmt::print("FINDER: {} mech(s) @{}: fail={}, tot={}, t_min={}\n", geo_data.mechs.size(), geo_data.centre, fail, tot, t_min);
         }
       }
     }
@@ -645,7 +764,7 @@ namespace fly::saddle {
       dimer.rebind(fzn_, in);
       dimer.rebind(id_, in);
 
-      if (auto err = find_sp(dimer, in, hist_sp, theta_tol)) {
+      if (find_sp(dimer, in, hist_sp, theta_tol)) {
         collision = true;
         return {};
       } else {
@@ -674,13 +793,13 @@ namespace fly::saddle {
         }
         return {};
       }
-      if (double r2w = gnorm(rev[r_] - dimer[r_]); r2w < m_opt.stationary_tol) {
+      if (double r2w = gnorm(rev[r_] - sp[r_]); r2w < m_opt.stationary_tol) {
         if (m_opt.debug) {
           fmt::print("FINDER: Min->Sp displacement={}\n", r2w);
         }
         return {};
       }
-      if (double w2f = gnorm(fwd[r_] - dimer[r_]); w2f < m_opt.stationary_tol) {
+      if (double w2f = gnorm(fwd[r_] - sp[r_]); w2f < m_opt.stationary_tol) {
         if (m_opt.debug) {
           fmt::print("FINDER: Sp->Min displacement={}\n", w2f);
         }
@@ -729,6 +848,37 @@ namespace fly::saddle {
         fmt::print("FINDER: found mech ΔE={} f={}, uncap={}, \n", mech.barrier, mech.capture_frac, tot - cap);
       }
 
+      //////////////// Partial hessian compute. ////////////////
+
+      thr.pot_nl.rebuild(sp, 1);
+
+      thr.pot.hessian(thr.hess, in, thr.pot_nl);
+
+      system::Hessian::Vector const& freq = thr.hess.eigenvalues();
+
+      ASSERT(freq.size() > 1 + m_deg_free, "Only {} eigenvalues", freq.size());
+
+      // Must have at least one neg
+      verify(freq[0] < -m_opt.hessian_eigen_zero_tol, "Saddle-point with minimum mode={}", freq[0]);
+
+      for (int i = 1; i < 1 + m_deg_free; i++) {
+        // More than one is a higher order.
+        if (freq[i] < -m_opt.hessian_eigen_zero_tol) {
+          if (m_opt.debug) {
+            fmt::print("FINDER: Second order SP or higher, modes = {}\n", freq.head(10));
+          }
+          return {};
+        }
+        verify(std::abs(freq[i]) < m_opt.hessian_eigen_zero_tol, "Expecting zero eigen-value, got modes = {}", freq.head(10));
+      }
+      verify(freq[1 + m_deg_free] > m_opt.hessian_eigen_zero_tol, "Seem to have too many zero modes = {}", freq.head(10));
+
+      mech.kinetic_pre = 0;
+
+      for (int i = 1 + m_deg_free; i < freq.size(); i++) {
+        mech.kinetic_pre += std::log(freq[i]);
+      }
+
       return mech;
     }
 
@@ -765,7 +915,7 @@ namespace fly::saddle {
 
       nl.for_neighbours(centre, m_opt.r_pert, [&](auto n, double r, auto const&) {
         if (!in(Frozen{}, n)) {
-          out(r_, n) += (1. - r / m_opt.r_pert) * Vec{gauss(prng), gauss(prng), gauss(prng)};
+          out(r_, n) += Vec{gauss(prng), gauss(prng), gauss(prng)} * (1. - r / m_opt.r_pert);
           out(ax_, n) += Vec{normal(prng), normal(prng), normal(prng)};
         }
       });

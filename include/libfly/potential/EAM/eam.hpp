@@ -95,7 +95,7 @@ namespace fly::potential {
                   int threads = 1) -> void;
 
     /**
-     * @brief Compute hessian matrix of the active atoms.
+     * @brief Compute mass weighted hessian matrix of the active atoms.
      *
      * Assumes the neighbour list are ready. The resulting hessian will be m by m and only include contributions from the m active
      * atoms. As hessian matrices are always symmetric this function only computes the lower diagonal portion.

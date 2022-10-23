@@ -18,6 +18,7 @@
 #include <fmt/core.h>
 
 #include <catch2/catch_test_macros.hpp>
+#include <iostream>
 #include <memory>
 
 #include "libfly/potential/EAM/data.hpp"
@@ -129,6 +130,10 @@ TEST_CASE("EAM compute", "[potential]") {
         {-1.0875103661087880, +9.0654715551510830, -1.0875103661087873},
         {-1.0875103661087877, -1.0875103661087873, +9.0654715551510830},
     };
+
+    ngd /= 55.847;  // Mass weighted.
+
+    std::cout << H(0, 0) << std::endl;
 
     REQUIRE(gnorm(ngd - H(0, 0)) < 1e-10);
 

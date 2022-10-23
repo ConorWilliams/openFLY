@@ -108,7 +108,9 @@ namespace fly::potential {
         double mass;
         getline(in) >> atomic >> mass;
 
-        tmap.set(0, m_, mass);
+        // fmt::print("set mass of id={} to {}", i, )
+
+        tmap.set(std::uint32_t(i), m_, mass);
       }
 
       // Read F

@@ -168,17 +168,17 @@ namespace fly::potential {
           out(m_aux(Hidx{}, z), m_aux(Hidx{}, z)) += A * Mat::Identity() - ABFpp * dr * dr.transpose();
 
           // Now we will compute the off diagonal element in this column block of H, the a's must now not be frozen, we do not
-          // compute overlap here. Only need to compute lower triangular part of hessian hence, drop writes to out(z, a) with a > z.
+          // compute overlap here. Only need to compute lower triangular part of hessian hence, drop writes to out(a, z) with a < z.
           ASSERT(z != a, "Atoms {} is interacting with itself", z);
 
-          if (z >= a && !in(fzn_, a)) {
+          if (a >= z && !in(fzn_, a)) {
             double BArr = (B - A) / (r * r);
 
             double ur = m_data->f(in(id_, z)).fpp(m_aux(Rho{}, z)) * m_data->phi(in(id_, a), in(id_, z)).fp(r) / r;
 
             double ru = m_data->f(in(id_, a)).fpp(m_aux(Rho{}, a)) * m_data->phi(in(id_, z), in(id_, a)).fp(r) / r;
 
-            out(m_aux(Hidx{}, z), m_aux(Hidx{}, a)).noalias() += -BArr * dr * dr.transpose() - A * Mat::Identity()
+            out(m_aux(Hidx{}, a), m_aux(Hidx{}, z)).noalias() += -BArr * dr * dr.transpose() - A * Mat::Identity()
                                                                  + ur * m_aux(Mu{}, z) * dr.transpose()
                                                                  - ru * m_aux(Mu{}, a) * dr.transpose();
           }
@@ -188,14 +188,32 @@ namespace fly::potential {
           double ddFg = m_data->f(in(id_, a)).fpp(m_aux(Rho{}, a)) * m_data->phi(in(id_, z), in(id_, a)).fp(r);
 
           nl.for_neighbours(a, r_cut(), [&](auto g, double r_g, Vec const& dr_ag) {
-            if (z > g && !in(fzn_, g)) {
+            if (g > z && !in(fzn_, g)) {
               // Now iterating over all pair of unfrozen neighbours of a
               double mag = ddFg / (r * r_g) * m_data->phi(in(id_, g), in(id_, a)).fp(r_g);
 
-              out(m_aux(Hidx{}, z), m_aux(Hidx{}, g)).noalias() -= mag * dr * dr_ag.transpose();
+              out(m_aux(Hidx{}, g), m_aux(Hidx{}, z)).noalias() -= mag * dr * dr_ag.transpose();
             }
           });
         });
+      }
+    }
+
+// Transform into mass-weighted hessian
+#pragma omp parallel for num_threads(num_threads) schedule(dynamic)
+    for (Eigen::Index i = 0; i < in.size(); ++i) {
+      if (!in(fzn_, i)) {
+        //
+        double mass_i = m_data->type_map().get(in(id_, i), m_);
+
+        for (Eigen::Index j = i; j < in.size(); ++j) {
+          if (!in(fzn_, j)) {
+            //
+            double mass_j = m_data->type_map().get(in(id_, j), m_);
+
+            out(m_aux(Hidx{}, j), m_aux(Hidx{}, i)) *= 1 / std::sqrt(mass_i * mass_j);
+          }
+        }
       }
     }
   }

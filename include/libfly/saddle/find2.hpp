@@ -97,11 +97,11 @@ namespace fly::saddle {
       /**
        * @brief Maximum number of searches per environment.
        */
-      int max_searches = 75;
+      int max_searches = 750;
       /**
        * @brief Maximum number of consecutive failed searches per environment.
        */
-      int max_failed_searches = 50;
+      int max_failed_searches = 250;
 
       /**
        * @brief Number of simultaneous SP searches per new environment.
@@ -219,9 +219,10 @@ namespace fly::saddle {
       return sp;
     }
 
-    // Reconstruct saddle point according to geo and relax system to saddle, check we have not constructed a false SP.
+    // Reconstruct saddle point according to geo and relax system to saddle,
+    // check we have not constructed a false SP, if we have mark mechanism as poisoned
     system::SoA<Position> recon_sp_relax(env::Geometry<Index> const& geo,
-                                         system::LocalMech const& m,
+                                         system::LocalMech& m,
                                          system::SoA<Position const&, TypeID const&, Frozen const&> in) {
       //
       system::SoA<Position> recon = reconstruct_sp(geo, m, in);
@@ -252,8 +253,18 @@ namespace fly::saddle {
             m_opt.fout->commit([&] { m_opt.fout->write(r_, recon); });
             m_opt.fout->commit([&] { m_opt.fout->write(r_, dim); });
           }
-          throw error("Reconstructed saddle relaxing failed with err={} and delta={}", err, lax);
         }
+        if (m_opt.debug) {
+          fmt::print("Reconstructed saddle relaxing failed with: err={}, delta={}, cap_frac={}, disp0={}\n",
+                     err,
+                     lax,
+                     m.capture_frac,
+                     gnorm(m.delta_sp[0][del_]));
+        }
+        if (err) {
+          throw error("Relaxing mech's SP failed with err={}", err);
+        }
+        m.poison = true;
       }
 
       return system::SoA<Position>(std::move(dim));
@@ -287,7 +298,7 @@ namespace fly::saddle {
 
       //   Output
       if (m_opt.fout && m_opt.debug) {
-        int c = 0;
+        int c = 1;
         for (std::size_t i = 0; i < geo_data.size(); ++i) {
           for (auto&& mech : geo_data[i].mechs) {
             //
@@ -329,8 +340,15 @@ namespace fly::saddle {
       //
       auto N = safe_cast<std::size_t>(m_opt.batch_size);
 
-      std::vector<std::optional<system::LocalMech>> mechs(N);         // Batched
-      std::vector dimers(N, system::SoA<Position, Axis>{in.size()});  // Batched
+      struct Batch {
+        bool collsion = false;
+        std::optional<system::LocalMech> mech = {};
+        system::SoA<Position, Axis> dimer;
+
+        Batch(Eigen::Index n) : dimer(n){};
+      };
+
+      std::vector<Batch> batch(N, in.size());
 
       std::vector<system::SoA<Position>> sps_cache;
 
@@ -338,22 +356,29 @@ namespace fly::saddle {
       int fail = 0;
 
       while (tot < m_opt.max_searches && fail < m_opt.max_failed_searches) {
+        // Abort SPS if the cosine of the angle between the dimer and a known SP is greater than this.
+        double theta_tol = ((30 - 5) * std::exp(-0.02 * fail) + 5) / 360. * 2. * M_PI;
+
+        if (m_opt.debug) {
+          fmt::print("FINDER: Theta tolerance = {}\n", theta_tol / 2. / M_PI * 360.);
+        }
+
         //  Do batch_size SP searches
         for (std::size_t i = 0; i < N; i++) {
-#pragma omp task untied default(none) firstprivate(i) shared(in, nl_pert, mechs, geo, sps_cache, geo_data, dimers)
+#pragma omp task untied default(none) firstprivate(i, theta_tol) shared(in, nl_pert, batch, geo, sps_cache, geo_data)
           {
-            perturb(dimers[i], in, geo_data.centre, nl_pert);
-            mechs[i] = find_one(in, dimers[i], geo, sps_cache);
+            perturb(batch[i].dimer, in, geo_data.centre, nl_pert);
+            batch[i].mech = find_one(in, batch[i].dimer, batch[i].collsion, geo, sps_cache, theta_tol);
           }
         }
 #pragma omp taskwait
 
         // Process batch
         for (std::size_t i = 0; i < N; i++) {
-          if (mechs[i]) {
-            if (is_new_mech(*mechs[i], geo_data.mechs)) {
+          if (batch[i].mech) {
+            if (is_new_mech(*batch[i].mech, geo_data.mechs)) {
               //
-              std::size_t num_new = append_syms(geo_data.tr, *mechs[i], geo_data.mechs);
+              std::size_t num_new = append_syms(geo_data.tr, *batch[i].mech, geo_data.mechs);
 
               ASSERT(num_new > 0, "Only found {} but should have had at least 1", num_new);
 
@@ -375,7 +400,14 @@ namespace fly::saddle {
               fail++;
             }
           } else {
-            sps_cache.emplace_back(dimers[i]);  // Add failures
+            if (batch[i].collsion == false) {
+              if (m_opt.debug) {
+                fmt::print("FINDER: Adding failure to cache\n");
+              }
+              sps_cache.emplace_back(batch[i].dimer);  // Add failures
+            } else if (m_opt.debug) {
+              fmt::print("FINDER: Not adding collision to cache\n");
+            }
             fail++;
           }
         }
@@ -471,33 +503,32 @@ namespace fly::saddle {
       return {min, max};
     }
 
-    bool find_sp(system::SoA<Position&, Axis&, Frozen const&, TypeID const&> dimer,
-                 system::SoA<Position const&> in,
-                 std::vector<system::SoA<Position>> const& hist_sp) {
+    Dimer::Exit find_sp(system::SoA<Position&, Axis&, Frozen const&, TypeID const&> dimer,
+                        system::SoA<Position const&> in,
+                        std::vector<system::SoA<Position>> const& hist_sp,
+                        double theta_tol) {
       //
       ThreadData& thr = thread();
 
-      if (auto err = thr.dimer.step(dimer, dimer, in, thr.pot, hist_sp, 1)) {
-        if (m_opt.debug) {
-          switch (err) {
-            case Dimer::collision:
-              fmt::print("FINDER: SPS fail - collision\n");
-              break;
-            case Dimer::iter_max:
-              fmt::print("FINDER: SPS fail - iter_max\n");
-              break;
-            case Dimer::convex:
-              fmt::print("FINDER: SPS fail - convex\n");
-              break;
-            default:
-              ASSERT(false, "Unknown error = {}", err);
-          };
+      auto err = thr.dimer.step(dimer, dimer, in, thr.pot, hist_sp, theta_tol, 1);
+
+      if (err && m_opt.debug) {
+        switch (err) {
+          case Dimer::collision:
+            fmt::print("FINDER: SPS fail - collision\n");
+            break;
+          case Dimer::iter_max:
+            fmt::print("FINDER: SPS fail - iter_max\n");
+            break;
+          case Dimer::convex:
+            fmt::print("FINDER: SPS fail - convex\n");
+            break;
+          default:
+            ASSERT(false, "Unknown error = {}", err);
         }
+      }
 
-        return false;
-      };
-
-      return true;
+      return err;
     }
 
     struct Pathway {
@@ -595,12 +626,16 @@ namespace fly::saddle {
      * @param in Initial basin
      * @param dimer_in_out Perturbed dimer as input and output.
      * @param hist_sp Previous saddle points.
+     * @param collision If dimer exits due to rediscovering a previous SP the this is set to true.
+     * @param theta_tol forwarded to Dimer::step()
      * @param geo Centred of perturbation.
      */
     std::optional<system::LocalMech> find_one(system::SoA<Position const&, Frozen const&, TypeID const&> in,
                                               system::SoA<Position&, Axis&> dimer_in_out,
+                                              bool& collision,
                                               env::Geometry<Index> const& geo,
-                                              std::vector<system::SoA<Position>> const& hist_sp) {
+                                              std::vector<system::SoA<Position>> const& hist_sp,
+                                              double theta_tol) {
       // Saddle search
 
       system::SoA<Position&, Axis&, Frozen const&, TypeID const&> dimer(in.size());
@@ -610,8 +645,11 @@ namespace fly::saddle {
       dimer.rebind(fzn_, in);
       dimer.rebind(id_, in);
 
-      if (!find_sp(dimer, in, hist_sp)) {
+      if (auto err = find_sp(dimer, in, hist_sp, theta_tol)) {
+        collision = true;
         return {};
+      } else {
+        collision = false;
       }
 
       std::optional path = do_adj_min(dimer, in, geo[0][i_]);

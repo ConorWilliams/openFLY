@@ -22,34 +22,12 @@
 
 namespace fly::saddle {
 
-  static double com_norm(system::SoA<Position const &> a, system::SoA<Position const &> b) {
-    //
-    Vec com_a = Vec::Zero();
-    Vec com_b = Vec::Zero();
-
-    ASSERT(a.size() == b.size(), "Size miss-match {}!={}", a.size(), b.size());
-
-    for (int i = 0; i < a.size(); i++) {
-      com_a += a(r_, i);
-      com_b += b(r_, i);
-    }
-
-    Vec drift = (com_a - com_b) / a.size();
-
-    double sum = 0;
-
-    for (int i = 0; i < a.size(); i++) {
-      sum += gnorm_sq(a(r_, i) - drift - b(r_, i));
-    }
-
-    return std::sqrt(sum);
-  }
-
   auto Dimer::step(system::SoA<Position &, Axis &> out,
                    system::SoA<Position const &, Axis const &, TypeID const &, Frozen const &> in,
                    system::SoA<Position const &> in_min,
                    potential::Generic &pot,
                    std::vector<system::SoA<Position>> const &hist_sp,
+                   double theta_tol,
                    int num_threads) -> Exit {
     // Check inputs
 
@@ -129,7 +107,7 @@ namespace fly::saddle {
 
           ctheta = std::max(ctheta, dt / (sn * on));
 
-          if (ctheta > m_opt.cos_theta_tol) {
+          if (ctheta > std::cos(theta_tol)) {
             if (m_opt.debug) {
               fmt::print("Dimer: Early exit - θ={}\n", std::acos(ctheta) / (2 * M_PI) * 360);
             }

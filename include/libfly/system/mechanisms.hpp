@@ -43,6 +43,8 @@ namespace fly::system {
     double kinetic_pre;   ///< Arrhenius pre factor.
     double capture_frac;  ///< norm(delta_fwd in local) / norm(delta_fwd in global)
 
+    bool poison = false;  ///< If true this mechanism cannot be reconstructed.
+
     system::VoS<Delta> delta_sp;   ///< Displacement vectors from initial to saddle-point.
     system::VoS<Delta> delta_fwd;  ///< Displacement vectors from initial to final.
   };

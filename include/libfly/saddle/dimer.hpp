@@ -55,8 +55,6 @@ namespace fly::saddle {
       int max_steps = 1000;
       /** @brief Every ``hist_check_freq`` number of steps will check not converging to known SP. */
       int hist_check_freq = 5;
-      /** @brief Abort if the cosine of the angle between the dimer and a known SP is greater than this. */
-      double cos_theta_tol = std::cos(10. / 360. * 2 * M_PI);
       /** @brief Force convergence criterion (eV/Angstroms). */
       double f2norm = 1e-5;
       /**
@@ -132,6 +130,7 @@ namespace fly::saddle {
      * @param pot Potential energy function.
      * @param in_min initial minima that dimer is climbing FROM.
      * @param hist_sp Previously discovered saddle points.
+     * @param theta_tol If the angle (Radians) between this SPS and a previous SP is less than theta_tol then abort.
      * @param num_threads Number of openMP threads to use.
      * @return Exit-code.
      */
@@ -140,6 +139,7 @@ namespace fly::saddle {
               system::SoA<Position const &> in_min,
               potential::Generic &pot,
               std::vector<system::SoA<Position>> const &hist_sp,
+              double theta_tol,
               int num_threads = 1) -> Exit;
 
   private:

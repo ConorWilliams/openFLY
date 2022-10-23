@@ -65,7 +65,20 @@ system::Supercell<system::TypeMap<>, Ts...> supercell_from(std::string_view fnam
 int main() {
   system::Supercell cell = supercell_from<Position, Frozen, PotentialGradient, Axis, Hash>("data/xyz/V1-unrelaxed.gsd", 0);
 
-  cell[hash_] = 0;
+  system::Supercell old = cell;
+
+  cell.destructive_resize(old.size() + 1);
+
+  for (int i = 0; i < old.size(); i++) {
+    cell(r_, i) = old(r_, i);
+    cell(id_, i) = old(id_, i);
+  }
+
+  cell(r_, old.size()) = Vec{0.4, 1.4, 1.4};
+
+  cell(id_, old.size()) = 1;
+
+  cell[fzn_] = false;
 
   cell[r_] += 0.2;
 
@@ -113,6 +126,8 @@ int main() {
   dout.write(cell.map());                                                 //< Write the map to frame 0.
   dout.write("particles/N", fly::safe_cast<std::uint32_t>(cell.size()));  //< Write the number of atoms to frame 0.
   dout.write(fly::id_, cell);
+  dout.write(fly::r_, cell);
+  dout.commit();
 
   std::vector<env::Geometry<Index>> tmp;
 
@@ -134,7 +149,7 @@ int main() {
       dimer,
   };
 
-  mast.find_mechs({cat.get_geo(2)}, cell);
+  mast.find_mechs({cat.get_geo(685)}, cell);
 
   /////////////////////////// IO ///////////////////////////
 

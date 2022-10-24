@@ -102,11 +102,11 @@ namespace fly::saddle {
       /**
        * @brief Maximum number of searches per environment.
        */
-      int max_searches = 7500;
+      int max_searches = 1000;
       /**
        * @brief Maximum number of consecutive failed searches per environment.
        */
-      int max_failed_searches = 500;
+      int max_failed_searches = 250;
 
       /**
        * @brief Number of simultaneous SP searches per new environment.
@@ -465,9 +465,7 @@ namespace fly::saddle {
 
       while (tot < m_opt.max_searches && fail < m_opt.max_failed_searches) {
         // Abort SPS if the cosine of the angle between the dimer and a known SP is greater than this.
-        double theta_tol = ((30 - 5) * std::exp(-0.02 * fail) + 5) / 360. * 2. * M_PI;
-
-        theta_tol = 7. / 360. * 2. * M_PI;
+        double theta_tol = ((30 - 5) * std::exp(-0.02 * tot) + 5) / 360. * 2. * M_PI;
 
         if (m_opt.debug) {
           fmt::print("FINDER: Theta tolerance = {}\n", theta_tol / 2. / M_PI * 360.);
@@ -844,10 +842,6 @@ namespace fly::saddle {
 
       mech.capture_frac = cap / tot;
 
-      if (m_opt.debug) {
-        fmt::print("FINDER: found mech ΔE={} f={}, uncap={}, \n", mech.barrier, mech.capture_frac, tot - cap);
-      }
-
       //////////////// Partial hessian compute. ////////////////
 
       thr.pot_nl.rebuild(sp, 1);
@@ -879,6 +873,14 @@ namespace fly::saddle {
         mech.kinetic_pre += std::log(freq[i]);
       }
 
+      if (m_opt.debug) {
+        fmt::print("FINDER: Mech ΔE={:.2e} f={:.4f}, uncap={:.2e}, modes = {::.2e}, \n",
+                   mech.barrier,
+                   mech.capture_frac,
+                   tot - cap,
+                   freq.head(5));
+      }
+
       return mech;
     }
 
@@ -902,10 +904,14 @@ namespace fly::saddle {
 
       std::normal_distribution prime(m_opt.stddev, m_opt.stddev / 3.0);
 
-      double stddev = std::abs(prime(prng));
+      double stddev = -1;
+
+      while (stddev < 0) {
+        stddev = prime(prng);
+      }
 
       if (m_opt.debug) {
-        fmt::print("FINDER: stddev={}\n", stddev);
+        fmt::print("FINDER: standard deviation={}\n", stddev);
       }
 
       std::normal_distribution<double> gauss(0, stddev);
@@ -915,15 +921,45 @@ namespace fly::saddle {
 
       nl.for_neighbours(centre, m_opt.r_pert, [&](auto n, double r, auto const&) {
         if (!in(Frozen{}, n)) {
-          out(r_, n) += Vec{gauss(prng), gauss(prng), gauss(prng)} * (1. - r / m_opt.r_pert);
-          out(ax_, n) += Vec{normal(prng), normal(prng), normal(prng)};
+          out(r_, n) += Vec::NullaryExpr([&] { return gauss(prng); }) * (1. - r / m_opt.r_pert);
+          out(ax_, n) += Vec::NullaryExpr([&] { return normal(prng); });
         }
       });
 
+      /* Experimental quasi-random centre
+
+      constexpr double g = 1.32471795724474602596;  // Golden ratio
+      constexpr double a1 = 1.0 / g;
+      constexpr double a2 = 1.0 / (g * g);
+
+      static int n = 0;
+
+      double u = 0.5 + a1 * n - std::floor(0.5 + a1 * n);
+      double v = 0.5 + a2 * n - std::floor(0.5 + a2 * n);
+
+      n++;
+
+      ASSERT(u >= 0 && u < 1, "u={}", u);
+      ASSERT(u >= 0 && u < 1, "v={}", v);
+
+      //    Lambert projection
+
+      double phi = 2 * M_PI * v;
+      double sin_lam = 2 * u - 1;
+      double cos_lam = std::cos(std::asin(sin_lam));
+
+      Vec p = {
+          cos_lam * std::cos(phi),
+          cos_lam * std::sin(phi),
+          sin_lam,
+      };
+
+      */
+
       ASSERT(!in(Frozen{}, centre), "perturbation centred on a frozen atom {}", centre);
 
-      out(r_, centre) += Vec{gauss(prng), gauss(prng), gauss(prng)};
-      out(ax_, centre) += Vec{normal(prng), normal(prng), normal(prng)};
+      out(r_, centre) += Vec::NullaryExpr([&] { return gauss(prng); });  // p * std::abs(gauss(prng)) * std::sqrt(3);
+      out(ax_, centre) += Vec::NullaryExpr([&] { return normal(prng); });
 
       out[ax_] /= gnorm(out[ax_]);  // normalize
     }

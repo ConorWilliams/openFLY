@@ -339,8 +339,6 @@
 </li>
         <li><a href="api/env.html#_CPPv4NK3fly3env9Catalogue3Env7ref_geoEv">fly::env::Catalogue::Env::ref_geo (C++ function)</a>
 </li>
-        <li><a href="api/env.html#_CPPv4N3fly3env9Catalogue3Env8set_mechERRNSt6vectorIN6system9LocalMechEEE">fly::env::Catalogue::Env::set_mech (C++ function)</a>
-</li>
         <li><a href="api/env.html#_CPPv4NK3fly3env9Catalogue7get_geoEi">fly::env::Catalogue::get_geo (C++ function)</a>
 </li>
         <li><a href="api/env.html#_CPPv4N3fly3env9Catalogue7get_refEi">fly::env::Catalogue::get_ref (C++ function)</a>
@@ -389,11 +387,27 @@
 </li>
         <li><a href="api/env.html#_CPPv4IDpEN3fly3env8Geometry12permute_ontoENSt8optionalI7GeoInfoEERKN6system3VoSIDp2TsEEd">fly::env::Geometry::permute_onto (C++ function)</a>
 </li>
-        <li><a href="api/env.html#_CPPv4I0DpDpEN3fly3env5grmsdEdRK1ERKN6system3VoSIDp2M1EERKN6system3VoSIDp2M2EE">fly::env::grmsd (C++ function)</a>
+        <li><a href="api/env.html#_CPPv4I00DpDpEN3fly3env5grmsdEdRK1ERKN6system3VoSIDp2M1EERKN6system3VoSIDp2M2EE">fly::env::grmsd (C++ function)</a>
+</li>
+        <li><a href="api/env.html#_CPPv4N3fly3env9MechanismE">fly::env::Mechanism (C++ class)</a>
+</li>
+        <li><a href="api/env.html#_CPPv4N3fly3env9Mechanism7barrierE">fly::env::Mechanism::barrier (C++ member)</a>
+</li>
+        <li><a href="api/env.html#_CPPv4N3fly3env9Mechanism12capture_fracE">fly::env::Mechanism::capture_frac (C++ member)</a>
+</li>
+        <li><a href="api/env.html#_CPPv4N3fly3env9Mechanism5deltaE">fly::env::Mechanism::delta (C++ member)</a>
+</li>
+        <li><a href="api/env.html#_CPPv4N3fly3env9Mechanism9delta_fwdE">fly::env::Mechanism::delta_fwd (C++ member)</a>
+</li>
+        <li><a href="api/env.html#_CPPv4N3fly3env9Mechanism8delta_spE">fly::env::Mechanism::delta_sp (C++ member)</a>
+</li>
+        <li><a href="api/env.html#_CPPv4N3fly3env9Mechanism11kinetic_preE">fly::env::Mechanism::kinetic_pre (C++ member)</a>
+</li>
+        <li><a href="api/env.html#_CPPv4N3fly3env9Mechanism6poisonE">fly::env::Mechanism::poison (C++ member)</a>
 </li>
         <li><a href="api/env.html#_CPPv4IDpDpEN3fly3env10ortho_ontoE3MatRKN6system3VoSIDp2M1EERKN6system3VoSIDp2M2EE">fly::env::ortho_onto (C++ function)</a>
 </li>
-        <li><a href="api/env.html#_CPPv4IDpDpEN3fly3env4rmsdEdRKN6system3VoSIDp2M1EERKN6system3VoSIDp2M2EE">fly::env::rmsd (C++ function)</a>
+        <li><a href="api/env.html#_CPPv4I0DpDpEN3fly3env4rmsdEdRKN6system3VoSIDp2M1EERKN6system3VoSIDp2M2EE">fly::env::rmsd (C++ function)</a>
 </li>
         <li><a href="api/utility.html#_CPPv4IDpEN3fly5errorE12RuntimeErrorN3fmt13format_stringIDp4ArgsEEDpRR4Args">fly::error (C++ function)</a>
 </li>
@@ -545,19 +559,23 @@
 </li>
         <li><a href="api/utility.html#_CPPv4N3fly12RuntimeErrorE">fly::RuntimeError (C++ struct)</a>
 </li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="api/saddle.html#_CPPv4N3fly6saddle5DimerE">fly::saddle::Dimer (C++ class)</a>
 </li>
         <li><a href="api/saddle.html#_CPPv4N3fly6saddle5Dimer5DimerERK5Dimer">fly::saddle::Dimer::Dimer (C++ function)</a>, <a href="api/saddle.html#_CPPv4N3fly6saddle5Dimer5DimerERK7OptionsRKN5Rotor7OptionsERKN6system3BoxE">[1]</a>, <a href="api/saddle.html#_CPPv4N3fly6saddle5Dimer5DimerERR5Dimer">[2]</a>
 </li>
         <li><a href="api/saddle.html#_CPPv4N3fly6saddle5Dimer4ExitE">fly::saddle::Dimer::Exit (C++ enum)</a>
 </li>
-        <li><a href="api/saddle.html#_CPPv4N3fly6saddle5Dimer4Exit4failE">fly::saddle::Dimer::Exit::fail (C++ enumerator)</a>
+        <li><a href="api/saddle.html#_CPPv4N3fly6saddle5Dimer4Exit9collisionE">fly::saddle::Dimer::Exit::collision (C++ enumerator)</a>
 </li>
-    </ul></td>
-    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/saddle.html#_CPPv4N3fly6saddle5Dimer4Exit6convexE">fly::saddle::Dimer::Exit::convex (C++ enumerator)</a>
+</li>
         <li><a href="api/saddle.html#_CPPv4N3fly6saddle5Dimer4Exit8iter_maxE">fly::saddle::Dimer::Exit::iter_max (C++ enumerator)</a>
 </li>
         <li><a href="api/saddle.html#_CPPv4N3fly6saddle5Dimer4Exit7successE">fly::saddle::Dimer::Exit::success (C++ enumerator)</a>
+</li>
+        <li><a href="api/saddle.html#_CPPv4N3fly6saddle5Dimer7find_spEN6system3SoAIR8PositionR4AxisEEN6system3SoAIRK8PositionRK4AxisRK6TypeIDRK6FrozenEEN6system3SoAIRK8PositionEERN9potential7GenericERKNSt6vectorIN6system3SoAI8PositionEEEEdi">fly::saddle::Dimer::find_sp (C++ function)</a>
 </li>
         <li><a href="api/saddle.html#_CPPv4N3fly6saddle5Dimer7OptionsE">fly::saddle::Dimer::Options (C++ struct)</a>
 </li>
@@ -571,6 +589,10 @@
 </li>
         <li><a href="api/saddle.html#_CPPv4N3fly6saddle5Dimer7Options10grow_trustE">fly::saddle::Dimer::Options::grow_trust (C++ member)</a>
 </li>
+        <li><a href="api/saddle.html#_CPPv4N3fly6saddle5Dimer7Options15hist_check_freqE">fly::saddle::Dimer::Options::hist_check_freq (C++ member)</a>
+</li>
+        <li><a href="api/saddle.html#_CPPv4N3fly6saddle5Dimer7Options9max_stepsE">fly::saddle::Dimer::Options::max_steps (C++ member)</a>
+</li>
         <li><a href="api/saddle.html#_CPPv4N3fly6saddle5Dimer7Options9max_trustE">fly::saddle::Dimer::Options::max_trust (C++ member)</a>
 </li>
         <li><a href="api/saddle.html#_CPPv4N3fly6saddle5Dimer7Options9min_trustE">fly::saddle::Dimer::Options::min_trust (C++ member)</a>
@@ -583,53 +605,49 @@
 </li>
         <li><a href="api/saddle.html#_CPPv4N3fly6saddle5Dimer7Options9skin_fracE">fly::saddle::Dimer::Options::skin_frac (C++ member)</a>
 </li>
-        <li><a href="api/saddle.html#_CPPv4N3fly6saddle5Dimer4stepEN6system3SoAIR8PositionR4AxisEEN6system3SoAIRK8PositionRK4AxisRK6TypeIDRK6FrozenEERN9potential7GenericEii">fly::saddle::Dimer::step (C++ function)</a>
+        <li><a href="api/saddle.html#_CPPv4N3fly6saddle6MasterE">fly::saddle::Master (C++ class)</a>
 </li>
-        <li><a href="api/saddle.html#_CPPv4N3fly6saddle12MasterFinderE">fly::saddle::MasterFinder (C++ class)</a>
+        <li><a href="api/saddle.html#_CPPv4N3fly6saddle6Master10find_mechsERKNSt6vectorIN3env8GeometryI5IndexEEEEN6system3SoAIRK8PositionRK6FrozenRK6TypeIDEE">fly::saddle::Master::find_mechs (C++ function)</a>
 </li>
-        <li><a href="api/saddle.html#_CPPv4N3fly6saddle12MasterFinder13find_pathwaysERKN6system3BoxERKNSt6vectorIiEEN6system3SoAIRK8PositionRK6FrozenRK6TypeIDEE">fly::saddle::MasterFinder::find_pathways (C++ function)</a>
+        <li><a href="api/saddle.html#_CPPv4N3fly6saddle6Master5FoundE">fly::saddle::Master::Found (C++ struct)</a>
 </li>
-        <li><a href="api/saddle.html#_CPPv4N3fly6saddle12MasterFinder12MasterFinderERK7OptionsRKN9potential7GenericERKN8minimise5LBFGSERKN6saddle5DimerE">fly::saddle::MasterFinder::MasterFinder (C++ function)</a>
+        <li><a href="api/saddle.html#_CPPv4N3fly6saddle6Master5Found6centreE">fly::saddle::Master::Found::centre (C++ member)</a>
 </li>
-        <li><a href="api/saddle.html#_CPPv4N3fly6saddle12MasterFinder7OptionsE">fly::saddle::MasterFinder::Options (C++ struct)</a>
+        <li><a href="api/saddle.html#_CPPv4N3fly6saddle6Master5Found5mechsE">fly::saddle::Master::Found::mechs (C++ member)</a>
 </li>
-        <li><a href="api/saddle.html#_CPPv4N3fly6saddle12MasterFinder7Options9basin_tolE">fly::saddle::MasterFinder::Options::basin_tol (C++ member)</a>
+        <li><a href="api/saddle.html#_CPPv4N3fly6saddle6Master6MasterERK7OptionsRKN6system3BoxERKN9potential7GenericERKN8minimise5LBFGSERKN6saddle5DimerE">fly::saddle::Master::Master (C++ function)</a>
 </li>
-        <li><a href="api/saddle.html#_CPPv4N3fly6saddle12MasterFinder7Options10batch_sizeE">fly::saddle::MasterFinder::Options::batch_size (C++ member)</a>
+        <li><a href="api/saddle.html#_CPPv4N3fly6saddle6Master7OptionsE">fly::saddle::Master::Options (C++ struct)</a>
 </li>
-        <li><a href="api/saddle.html#_CPPv4N3fly6saddle12MasterFinder7Options5debugE">fly::saddle::MasterFinder::Options::debug (C++ member)</a>
+        <li><a href="api/saddle.html#_CPPv4N3fly6saddle6Master7Options9basin_tolE">fly::saddle::Master::Options::basin_tol (C++ member)</a>
 </li>
-        <li><a href="api/saddle.html#_CPPv4N3fly6saddle12MasterFinder7Options4foutE">fly::saddle::MasterFinder::Options::fout (C++ member)</a>
+        <li><a href="api/saddle.html#_CPPv4N3fly6saddle6Master7Options10batch_sizeE">fly::saddle::Master::Options::batch_size (C++ member)</a>
 </li>
-        <li><a href="api/saddle.html#_CPPv4N3fly6saddle12MasterFinder7Options10freeze_tolE">fly::saddle::MasterFinder::Options::freeze_tol (C++ member)</a>
+        <li><a href="api/saddle.html#_CPPv4N3fly6saddle6Master7Options5debugE">fly::saddle::Master::Options::debug (C++ member)</a>
 </li>
-        <li><a href="api/saddle.html#_CPPv4N3fly6saddle12MasterFinder7Options19max_failed_searchesE">fly::saddle::MasterFinder::Options::max_failed_searches (C++ member)</a>
+        <li><a href="api/saddle.html#_CPPv4N3fly6saddle6Master7Options4foutE">fly::saddle::Master::Options::fout (C++ member)</a>
 </li>
-        <li><a href="api/saddle.html#_CPPv4N3fly6saddle12MasterFinder7Options12max_searchesE">fly::saddle::MasterFinder::Options::max_searches (C++ member)</a>
+        <li><a href="api/saddle.html#_CPPv4N3fly6saddle6Master7Options10freeze_tolE">fly::saddle::Master::Options::freeze_tol (C++ member)</a>
 </li>
-        <li><a href="api/saddle.html#_CPPv4N3fly6saddle12MasterFinder7Options10nudge_fracE">fly::saddle::MasterFinder::Options::nudge_frac (C++ member)</a>
+        <li><a href="api/saddle.html#_CPPv4N3fly6saddle6Master7Options22hessian_eigen_zero_tolE">fly::saddle::Master::Options::hessian_eigen_zero_tol (C++ member)</a>
 </li>
-        <li><a href="api/saddle.html#_CPPv4N3fly6saddle12MasterFinder7Options11num_threadsE">fly::saddle::MasterFinder::Options::num_threads (C++ member)</a>
+        <li><a href="api/saddle.html#_CPPv4N3fly6saddle6Master7Options19max_failed_searchesE">fly::saddle::Master::Options::max_failed_searches (C++ member)</a>
 </li>
-        <li><a href="api/saddle.html#_CPPv4N3fly6saddle12MasterFinder7Options6r_pertE">fly::saddle::MasterFinder::Options::r_pert (C++ member)</a>
+        <li><a href="api/saddle.html#_CPPv4N3fly6saddle6Master7Options12max_searchesE">fly::saddle::Master::Options::max_searches (C++ member)</a>
 </li>
-        <li><a href="api/saddle.html#_CPPv4N3fly6saddle12MasterFinder7Options14stationary_tolE">fly::saddle::MasterFinder::Options::stationary_tol (C++ member)</a>
+        <li><a href="api/saddle.html#_CPPv4N3fly6saddle6Master7Options8mech_tolE">fly::saddle::Master::Options::mech_tol (C++ member)</a>
 </li>
-        <li><a href="api/saddle.html#_CPPv4N3fly6saddle12MasterFinder7Options6stddevE">fly::saddle::MasterFinder::Options::stddev (C++ member)</a>
+        <li><a href="api/saddle.html#_CPPv4N3fly6saddle6Master7Options10nudge_fracE">fly::saddle::Master::Options::nudge_frac (C++ member)</a>
 </li>
-        <li><a href="api/saddle.html#_CPPv4N3fly6saddle12MasterFinder9PathGroupE">fly::saddle::MasterFinder::PathGroup (C++ struct)</a>
+        <li><a href="api/saddle.html#_CPPv4N3fly6saddle6Master7Options11num_threadsE">fly::saddle::Master::Options::num_threads (C++ member)</a>
 </li>
-        <li><a href="api/saddle.html#_CPPv4N3fly6saddle12MasterFinder9PathGroup5indexE">fly::saddle::MasterFinder::PathGroup::index (C++ member)</a>
+        <li><a href="api/saddle.html#_CPPv4N3fly6saddle6Master7Options6r_pertE">fly::saddle::Master::Options::r_pert (C++ member)</a>
 </li>
-        <li><a href="api/saddle.html#_CPPv4N3fly6saddle12MasterFinder9PathGroup5pathsE">fly::saddle::MasterFinder::PathGroup::paths (C++ member)</a>
+        <li><a href="api/saddle.html#_CPPv4N3fly6saddle6Master7Options12sp_relax_tolE">fly::saddle::Master::Options::sp_relax_tol (C++ member)</a>
 </li>
-        <li><a href="api/saddle.html#_CPPv4N3fly6saddle12MasterFinder7PathwayE">fly::saddle::MasterFinder::Pathway (C++ struct)</a>
+        <li><a href="api/saddle.html#_CPPv4N3fly6saddle6Master7Options14stationary_tolE">fly::saddle::Master::Options::stationary_tol (C++ member)</a>
 </li>
-        <li><a href="api/saddle.html#_CPPv4N3fly6saddle12MasterFinder7Pathway3fwdE">fly::saddle::MasterFinder::Pathway::fwd (C++ member)</a>
-</li>
-        <li><a href="api/saddle.html#_CPPv4I00EN3fly6saddle12MasterFinder7Pathway7PathwayERR1URR1V">fly::saddle::MasterFinder::Pathway::Pathway (C++ function)</a>
-</li>
-        <li><a href="api/saddle.html#_CPPv4N3fly6saddle12MasterFinder7Pathway2spE">fly::saddle::MasterFinder::Pathway::sp (C++ member)</a>
+        <li><a href="api/saddle.html#_CPPv4N3fly6saddle6Master7Options6stddevE">fly::saddle::Master::Options::stddev (C++ member)</a>
 </li>
         <li><a href="api/saddle.html#_CPPv4N3fly6saddle5RotorE">fly::saddle::Rotor (C++ class)</a>
 </li>
@@ -718,10 +736,6 @@
         <li><a href="api/crystal_systems.html#_CPPv4NK3fly6system9HyperGrid5r_cutEv">fly::system::HyperGrid::r_cut (C++ function)</a>
 </li>
         <li><a href="api/crystal_systems.html#_CPPv4NK3fly6system9HyperGrid5shapeEv">fly::system::HyperGrid::shape (C++ function)</a>
-</li>
-        <li><a href="api/system.html#_CPPv4N3fly6system9LocalMechE">fly::system::LocalMech (C++ class)</a>
-</li>
-        <li><a href="api/system.html#_CPPv4N3fly6system9LocalMech9delta_fwdE">fly::system::LocalMech::delta_fwd (C++ member)</a>
 </li>
         <li><a href="api/system.html#_CPPv4IDpDpEN3fly6system14make_supercellE9SupercellI7TypeMapIDp1UEDp1TERK3BoxRK7TypeMapIDp1UEN5Eigen5IndexE">fly::system::make_supercell (C++ function)</a>
 </li>

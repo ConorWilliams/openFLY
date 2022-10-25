@@ -117,17 +117,6 @@ File: ``libfly/system/supercell.hpp``
 
 .. doxygenfunction:: fly::system::make_supercell
 
-Mechanisms
----------------------------
-
-File: ``libfly/system/mechanisms.hpp``
-
-.. doxygenfile:: libfly/system/mechanisms.hpp
-    :sections: briefdescription detaileddescription
-
-.. doxygenclass:: fly::system::LocalMech
-    :members:
-    :undoc-members:
 
 
 Hessians

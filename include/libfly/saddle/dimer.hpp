@@ -122,8 +122,8 @@ namespace fly::saddle {
     /**
      * @brief Advance the dimer towards a saddle-point.
      *
-     * Performs at most ``max_step`` translation steps. The translation uses the LBFGS algorithm with a trust-radius limited step size
-     * and an early-exit condition if the curvature is positive for too long.
+     * Performs at most ``max_find_sp`` translation steps. The translation uses the LBFGS algorithm with a trust-radius limited step
+     * size and an early-exit condition if the curvature is positive for too long.
      *
      * @param out Final position and axis orientation written here.
      * @param in Initial position, axis and per-particle data forwarded to potential.
@@ -134,13 +134,13 @@ namespace fly::saddle {
      * @param num_threads Number of openMP threads to use.
      * @return Exit-code.
      */
-    auto step(system::SoA<Position &, Axis &> out,
-              system::SoA<Position const &, Axis const &, TypeID const &, Frozen const &> in,
-              system::SoA<Position const &> in_min,
-              potential::Generic &pot,
-              std::vector<system::SoA<Position>> const &hist_sp,
-              double theta_tol,
-              int num_threads = 1) -> Exit;
+    auto find_sp(system::SoA<Position &, Axis &> out,
+                 system::SoA<Position const &, Axis const &, TypeID const &, Frozen const &> in,
+                 system::SoA<Position const &> in_min,
+                 potential::Generic &pot,
+                 std::vector<system::SoA<Position>> const &hist_sp,
+                 double theta_tol,
+                 int num_threads = 1) -> Exit;
 
   private:
     Options m_opt;

@@ -23,6 +23,9 @@ Added
 
 Changed
 ~~~~~~~
+
+- ``Dimer``'s interface changed.
+
 Removed
 ~~~~~~~
 Bugfixes

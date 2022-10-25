@@ -22,13 +22,13 @@
 
 namespace fly::saddle {
 
-  auto Dimer::step(system::SoA<Position &, Axis &> out,
-                   system::SoA<Position const &, Axis const &, TypeID const &, Frozen const &> in,
-                   system::SoA<Position const &> in_min,
-                   potential::Generic &pot,
-                   std::vector<system::SoA<Position>> const &hist_sp,
-                   double theta_tol,
-                   int num_threads) -> Exit {
+  auto Dimer::find_sp(system::SoA<Position &, Axis &> out,
+                      system::SoA<Position const &, Axis const &, TypeID const &, Frozen const &> in,
+                      system::SoA<Position const &> in_min,
+                      potential::Generic &pot,
+                      std::vector<system::SoA<Position>> const &hist_sp,
+                      double theta_tol,
+                      int num_threads) -> Exit {
     // Check inputs
 
     verify(in.size() == out.size(), "Dimer stepper inputs size mismatch, in={} out={}", in.size(), out.size());

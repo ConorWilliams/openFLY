@@ -25,6 +25,10 @@ jobs:
           submodules: true
           fetch-depth: 0
 
+      - name: Compile a universal OpenMP
+        run: brew reinstall --build-from-source --formula ./shell/apple/libomp.rb
+        if: runner.os == 'macOS'
+
       - name: Install vcpkg
         uses: friendlyanon/setup-vcpkg@v1
         with: { path: "external/vcpkg", cache-version: "${{ matrix.cpp }}" }

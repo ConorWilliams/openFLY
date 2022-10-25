@@ -26,7 +26,8 @@ jobs:
           fetch-depth: 0
 
       - name: Compile a universal OpenMP
-        run: brew reinstall --build-from-source --formula ./shell/apple/libomp.rb
+        run: echo ${{runner.os}}
+        # run: brew reinstall --build-from-source --formula ./shell/apple/libomp.rb
         if: runner.os == 'macos-latest'
 
       - name: Install vcpkg

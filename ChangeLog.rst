@@ -14,18 +14,14 @@ Changelog
 .. Meta 
 .. ~~~~
 
+.. Version is specified in vcpkg.json, docs/index.rst and libfly/utility/version.hpp
+
 Unreleased
 -------------------------------
 Added
 ~~~~~
-
-- New ``LocalMech`` classes (incomplete).
-
 Changed
 ~~~~~~~
-
-- ``Dimer``'s interface changed.
-
 Removed
 ~~~~~~~
 Bugfixes
@@ -33,7 +29,40 @@ Bugfixes
 Meta 
 ~~~~
 
-.. Version is specified in vcpkg.json, docs/index.rst and libfly/utility/version.hpp
+Version 0.7.0
+-------------------------------
+
+
+Overhauled saddle-point finding including: returning the new ``Mechanism`` class, automatic mechanisms symmetry identification and discovery and history dependant dimer searches.
+
+
+Added
+~~~~~
+
+- New ``Mechanism`` class.
+- New ``rebuild_geo_from_nl()`` geometry function.
+- The ``Master`` class added which is an improved version of the ``MasterFinder`` class.
+
+Changed
+~~~~~~~
+
+- ``Dimer``'s interface changed.
+- Generalised some geometry functions: ``rmsd()``, ``grmsd()``.
+- Potentials now compute mass weighted Hessians.
+- EAM hessian computation made more cache efficiant.
+
+Removed
+~~~~~~~
+
+- The ``MasterFinder`` class was removed.
+
+Bugfixes
+~~~~~~~~
+
+- Return wrong value in ``examples/env/geometry.cpp``.
+- Fix EAM parser bug not reading masses correctly.
+- Fix bug in finder which forgot to ``std::swap`` two states.
+
 
 
 Version 0.6.0

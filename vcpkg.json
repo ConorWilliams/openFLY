@@ -1,6 +1,6 @@
 {
     "name": "openfly",
-    "version-semver": "0.6.0",
+    "version-semver": "0.7.0",
     "dependencies": [
         {
             "name": "fmt",

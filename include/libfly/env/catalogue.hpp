@@ -25,12 +25,12 @@
 
 #include "libfly/env/geometry.hpp"
 #include "libfly/env/heuristics.hpp"
+#include "libfly/env/mechanisms.hpp"
 #include "libfly/neigh/list.hpp"
 #include "libfly/potential/generic.hpp"
 #include "libfly/saddle/find.hpp"
 #include "libfly/system/SoA.hpp"
 #include "libfly/system/box.hpp"
-#include "libfly/system/mechanisms.hpp"
 #include "libfly/system/supercell.hpp"
 #include "libfly/utility/core.hpp"
 
@@ -77,11 +77,11 @@ namespace fly::env {
       auto ref_geo() const -> Geometry<> const& { return *this; }
 
       /**
-       * @brief Get a vector of the ``system::LocalMech``s centred on this environment.
+       * @brief Get a vector of the ``Mechanism``s centred on this environment.
        *
        * Pre-condition, set_mechs() must have been called on this ``Env``.
        */
-      auto get_mechs() const -> std::vector<system::LocalMech> const& {
+      auto get_mechs() const -> std::vector<Mechanism> const& {
         ASSERT(!m_mechs.empty(), "Environment has not been completed", 0);
         return m_mechs;
       }
@@ -94,11 +94,11 @@ namespace fly::env {
     private:
       friend class Catalogue;
 
-      Fingerprint m_finger;                      ///< The fingerprint of this environment.
-      std::vector<system::LocalMech> m_mechs{};  ///< The mechanisms accessible, centred on this environment.
-      int m_freq = 0;                            ///< The number of times this environment has been discovered.
-      int m_index;                               ///< The unique index in the catalogue.
-      double m_delta_max;                        ///< The maximum value norm for environments to be considered equivilent.
+      Fingerprint m_finger;              ///< The fingerprint of this environment.
+      std::vector<Mechanism> m_mechs{};  ///< The mechanisms accessible, centred on this environment.
+      int m_freq = 0;                    ///< The number of times this environment has been discovered.
+      int m_index;                       ///< The unique index in the catalogue.
+      double m_delta_max;                ///< The maximum value norm for environments to be considered equivilent.
 
       /**
        * @brief Construct a new ``Env`` object.
@@ -111,15 +111,15 @@ namespace fly::env {
       }
 
       /**
-       * @brief Set the vector of ``system::LocalMech``s.
+       * @brief Set the vector of ``Mechanism``s.
        *
        * Pre-condition, this may only be called once.
        */
-      auto set_mech(std::vector<system::LocalMech>&& m) -> void {
+      auto set_mech(std::vector<Mechanism>&& m) -> void {
         verify(m_mechs.empty(), "We already have {} mechanisms, set_mech() should only be called once.", m_mechs.size());
         verify(std::all_of(m.begin(),
                            m.end(),
-                           [s = this->size()](system::LocalMech const& x) {
+                           [s = this->size()](Mechanism const& x) {
                              //
                              return x.delta_sp.size() == s && x.delta_fwd.size() == s;
                            }),

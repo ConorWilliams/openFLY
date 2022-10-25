@@ -25,6 +25,7 @@
 #include <vector>
 
 #include "libfly/env/geometry.hpp"
+#include "libfly/env/mechanisms.hpp"
 #include "libfly/minimise/LBFGS/lbfgs.hpp"
 #include "libfly/neigh/list.hpp"
 #include "libfly/potential/generic.hpp"
@@ -32,7 +33,6 @@
 #include "libfly/system/SoA.hpp"
 #include "libfly/system/box.hpp"
 #include "libfly/system/hessian.hpp"
-#include "libfly/system/mechanisms.hpp"
 #include "libfly/system/property.hpp"
 #include "libfly/utility/core.hpp"
 #include "libfly/utility/random.hpp"
@@ -49,7 +49,7 @@ namespace fly::saddle {
 
   // Reconstruct saddle point according to reference geometry
   static system::SoA<Position> reconstruct_sp(env::Geometry<Index> const& ref,
-                                              system::LocalMech const& m,
+                                              env::Mechanism const& m,
                                               system::SoA<Position const&> in) {
     system::SoA<Position> sp(in);
 
@@ -61,7 +61,7 @@ namespace fly::saddle {
   }
 
   // Compute angle between mechanisms saddle points
-  static double theta_mech(system::LocalMech const& a, system::LocalMech const& b) {
+  static double theta_mech(env::Mechanism const& a, env::Mechanism const& b) {
     //
     verify(a.delta_sp.size() == b.delta_sp.size(), "");
 
@@ -323,12 +323,12 @@ namespace fly::saddle {
     return found_one_or_more;
   }
 
-  std::optional<system::LocalMech> Master::find_one(system::SoA<Position const&, Frozen const&, TypeID const&> in,
-                                                    system::SoA<Position&, Axis&> dimer_in_out,
-                                                    bool& collision,
-                                                    env::Geometry<Index> const& geo,
-                                                    std::vector<system::SoA<Position>> const& hist_sp,
-                                                    double theta_tol) {
+  std::optional<env::Mechanism> Master::find_one(system::SoA<Position const&, Frozen const&, TypeID const&> in,
+                                                 system::SoA<Position&, Axis&> dimer_in_out,
+                                                 bool& collision,
+                                                 env::Geometry<Index> const& geo,
+                                                 std::vector<system::SoA<Position>> const& hist_sp,
+                                                 double theta_tol) {
     // Saddle search
 
     system::SoA<Position&, Axis&, Frozen const&, TypeID const&> dimer(in.size());
@@ -393,7 +393,7 @@ namespace fly::saddle {
     thr.pot_nl.rebuild(fwd);
     double Ef = thr.pot.energy(in, thr.pot_nl, 1);
 
-    system::LocalMech mech;
+    env::Mechanism mech;
 
     mech.barrier = Esp - E0;
     mech.delta = Ef - E0;
@@ -737,9 +737,9 @@ namespace fly::saddle {
     out[ax_] /= gnorm(out[ax_]);  // normalize
   }
 
-  bool Master::is_new_mech(system::LocalMech const& maybe, std::vector<system::LocalMech> const& hist) const {
+  bool Master::is_new_mech(env::Mechanism const& maybe, std::vector<env::Mechanism> const& hist) const {
     // All searches have been around same atom hence orientation is fixed.
-    for (system::LocalMech const& m : hist) {
+    for (env::Mechanism const& m : hist) {
       //
       double d_sp = env::rmsd<Delta>(maybe.delta_sp, m.delta_sp);
       double d_fwd = env::rmsd<Delta>(maybe.delta_fwd, m.delta_fwd);
@@ -753,10 +753,10 @@ namespace fly::saddle {
   }
 
   std::size_t Master::append_syms(std::vector<std::pair<Mat, std::vector<Index::scalar_t>>> const& syms,
-                                  system::LocalMech const& new_mech,
-                                  std::vector<system::LocalMech>& mechs) const {
+                                  env::Mechanism const& new_mech,
+                                  std::vector<env::Mechanism>& mechs) const {
     //
-    system::LocalMech mech = new_mech;
+    env::Mechanism mech = new_mech;
 
     std::size_t count = 0;
     //
@@ -780,7 +780,7 @@ namespace fly::saddle {
   }
 
   system::SoA<Position> Master::recon_sp_relax(env::Geometry<Index> const& geo,
-                                               system::LocalMech& m,
+                                               env::Mechanism& m,
                                                system::SoA<Position const&, TypeID const&, Frozen const&> in) {
     //
     system::SoA<Position> recon = reconstruct_sp(geo, m, in);

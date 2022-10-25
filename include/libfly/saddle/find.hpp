@@ -26,6 +26,7 @@
 #include <vector>
 
 #include "libfly/env/geometry.hpp"
+#include "libfly/env/mechanisms.hpp"
 #include "libfly/minimise/LBFGS/lbfgs.hpp"
 #include "libfly/neigh/list.hpp"
 #include "libfly/potential/generic.hpp"
@@ -33,7 +34,6 @@
 #include "libfly/system/SoA.hpp"
 #include "libfly/system/box.hpp"
 #include "libfly/system/hessian.hpp"
-#include "libfly/system/mechanisms.hpp"
 #include "libfly/system/property.hpp"
 #include "libfly/utility/core.hpp"
 #include "libfly/utility/random.hpp"
@@ -47,11 +47,10 @@
 namespace fly::saddle {
 
   /**
-   * @brief Coordinate saddle-point searches on a node.
+   * @brief Coordinate saddle-point searches on a (compute) node.
    *
    * The ``Master`` coordinates saddle-point finding for a set of openMP threads, typically one ``Master`` should be
    * instantiated per compute node. Each ``Master`` stores all the threads reusable objects: minimiser, prng, etc.
-   *
    */
   class Master {
   public:
@@ -73,6 +72,8 @@ namespace fly::saddle {
       double stddev = 0.6;
       /**
        * @brief Tolerance for minimally displaced atom to be frozen (to remove translational error accumulation).
+       *
+       * If the minimally displaced atom displaces further than this then an error will be raised.
        */
       double freeze_tol = 0.01;
       /**
@@ -133,8 +134,8 @@ namespace fly::saddle {
      * @brief A collection of mechanisms centred on a central atom.
      */
     struct Found {
-      Index::scalar_t centre;                ///< The central atom.
-      std::vector<system::LocalMech> mechs;  ///< Mechanisms centred on ``this->centre``.
+      Index::scalar_t centre;             ///< The central atom.
+      std::vector<env::Mechanism> mechs;  ///< Mechanisms on ``this->centre``.
     };
 
     /**
@@ -143,7 +144,7 @@ namespace fly::saddle {
      * This will create ``opt.num_threads`` copies of each of the input parameters, one for each thread.
      *
      * @param opt The configuration options.
-     * @param box ...
+     * @param box Description of the simulation space.
      * @param pot The potential to use for minimisations and SP searches.
      * @param min The minimiser to relax either side of a SP.
      * @param dimer Used to find SPs.
@@ -155,9 +156,11 @@ namespace fly::saddle {
            saddle::Dimer const& dimer);
 
     /**
-     * @brief Find all the mechanisms centred on the ``unknown`` atoms.
+     * @brief Find all the mechanisms centred on the ``unknown`` geometries.
      *
-     * @param geos List of indices of the atoms which the mechanisms must be centred on.
+     * This will recursively schedule SP searches on the slave threads.
+     *
+     * @param geos List of geometries centred on the atoms which the mechanisms must be centred on.
      * @param in Description of system to search in.
      *
      */
@@ -179,7 +182,7 @@ namespace fly::saddle {
     struct Data {
       Index::scalar_t centre;                                        // Central atom
       std::vector<std::pair<Mat, std::vector<Index::scalar_t>>> tr;  // Perm + transformation.
-      std::vector<system::LocalMech> mechs;                          // Unique, mechanisms
+      std::vector<env::Mechanism> mechs;                             // Unique, mechanisms
     };
 
     // min->sp->min data
@@ -191,7 +194,7 @@ namespace fly::saddle {
 
     struct Batch {
       bool collsion = false;
-      std::optional<system::LocalMech> mech = {};
+      std::optional<env::Mechanism> mech = {};
       system::SoA<Position, Axis> dimer;
 
       explicit Batch(Eigen::Index n) : dimer(n){};
@@ -231,12 +234,12 @@ namespace fly::saddle {
      * @param theta_tol forwarded to Dimer::find_sp()
      * @param geo Centred of perturbation.
      */
-    std::optional<system::LocalMech> find_one(system::SoA<Position const&, Frozen const&, TypeID const&> in,
-                                              system::SoA<Position&, Axis&> dimer_in_out,
-                                              bool& collision,
-                                              env::Geometry<Index> const& geo,
-                                              std::vector<system::SoA<Position>> const& hist_sp,
-                                              double theta_tol);
+    std::optional<env::Mechanism> find_one(system::SoA<Position const&, Frozen const&, TypeID const&> in,
+                                           system::SoA<Position&, Axis&> dimer_in_out,
+                                           bool& collision,
+                                           env::Geometry<Index> const& geo,
+                                           std::vector<system::SoA<Position>> const& hist_sp,
+                                           double theta_tol);
 
     // Do a saddle point search
     Dimer::Exit find_sp(system::SoA<Position&, Axis&, Frozen const&, TypeID const&> dimer,
@@ -267,19 +270,19 @@ namespace fly::saddle {
     /**
      * @brief True if mech has been seen before.
      */
-    bool is_new_mech(system::LocalMech const& maybe, std::vector<system::LocalMech> const& hist) const;
+    bool is_new_mech(env::Mechanism const& maybe, std::vector<env::Mechanism> const& hist) const;
 
     /**
      * @brief Compute every symmetric version of new_mech (according to syms), if not in mechs append to mechs.
      */
     std::size_t append_syms(std::vector<std::pair<Mat, std::vector<Index::scalar_t>>> const& syms,
-                            system::LocalMech const& new_mech,
-                            std::vector<system::LocalMech>& mechs) const;
+                            env::Mechanism const& new_mech,
+                            std::vector<env::Mechanism>& mechs) const;
 
     // Reconstruct saddle point according to geo and relax system to saddle,
     // check we have not constructed a false SP, if we have mark mechanism as poisoned
     system::SoA<Position> recon_sp_relax(env::Geometry<Index> const& geo,
-                                         system::LocalMech& m,
+                                         env::Mechanism& m,
                                          system::SoA<Position const&, TypeID const&, Frozen const&> in);
 
     ThreadData& thread() { return m_data[safe_cast<std::size_t>(omp_get_thread_num())]; }

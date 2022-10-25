@@ -29,19 +29,21 @@
  * @brief Representations of mechanisms.
  */
 
-namespace fly::system {
+namespace fly::env {
 
   /**
    * @brief A representation of a local mechanism containing the the displacements of the atoms in a LE.
    *
+   * A mechanism describes the displacement vectors from a LE to an adjacent minima via a SP.
+   *
    * Frozen atoms must have a displacement equal to ``Vec::Zero()``.
    */
-  class LocalMech {
+  class Mechanism {
   public:
-    double barrier;       ///< Energy barrier (eSp - e0).
+    double barrier;       ///< Energy barrier (``eSp - e0``).
     double delta;         ///< Energy change (eF - e0).
     double kinetic_pre;   ///< Arrhenius pre factor.
-    double capture_frac;  ///< norm(delta_fwd in local) / norm(delta_fwd in global)
+    double capture_frac;  ///< ``norm(delta_fwd in local) / norm(delta_fwd in global)``
 
     bool poison = false;  ///< If true this mechanism cannot be reconstructed.
 
@@ -49,4 +51,4 @@ namespace fly::system {
     system::VoS<Delta> delta_fwd;  ///< Displacement vectors from initial to final.
   };
 
-}  // namespace fly::system
+}  // namespace fly::env

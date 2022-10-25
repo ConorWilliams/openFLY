@@ -16,7 +16,7 @@ File: ``libfly/saddle/find.hpp``
 .. doxygenfile:: libfly/saddle/find.hpp
     :sections: briefdescription detaileddescription
 
-.. doxygenclass:: fly::saddle::MasterFinder
+.. doxygenclass:: fly::saddle::Master
     :members:
     :undoc-members:
 

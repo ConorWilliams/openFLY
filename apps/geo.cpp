@@ -67,7 +67,7 @@ int main() {
 
   system::Supercell old = cell;
 
-  cell.destructive_resize(old.size() + 1);
+  cell.destructive_resize(old.size() + 2);
 
   for (int i = 0; i < old.size(); i++) {
     cell(r_, i) = old(r_, i);
@@ -75,11 +75,12 @@ int main() {
   }
 
   cell(r_, old.size()) = Vec{0.4, 1.4, 1.4};
-
   cell(id_, old.size()) = 1;
 
-  cell[fzn_] = false;
+  cell(r_, old.size() + 1) = Vec{2.4, 1.4, 1.4};
+  cell(id_, old.size() + 1) = 1;
 
+  cell[fzn_] = false;
   cell[r_] += 0.2;
 
   //   Minimise.
@@ -149,7 +150,7 @@ int main() {
       dimer,
   };
 
-  mast.find_mechs({cat.get_geo(685)}, cell);
+  mast.find_mechs({cat.get_geo(113)}, cell);
 
   /////////////////////////// IO ///////////////////////////
 

@@ -60,6 +60,19 @@ Graph hash
 .. doxygenfunction:: fly::env::canon_hash
 
 
+Mechanisms
+---------------------------
+
+File: ``libfly/env/mechanisms.hpp``
+
+.. doxygenfile:: libfly/env/mechanisms.hpp
+    :sections: briefdescription detaileddescription
+
+.. doxygenclass:: fly::env::Mechanism
+    :members:
+    :undoc-members:
+
+
 The catalogue
 --------------------------
 

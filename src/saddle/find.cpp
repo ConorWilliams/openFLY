@@ -603,7 +603,7 @@ namespace fly::saddle {
     ASSERT(freq.size() > m_deg_free, "Only {} normal modes", freq.size());
 
     for (int i = 0; i < m_deg_free; i++) {
-      verify(std::abs(freq[i]) < m_opt.hessian_eigen_zero_tol, "Master input modes (1)= {}", freq.head(10));
+      verify(std::abs(freq[i]) < m_opt.hessian_eigen_zero_tol, "Master's input is not minima, modes (1)= {}", freq.head(10));
     }
 
     verify(freq[m_deg_free] > m_opt.hessian_eigen_zero_tol, "Master input modes (2)= {}", freq.head(10));
@@ -745,7 +745,7 @@ namespace fly::saddle {
       double d_fwd = env::rmsd<Delta>(maybe.delta_fwd, m.delta_fwd);
 
       if (d_sp < m_opt.mech_tol) {
-        verify(d_fwd < m_opt.mech_tol, "Same sp, different final");
+        verify(d_fwd < m_opt.mech_tol, "Same sp, different final, d_fwd={}, d_sp={}", d_fwd, d_sp);
         return false;
       }
     }

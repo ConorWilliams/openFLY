@@ -434,7 +434,13 @@ namespace fly {
     template <int N = 0, typename F, typename... Args, typename T>
     void template_for_impl(Arr<T> const &beg, Arr<T> const &end, F const &f, Args... args) {
       if constexpr (N == spatial_dims) {
-        f(args...);
+        if constexpr (std::is_invocable_v<F const &, Args...>) {
+          std::invoke(f, args...);
+        } else if constexpr (std::is_invocable_v<F const &, Arr<T>>) {
+          std::invoke(f, Arr<T>{args...});
+        } else {
+          static_assert(always_false<F>, "template_for()'s function argument 'f' not invokable with indices or Arr<...>");
+        }
       } else {
         for (T i = beg[spatial_dims - 1 - N]; i < end[spatial_dims - 1 - N]; i++) {
           template_for_impl<N + 1>(beg, end, f, i, args...);
@@ -460,6 +466,12 @@ namespace fly {
    *            }
    *        }
    *    }
+   *
+   * Additionally, this will detect if ``f`` is callable with an array of indexes, e.g. (in the notation from above):
+   *
+   * .. code::
+   *
+   *    f(Arr<int>{i, j, ..., n});
    *
    * \endrst
    *

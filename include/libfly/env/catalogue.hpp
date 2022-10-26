@@ -151,6 +151,10 @@ namespace fly::env {
      * same match will always be returned.
      *
      * \endrst
+     *
+     * @param cell The supercell, must have the Position, TypeID and Frozen properties.
+     * @param num_threads The number of openMP threads to use.
+     * @return A ``std::vector`` of indices corresponding to the new geometries.
      */
     template <typename Map, typename... T>
     auto rebuild(system::Supercell<Map, T...> const& cell, int num_threads = 1) -> std::vector<int> {

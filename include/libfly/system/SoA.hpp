@@ -271,7 +271,19 @@ namespace fly::system {
      * @return void
      */
     template <typename T, typename U>
-    auto rebind(T, U const& other) -> std::enable_if_t<(std::is_same_v<T&, Pr> || ...) || (std::is_same_v<T const&, Pr> || ...)> {
+    auto rebind(T, U const& other) -> std::enable_if_t<(std::is_same_v<T const&, Pr> || ...)> {
+      ASSERT(size() == other.size(), "rebinding to a differently sized SoA: {} != {}", size(), other.size());
+      static_cast<detail::Adaptor<T const&>&>(*this) = other;
+    }
+
+    /**
+     * @brief Rebind a reference property to point at ''other''.
+     *
+     * @param other Property tag
+     * @return void
+     */
+    template <typename T, typename U>
+    auto rebind(T, U& other) -> std::enable_if_t<(std::is_same_v<T&, Pr> || ...) || (std::is_same_v<T const&, Pr> || ...)> {
       ASSERT(size() == other.size(), "rebinding to a differently sized SoA: {} != {}", size(), other.size());
       if constexpr ((std::is_same_v<T&, Pr> || ...)) {
         static_cast<detail::Adaptor<T&>&>(*this) = other;

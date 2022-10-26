@@ -176,3 +176,17 @@ File ``spline.hpp``
 .. doxygenclass:: fly::Spline
     :members:
     :undoc-members:
+
+Lattices
+---------------------
+
+File ``lattice.hpp``
+
+.. doxygenfile:: lattice.hpp
+    :sections: briefdescription detaileddescription
+
+.. doxygenfunction:: motif_to_lattice
+    
+.. doxygenfunction:: remove_atoms
+    
+.. doxygenfunction:: remove_sphere

@@ -20,6 +20,7 @@
 
 #include <algorithm>
 #include <cstddef>
+#include <limits>
 #include <map>
 #include <vector>
 
@@ -55,7 +56,7 @@ namespace fly::env {
      */
     struct Options {
       /** @brief Initial maximum difference in L2 norm between LEs for them to be considered the same. */
-      double delta_max = 0.5;
+      double delta_max = std::numeric_limits<double>::max();
       /** @brief Smaller to decrease false positives during fingerprint equivalence but, values < 1.0 introduce false negatives. */
       double overfuzz = 0.5;
       /** @brief Radius of a local environment. */
@@ -243,7 +244,7 @@ namespace fly::env {
       }
     }
 
-    auto rebuild_impl(system::SoA<Position const&, TypeID const&, Frozen const&> const& info, int num_types, int num_threads)
+    auto rebuild_impl(system::SoA<Position const&, TypeID const&, Frozen const&> const& info, Eigen::Index num_types, int num_threads)
         -> std::vector<int>;
 
     /**

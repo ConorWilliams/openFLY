@@ -83,7 +83,7 @@ namespace fly::saddle {
       /**
        * @brief Tolerance for mechanisms to be considered distinct.
        */
-      double mech_tol = 0.1;
+      double mech_tol = 0.25;
       /**
        * @brief Tolerance for stationary points to be considered distinct.
        */

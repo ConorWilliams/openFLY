@@ -107,6 +107,10 @@ add_executable(geoFLY apps/geo.cpp)
 target_compile_features(geoFLY PRIVATE cxx_std_17)
 target_link_libraries(geoFLY PRIVATE libFLY Nauty)
 
+add_executable(benchFLY apps/bench.cpp)
+target_compile_features(benchFLY PRIVATE cxx_std_17)
+target_link_libraries(benchFLY PRIVATE libFLY)
+
 # Dev mode
 if(FLY_DEVELOPER_MODE)
     include(CTest)

@@ -27,6 +27,7 @@
 #include "libfly/system/supercell.hpp"
 #include "libfly/system/typemap.hpp"
 #include "libfly/utility/core.hpp"
+#include "libfly/utility/lattice.hpp"
 #include "libfly/utility/random.hpp"
 
 using namespace fly;
@@ -45,7 +46,7 @@ system::Supercell<system::TypeMap<>, Ts...> supercell_from(std::string_view fnam
   auto read = [&](auto property) {
     try {
       file.read_to(frame, property, out_cell);
-    } catch (fly::RuntimeError const& err) {
+    } catch (fly::RuntimeError const &err) {
       fmt::print("Ignoring error, what(): {}\n", err.what());
     }
   };
@@ -55,40 +56,79 @@ system::Supercell<system::TypeMap<>, Ts...> supercell_from(std::string_view fnam
   return out_cell;
 }
 
+system::Supercell<system::TypeMap<>, Position, Frozen> bcc_iron_motif() {
+  //
+  fly::system::TypeMap<> FeH(2);
+
+  FeH.set(0, tp_, "Fe");
+  FeH.set(1, tp_, "H");
+
+  Mat basis{
+      {2.855300, 0.000000, 0.000000},
+      {0.000000, 2.855300, 0.000000},
+      {0.000000, 0.000000, 2.855300},
+  };
+
+  system::Supercell motif = system::make_supercell<Position, Frozen>({basis, Arr<bool>::Constant(true)}, FeH, 2);
+
+  motif[fzn_] = false;
+  motif[id_] = 0;
+
+  motif(r_, 0) = Vec::Zero();
+  motif(r_, 1) = Vec::Constant(0.5);
+
+  return motif;
+}
+
+system::Supercell<system::TypeMap<>, Position, Frozen> fcc_iron_motif() {
+  //
+  fly::system::TypeMap<> FeH(2);
+
+  FeH.set(0, tp_, "Fe");
+  FeH.set(1, tp_, "H");
+
+  Mat basis{
+      {3.650000, 0.000000, 0.000000},
+      {0.000000, 3.650000, 0.000000},
+      {0.000000, 0.000000, 3.650000},
+  };
+
+  system::Supercell motif = system::make_supercell<Position, Frozen>({basis, Arr<bool>::Constant(true)}, FeH, 4);
+
+  motif[fzn_] = false;
+  motif[id_] = 0;
+
+  motif(r_, 0) = Vec::Zero();
+  motif(r_, 1) = Vec{0.0, 0.5, 0.5};
+  motif(r_, 2) = Vec{0.5, 0.0, 0.5};
+  motif(r_, 3) = Vec{0.5, 0.5, 0.0};
+
+  return motif;
+}
+
 int main() {
   //
 
-  system::Supercell cell = supercell_from<Position, Frozen, PotentialGradient, Axis>("data/xyz/V1-unrelaxed.gsd", 0);
+  system::Supercell cell0 = motif_to_lattice(fcc_iron_motif(), {5, 5, 5});
 
-  //   system::Supercell old = cell;
+  system::Supercell cell = remove_atoms(cell0, {172});
 
-  //   cell.destructive_resize(old.size() + 1);
+  fly::io::BinaryFile tmp("test.gsd", fly::io::create);
 
-  //   for (int i = 0; i < old.size(); i++) {
-  //     cell(r_, i) = old(r_, i);
-  //     cell(id_, i) = old(id_, i);
-  //   }
+  tmp.commit([&] {
+    tmp.write(cell.box());
+    tmp.write(cell.map());
+    tmp.write("particles/N", fly::safe_cast<std::uint32_t>(cell.size()));
+    tmp.write(id_, cell);
 
-  //   cell(r_, old.size()) = Vec{0.4, 1.4, 1.4};
-
-  //   cell(id_, old.size()) = 1;
-
-  //   cell[fzn_] = false;
-
-  //   auto cell = make_super();
-
-  // IO
+    tmp.write(r_, cell);
+  });
 
   fly::io::BinaryFile fout("lbfgs.gsd", fly::io::create);
 
-  fout.write(cell.box());                                                 //< Write the box to frame 0.
-  fout.write(cell.map());                                                 //< Write the map to frame 0.
-  fout.write("particles/N", fly::safe_cast<std::uint32_t>(cell.size()));  //< Write the number of atoms to frame 0.
-  fout.write(fly::id_, cell);                                             //< Write the TypeID's of the atoms to frame 0.
-
   //   WORK
 
-  minimise::LBFGS minimiser({.debug = false, .fout = nullptr}, cell.box());
+  minimise::LBFGS minimiser({.debug = true, .fout = &tmp}, cell.box());
 
   potential::Generic pot{
       potential::EAM{
@@ -97,67 +137,13 @@ int main() {
       },
   };
 
-  bool done = timeit("Minimise", [&] { return minimiser.minimise(cell, cell, pot, omp_get_max_threads()); });
+  system::SoA<Position, PotentialGradient> out(cell.size());
+
+  bool done = timeit("Minimise", [&] { return minimiser.minimise(out, cell, pot, omp_get_max_threads()); });
 
   fmt::print("FoundMin?={}\n", !done);
 
-  //   /////////////////////////////////////////////////
-
-  system::Supercell<system::TypeMap<>, Position, Axis, Frozen, PotentialGradient> dcell(cell.box(), cell.map(), cell.size());
-
-  dcell[r_] = cell[r_];
-  dcell[fzn_] = cell[fzn_];
-  dcell[id_] = cell[id_];
-  dcell[ax_] = 1;
-  dcell[ax_] /= gnorm(dcell[ax_]);
-
-  std::random_device dev;
-
-  //   Xoshiro rng({0, 0, 1, 1});
-
-  //     saddle::perturb(dcell, rng, dcell.box(), dcell(r_, 113), dcell, 6, 0.5);
-
-  fout.commit([&] {
-    fout.write(fly::r_, dcell);  //< Write the positions of perturbed the atoms.
-  });
-
-  saddle::Dimer dimer{
-      {.f2norm = 1e-9},  //{.debug = true, .fout = &fout},
-      {},                //{.debug = true},
-      dcell.box(),
-  };
-
-  //   saddle::MasterFinder finder{{
-  //                                   .stddev = 0.6,
-  //                                   .num_threads = omp_get_max_threads(),
-  //                                   .debug = true,
-  //                                   .fout = &fout,
-
-  //                               },
-  //                               pot,
-  //                               minimiser,
-  //                               dimer};
-
-  //   finder.find_pathways(dcell.box(), {113}, dcell);  // 685, 98
-
-  exit(1);
-
-  // fly::system::SoA<Position, Axis> init{dcell};
-
-  // bool sp = timeit("warmup", [&] { return dimer.step(dcell, dcell, pot, 10000, omp_get_max_threads()); });
-
-  //   for (size_t i = 0; i < 1; i++) {
-  //     dcell[r_] = init[r_];
-  //     dcell[ax_] = init[ax_];
-  //     sp = timeit("FindSP", [&] { return dimer.step(dcell, dcell, pot, 10000, omp_get_max_threads()); });
-  //   }
-
-  //   fout.commit([&] {
-  //     fout.write(fly::r_, dcell);  //< Write the position of the SP.
-  //     fout.write(fly::ax_, dcell);
-  //   });
-
-  //   fmt::print("FoundSP?={}\n", !sp);
+  tmp.commit([&] { tmp.write(r_, out); });
 
   return 0;
 }

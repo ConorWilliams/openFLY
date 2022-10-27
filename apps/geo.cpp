@@ -63,25 +63,25 @@ system::Supercell<system::TypeMap<>, Ts...> supercell_from(std::string_view fnam
 #include "libfly/env/heuristics.hpp"
 
 int main() {
-  system::Supercell cell = supercell_from<Position, Frozen, PotentialGradient, Axis, Hash>("data/xyz/V1-unrelaxed.gsd", 0);
+  system::Supercell cell = supercell_from<Position, Frozen, PotentialGradient, Axis, Hash>("test.gsd", 0);
 
-  system::Supercell old = cell;
+  //   system::Supercell old = cell;
 
-  cell.destructive_resize(old.size() + 2);
+  //   cell.destructive_resize(old.size() + 2);
 
-  for (int i = 0; i < old.size(); i++) {
-    cell(r_, i) = old(r_, i);
-    cell(id_, i) = old(id_, i);
-  }
+  //   for (int i = 0; i < old.size(); i++) {
+  //     cell(r_, i) = old(r_, i);
+  //     cell(id_, i) = old(id_, i);
+  //   }
 
-  cell(r_, old.size()) = Vec{0.4, 1.4, 1.4};
-  cell(id_, old.size()) = 1;
+  //   cell(r_, old.size()) = Vec{0.4, 1.4, 1.4};
+  //   cell(id_, old.size()) = 1;
 
-  cell(r_, old.size() + 1) = Vec{2.4, 1.4, 1.4};
-  cell(id_, old.size() + 1) = 1;
+  //   cell(r_, old.size() + 1) = Vec{2.4, 1.4, 1.4};
+  //   cell(id_, old.size() + 1) = 1;
 
-  cell[fzn_] = false;
-  cell[r_] += 0.2;
+  //   cell[fzn_] = false;
+  //   cell[r_] += 0.2;
 
   //   Minimise.
 
@@ -96,7 +96,7 @@ int main() {
 
   fmt::print("FoundMin?={}\n", !timeit("Minimise", [&] { return minimiser.minimise(cell, cell, pot, omp_get_max_threads()); }));
 
-  env::Catalogue cat({.delta_max = 500, .debug = false});
+  env::Catalogue cat({.delta_max = 0.1, .debug = false});
 
   std::vector ix = timeit("cat.rebuild()", [&] { return cat.rebuild(cell, omp_get_max_threads()); });
 
@@ -150,7 +150,7 @@ int main() {
       dimer,
   };
 
-  mast.find_mechs({cat.get_geo(113)}, cell);
+  mast.find_mechs({cat.get_geo(72)}, cell);
 
   /////////////////////////// IO ///////////////////////////
 

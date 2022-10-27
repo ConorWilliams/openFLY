@@ -224,7 +224,7 @@ namespace fly {
     /**
      * @brief Tag type for a particle local environment hash.
      */
-    struct Hash : system::Property<std::size_t> {
+    struct Hash : system::Property<int> {
       static constexpr char const* tag = "log/particles/hash";  ///< GSD chunk label.
     };
 

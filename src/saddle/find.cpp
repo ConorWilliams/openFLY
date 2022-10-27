@@ -15,6 +15,7 @@
 
 #include "libfly/saddle/find.hpp"
 
+#include <fmt/core.h>
 #include <omp.h>
 
 #include <cmath>
@@ -31,6 +32,7 @@
 #include "libfly/potential/generic.hpp"
 #include "libfly/saddle/dimer.hpp"
 #include "libfly/system/SoA.hpp"
+#include "libfly/system/VoS.hpp"
 #include "libfly/system/box.hpp"
 #include "libfly/system/hessian.hpp"
 #include "libfly/system/property.hpp"
@@ -60,22 +62,22 @@ namespace fly::saddle {
     return sp;
   }
 
-  // Compute angle between mechanisms saddle points
-  static double theta_mech(env::Mechanism const& a, env::Mechanism const& b) {
+  // Compute angle between VoSs (in degrees)
+  static double theta_mech(system::VoS<Delta> const& a, system::VoS<Delta> const& b) {
     //
-    verify(a.delta_sp.size() == b.delta_sp.size(), "");
+    verify(a.size() == b.size(), "");
 
-    auto n = a.delta_sp.size();
+    auto n = a.size();
 
     double ct = 0;
     double sa = 0;
     double sb = 0;
 
     for (int i = 0; i < n; i++) {
-      ct += gdot(a.delta_sp[i][del_], b.delta_sp[i][del_]);
+      ct += gdot(a[i][del_], b[i][del_]);
 
-      sa += gnorm_sq(a.delta_sp[i][del_]);
-      sb += gnorm_sq(b.delta_sp[i][del_]);
+      sa += gnorm_sq(a[i][del_]);
+      sb += gnorm_sq(b[i][del_]);
     }
 
     return std::acos(ct / std::sqrt(sa * sb)) / 2 / M_PI * 360.;
@@ -175,7 +177,7 @@ namespace fly::saddle {
       }
     }
 
-    if (m_opt.debug) {
+    if (m_opt.fout || m_opt.debug) {
       //
       int c = 1;
 
@@ -237,7 +239,7 @@ namespace fly::saddle {
         for (auto const& a : geo_data.mechs) {
           for (auto const& b : geo_data.mechs) {
             if (&a != &b) {
-              t_min = std::min(t_min, theta_mech(a, b));
+              t_min = std::min(t_min, theta_mech(a.delta_sp, b.delta_sp));
             }
           }
         }
@@ -293,8 +295,17 @@ namespace fly::saddle {
         cache.resize(n + num_new);
 
         for (std::size_t k = 0; k < num_new; k++) {
-#pragma omp task untied default(none) firstprivate(n, k, num_new) shared(in, geo, cache, geo_data)
-          { cache[n + k] = (recon_sp_relax(geo, geo_data.mechs[geo_data.mechs.size() - num_new + k], in)); }
+#pragma omp task untied default(none) firstprivate(n, k, num_new) shared(in, geo, cache, geo_data, elem)
+          {
+            try {
+              cache[n + k] = recon_sp_relax(geo, geo_data.mechs[geo_data.mechs.size() - num_new + k], in);
+            } catch (...) {
+              fmt::print("***** Catching, trying symmetry no = {}\n", k);
+#pragma omp critical
+              m_opt.fout->commit([&] { m_opt.fout->write(r_, elem.dimer); });
+              throw;
+            }
+          }
         }
 #pragma omp taskwait
 
@@ -505,12 +516,6 @@ namespace fly::saddle {
       return {};
     }
 
-    if (double dr = gnorm(in(r_, min) - dimer(r_, min)); dr > m_opt.freeze_tol) {
-      throw error("FINDER: Trying to freeze an atom {} that displaced {}", min, dr);
-    } else if (m_opt.debug) {
-      fmt::print("FINDER: Freezing atom #{}\n", min);
-    }
-
     //   Minimisations
 
     double disp = gnorm(dimer[r_] - in[r_]);
@@ -518,8 +523,19 @@ namespace fly::saddle {
     system::SoA<Position, PotentialGradient, Frozen, TypeID const&> relax{dimer.size()};
     relax[r_] = dimer[r_] + dimer[ax_] * disp * m_opt.nudge_frac;
     relax[fzn_] = dimer[fzn_];
-    relax(fzn_, min) = true;  // Freeze minimally displaced atom.
     relax.rebind(id_, dimer);
+
+    if (m_deg_free > 0) {
+      // Freeze minimally displaced atom to remove translational degrees of freedom.
+
+      if (double dr = gnorm(in(r_, min) - dimer(r_, min)); dr > m_opt.freeze_tol) {
+        throw error("FINDER: Trying to freeze an atom {} that displaced {}", min, dr);
+      } else if (m_opt.debug) {
+        fmt::print("FINDER: Freezing atom #{}\n", min);
+      }
+
+      relax(fzn_, min) = true;
+    }
 
     ThreadData& thr = thread();
 
@@ -575,20 +591,30 @@ namespace fly::saddle {
 
   void Master::calc_minima_hess(system::SoA<Position const&, Frozen const&, TypeID const&> in) {
     //
-    m_deg_free = 0;
+
+    int count_periodic = 0;
 
     for (int i = 0; i < spatial_dims; i++) {
       if (m_box.periodic(i)) {
-        m_deg_free++;
+        count_periodic++;
       }
     }
 
+    int count_frozen = 0;
+
     for (auto&& elem : in[fzn_]) {
       if (elem) {
-        m_deg_free = 0;
+        count_frozen++;
         break;
       }
     }
+
+    // Translational degrees of freedom
+    int tran_free = count_frozen ? 0 : spatial_dims;
+    // Rotational degrees of freedom
+    int rotational_free = std::min(0, spatial_dims - count_periodic - count_frozen);
+
+    m_deg_free = 100;
 
     if (m_opt.debug) {
       fmt::print("FINDER: Degrees of freedom = {}\n", m_deg_free);
@@ -642,7 +668,7 @@ namespace fly::saddle {
         copy[j][i_] = j;
       }
 
-      double delta = r_min * 0.1;
+      double delta = r_min * 1e-2;
 
       env::for_equiv_perms(copy, geos[i], delta, 1, [&](fly::Mat const& O, double) {
         //
@@ -744,8 +770,17 @@ namespace fly::saddle {
       double d_sp = env::rmsd<Delta>(maybe.delta_sp, m.delta_sp);
       double d_fwd = env::rmsd<Delta>(maybe.delta_fwd, m.delta_fwd);
 
+      /* Debugging
+
+      double theta_sp = theta_mech(maybe.delta_sp, m.delta_sp);
+      double theta_fwd = theta_mech(maybe.delta_fwd, m.delta_fwd);
+
+      fmt::print("d_fwd={:.4f}, d_sp={:.4f}, t_fwd={:.4f}, t_sp={:.4f}\n", d_fwd, d_sp, theta_fwd, theta_sp);
+
+      */
+
       if (d_sp < m_opt.mech_tol) {
-        verify(d_fwd < m_opt.mech_tol, "Same sp, different final, d_fwd={}, d_sp={}", d_fwd, d_sp);
+        verify(d_fwd < m_opt.mech_tol, "Same sp, different final, d_fwd={}, d_sp={}, Esp={}", d_fwd, d_sp, maybe.barrier);
         return false;
       }
     }
@@ -802,9 +837,28 @@ namespace fly::saddle {
     dim[ax_] /= gnorm(dim[ax_]);
 
     auto err = thr.dimer.find_sp(dim, dim, in, thr.pot, {}, 1);
-    auto lax = gnorm(recon[r_] - dim[r_]);
 
-    if (err || lax > m_opt.sp_relax_tol) {
+    if (auto lax = gnorm(recon[r_] - dim[r_]); err || lax > m_opt.sp_relax_tol) {
+      //
+      m.poison = true;
+
+      if (err || m_opt.debug) {
+        double sum = 0;
+
+        for (auto&& elem : m.delta_sp) {
+          sum += gnorm_sq(elem[del_]);
+        }
+        fmt::print("Reconstructed saddle relaxing @{} failed with: err={}, dr_err={}, cap_frac={}, disp0={}, dispTot={}\n",
+                   geo[0][i_],
+                   err,
+                   lax,
+                   m.capture_frac,
+                   gnorm(m.delta_sp[0][del_]),
+                   std::sqrt(sum));
+      }
+    }
+
+    if (err) {
 #pragma omp critical
       {
         if (m_opt.fout) {
@@ -812,17 +866,8 @@ namespace fly::saddle {
           m_opt.fout->commit([&] { m_opt.fout->write(r_, dim); });
         }
       }
-      if (m_opt.debug) {
-        fmt::print("Reconstructed saddle relaxing failed with: err={}, delta={}, cap_frac={}, disp0={}\n",
-                   err,
-                   lax,
-                   m.capture_frac,
-                   gnorm(m.delta_sp[0][del_]));
-      }
-      if (err) {
-        throw error("Relaxing mech's SP failed with err={}", err);
-      }
-      m.poison = true;
+
+      throw error("Relaxing mech's SP failed with err={}", err);
     }
 
     return system::SoA<Position>(std::move(dim));

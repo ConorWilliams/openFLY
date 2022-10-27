@@ -25,7 +25,7 @@
 namespace fly::env {
 
   std::vector<int> Catalogue::rebuild_impl(system::SoA<Position const &, TypeID const &, Frozen const &> const &info,
-                                           int num_types,
+                                           Eigen::Index num_types,
                                            int num_threads) {
     // Prepare memory.
     m_real.resize(std::size_t(info.size()));

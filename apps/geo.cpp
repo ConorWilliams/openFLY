@@ -15,6 +15,7 @@
 #include <vector>
 
 #include "libfly/env/catalogue.hpp"
+#include "libfly/env/heuristics.hpp"
 #include "libfly/io/gsd.hpp"
 #include "libfly/minimise/LBFGS/lbfgs.hpp"
 #include "libfly/neigh/list.hpp"
@@ -32,38 +33,39 @@
 #include "libfly/system/supercell.hpp"
 #include "libfly/system/typemap.hpp"
 #include "libfly/utility/core.hpp"
+#include "libfly/utility/lattice.hpp"
 #include "libfly/utility/random.hpp"
 
 using namespace fly;
 
-template <typename... Ts>
-system::Supercell<system::TypeMap<>, Ts...> supercell_from(std::string_view fname, std::uint64_t frame) {
+system::Supercell<system::TypeMap<>, PotentialGradient, Position, Frozen, Hash> bcc_motif() {
   //
-  io::BinaryFile file(fname, io::read_only);
+  system::TypeMap<> FeH(2);
 
-  system::TypeMap out_map = file.read_map(frame);
+  FeH.set(0, tp_, "Fe");
+  FeH.set(1, tp_, "H");
 
-  system::Box out_box = file.read_box(frame);
-
-  system::Supercell out_cell = system::make_supercell<Ts...>(out_box, out_map, file.read<std::uint32_t>(frame, "particles/N"));
-
-  auto read = [&](auto property) {
-    try {
-      file.read_to(frame, property, out_cell);
-    } catch (fly::RuntimeError const &err) {
-      fmt::print("Ignoring error, what(): {}\n", err.what());
-    }
+  Mat basis{
+      {2.855300, 0.000000, 0.000000},
+      {0.000000, 2.855300, 0.000000},
+      {0.000000, 0.000000, 2.855300},
   };
 
-  (read(Ts{}), ...);
+  system::Supercell motif
+      = system::make_supercell<PotentialGradient, Position, Frozen, Hash>({basis, Arr<bool>::Constant(true)}, FeH, 2);
 
-  return out_cell;
+  motif[fzn_] = false;
+  motif[id_] = 0;
+  motif[hash_] = 0;
+
+  motif(r_, 0) = Vec::Zero();
+  motif(r_, 1) = Vec::Constant(0.5);
+
+  return motif;
 }
 
-#include "libfly/env/heuristics.hpp"
-
 int main() {
-  system::Supercell cell = supercell_from<Position, Frozen, PotentialGradient, Axis, Hash>("test.gsd", 0);
+  system::Supercell cell = remove_atoms(motif_to_lattice(bcc_motif(), {6, 6, 6}), {1});
 
   //   system::Supercell old = cell;
 
@@ -150,7 +152,7 @@ int main() {
       dimer,
   };
 
-  mast.find_mechs({cat.get_geo(72)}, cell);
+  mast.find_mechs({cat.get_geo(2)}, cell);
 
   /////////////////////////// IO ///////////////////////////
 

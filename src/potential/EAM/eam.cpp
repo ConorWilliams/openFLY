@@ -103,16 +103,7 @@ namespace fly::potential {
     // Usually a noop, make space in aux
     m_aux.destructive_resize(in.size());
 
-    // Compute hessian indexes and count active
-    Eigen::Index num_active = 0;
-
-    for (Eigen::Index i = 0; i < in.size(); i++) {
-      if (!in(fzn_, i)) {
-        m_aux(Hidx{}, i) = num_active++;
-      }
-    }
-
-    out.zero_for(num_active);
+    out.zero_for(in.size());
 
 // First sum computes  rho & mu  at each atom, runs over active + frozen atoms
 #pragma omp parallel for num_threads(num_threads) schedule(static)
@@ -140,7 +131,7 @@ namespace fly::potential {
         //
         Vec v = m_aux(Mu{}, z);
         // A.15 pre sum term, including off-diagonal elements along block diagonal make code simpler.
-        out(m_aux(Hidx{}, z), m_aux(Hidx{}, z)).noalias() = m_data->f(in(id_, z)).fpp(m_aux(Rho{}, z)) * v * v.transpose();
+        out(z, z).noalias() = m_data->f(in(id_, z)).fpp(m_aux(Rho{}, z)) * v * v.transpose();
 
         // Note: dr = r^{za}
         nl.for_neighbours(z, r_cut(), [&](auto a, double r, Vec const& dr) {
@@ -165,7 +156,7 @@ namespace fly::potential {
           double ABFpp
               = (A - B - m_data->f(in(id_, a)).fpp(m_aux(Rho{}, a)) * ipow<2>(m_data->phi(in(id_, z), in(id_, a)).fp(r))) / (r * r);
 
-          out(m_aux(Hidx{}, z), m_aux(Hidx{}, z)) += A * Mat::Identity() - ABFpp * dr * dr.transpose();
+          out(z, z) += A * Mat::Identity() - ABFpp * dr * dr.transpose();
 
           // Now we will compute the off diagonal element in this column block of H, the a's must now not be frozen, we do not
           // compute overlap here. Only need to compute lower triangular part of hessian hence, drop writes to out(a, z) with a < z.
@@ -178,9 +169,8 @@ namespace fly::potential {
 
             double ru = m_data->f(in(id_, a)).fpp(m_aux(Rho{}, a)) * m_data->phi(in(id_, z), in(id_, a)).fp(r) / r;
 
-            out(m_aux(Hidx{}, a), m_aux(Hidx{}, z)).noalias() += -BArr * dr * dr.transpose() - A * Mat::Identity()
-                                                                 + ur * m_aux(Mu{}, z) * dr.transpose()
-                                                                 - ru * m_aux(Mu{}, a) * dr.transpose();
+            out(a, z).noalias() += -BArr * dr * dr.transpose() - A * Mat::Identity() + ur * m_aux(Mu{}, z) * dr.transpose()
+                                   - ru * m_aux(Mu{}, a) * dr.transpose();
           }
 
           // Finally compute overlap terms of z coupling to active atom g via a. Each thread only writes to e^th column blocks.
@@ -192,7 +182,7 @@ namespace fly::potential {
               // Now iterating over all pair of unfrozen neighbours of a
               double mag = ddFg / (r * r_g) * m_data->phi(in(id_, g), in(id_, a)).fp(r_g);
 
-              out(m_aux(Hidx{}, g), m_aux(Hidx{}, z)).noalias() -= mag * dr * dr_ag.transpose();
+              out(g, z).noalias() -= mag * dr * dr_ag.transpose();
             }
           });
         });
@@ -202,18 +192,14 @@ namespace fly::potential {
 // Transform into mass-weighted hessian
 #pragma omp parallel for num_threads(num_threads) schedule(dynamic)
     for (Eigen::Index i = 0; i < in.size(); ++i) {
-      if (!in(fzn_, i)) {
+      //
+      double mass_i = m_data->type_map().get(in(id_, i), m_);
+
+      for (Eigen::Index j = i; j < in.size(); ++j) {
         //
-        double mass_i = m_data->type_map().get(in(id_, i), m_);
+        double mass_j = m_data->type_map().get(in(id_, j), m_);
 
-        for (Eigen::Index j = i; j < in.size(); ++j) {
-          if (!in(fzn_, j)) {
-            //
-            double mass_j = m_data->type_map().get(in(id_, j), m_);
-
-            out(m_aux(Hidx{}, j), m_aux(Hidx{}, i)) *= 1 / std::sqrt(mass_i * mass_j);
-          }
-        }
+        out(j, i) *= 1 / std::sqrt(mass_i * mass_j);
       }
     }
   }

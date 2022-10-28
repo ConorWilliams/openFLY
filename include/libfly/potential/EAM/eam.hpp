@@ -115,9 +115,7 @@ namespace fly::potential {
     struct Rho : system::Property<double, 1> {};
     struct Mu : system::Property<double, spatial_dims> {};
 
-    struct Hidx : system::Property<Eigen::Index, 1> {};
-
-    system::SoA<Fprime, Rho, Mu, Hidx> m_aux;
+    system::SoA<Fprime, Rho, Mu> m_aux;
   };
 
 }  // namespace fly::potential

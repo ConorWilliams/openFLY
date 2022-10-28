@@ -48,31 +48,11 @@ void benchmark(saddle::Master &master,
 int main() {
   /////////////////   Initialise cell   /////////////////
 
-  system::Supercell cellx = remove_atoms(motif_to_lattice(bcc_motif(), {6, 6, 6}), {});
-
-  fly::system::Supercell cell
-      = system::make_supercell<Position, Frozen, Hash>({Mat::Identity() * 60, {false, false, false}}, cellx.map(), cellx.size());
-
-  cell[r_] = cellx[r_] + 5;
-  cell[id_] = cellx[id_];
-  cell[fzn_] = cellx[fzn_];
-  cell[hash_] = cellx[hash_];
-
-  cell(fzn_, 430) = true;
-  cell(fzn_, 0) = true;
-  cell(fzn_, 1) = true;
-  cell(fzn_, 2) = true;
-  cell(fzn_, 72) = true;
-
-  //   cell(r_, 5) += Vec{0.3, 0.4, 0.3};
-
-  // 0,0 -> 6
-  // 0,1 -> 5
-  // 0,2 ->
+  system::Supercell cell = remove_atoms(motif_to_lattice(bcc_motif(), {6, 6, 6}), {});
 
   /////////////////////   Relax   /////////////////////
 
-  minimise::LBFGS minimiser({}, cell.box());
+  minimise::LBFGS minimiser({.f2norm = 1e-12}, cell.box());
 
   potential::Generic pot{
       potential::EAM{
@@ -85,9 +65,9 @@ int main() {
 
   mirror.rebind(r_, cell);
 
-  //   bool done = timeit("Minimise", [&] { return minimiser.minimise(mirror, cell, pot, omp_get_max_threads()); });
+  bool done = timeit("Minimise", [&] { return minimiser.minimise(mirror, cell, pot, omp_get_max_threads()); });
 
-  //   fmt::print("FoundMin?={}\n", !done);
+  fmt::print("FoundMin?={}\n", !done);
 
   //   /////////////////////   Get geometries   /////////////////////
 

@@ -437,36 +437,37 @@ namespace fly::saddle {
 
     system::Hessian::Vector const& freq = thr.hess.eigenvalues();
 
-    ASSERT(freq.size() > 1 + m_deg_free, "Only {} eigenvalues", freq.size());
-
     // Must have at least one neg
     verify(freq[0] < -m_opt.hessian_eigen_zero_tol, "Saddle-point with minimum mode={}", freq[0]);
 
-    for (int i = 1; i < 1 + m_deg_free; i++) {
-      // More than one is a higher order.
+    int count_zeros = 0;
+    mech.kinetic_pre = 0;
+
+    for (int i = 1; i < freq.size(); i++) {
+      //
       if (freq[i] < -m_opt.hessian_eigen_zero_tol) {
         if (m_opt.debug) {
-          fmt::print("FINDER: Second order SP or higher, modes = {}\n", freq.head(10));
+          fmt::print("FINDER: Second order SP or higher, modes {} = {}\n", i, freq.head(i));
         }
         return {};
       }
-      verify(std::abs(freq[i]) < m_opt.hessian_eigen_zero_tol, "Expecting zero eigen-value, got modes = {}", freq.head(10));
-    }
-    verify(freq[1 + m_deg_free] > m_opt.hessian_eigen_zero_tol, "Seem to have too many zero modes = {}", freq.head(10));
 
-    mech.kinetic_pre = 0;
-
-    for (int i = 1 + m_deg_free; i < freq.size(); i++) {
-      mech.kinetic_pre += std::log(freq[i]);
+      if (freq[i] > m_opt.hessian_eigen_zero_tol) {
+        mech.kinetic_pre += std::log(freq[i]);
+      } else {
+        ++count_zeros;
+      }
     }
 
     if (m_opt.debug) {
-      fmt::print("FINDER: Mech ΔE={:.2e} f={:.4f}, uncap={:.2e}, modes = {::.2e}, \n",
-                 mech.barrier,
-                 mech.capture_frac,
-                 tot - cap,
-                 freq.head(5));
+      fmt::print("FINDER: Mech ΔE={:.2e} f={:.4f}, uncap={:.2e}, N0={}\n", mech.barrier, mech.capture_frac, tot - cap, count_zeros);
+
+      for (int i = 0; i < m_deg_free + 10; i++) {
+        fmt::print("Finder: sp mode {} = {}\n", i, freq[i]);
+      }
     }
+
+    ASSERT(count_zeros == m_deg_free, "Sp has {} zero modes but min has {}", count_zeros, m_deg_free);
 
     return mech;
   }
@@ -592,33 +593,15 @@ namespace fly::saddle {
   void Master::calc_minima_hess(system::SoA<Position const&, Frozen const&, TypeID const&> in) {
     //
 
-    int count_periodic = 0;
+    int num_frozen = 0;
 
-    for (int i = 0; i < spatial_dims; i++) {
-      if (m_box.periodic(i)) {
-        count_periodic++;
+    for (int i = 0; i < in.size(); i++) {
+      if (in(fzn_, i)) {
+        num_frozen++;
       }
     }
 
-    int count_frozen = 0;
-
-    for (auto&& elem : in[fzn_]) {
-      if (elem) {
-        count_frozen++;
-        break;
-      }
-    }
-
-    // Translational degrees of freedom
-    int tran_free = count_frozen ? 0 : spatial_dims;
-    // Rotational degrees of freedom
-    int rotational_free = std::min(0, spatial_dims - count_periodic - count_frozen);
-
-    m_deg_free = 100;
-
-    if (m_opt.debug) {
-      fmt::print("FINDER: Degrees of freedom = {}\n", m_deg_free);
-    }
+    int exp_deg_free = num_frozen > 0 ? spatial_dims * num_frozen : spatial_dims;
 
     m_data[0].pot_nl.rebuild(in);
 
@@ -626,21 +609,28 @@ namespace fly::saddle {
 
     system::Hessian::Vector const& freq = m_data[0].hess.eigenvalues();
 
-    ASSERT(freq.size() > m_deg_free, "Only {} normal modes", freq.size());
+    m_log_prod_eigen = 0;
+    m_deg_free = 0;
 
-    for (int i = 0; i < m_deg_free; i++) {
-      verify(std::abs(freq[i]) < m_opt.hessian_eigen_zero_tol, "Master's input is not minima, modes (1)= {}", freq.head(10));
+    for (int i = 0; i < freq.size(); i++) {
+      // Negative modes = not a minima.
+      verify(freq[i] > -m_opt.hessian_eigen_zero_tol, "Mode {} has eigenvalue = {}", i, freq[i]);
+
+      // Sum non-zero modes.
+      if (freq[i] > m_opt.hessian_eigen_zero_tol) {
+        m_log_prod_eigen += std::log(freq[i]);
+      } else {
+        ++m_deg_free;
+      }
     }
 
-    verify(freq[m_deg_free] > m_opt.hessian_eigen_zero_tol, "Master input modes (2)= {}", freq.head(10));
+    if (m_opt.debug) {
+      fmt::print("FINDER: Null space of Hessian has dimension  = {}, exp = {}\n", m_deg_free, exp_deg_free);
 
-    double sum = 0;
-
-    for (int i = m_deg_free; i < freq.size(); i++) {
-      sum += std::log(freq[i]);
+      for (int i = 0; i < m_deg_free + 10; i++) {
+        fmt::print("Finder: min mode {} = {}\n", i, freq[i]);
+      }
     }
-
-    m_log_prod_eigen = sum;
   }
 
   std::vector<Master::Data> Master::process_geos(std::vector<env::Geometry<Index>> const& geos) const {

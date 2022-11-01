@@ -25,6 +25,7 @@
 #include <random>
 #include <vector>
 
+#include "libfly/env/catalogue.hpp"
 #include "libfly/env/geometry.hpp"
 #include "libfly/env/mechanisms.hpp"
 #include "libfly/minimise/LBFGS/lbfgs.hpp"
@@ -133,9 +134,38 @@ namespace fly::saddle {
     /**
      * @brief A collection of mechanisms centred on a central atom.
      */
-    struct Found {
-      Index::scalar_t centre;             ///< The central atom.
-      std::vector<env::Mechanism> mechs;  ///< Mechanisms on ``this->centre``.
+    class Found {
+    public:
+      /**
+       * @brief Truthy if search was successful.
+       *
+       * If during the SPS, a reconstruction was attempted onto a supposedly symmetric state and the dimer-method failed to converge
+       * that reconstruction to a SP then the searches in that environment will be cancelled and this will return false.
+       *
+       * This probably occurred because the symmetry tolerance was not tight enough e.g. this geometry was associated to the wrong
+       * reference LE. The best course of action is to tighten the corresponding reference LE's ``delta_max``, reclassify
+       * system and re-run the SP searches.
+       */
+      explicit operator bool() const noexcept { return !m_fail; }
+
+      /**
+       * @brief Fetch the mechanisms on ``this->centre``.
+       *
+       * Throws if SPS failed.
+       */
+      std::vector<env::Mechanism>& mechs() {
+        if (m_fail) {
+          throw error("Attempting to fetch mechanisms but the search failed!");
+        } else {
+          return m_mechs;
+        }
+      }
+
+    private:
+      friend class Master;
+
+      bool m_fail = false;
+      std::vector<env::Mechanism> m_mechs{};
     };
 
     /**
@@ -160,12 +190,13 @@ namespace fly::saddle {
      *
      * This will recursively schedule SP searches on the slave threads.
      *
-     * @param geos List of geometries centred on the atoms which the mechanisms must be centred on.
+     * @param ix List of indexes of environments which the mechanisms must be centred on.
+     * @param cat Catalogue in ready state.
      * @param in Description of system to search in.
-     *
      */
-    auto find_mechs(std::vector<env::Geometry<Index>> const& geos, system::SoA<Position const&, Frozen const&, TypeID const&> in)
-        -> std::vector<Found>;
+    auto find_mechs(std::vector<int> const& ix,
+                    env::Catalogue const& cat,
+                    system::SoA<Position const&, Frozen const&, TypeID const&> in) -> std::vector<Found>;
 
   private:
     // Per thread variables
@@ -180,9 +211,9 @@ namespace fly::saddle {
 
     // Per input geometry data
     struct Data {
+      env::Geometry<Index> geo;                                      // Geometry
       Index::scalar_t centre;                                        // Central atom
       std::vector<std::pair<Mat, std::vector<Index::scalar_t>>> tr;  // Perm + transformation.
-      std::vector<env::Mechanism> mechs;                             // Unique, mechanisms
     };
 
     // min->sp->min data
@@ -211,15 +242,15 @@ namespace fly::saddle {
     ///////////////////////////////////////////////////////////////////////////////////
 
     // Find all mechs and write to geo_data
-    void find_n(env::Geometry<Index> const& geo,
-                Data& geo_data,
+    void find_n(Found& out,
+                Data const& geo_data,
                 system::SoA<Position const&, Frozen const&, TypeID const&> in,
                 neigh::List const& nl_pert);
 
     bool find_batch(int tot,
+                    Found& out,
                     std::vector<Batch>& batch,
-                    env::Geometry<Index> const& geo,
-                    Data& geo_data,
+                    Data const& geo_data,
                     system::SoA<Position const&, Frozen const&, TypeID const&> in,
                     neigh::List const& nl_pert,
                     std::vector<system::SoA<Position>>& sps_cache);
@@ -259,7 +290,7 @@ namespace fly::saddle {
     // Compute m_deg_free and m_log_prod_eigen.
     void calc_minima_hess(system::SoA<Position const&, Frozen const&, TypeID const&> in);
 
-    std::vector<Data> process_geos(std::vector<env::Geometry<Index>> const& geos) const;
+    std::vector<Data> process_geos(std::vector<int> const& ix, env::Catalogue const& cat) const;
 
     // Perturb in-place positions around centre and write axis,
     auto perturb(system::SoA<Position&, Axis&> out,
@@ -281,9 +312,9 @@ namespace fly::saddle {
 
     // Reconstruct saddle point according to geo and relax system to saddle,
     // check we have not constructed a false SP, if we have mark mechanism as poisoned
-    system::SoA<Position> recon_sp_relax(env::Geometry<Index> const& geo,
-                                         env::Mechanism& m,
-                                         system::SoA<Position const&, TypeID const&, Frozen const&> in);
+    std::optional<system::SoA<Position>> recon_sp_relax(env::Geometry<Index> const& geo,
+                                                        env::Mechanism& m,
+                                                        system::SoA<Position const&, TypeID const&, Frozen const&> in);
 
     ThreadData& thread() { return m_data[safe_cast<std::size_t>(omp_get_thread_num())]; }
 

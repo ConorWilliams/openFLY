@@ -98,19 +98,17 @@ int main() {
 
   fmt::print("FoundMin?={}\n", !timeit("Minimise", [&] { return minimiser.minimise(cell, cell, pot, omp_get_max_threads()); }));
 
-  env::Catalogue cat({.delta_max = 0.1, .debug = false});
+  env::Catalogue cat({.delta_max = 100000, .debug = false});
 
   std::vector ix = timeit("cat.rebuild()", [&] { return cat.rebuild(cell, omp_get_max_threads()); });
 
-  for (auto &&elem : ix) {
-    fmt::print("New env @{}\n", elem);
-  }
+  fmt::print("New env @{}\n", ix);
 
   for (int i = 0; i < cell.size(); ++i) {
     cell(hash_, i) = cat.get_ref(i).cat_index();
   }
 
-  fly::io::BinaryFile fout("geo.gsd", fly::io::create);
+  fly::io::BinaryFile fout("build/gsd/geo.gsd", fly::io::create);
 
   fout.commit([&] {
     fout.write(cell.box());                                                 //< Write the box to frame 0.
@@ -123,7 +121,7 @@ int main() {
 
   // ////////////////////// find 2 ////////////////////////
 
-  fly::io::BinaryFile dout("finder.gsd", fly::io::create);
+  fly::io::BinaryFile dout("build/gsd/finder.gsd", fly::io::create);
 
   dout.write(cell.box());                                                 //< Write the box to frame 0.
   dout.write(cell.map());                                                 //< Write the map to frame 0.
@@ -152,7 +150,15 @@ int main() {
       dimer,
   };
 
-  mast.find_mechs({cat.get_geo(2)}, cell);
+  std::vector found = mast.find_mechs({2}, cat, cell);
+
+  for (std::size_t i = 0; i < found.size(); i++) {
+    if (found[i]) {
+      fmt::print("@env #{} found {} mechs\n", ix[i], found[i].mechs().size());
+    } else {
+      fmt::print("@env #{} failed\n", ix[i]);
+    }
+  }
 
   /////////////////////////// IO ///////////////////////////
 

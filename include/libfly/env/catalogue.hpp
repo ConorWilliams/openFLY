@@ -29,7 +29,6 @@
 #include "libfly/env/mechanisms.hpp"
 #include "libfly/neigh/list.hpp"
 #include "libfly/potential/generic.hpp"
-#include "libfly/saddle/find.hpp"
 #include "libfly/system/SoA.hpp"
 #include "libfly/system/box.hpp"
 #include "libfly/system/supercell.hpp"
@@ -88,9 +87,14 @@ namespace fly::env {
       }
 
       /**
-       * @brief Get the index (unique to this environment) in the catalogue.
+       * @brief Get an index (unique to this environment) in the catalogue.
        */
       auto cat_index() const noexcept -> int { return m_index; }
+
+      /**
+       * @brief Get the internal maximum norm between this environment and a geometry for them to be considered equivalent.
+       */
+      auto delta_max() const noexcept -> double { return m_delta_max; }
 
     private:
       friend class Catalogue;
@@ -99,13 +103,12 @@ namespace fly::env {
       std::vector<Mechanism> m_mechs{};  ///< The mechanisms accessible, centred on this environment.
       int m_freq = 0;                    ///< The number of times this environment has been discovered.
       int m_index;                       ///< The unique index in the catalogue.
-      double m_delta_max;                ///< The maximum value norm for environments to be considered equivilent.
+      double m_delta_max;                ///< The maximum value norm for environments to be considered equivalent.
 
       /**
        * @brief Construct a new ``Env`` object.
        */
-      explicit Env(Geometry<Index> const& geo, Fingerprint const& f, int index, double del)
-          : m_finger(f), m_index(index), m_delta_max(del) {
+      Env(Geometry<Index> const& geo, Fingerprint const& f, int index, double del) : m_finger(f), m_index(index), m_delta_max(del) {
         for (auto const& elem : geo) {
           this->emplace_back(elem[r_], elem[col_]);
         }
@@ -187,7 +190,7 @@ namespace fly::env {
     /**
      * @brief Get the reference geometry stored in the catalogue that is equivalent to the geometry around atom ``i``.
      */
-    auto get_ref(int i) noexcept -> Env& { return **(m_real[std::size_t(i)].ptr); }
+    auto get_ref(int i) const noexcept -> Env const& { return **(m_real[std::size_t(i)].ptr); }
 
   private:
     /**

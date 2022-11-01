@@ -39,16 +39,18 @@ system::Supercell<system::TypeMap<>, Position, Frozen, Hash> bcc_motif() {
 }
 
 void benchmark(saddle::Master &master,
-               std::vector<env::Geometry<Index>> const &geos,
+               std::vector<int> const &ix,
+               env::Catalogue const &cat,
                system::SoA<Position const &, Frozen const &, TypeID const &> const &cell) {
   //
-  master.find_mechs(geos, cell);
+
+  master.find_mechs(ix, cat, cell);
 }
 
 int main() {
   /////////////////   Initialise cell   /////////////////
 
-  system::Supercell cell = remove_atoms(motif_to_lattice(bcc_motif(), {6, 6, 6}), {});
+  system::Supercell cell = remove_atoms(motif_to_lattice(bcc_motif(), {6, 6, 6}), {1});
 
   /////////////////////   Relax   /////////////////////
 
@@ -81,12 +83,6 @@ int main() {
     cell(hash_, i) = cat.get_ref(i).cat_index();
   }
 
-  std::vector<env::Geometry<Index>> geos;
-
-  for (auto const &elem : ix) {
-    geos.push_back(cat.get_geo(elem));
-  }
-
   /////////////////////   WRITE    /////////////////////
 
   io::BinaryFile fout("build/gsd/bench.gsd", io::create);
@@ -105,7 +101,7 @@ int main() {
   saddle::Dimer dimer{{}, {}, cell.box()};
 
   saddle::Master mast{
-      {.num_threads = omp_get_max_threads(), .debug = true, .fout = &fout},
+      {.num_threads = omp_get_max_threads(), .fout = &fout},
       cell.box(),
       pot,
       minimiser,
@@ -114,7 +110,7 @@ int main() {
 
   //////////////////  Do benchmarking  //////////////////
 
-  benchmark(mast, {cat.get_geo(0)}, cell);
+  benchmark(mast, ix, cat, cell);
 
   return 0;
 }

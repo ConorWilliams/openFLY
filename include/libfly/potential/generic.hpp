@@ -23,6 +23,7 @@
 
 #include "libfly/neigh/list.hpp"
 #include "libfly/potential/EAM/eam.hpp"
+#include "libfly/potential/counter.hpp"
 #include "libfly/system/SoA.hpp"
 #include "libfly/system/hessian.hpp"
 #include "libfly/system/property.hpp"
@@ -56,7 +57,6 @@ namespace fly::potential {
 
     using variant = std::variant<EAM>;
 
-    // clang-format on
   public:
     /**
      * @brief Construct a new Generic object

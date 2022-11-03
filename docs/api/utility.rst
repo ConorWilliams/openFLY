@@ -186,6 +186,8 @@ File ``lattice.hpp``
     :sections: briefdescription detaileddescription
 
 .. doxygenfunction:: motif_to_lattice
+
+.. doxygenfunction:: add_atoms
     
 .. doxygenfunction:: remove_atoms
     

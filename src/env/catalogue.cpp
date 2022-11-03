@@ -55,12 +55,10 @@ namespace fly::env {
 
     bool flag = false;
 
-    // Find in catalogue, optimising for
+    // Find in catalogue, optimising for found case
 #pragma omp parallel for num_threads(num_threads) schedule(static)
     for (std::size_t i = 0; i < m_real.size(); i++) {
-      if (std::optional ptr = canon_find(m_real[i])) {
-        m_real[i].ptr = ptr;
-      } else {
+      if (!(m_real[i].ptr = canon_find(m_real[i]))) {
 #pragma omp atomic write
         flag = true;
         if (m_opt.debug) {
@@ -81,7 +79,7 @@ namespace fly::env {
       return {};
     }
 
-    // Now must operate single threaded.
+    // Now must operate single threaded as we modify buckets
     std::vector<int> new_idx;
 
     struct Pair {
@@ -181,6 +179,46 @@ namespace fly::env {
     }
 
     return static_cast<bool>(mut.geo.permute_onto(ref, delta));
+  }
+
+  auto Catalogue::set_mechs(int i, std::vector<Mechanism> const &m) -> void {
+    //
+    Env &env = **(m_real[std::size_t(i)].ptr);
+
+    verify(env.m_mechs.empty(), "We already have {} mechanisms, set_mech() should only be called once.", env.m_mechs.size());
+
+    verify(std::all_of(m.begin(),
+                       m.end(),
+                       [s = env.size()](Mechanism const &x) {
+                         //
+                         return x.delta_sp.size() == s && x.delta_fwd.size() == s;
+                       }),
+           "Wrong number of atoms.");
+
+    env.m_mechs = m;
+  }
+
+  double Catalogue::refine_tol(int i, double min_delta) {
+    //
+    std::size_t si = safe_cast<std::size_t>(i);
+
+    double r_min = std::min(m_real[si].f.r_min(), get_ref(i).m_finger.r_min());
+
+    double delta = std::min(0.4 * r_min, get_ref(i).m_delta_max);
+
+    std::optional res = m_real[si].geo.permute_onto(get_ref(i).ref_geo(), delta);
+
+    verify(bool(res), "While tightening @{} perm failed with delta={}", delta, delta);
+
+    double new_delta_max = std::max(min_delta, res->rmsd / 1.5);
+
+    if (m_opt.debug) {
+      fmt::print("Refining delta_max @{} from {} to {}\n", i, get_ref(i).m_delta_max, new_delta_max);
+    }
+
+    (**(m_real[si].ptr)).m_delta_max = new_delta_max;
+
+    return new_delta_max;
   }
 
 }  // namespace fly::env

@@ -668,7 +668,7 @@ namespace fly::saddle {
         return false;
       });
 
-      if (m_opt.debug) {
+      if (true || m_opt.debug) {
         fmt::print("FINDER: Env @{} has {} symmetries @tol={}\n", out_data[i].centre, out_data[i].tr.size(), delta);
       }
     }

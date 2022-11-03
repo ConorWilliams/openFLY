@@ -22,8 +22,10 @@
 
 #include <algorithm>
 #include <cmath>
+#include <cstddef>
 
 #include "libfly/neigh/list.hpp"
+#include "libfly/system/atom.hpp"
 #include "libfly/system/box.hpp"
 #include "libfly/system/property.hpp"
 #include "libfly/system/supercell.hpp"
@@ -121,6 +123,35 @@ namespace fly {
         ((out_cell(T{}, x) = cell(T{}, i)), ...);
         x++;
       }
+    }
+
+    return out_cell;
+  }
+
+/**
+ * @brief Add atoms to a supercell.
+ * 
+ * @param cell Input ``SuperCell``.
+ * @param atoms Atoms to add to ``cell``.
+ */
+  template <typename Map, typename... T>
+  auto add_atoms(system::Supercell<Map, T...> const& cell, std::vector<system::Atom<TypeID, T...>> const& atoms) {
+    //
+    auto out_cell = system::make_supercell<T...>(cell.box(), cell.map(), cell.size() + safe_cast<Eigen::Index>(atoms.size()));
+
+    // Copy old atoms.
+    for (Eigen::Index i = 0; i < cell.size(); i++) {
+      out_cell(id_, i) = cell(id_, i);
+      ((out_cell(T{}, i) = cell(T{}, i)), ...);
+    }
+
+    // Copy new atoms.
+    for (std::size_t i = 0; i < atoms.size(); i++) {
+
+      Eigen::Index x = cell.size() + safe_cast<Eigen::Index>(i);
+
+      out_cell(id_,  x) =  atoms[i][id_];
+      ((out_cell(T{}, x) = atoms[i][T{}]), ...);
     }
 
     return out_cell;

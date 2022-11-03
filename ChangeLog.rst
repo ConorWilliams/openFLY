@@ -20,12 +20,22 @@ Unreleased
 -------------------------------
 Added
 ~~~~~
+
+- New ``add_atoms()`` lattice function.
+- New ``refine_tol()`` function in catalogue.
+
 Changed
 ~~~~~~~
+
+- Exposed catalogues ``set_mechs()`` method
+
 Removed
 ~~~~~~~
 Bugfixes
 ~~~~~~~~
+
+- Catalogue works correctly on the second pass
+
 Meta 
 ~~~~
 

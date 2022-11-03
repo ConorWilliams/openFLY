@@ -113,23 +113,6 @@ namespace fly::env {
           this->emplace_back(elem[r_], elem[col_]);
         }
       }
-
-      /**
-       * @brief Set the vector of ``Mechanism``s.
-       *
-       * Pre-condition, this may only be called once.
-       */
-      auto set_mech(std::vector<Mechanism>&& m) -> void {
-        verify(m_mechs.empty(), "We already have {} mechanisms, set_mech() should only be called once.", m_mechs.size());
-        verify(std::all_of(m.begin(),
-                           m.end(),
-                           [s = this->size()](Mechanism const& x) {
-                             //
-                             return x.delta_sp.size() == s && x.delta_fwd.size() == s;
-                           }),
-               "Wrong number of atoms.");
-        m_mechs = std::move(m);
-      }
     };
 
     /**
@@ -191,6 +174,26 @@ namespace fly::env {
      * @brief Get the reference geometry stored in the catalogue that is equivalent to the geometry around atom ``i``.
      */
     auto get_ref(int i) const noexcept -> Env const& { return **(m_real[std::size_t(i)].ptr); }
+
+    /**
+     * @brief Set the vector of ``Mechanism``s.
+     *
+     * Pre-condition, this may only be called once per LE.
+     */
+    auto set_mechs(int i, std::vector<Mechanism> const& m) -> void;
+
+    /**
+     * @brief Refine the delta of the ``i``th environment
+     */
+
+    /**
+     * @brief Tighten the tolerance of the ``i``th environment.
+     *
+     * This is done such that the current geometry no longer matches the reference or ``delta_max = min_delta``.
+     *
+     * @return The new ``delta_max`` of the environment reference environment that atom ``i`` was equivalent to.
+     */
+    double refine_tol(int i, double min_delta = 0);
 
   private:
     /**

@@ -2,7 +2,9 @@
 #include <fmt/core.h>
 #include <omp.h>
 
+#include <algorithm>
 #include <array>
+#include <cstddef>
 #include <ctime>
 #include <fstream>
 #include <iostream>
@@ -11,6 +13,7 @@
 #include <utility>
 #include <variant>
 
+#include "libfly/env/catalogue.hpp"
 #include "libfly/io/gsd.hpp"
 #include "libfly/minimise/LBFGS/lbfgs.hpp"
 #include "libfly/neigh/list.hpp"
@@ -32,33 +35,12 @@
 
 using namespace fly;
 
-template <typename... Ts>
-system::Supercell<system::TypeMap<>, Ts...> supercell_from(std::string_view fname, std::uint64_t frame) {
+#include "libfly/kinetic/basin.hpp"
+
+template <typename... T>
+system::Supercell<system::TypeMap<>, Position, Frozen, T...> bcc_iron_motif() {
   //
-  io::BinaryFile file(fname, io::read_only);
-
-  system::TypeMap out_map = file.read_map(frame);
-
-  system::Box out_box = file.read_box(frame);
-
-  system::Supercell out_cell = system::make_supercell<Ts...>(out_box, out_map, file.read<std::uint32_t>(frame, "particles/N"));
-
-  auto read = [&](auto property) {
-    try {
-      file.read_to(frame, property, out_cell);
-    } catch (fly::RuntimeError const &err) {
-      fmt::print("Ignoring error, what(): {}\n", err.what());
-    }
-  };
-
-  (read(Ts{}), ...);
-
-  return out_cell;
-}
-
-system::Supercell<system::TypeMap<>, Position, Frozen> bcc_iron_motif() {
-  //
-  fly::system::TypeMap<> FeH(2);
+  system::TypeMap<> FeH(2);
 
   FeH.set(0, tp_, "Fe");
   FeH.set(1, tp_, "H");
@@ -69,10 +51,11 @@ system::Supercell<system::TypeMap<>, Position, Frozen> bcc_iron_motif() {
       {0.000000, 0.000000, 2.855300},
   };
 
-  system::Supercell motif = system::make_supercell<Position, Frozen>({basis, Arr<bool>::Constant(true)}, FeH, 2);
+  system::Supercell motif = system::make_supercell<Position, Frozen, T...>({basis, Arr<bool>::Constant(true)}, FeH, 2);
 
   motif[fzn_] = false;
   motif[id_] = 0;
+  motif[hash_] = 0;
 
   motif(r_, 0) = Vec::Zero();
   motif(r_, 1) = Vec::Constant(0.5);
@@ -80,55 +63,76 @@ system::Supercell<system::TypeMap<>, Position, Frozen> bcc_iron_motif() {
   return motif;
 }
 
-system::Supercell<system::TypeMap<>, Position, Frozen> fcc_iron_motif() {
+template <typename Map, typename... T>
+bool update_cat(saddle::Master& mast, env::Catalogue& cat, system::Supercell<Map, T...> const& cell) {
   //
-  fly::system::TypeMap<> FeH(2);
 
-  FeH.set(0, tp_, "Fe");
-  FeH.set(1, tp_, "H");
+  std::vector<int> ix = cat.rebuild(cell, omp_get_max_threads());
 
-  Mat basis{
-      {3.650000, 0.000000, 0.000000},
-      {0.000000, 3.650000, 0.000000},
-      {0.000000, 0.000000, 3.650000},
-  };
+  bool no_fails = true;
 
-  system::Supercell motif = system::make_supercell<Position, Frozen>({basis, Arr<bool>::Constant(true)}, FeH, 4);
+  while (true) {
+    //
+    std::vector<int> fails;
 
-  motif[fzn_] = false;
-  motif[id_] = 0;
+    fmt::print("New envs @{}\n", ix);
 
-  motif(r_, 0) = Vec::Zero();
-  motif(r_, 1) = Vec{0.0, 0.5, 0.5};
-  motif(r_, 2) = Vec{0.5, 0.0, 0.5};
-  motif(r_, 3) = Vec{0.5, 0.5, 0.0};
+    std::vector found = mast.find_mechs(ix, cat, cell);
 
-  return motif;
-}
+    for (std::size_t i = 0; i < found.size(); i++) {
+      if (found[i]) {
+        fmt::print("Found {} mechs at {}\n", found[i].mechs().size(), ix[i]);
+        cat.set_mechs(ix[i], found[i].mechs());
+      } else {
+        fails.push_back(ix[i]);
+      }
+    }
+
+    if (fails.empty()) {
+      return no_fails;
+    } else {
+      no_fails = false;
+    }
+
+    // Refine tolerance's
+    for (auto const& f : fails) {
+      cat.refine_tol(f, cat.get_ref(f).delta_max() / 1.5);
+    }
+
+    std::vector tmp = cat.rebuild(cell, omp_get_max_threads());
+
+    // The atom whose symmetry tolerance increased still needs to be searched alongside any atoms that now no longer match that
+    // environment.
+    for (auto const& elem : tmp) {
+      verify(std::find(fails.begin(), fails.end(), elem) == fails.end(), "Atom #{} found twice", elem);
+    }
+
+    // tmp now stores previous fails + new environments that don't match the refined tolerance.
+    tmp.insert(tmp.end(), fails.begin(), fails.end());
+
+    ix = std::move(tmp);
+  }
+};
+
+struct Options {};
 
 int main() {
   //
 
-  system::Supercell cell0 = motif_to_lattice(fcc_iron_motif(), {5, 5, 5});
+  system::Supercell cell = remove_atoms(motif_to_lattice(bcc_iron_motif<Hash>(), {6, 6, 6}), {1});
 
-  system::Supercell cell = remove_atoms(cell0, {172});
+  fly::io::BinaryFile file("build/gsd/sim.gsd", fly::io::create);
 
-  fly::io::BinaryFile tmp("test.gsd", fly::io::create);
+  file.commit([&] {
+    file.write(cell.box());
+    file.write(cell.map());
+    file.write("particles/N", fly::safe_cast<std::uint32_t>(cell.size()));
+    file.write(id_, cell);
 
-  tmp.commit([&] {
-    tmp.write(cell.box());
-    tmp.write(cell.map());
-    tmp.write("particles/N", fly::safe_cast<std::uint32_t>(cell.size()));
-    tmp.write(id_, cell);
-
-    tmp.write(r_, cell);
+    file.write(r_, cell);
   });
 
-  fly::io::BinaryFile fout("lbfgs.gsd", fly::io::create);
-
-  //   WORK
-
-  minimise::LBFGS minimiser({.debug = true, .fout = &tmp}, cell.box());
+  minimise::LBFGS minimiser({}, cell.box());
 
   potential::Generic pot{
       potential::EAM{
@@ -137,13 +141,57 @@ int main() {
       },
   };
 
+  neigh::List neigh_list(cell.box(), pot.r_cut());
+
   system::SoA<Position, PotentialGradient> out(cell.size());
 
-  bool done = timeit("Minimise", [&] { return minimiser.minimise(out, cell, pot, omp_get_max_threads()); });
+  auto do_min = [&] {
+    bool err = timeit("Minimise", [&] { return minimiser.minimise(out, cell, pot, omp_get_max_threads()); });
+    verify(!err, "Minimiser failed");
+    cell[r_] = out[r_];
+  };
 
-  fmt::print("FoundMin?={}\n", !done);
+  do_min();
 
-  tmp.commit([&] { tmp.write(r_, out); });
+  file.commit([&] { file.write(r_, cell); });
+
+  env::Catalogue cat({.delta_max = 0.5, .debug = true});
+
+  saddle::Master mast{
+      {.num_threads = omp_get_max_threads(), .max_searches = 500, .max_failed_searches = 125},
+      cell.box(),
+      pot,
+      minimiser,
+      saddle::Dimer{{}, {}, cell.box()},
+  };
+
+  update_cat(mast, cat, cell);
+
+  //   for (int i = 0; i < cell.size(); ++i) {
+  //     cell(hash_, i) = cat.get_ref(i).cat_index();
+  //   }
+
+  //   for (int i = 0; i < 1000; i++) {
+  //     ///////////// Select mechanism /////////////
+
+  //     ///////////// Reconstruct mech /////////////
+
+  //     neigh_list.rebuild(cell, omp_get_max_threads());
+
+  //     // Energy before mechanism
+  //     double E0 = pot.energy(cell, neigh_list, omp_get_max_threads());
+
+  //     // auto const &m = superbasins.reconstruct(mech).onto(init, geos);
+
+  //     // post_recon.activ.view() = init.activ.view();
+
+  //     neigh_list.rebuild(cell, omp_get_max_threads());
+
+  //     // Energy after reconstruction
+  //     double E1 = pot.energy(cell, neigh_list, omp_get_max_threads());
+
+  //     do_min();
+  //   }
 
   return 0;
 }

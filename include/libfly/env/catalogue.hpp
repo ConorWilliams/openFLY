@@ -20,9 +20,15 @@
 
 #include <algorithm>
 #include <cstddef>
+#include <fstream>
+#include <functional>
 #include <limits>
 #include <map>
 #include <vector>
+
+//
+
+#include <cereal/archives/binary.hpp>
 
 #include "libfly/env/geometry.hpp"
 #include "libfly/env/heuristics.hpp"
@@ -64,6 +70,14 @@ namespace fly::env {
       double r_edge = 3.0;
       /** @brief If true prints debugging info. */
       bool debug = false;
+
+      /**
+       * @brief Lib cereal serialization support.
+       */
+      template <class Archive>
+      void serialize(Archive& archive) {
+        archive(delta_max, overfuzz, r_env, r_edge, debug);
+      }
     };
 
     /**
@@ -241,6 +255,52 @@ namespace fly::env {
       reconstruct_impl(mech, i, in, out, in_ready_state, in.map().num_types(), num_threads);
     }
 
+    /**
+     * @brief Lib cereal serialization support.
+     */
+    template <class Archive>
+    void serialize(Archive& archive) {
+      // Options m_opt;
+      // int m_size = 0;
+      // std::optional<system::Box> m_box;
+      // std::optional<neigh::List> m_nl;
+      // std::vector<RelEnv> m_real;
+      // std::map<std::size_t, std::vector<Env>, std::less<>> m_cat;
+      archive(m_opt, m_size);
+    }
+
+    /**
+     * @brief Load a catalogue from a binary archive.
+     */
+    Catalogue(Options const& opt, std::ifstream& fin) {
+      //
+      cereal::BinaryInputArchive iarchive(fin);
+
+      Catalogue loaded(opt);
+
+      iarchive(loaded);
+
+      std::equal_to<> eq;
+
+      verify(eq(opt.overfuzz, loaded.m_opt.overfuzz), "Loading a catalogue with contradicting .overfuzz");
+      verify(eq(opt.r_env, loaded.m_opt.r_env), "Loading a catalogue with contradicting .r_env");
+      verify(eq(opt.r_edge, loaded.m_opt.r_edge), "Loading a catalogue with contradicting .r_edge");
+
+      *this = std::move(loaded);
+    }
+
+    /**
+     * @brief Write this catalogue to a binary archive.
+     */
+    auto dump(std::ofstream& fout) const -> void {
+      if (m_opt.debug) {
+        fmt::print("Dump catalogue\n");
+      }
+
+      cereal::BinaryOutputArchive iarchive(fout);
+      iarchive(*this);
+    }
+
   private:
     /**
      * @brief  A non-null pointer-like type to an ``Catalogue::Env``.
@@ -279,6 +339,8 @@ namespace fly::env {
       std::size_t hash;
       std::optional<Pointer> ptr;
     };
+
+    // Members
 
     Options m_opt;
     int m_size = 0;

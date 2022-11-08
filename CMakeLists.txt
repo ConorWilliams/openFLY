@@ -58,6 +58,7 @@ find_package(fmt CONFIG REQUIRED)
 find_package(Eigen3 CONFIG REQUIRED)
 find_package(span-lite CONFIG REQUIRED)
 find_package(xxHash CONFIG REQUIRED)
+find_package(cereal CONFIG REQUIRED)
 
 # Ancient voodoo
 ExternalProject_Add(
@@ -93,7 +94,7 @@ add_dependencies(Nauty nauty)
 
 target_link_libraries(libFLY PRIVATE Nauty xxHash::xxhash)
 
-target_link_libraries(libFLY PUBLIC Eigen3::Eigen fmt::fmt nonstd::span-lite OpenMP::OpenMP_CXX)
+target_link_libraries(libFLY PUBLIC Eigen3::Eigen fmt::fmt nonstd::span-lite OpenMP::OpenMP_CXX cereal::cereal)
 
 # Declare executable
 add_executable(openFLY apps/main.cpp)

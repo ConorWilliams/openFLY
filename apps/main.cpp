@@ -2,6 +2,8 @@
 #include <fmt/core.h>
 #include <omp.h>
 
+//
+
 #include <algorithm>
 #include <array>
 #include <cstddef>
@@ -77,7 +79,7 @@ bool update_cat(saddle::Master& mast, env::Catalogue& cat, system::Supercell<Map
 
     fmt::print("New envs @{} with {} refines\n", ix, refines);
 
-    std::vector found = mast.find_mechs(ix, cat, cell);
+    std::vector found = timeit("find_mechs", [&] { return mast.find_mechs(ix, cat, cell); });
 
     for (std::size_t i = 0; i < found.size(); i++) {
       if (found[i]) {
@@ -155,7 +157,18 @@ int main() {
 
   file.commit([&] { file.write(r_, cell); });
 
-  env::Catalogue cat({.delta_max = 0.5});
+  env::Catalogue cat = [&] {
+    if (std::ifstream fcat("build/gsd/cat.bin"); fcat.good()) {
+      return env::Catalogue{{.delta_max = 0.5}, fcat};
+    } else {
+      return env::Catalogue{{.delta_max = 0.5}};
+    }
+  }();
+
+  auto dump_cat = [&] {
+    std::ofstream fcat("build/gsd/cat.bin");
+    cat.dump(fcat);
+  };
 
   saddle::Master mast{
       {.num_threads = omp_get_max_threads(), .max_searches = 500, .max_failed_searches = 125},
@@ -167,6 +180,8 @@ int main() {
 
   update_cat(mast, cat, cell);
 
+  dump_cat();
+
   std::random_device rd;
 
   Xoshiro rng({rd(), 2, rd(), 4});
@@ -174,43 +189,46 @@ int main() {
   double time = 0;
 
   for (int i = 0; i < 1000; i++) {
-    ///////////// Select mechanism /////////////
+    timeit("TOTAL", [&] {
+      ///////////// Select mechanism /////////////
 
-    kinetic::Basin basin({.debug = true}, cell, cat);
+      kinetic::Basin basin = timeit("kinetic::Basin", [&] { return kinetic::Basin({.debug = true}, cell, cat); });
 
-    auto const& [m, atom, dt] = basin.kmc_choice(rng);
+      auto const& [m, atom, dt] = timeit("kmc_choice", [&] { return basin.kmc_choice(rng); });
 
-    time += dt;
+      time += dt;
 
-    ///////////// Reconstruct mech /////////////
+      ///////////// Reconstruct mech /////////////
 
-    neigh_list.rebuild(cell, omp_get_max_threads());
-    // Energy before mechanism
-    double E0 = pot.energy(cell, neigh_list, omp_get_max_threads());
+      // Energy before mechanism
+      neigh_list.rebuild(cell, omp_get_max_threads());
+      double E0 = pot.energy(cell, neigh_list, omp_get_max_threads());
 
-    cat.reconstruct(cell, m, atom, cell, true, omp_get_max_threads());
+      // recon
+      cat.reconstruct(cell, m, atom, cell, true, omp_get_max_threads());
 
-    neigh_list.rebuild(cell, omp_get_max_threads());
-    // Energy after reconstruction
-    double Etmp = pot.energy(cell, neigh_list, omp_get_max_threads());
+      // Energy after reconstruction
+      neigh_list.rebuild(cell, omp_get_max_threads());
+      double Etmp = pot.energy(cell, neigh_list, omp_get_max_threads());
 
-    timeit("Dump positions", [&] { file.commit([&] { file.write(r_, cell); }); });
+      do_min();
 
-    do_min();
+      // Energy after relax
+      neigh_list.rebuild(cell, omp_get_max_threads());
+      double Ef = pot.energy(cell, neigh_list, omp_get_max_threads());
 
-    neigh_list.rebuild(cell, omp_get_max_threads());
-    // Energy after relax
-    double Ef = pot.energy(cell, neigh_list, omp_get_max_threads());
+      ///////////// Output data/logs /////////////
 
-    ///////////// Output data/logs /////////////
+      fmt::print("E0={}, Etmp={}, Ef={}\n", E0, Etmp, Ef);
 
-    fmt::print("E0={}, Etmp={}, Ef={}\n", E0, Etmp, Ef);
+      timeit("Dump positions", [&] { file.commit([&] { file.write(r_, cell); }); });
 
-    timeit("Dump positions", [&] { file.commit([&] { file.write(r_, cell); }); });
+      ///////////// Update catalogue /////////////
 
-    ///////////// Update catalogue /////////////
+      timeit("Update catalogue", [&] { update_cat(mast, cat, cell); });
 
-    update_cat(mast, cat, cell);
+      dump_cat();
+    });
   }
 
   return 0;

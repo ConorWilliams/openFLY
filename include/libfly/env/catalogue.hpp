@@ -81,10 +81,7 @@ namespace fly::env {
        *
        * Pre-condition, set_mechs() must have been called on this ``Env``.
        */
-      auto get_mechs() const -> std::vector<Mechanism> const& {
-        ASSERT(!m_mechs.empty(), "Environment has not been completed", 0);
-        return m_mechs;
-      }
+      auto get_mechs() const -> std::vector<Mechanism> const& { return m_mechs; }
 
       /**
        * @brief Get an index (unique to this environment) in the catalogue.
@@ -168,12 +165,26 @@ namespace fly::env {
     /**
      * @brief Get a view of the (indexed) geometry, in canonical order, around atom ``i``.
      */
-    auto get_geo(int i) const noexcept -> Geometry<Index> const& { return m_real[std::size_t(i)].geo; }
+    auto get_geo(int i) const -> Geometry<Index> const& {
+      //
+      std::size_t si = safe_cast<std::size_t>(i);
+
+      ASSERT(si < m_real.size(), "Accessing atom {} in catalogue, out of bounds as cat has {} active atoms", i, m_real.size());
+
+      return m_real[si].geo;
+    }
 
     /**
      * @brief Get the reference geometry stored in the catalogue that is equivalent to the geometry around atom ``i``.
      */
-    auto get_ref(int i) const noexcept -> Env const& { return **(m_real[std::size_t(i)].ptr); }
+    auto get_ref(int i) const -> Env const& {
+      //
+      std::size_t si = safe_cast<std::size_t>(i);
+
+      ASSERT(si < m_real.size(), "Accessing atom {} in catalogue, out of bounds as cat has {} active atoms", i, m_real.size());
+
+      return **(m_real[si].ptr);
+    }
 
     /**
      * @brief Set the vector of ``Mechanism``s.
@@ -193,7 +204,42 @@ namespace fly::env {
      *
      * @return The new ``delta_max`` of the environment reference environment that atom ``i`` was equivalent to.
      */
-    double refine_tol(int i, double min_delta = 0);
+    auto refine_tol(int i, double min_delta = 0) -> double;
+
+  private:
+    void reconstruct_impl(Mechanism const& mech,
+                          int i,
+                          system::SoA<Position const&, TypeID const&, Frozen const&> in,
+                          system::SoA<Position&> out,
+                          bool in_ready_state,
+                          Eigen::Index num_types,
+                          int num_threads);
+
+  public:
+    /**
+     * @brief Reconstruct a mechanisms ``mech`` onto the ``i`` atom of ``in``.
+     */
+
+    /**
+     * @brief Reconstruct a mechanisms.
+     *
+     * @param out Write the reconstructed position here.
+     * @param mech The mechanism to reconstruct.
+     * @param i The index of the atom to reconstruct the mechanism onto.
+     * @param in The initial state of the system before the reconstruction.
+     * @param in_ready_state If ``true`` this function will assume the currently loaded geo/ref of the ``i``th atom match the input
+     * ``in``.
+     * @param num_threads Number of openMP threads to use.
+     */
+    template <typename Map, typename... T>
+    auto reconstruct(system::SoA<Position&> out,
+                     Mechanism const& mech,
+                     int i,
+                     system::Supercell<Map, T...> const& in,
+                     bool in_ready_state,
+                     int num_threads) -> void {
+      reconstruct_impl(mech, i, in, out, in_ready_state, in.map().num_types(), num_threads);
+    }
 
   private:
     /**
@@ -266,6 +312,11 @@ namespace fly::env {
      */
     std::optional<Pointer> canon_find(RelEnv& env);
 
+    /** Get delta for the reference environment of the ith atom and */
+    double calc_delta(Fingerprint const& f_mut, Env const& ref) const {
+      return std::min(0.4 * std::min(f_mut.r_min(), ref.m_finger.r_min()), ref.m_delta_max);
+    }
+
     /**
      * @brief Simultaneously canonise the input local environment and insert it into the Catalogue.
      *
@@ -274,6 +325,16 @@ namespace fly::env {
     Pointer insert(RelEnv& env);
 
     bool canon_equiv(RelEnv& mut, Env const& ref) const;
+
+    /**
+     * @brief Rebuild the ith RelEnv.
+     *
+     * Neighbour list must be ready.
+     */
+    void rebuild_env(int i,
+                     Eigen::Index num_types,
+                     Geometry<Index>& scratch,
+                     system::SoA<Position const&, TypeID const&, Frozen const&> const& info);
   };
 
 }  // namespace fly::env

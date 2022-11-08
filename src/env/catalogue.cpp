@@ -20,9 +20,24 @@
 
 #include "libfly/env/geometry.hpp"
 #include "libfly/env/heuristics.hpp"
+#include "libfly/system/property.hpp"
 #include "libfly/utility/core.hpp"
 
 namespace fly::env {
+
+  void Catalogue::rebuild_env(int i,
+                              Eigen::Index num_types,
+                              Geometry<Index> &scratch,
+                              system::SoA<Position const &, TypeID const &, Frozen const &> const &info) {
+    //
+    RelEnv &env = m_real[std::size_t(i)];
+    // Build geometries
+    rebuild_geo_from_nl(i, env.geo, info, *m_nl, m_opt.r_env);
+    // Make fingerprint.
+    env.f.rebuild(env.geo);
+    // Compute graph-hash and canonise
+    env.hash = canon_hash(env.geo, m_opt.r_edge, safe_cast<std::size_t>(2 * num_types), &scratch);
+  }
 
   std::vector<int> Catalogue::rebuild_impl(system::SoA<Position const &, TypeID const &, Frozen const &> const &info,
                                            Eigen::Index num_types,
@@ -34,18 +49,10 @@ namespace fly::env {
     m_nl->rebuild(info, num_threads);
 
     Geometry<Index> scratch;
-
+    // Rebuild the RelEnv's
 #pragma omp parallel for num_threads(num_threads) firstprivate(scratch) schedule(static)
     for (int i = 0; i < info.size(); i++) {
-      //
-      RelEnv &env = m_real[std::size_t(i)];
-
-      // Build geometries
-      rebuild_geo_from_nl(i, env.geo, info, *m_nl, m_opt.r_env);
-      // Make fingerprint.
-      env.f.rebuild(env.geo);
-      //
-      env.hash = canon_hash(env.geo, m_opt.r_edge, safe_cast<std::size_t>(2 * num_types), &scratch);
+      rebuild_env(i, num_types, scratch, info);
     }
 
     // Make sure every hash is in the map.
@@ -67,12 +74,7 @@ namespace fly::env {
       }
     }
 
-    bool missing;
-
-#pragma omp atomic read
-    missing = flag;
-
-    if (!missing) {
+    if (!flag) {
       if (m_opt.debug) {
         fmt::print("CAT: No new environments\n");
       }
@@ -99,10 +101,7 @@ namespace fly::env {
         });
 
         if (it == new_ptrs.end()) {
-          // New environment.
-          [[maybe_unused]] auto new_hash = canon_hash(m_real[i].geo, m_opt.r_edge, safe_cast<std::size_t>(2 * num_types), &scratch);
-          ASSERT(new_hash == m_real[i].hash, "Hash has changed unexpectedly, {}!={}", new_hash, m_real[i].hash);
-
+          //
           m_real[i].ptr = insert(m_real[i]);
           new_idx.push_back(int(i));
           new_ptrs.push_back({*m_real[i].ptr, m_real[i].hash});
@@ -119,7 +118,6 @@ namespace fly::env {
             fmt::print("CAT: Unknown at {} is a duplicate new\n", i);
           }
         }
-        //
       }
     }
 
@@ -169,9 +167,7 @@ namespace fly::env {
 
   bool Catalogue::canon_equiv(Catalogue::RelEnv &mut, Env const &ref) const {
     //
-    double r_min = std::min(mut.f.r_min(), ref.m_finger.r_min());
-
-    double delta = std::min(0.4 * r_min, ref.m_delta_max);
+    double delta = calc_delta(mut.f, ref);
 
     // Test if fuzzy keys match (fast)
     if (!ref.m_finger.equiv(mut.f, delta * m_opt.overfuzz)) {
@@ -202,13 +198,11 @@ namespace fly::env {
     //
     std::size_t si = safe_cast<std::size_t>(i);
 
-    double r_min = std::min(m_real[si].f.r_min(), get_ref(i).m_finger.r_min());
-
-    double delta = std::min(0.4 * r_min, get_ref(i).m_delta_max);
+    double delta = calc_delta(m_real[si].f, get_ref(i));
 
     std::optional res = m_real[si].geo.permute_onto(get_ref(i).ref_geo(), delta);
 
-    verify(bool(res), "While tightening @{} perm failed with delta={}", delta, delta);
+    verify(bool(res), "While tightening @{} perm failed with delta={}", i, delta);
 
     double new_delta_max = std::max(min_delta, res->rmsd / 1.5);
 
@@ -219,6 +213,56 @@ namespace fly::env {
     (**(m_real[si].ptr)).m_delta_max = new_delta_max;
 
     return new_delta_max;
+  }
+
+  void Catalogue::reconstruct_impl(Mechanism const &mech,
+                                   int i,
+                                   system::SoA<Position const &, TypeID const &, Frozen const &> in,
+                                   system::SoA<Position &> out,
+                                   bool in_ready_state,
+                                   Eigen::Index num_types,
+                                   int num_threads) {
+    //
+
+    verify(out.size() == in.size(), "Output system is a different size from input system {}!={}", out.size(), in.size());
+
+    out[r_] = in[r_];
+
+    std::size_t si = safe_cast<std::size_t>(i);
+
+    if (!in_ready_state) {
+      // Prepare memory.
+      m_real.resize(std::size_t(in.size()));
+      // Prep neigh list.
+      m_nl->rebuild(in, num_threads);
+
+      Geometry<Index> scratch;
+
+      rebuild_env(i, num_types, scratch, in);
+
+      m_real[si].ptr = canon_find(m_real[si]);
+
+      if (!m_real[si].ptr) {
+        throw error("Rebuilding the geo centred on {} cat failed to find a matching Env", i);
+      }
+    } else {
+      verify(i >= 0 && size_t(i) < m_real.size(), "Atom with index {} is not in catalogue", i);
+    }
+
+    double delta = calc_delta(m_real[si].f, get_ref(i));
+
+    if (std::optional res = m_real[si].geo.permute_onto(get_ref(i), delta)) {
+      //
+      auto const &geo = get_geo(i);
+
+      Mat O = res->O.transpose();
+
+      for (int j = 0; j < geo.size(); ++j) {
+        out(r_, geo[j][i_]).noalias() += O * mech.delta_fwd[j][del_];
+      }
+    } else {
+      throw error("Unable to align cell perm geo {} onto reference, ready={}", i, in_ready_state);
+    }
   }
 
 }  // namespace fly::env

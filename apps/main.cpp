@@ -69,13 +69,13 @@ bool update_cat(saddle::Master& mast, env::Catalogue& cat, system::Supercell<Map
 
   std::vector<int> ix = cat.rebuild(cell, omp_get_max_threads());
 
-  bool no_fails = true;
+  int refines = 0;
 
   while (true) {
     //
     std::vector<int> fails;
 
-    fmt::print("New envs @{}\n", ix);
+    fmt::print("New envs @{} with {} refines\n", ix, refines);
 
     std::vector found = mast.find_mechs(ix, cat, cell);
 
@@ -89,9 +89,9 @@ bool update_cat(saddle::Master& mast, env::Catalogue& cat, system::Supercell<Map
     }
 
     if (fails.empty()) {
-      return no_fails;
+      return refines == 0;
     } else {
-      no_fails = false;
+      ++refines;
     }
 
     // Refine tolerance's
@@ -155,7 +155,7 @@ int main() {
 
   file.commit([&] { file.write(r_, cell); });
 
-  env::Catalogue cat({.delta_max = 0.5, .debug = true});
+  env::Catalogue cat({.delta_max = 0.5});
 
   saddle::Master mast{
       {.num_threads = omp_get_max_threads(), .max_searches = 500, .max_failed_searches = 125},
@@ -167,31 +167,51 @@ int main() {
 
   update_cat(mast, cat, cell);
 
-  //   for (int i = 0; i < cell.size(); ++i) {
-  //     cell(hash_, i) = cat.get_ref(i).cat_index();
-  //   }
+  std::random_device rd;
 
-  //   for (int i = 0; i < 1000; i++) {
-  //     ///////////// Select mechanism /////////////
+  Xoshiro rng({rd(), 2, rd(), 4});
 
-  //     ///////////// Reconstruct mech /////////////
+  double time = 0;
 
-  //     neigh_list.rebuild(cell, omp_get_max_threads());
+  for (int i = 0; i < 1000; i++) {
+    ///////////// Select mechanism /////////////
 
-  //     // Energy before mechanism
-  //     double E0 = pot.energy(cell, neigh_list, omp_get_max_threads());
+    kinetic::Basin basin({.debug = true}, cell, cat);
 
-  //     // auto const &m = superbasins.reconstruct(mech).onto(init, geos);
+    auto const& [m, atom, dt] = basin.kmc_choice(rng);
 
-  //     // post_recon.activ.view() = init.activ.view();
+    time += dt;
 
-  //     neigh_list.rebuild(cell, omp_get_max_threads());
+    ///////////// Reconstruct mech /////////////
 
-  //     // Energy after reconstruction
-  //     double E1 = pot.energy(cell, neigh_list, omp_get_max_threads());
+    neigh_list.rebuild(cell, omp_get_max_threads());
+    // Energy before mechanism
+    double E0 = pot.energy(cell, neigh_list, omp_get_max_threads());
 
-  //     do_min();
-  //   }
+    cat.reconstruct(cell, m, atom, cell, true, omp_get_max_threads());
+
+    neigh_list.rebuild(cell, omp_get_max_threads());
+    // Energy after reconstruction
+    double Etmp = pot.energy(cell, neigh_list, omp_get_max_threads());
+
+    timeit("Dump positions", [&] { file.commit([&] { file.write(r_, cell); }); });
+
+    do_min();
+
+    neigh_list.rebuild(cell, omp_get_max_threads());
+    // Energy after relax
+    double Ef = pot.energy(cell, neigh_list, omp_get_max_threads());
+
+    ///////////// Output data/logs /////////////
+
+    fmt::print("E0={}, Etmp={}, Ef={}\n", E0, Etmp, Ef);
+
+    timeit("Dump positions", [&] { file.commit([&] { file.write(r_, cell); }); });
+
+    ///////////// Update catalogue /////////////
+
+    update_cat(mast, cat, cell);
+  }
 
   return 0;
 }

@@ -18,8 +18,12 @@
 #include <limits>
 #include <vector>
 
+#include "libfly/env/catalogue.hpp"
+#include "libfly/env/mechanisms.hpp"
 #include "libfly/system/SoA.hpp"
 #include "libfly/system/property.hpp"
+#include "libfly/utility/core.hpp"
+#include "libfly/utility/random.hpp"
 
 /**
  * \file basin.hpp
@@ -30,24 +34,56 @@
 namespace fly::kinetic {
 
   /**
-   * @brief A result type to indicate a randomly selected mechanism in a basin/superbasin.
+   * @brief Represents ``Mechanism`` acting on a SPECIFIC atom.
+   *
    */
-  struct Choice {
+  class LocalisedMech {
   public:
-    /**
-     * @brief True if the chosen mechanism starts from a basin different than the current one.
-     */
-    bool basin_changed() const noexcept { return m_basin_changed; }
-
   private:
     friend class Basin;
+    friend class SuperBasin;
 
-    bool m_basin_changed;  ///< True if mech starts from different basin.
-    double m_delta_t;      ///< Time increment if mech is carried out.
+    int m_atom_index;                   // The index of the atom in the supercell this mechanisms is centred on.
+    fly::env::Mechanism const *m_mech;  // The actual mechanism.
+    double m_rate;                      // (Hz)
+    double m_barrier;                   // Maximum of forward/reverse barriers.
+    bool m_exit_mech = true;            // If true it is thought *mech links: inside SB -> outside SB.
 
-    std::size_t m_mech;   ///< i'th mech in current basin.
-    std::size_t m_basin;  ///< Current basin in superbasin
+    /**
+     * @brief Construct a new Localised Mech object.
+     *
+     * @param i The atom index this mech acts on.
+     * @param rate The rate (frequency) of this mechanism.
+     * @param mech Pointer to the mechanism.
+     */
+    LocalisedMech(int i, double rate, fly::env::Mechanism const *mech)
+        : m_atom_index(i), m_mech(mech), m_rate(rate), m_barrier(mech->barrier - std::min(0.0, mech->delta)) {
+      ASSERT(mech, "Null mechanisms is invalid", 0);
+    }
   };
+
+  /**
+   * @brief Compute a hash encoding the ID's of the local environments of each atom loaded into the catalogue.
+   *
+   * @param num_atoms Number of atoms loaded into the catalogue.
+   * @param cat A catalogue in the ready state.
+   */
+  auto hash(int num_atoms, fly::env::Catalogue const &cat) -> std::size_t;
+
+  //   class SuperChoice : private Choice {
+  //   public:
+  //     /**
+  //      * @brief True if the chosen mechanism starts from a basin different than the current one.
+  //      */
+  //     auto basin_changed() const noexcept -> bool { return m_basin_changed; }
+
+  //   private:
+  //     friend class SuperBasin;
+  //     friend class SuperCache;
+
+  //     bool m_basin_changed;  // True if mech starts from different basin.
+  //     std::size_t m_basin;   // Current basin in superbasin
+  //   };
 
   /**
    * @brief  Represents a basin of the potential energy of the entire system.
@@ -62,59 +98,56 @@ namespace fly::kinetic {
      * @brief Configure the ``Basin`` class.
      */
     struct Options {
-      double temp;                                              ///< Of simulation in kelvin.
+      bool debug = false;                                       ///< Controls printing of debugging data.
+      double temp = 300;                                        ///< Of simulation in kelvin.
       double max_barrier = std::numeric_limits<double>::max();  ///< Maximum energy barrier, higher energy mechanisms are ignored.
     };
 
-    // Basin(Options const &, Supercell const &, std::vector<Catalogue::pointer> const &);
+    /**
+     * @brief Construct a new Basin.
+     *
+     * @param opt The options for this Basin.
+     * @param state The state of the system.
+     * @param cat A catalogue in the ready state for this system.
+     */
+    Basin(Options const &opt, system::SoA<Position const &> state, fly::env::Catalogue const &cat);
 
-    // // Uses standard n-fold-way kmc algorithm to select mechanism inside basin. Choice.basin_changed
-    // // is always false,
-    // Choice kmc_Choice(pcg64 &, std::size_t basin) const;
+    /**
+     * @brief A result type to indicate a randomly selected mechanism in a basin/superbasin.
+     */
+    class Choice {
+    public:
+      env::Mechanism const &mech;  ///< A reference to the mechanism stored in the catalogue.
+      int atom;                    ///< The index of the atom chosen
+      double dt;                   ///< Fetch the time elapsed if this mechanisms is carried out.
+    };
 
-    // LocalMech &operator[](std::size_t i) {
-    //   CHECK(i < size(), "Invalid mech");
-    //   return _mechs[i];
-    // }
+    /**
+     * @brief Choose a mechanisms in the basin using standard n-fold-way kmc algorithm.
+     */
+    auto kmc_choice(Xoshiro &psudo_rng) const -> Choice;
 
-    // LocalMech const &operator[](std::size_t i) const {
-    //   CHECK(i < size(), "Invalid mech");
-    //   return _mechs[i];
-    // }
+    /**
+     * @brief Fetch the sum of the rates of all mechanisms from this basin.
+     */
+    double rate_sum() const noexcept { return m_rate_sum; }
 
-    // std::size_t size() const { return _mechs.size(); }
-
-    // VecN<double> const &state() const { return _state; }
-
-    // double rate_sum() const { return _rate_sum; }
+    /**
+     * @brief Fetch every mechanisms that is accessible that with a probability greater than ``tol``.
+     */
+    auto most_likely(double tol) -> std::vector<Choice>;
 
   private:
-    // Represents generalised-mechanism acting on a SPECIFIC atom.
-    // class LocalMech {
-    // public:
-    //   double rate;            // (Hz)
-    //   double barrier;         // Maximum of forward/reverse barriers.
-    //   bool exit_mech = true;  // If true it is known *this links: inside SB -> outside SB.
+    friend class SuperBasin;
+    friend class SuperCache;
 
-    //   LocalMech(double rate, double barrier, std::size_t atom_idx, std::size_t mech_off, Catalogue::pointer env)
-    //       : rate(rate), barrier(barrier), _env(env), _atom_idx(atom_idx), _mech_off(mech_off) {}
+    Options m_opt;
 
-    //   // Reconstruct mechanism pointed to by *this onto supercell, returns ref to mech
-    //   // reconstructed.
-    //   Mechanism const &onto(Supercell &, std::vector<Geometry> &) const;
-
-    //   void refine(std::vector<Geometry> &geo) const;
-
-    // private:
-    //   Catalogue::pointer _env;
-    //   std::size_t _atom_idx;
-    //   std::size_t _mech_off;
-    // };
-
-    bool connected = false;  // True if any of the mechs have exit_mech = false
-    system::SoA<Position> m_state{10};
-    std::vector<int> m_mechs;
-    double m_rate_sum = 0;
+    bool connected = false;              // True if any of the mechs have exit_mech = false.
+    double m_rate_sum = 0;               // From this basin.
+    std::size_t m_state_hash;            // A hash of the state.
+    system::SoA<Position> m_state;       // The full xyz state info.
+    std::vector<LocalisedMech> m_mechs;  // Pointers invalidated if catalogue refined!
   };
 
 }  // namespace fly::kinetic

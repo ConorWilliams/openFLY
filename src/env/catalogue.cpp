@@ -14,6 +14,8 @@
 
 #include "libfly/env/catalogue.hpp"
 
+#include <fmt/core.h>
+
 #include <algorithm>
 #include <cstddef>
 #include <vector>
@@ -65,6 +67,7 @@ namespace fly::env {
     // Find in catalogue, optimising for found case
 #pragma omp parallel for num_threads(num_threads) schedule(static)
     for (std::size_t i = 0; i < m_real.size(); i++) {
+      //   if (!(m_real[i].ptr = timeit("canon", [&] { return canon_find(m_real[i]); }))) {
       if (!(m_real[i].ptr = canon_find(m_real[i]))) {
 #pragma omp atomic write
         flag = true;
@@ -174,7 +177,12 @@ namespace fly::env {
       return false;
     }
 
-    return static_cast<bool>(mut.geo.permute_onto(ref, delta));
+    if (mut.geo.permute_onto(ref, delta)) {
+      return true;
+    } else {
+      //   fmt::print("False positive\n");
+      return false;
+    }
   }
 
   auto Catalogue::set_mechs(int i, std::vector<Mechanism> const &m) -> void {

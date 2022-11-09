@@ -143,7 +143,11 @@ namespace fly::saddle {
   std::vector<Master::Found> Master::find_mechs(std::vector<int> const& ix,
                                                 env::Catalogue const& cat,
                                                 system::SoA<Position const&, Frozen const&, TypeID const&> in) {
-    //
+    // Early exit!
+    if (ix.empty()) {
+      return {};
+    }
+
     neigh::List nl_pert{m_box, m_opt.r_pert};
 
     nl_pert.rebuild(in, m_opt.num_threads);

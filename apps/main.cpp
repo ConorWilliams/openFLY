@@ -17,6 +17,7 @@
 
 #include "libfly/env/catalogue.hpp"
 #include "libfly/io/gsd.hpp"
+#include "libfly/kinetic/basin.hpp"
 #include "libfly/minimise/LBFGS/lbfgs.hpp"
 #include "libfly/neigh/list.hpp"
 #include "libfly/neigh/sort.hpp"
@@ -36,8 +37,6 @@
 #include "libfly/utility/random.hpp"
 
 using namespace fly;
-
-#include "libfly/kinetic/basin.hpp"
 
 template <typename... T>
 system::Supercell<system::TypeMap<>, Position, Frozen, T...> bcc_iron_motif() {
@@ -65,11 +64,12 @@ system::Supercell<system::TypeMap<>, Position, Frozen, T...> bcc_iron_motif() {
   return motif;
 }
 
-template <typename Map, typename... T>
-bool update_cat(saddle::Master& mast, env::Catalogue& cat, system::Supercell<Map, T...> const& cell) {
+// Returns true it catalogue has been refined.
+template <typename Map, typename... T, typename F>
+bool update_cat(saddle::Master& mast, env::Catalogue& cat, system::Supercell<Map, T...> const& cell, F& dump) {
   //
 
-  std::vector<int> ix = cat.rebuild(cell, omp_get_max_threads());
+  std::vector<int> ix = timeit("cat.rebuild()", [&] { return cat.rebuild(cell, omp_get_max_threads()); });
 
   int refines = 0;
 
@@ -79,7 +79,7 @@ bool update_cat(saddle::Master& mast, env::Catalogue& cat, system::Supercell<Map
 
     fmt::print("New envs @{} with {} refines\n", ix, refines);
 
-    std::vector found = timeit("find_mechs", [&] { return mast.find_mechs(ix, cat, cell); });
+    std::vector found = mast.find_mechs(ix, cat, cell);
 
     for (std::size_t i = 0; i < found.size(); i++) {
       if (found[i]) {
@@ -88,6 +88,10 @@ bool update_cat(saddle::Master& mast, env::Catalogue& cat, system::Supercell<Map
       } else {
         fails.push_back(ix[i]);
       }
+    }
+
+    if (!found.empty()) {
+      dump();
     }
 
     if (fails.empty()) {
@@ -121,7 +125,7 @@ struct Options {};
 int main() {
   //
 
-  system::Supercell cell = remove_atoms(motif_to_lattice(bcc_iron_motif<Hash>(), {6, 6, 6}), {1});
+  system::Supercell cell = remove_atoms(motif_to_lattice(bcc_iron_motif<Hash>(), {6, 6, 6}), {1, 3});
 
   fly::io::BinaryFile file("build/gsd/sim.gsd", fly::io::create);
 
@@ -178,7 +182,7 @@ int main() {
       saddle::Dimer{{}, {}, cell.box()},
   };
 
-  update_cat(mast, cat, cell);
+  update_cat(mast, cat, cell, dump_cat);
 
   dump_cat();
 
@@ -189,12 +193,12 @@ int main() {
   double time = 0;
 
   for (int i = 0; i < 1000; i++) {
-    timeit("TOTAL", [&] {
+    timeit("TOTAL\n", [&] {
       ///////////// Select mechanism /////////////
 
       kinetic::Basin basin = timeit("kinetic::Basin", [&] { return kinetic::Basin({.debug = true}, cell, cat); });
 
-      auto const& [m, atom, dt] = timeit("kmc_choice", [&] { return basin.kmc_choice(rng); });
+      auto const& [m, atom, dt] = basin.kmc_choice(rng);
 
       time += dt;
 
@@ -219,15 +223,13 @@ int main() {
 
       ///////////// Output data/logs /////////////
 
-      fmt::print("E0={}, Etmp={}, Ef={}\n", E0, Etmp, Ef);
+      //   fmt::print("E0={}, Etmp={}, Ef={}\n", E0, Etmp, Ef);
 
-      timeit("Dump positions", [&] { file.commit([&] { file.write(r_, cell); }); });
+      file.commit([&] { file.write(r_, cell); });
 
       ///////////// Update catalogue /////////////
 
-      timeit("Update catalogue", [&] { update_cat(mast, cat, cell); });
-
-      dump_cat();
+      timeit("Update catalogue", [&] { update_cat(mast, cat, cell, dump_cat); });
     });
   }
 

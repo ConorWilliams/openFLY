@@ -305,6 +305,14 @@ namespace fly::env {
     }
 
     /**
+     * @brief Lib cereal serialization support.
+     */
+    template <class Archive>
+    void serialize(Archive &archive) {
+      archive(cereal::base_class<system::VoS<Position, Colour, Pr...>>(this));
+    }
+
+    /**
      * @brief Returned by permutation methods, contains extra info about the permutation.
      */
     struct GeoInfo {

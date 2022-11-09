@@ -27,8 +27,10 @@
 #include <vector>
 
 //
-
 #include <cereal/archives/binary.hpp>
+#include <cereal/types/base_class.hpp>
+#include <cereal/types/map.hpp>
+#include <cereal/types/vector.hpp>
 
 #include "libfly/env/geometry.hpp"
 #include "libfly/env/heuristics.hpp"
@@ -106,6 +108,19 @@ namespace fly::env {
        * @brief Get the internal maximum norm between this environment and a geometry for them to be considered equivalent.
        */
       auto delta_max() const noexcept -> double { return m_delta_max; }
+
+      /**
+       * @brief For lib cereal.
+       */
+      Env() = default;
+
+      /**
+       * @brief Lib cereal serialization support.
+       */
+      template <class Archive>
+      void serialize(Archive& archive) {
+        archive(static_cast<Geometry<>&>(*this), m_finger, m_mechs, m_freq, m_index, m_delta_max);
+      }
 
     private:
       friend class Catalogue;
@@ -260,13 +275,7 @@ namespace fly::env {
      */
     template <class Archive>
     void serialize(Archive& archive) {
-      // Options m_opt;
-      // int m_size = 0;
-      // std::optional<system::Box> m_box;
-      // std::optional<neigh::List> m_nl;
-      // std::vector<RelEnv> m_real;
-      // std::map<std::size_t, std::vector<Env>, std::less<>> m_cat;
-      archive(m_opt, m_size);
+      archive(m_opt, m_size, m_cat);
     }
 
     /**

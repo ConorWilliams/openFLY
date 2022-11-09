@@ -27,7 +27,7 @@
 
 #include <Eigen/Core>
 #include <Eigen/Dense>
-
+#include <cereal/types/vector.hpp>
 //
 
 #include <algorithm>
@@ -708,6 +708,14 @@ namespace fly {
     using size_type = typename Base::size_type;
 
   public:
+    /**
+     * @brief Lib cereal serialization support.
+     */
+    template <class Archive>
+    void serialize(Archive &archive) {
+      archive(static_cast<Base &>(*this));
+    }
+
     /**
      * @brief Construct a new empty Vector.
      */

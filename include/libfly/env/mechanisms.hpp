@@ -18,6 +18,8 @@
 // You should have received a copy of the GNU General Public License along with
 // openFLY. If not, see <https://www.gnu.org/licenses/>.
 
+#include <cereal/types/vector.hpp>
+
 #include "libfly/system/SoA.hpp"
 #include "libfly/system/VoS.hpp"
 #include "libfly/system/property.hpp"
@@ -49,6 +51,14 @@ namespace fly::env {
 
     system::VoS<Delta> delta_sp;   ///< Displacement vectors from initial to saddle-point.
     system::VoS<Delta> delta_fwd;  ///< Displacement vectors from initial to final.
+
+    /**
+     * @brief Lib cereal serialization support.
+     */
+    template <class Archive>
+    void serialize(Archive& archive) {
+      archive(barrier, delta, kinetic_pre, capture_frac, poison, delta_sp, delta_fwd);
+    }
   };
 
 }  // namespace fly::env

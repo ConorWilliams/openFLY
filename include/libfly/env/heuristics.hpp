@@ -22,6 +22,10 @@
 #include <functional>
 #include <memory>
 
+//
+#include <cereal/types/vector.hpp>
+//
+
 #include "libfly/env/geometry.hpp"
 #include "libfly/neigh/list.hpp"
 #include "libfly/system/SoA.hpp"
@@ -103,6 +107,14 @@ namespace fly::env {
 
       std::sort(m_r_0j.begin(), m_r_0j.end());  // Done
       std::sort(m_r_ij.begin(), m_r_ij.end());  // Done
+    }
+
+    /**
+     * @brief Lib cereal serialization support.
+     */
+    template <class Archive>
+    void serialize(Archive& archive) {
+      archive(m_r_0j, m_r_ij);
     }
 
   private:

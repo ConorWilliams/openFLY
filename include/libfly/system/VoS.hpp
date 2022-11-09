@@ -73,6 +73,14 @@ namespace fly::system {
      * @brief Provides an emplace_back with explicit ``matrix_t &&`` parameters.
      */
     decltype(auto) emplace_back(typename T::matrix_t &&...args) { return vector::emplace_back(std::move(args)...); }
+
+    /**
+     * @brief Lib cereal serialization support.
+     */
+    template <class Archive>
+    void serialize(Archive &archive) {
+      archive(cereal::base_class<Vector<Atom<T...>>>(this));
+    }
   };
 
 }  // namespace fly::system

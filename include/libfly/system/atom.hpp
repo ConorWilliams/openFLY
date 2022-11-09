@@ -15,11 +15,15 @@
 
 // You should have received a copy of the GNU General Public License along with openFLY. If not, see <https://www.gnu.org/licenses/>.
 
-#include <Eigen/Core>
 #include <cstddef>
 #include <string_view>
 #include <type_traits>
 #include <utility>
+
+//
+
+#include <cereal/cereal.hpp>
+#include <cereal/types/base_class.hpp>
 
 #include "libfly/utility/core.hpp"
 
@@ -28,6 +32,54 @@
  *
  * @brief The basic building block for atoms in libFLY.
  */
+
+namespace cereal {
+
+  /**
+   * @brief Lib cereal, free serialisation of Eigen dense objects.
+   */
+  template <class Archive, class Derived, class ArrT = Eigen::PlainObjectBase<Derived>>
+  std::enable_if_t<traits::is_output_serializable<BinaryData<typename Derived::Scalar>, Archive>::value> save(
+      Archive& ar,
+      Eigen::PlainObjectBase<Derived> const& m) {
+    if constexpr (ArrT::RowsAtCompileTime == Eigen::Dynamic) {
+      ar(m.rows());
+    }
+
+    if constexpr (ArrT::ColsAtCompileTime == Eigen::Dynamic) {
+      ar(m.cols());
+    }
+
+    ar(binary_data(m.data(), fly::safe_cast<std::size_t>(m.size()) * sizeof(typename Derived::Scalar)));
+  }
+  /**
+   * @brief Lib cereal, free de-serialisation of Eigen dense objects.
+   */
+  template <class Archive, class Derived, class ArrT = Eigen::PlainObjectBase<Derived>>
+  std::enable_if_t<traits::is_input_serializable<BinaryData<typename Derived::Scalar>, Archive>::value> load(
+      Archive& ar,
+      Eigen::PlainObjectBase<Derived>& m) {
+    //
+    Eigen::Index rows;
+    Eigen::Index cols;
+
+    if constexpr (ArrT::RowsAtCompileTime == Eigen::Dynamic) {
+      ar(m.rows());
+    } else {
+      rows = ArrT::RowsAtCompileTime;
+    }
+
+    if constexpr (ArrT::ColsAtCompileTime == Eigen::Dynamic) {
+      ar(m.cols());
+    } else {
+      cols = ArrT::ColsAtCompileTime;
+    }
+
+    m.resize(rows, cols);
+    ar(binary_data(m.data(), fly::safe_cast<std::size_t>(rows * cols) * sizeof(typename Derived::Scalar)));
+  }
+
+}  // namespace cereal
 
 namespace fly::system {
 
@@ -58,6 +110,14 @@ namespace fly::system {
       typename Tag::matrix_t const& operator[](Tag) const { return m_data; }
 
       typename Tag::matrix_t& operator[](Tag) { return m_data; }
+
+      /**
+       * @brief Lib cereal serialization support.
+       */
+      template <class Archive>
+      void serialize(Archive& archive) {
+        archive(m_data);
+      }
 
     private:
       typename Tag::matrix_t m_data;
@@ -120,6 +180,14 @@ namespace fly::system {
     explicit Atom(typename T::matrix_t&&... args) : detail::AtomMem<T>(args)... {}
 
     using detail::AtomMem<T>::operator[]...;
+
+    /**
+     * @brief Lib cereal serialization support.
+     */
+    template <class Archive>
+    void serialize(Archive& archive) {
+      archive(cereal::base_class<detail::AtomMem<T>>(this)...);
+    }
   };
 
 }  // namespace fly::system

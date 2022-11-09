@@ -114,6 +114,16 @@ target_link_libraries(benchFLY PRIVATE libFLY)
 
 # Dev mode
 if(FLY_DEVELOPER_MODE)
+    find_program(CCACHE "ccache")
+
+    if(CCACHE)
+        message(STATUS "Using ccache: ${CCACHE}")
+        set(CMAKE_C_COMPILER_LAUNCHER ${CCACHE})
+        set(CMAKE_CXX_COMPILER_LAUNCHER ${CCACHE})
+    else()
+        message(STATUS "Could not find ccache")
+    endif()
+
     include(CTest)
     add_subdirectory(tests)
 

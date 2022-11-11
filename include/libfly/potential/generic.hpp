@@ -135,8 +135,9 @@ namespace fly::potential {
     /**
      * @brief Compute hessian matrix..
      *
-     * Can assume the neighbour list are ready. The resulting hessian must be m by m and only include contributions from the m active
-     * atoms. As hessian matrices are always symmetric this function is only required to compute the lower diagonal portion.
+     * Can assume the neighbour list are ready. The resulting hessian must be n by n (n = number of atoms) and only include
+     * contributions from the m active atoms i.e. have zeros for frozen atoms. As hessian matrices are always symmetric this function
+     * is only required to compute the lower diagonal portion.
      *
      * @param in Per-atom data used by hessian for computation.
      * @param out Hessian matrix to write output to.

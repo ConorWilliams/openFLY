@@ -15,7 +15,6 @@ File: ``libfly/io/gsd.hpp``
 
 .. doxygenenum:: fly::io::Flags
 
-
 .. doxygenclass:: fly::io::BinaryFile
     :members:
     :undoc-members:

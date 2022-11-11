@@ -1,19 +1,21 @@
 Utility
 ======================================
 
+Directory: ``libfly/utility``
+
 The ``utility`` folder contains a collection of non-specific utilities, it is documented by file.
 
 Versioning
 ---------------------------------------
 
-File: ``version.hpp``
+File: ``libfly/version.hpp``
 
 .. doxygenfile:: version.hpp
 
 Core 
 ------------------------------------------
 
-File: ``core.hpp``
+File: ``libfly/core.hpp``
 
 .. doxygenfile:: core.hpp
     :sections: briefdescription detaileddescription
@@ -94,6 +96,10 @@ Meta programming
 Small functions
 ~~~~~~~~~~~~~~~~~~~~~~
 
+.. doxygenfunction:: dprint
+
+-------------------
+
 .. doxygenfunction:: safe_cast
 
 -------------------
@@ -148,7 +154,7 @@ Classes
 Timing 
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-File ``timeit.hpp``
+File: ``libfly/timeit.hpp``
 
 .. doxygenfunction:: timeit
 
@@ -156,7 +162,7 @@ File ``timeit.hpp``
 Random numbers 
 ----------------------
 
-File ``random.hpp``
+File ``libfly/random.hpp``
 
 .. doxygenfile:: random.hpp
     :sections: briefdescription detaileddescription
@@ -168,7 +174,7 @@ File ``random.hpp``
 Natural Splines
 ---------------------
 
-File ``spline.hpp``
+File ``libfly/spline.hpp``
 
 .. doxygenfile:: spline.hpp
     :sections: briefdescription detaileddescription
@@ -180,7 +186,7 @@ File ``spline.hpp``
 Lattices
 ---------------------
 
-File ``lattice.hpp``
+File ``libfly/lattice.hpp``
 
 .. doxygenfile:: lattice.hpp
     :sections: briefdescription detaileddescription

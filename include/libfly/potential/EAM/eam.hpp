@@ -97,8 +97,9 @@ namespace fly::potential {
     /**
      * @brief Compute mass weighted hessian matrix of the active atoms.
      *
-     * Assumes the neighbour list are ready. The resulting hessian will be m by m and only include contributions from the m active
-     * atoms. As hessian matrices are always symmetric this function only computes the lower diagonal portion.
+     * Assumes the neighbour list are ready. The resulting hessian will be  n by n (n = number of atoms) and only include
+     * contributions from the m active atoms i.e. have zeros for frozen atoms. As hessian matrices are always symmetric this function
+     * only computes the lower diagonal portion.
      *
      *
      * @param in Input data.

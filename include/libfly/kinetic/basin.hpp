@@ -28,7 +28,7 @@
 /**
  * \file basin.hpp
  *
- * @brief Representation of a set state in a Markov chain
+ * @brief Representation of a state in a Markov chain
  */
 
 namespace fly::kinetic {
@@ -38,7 +38,6 @@ namespace fly::kinetic {
    *
    */
   class LocalisedMech {
-  public:
   private:
     friend class Basin;
     friend class SuperBasin;
@@ -88,8 +87,8 @@ namespace fly::kinetic {
   /**
    * @brief  Represents a basin of the potential energy of the entire system.
    *
-   * Stores a reference image of the system (active atoms only) and a list of all mechanisms accessible from the basin. Implements
-   * standard kmc algorithm on this list. Stored mechanisms are pointers into catalogue and can be reconstructed onto a supercell.
+   * Stores a reference image of the system and a list of all mechanisms accessible from the basin. Implements
+   * standard KMC algorithm on this list. Stored Mechanisms are pointers into a Catalogue.
    *
    */
   class Basin {
@@ -99,7 +98,7 @@ namespace fly::kinetic {
      */
     struct Options {
       bool debug = false;                                       ///< Controls printing of debugging data.
-      double temp = 300;                                        ///< Of simulation in kelvin.
+      double temp = 300;                                        ///< Temperature of simulation in kelvin.
       double max_barrier = std::numeric_limits<double>::max();  ///< Maximum energy barrier, higher energy mechanisms are ignored.
     };
 
@@ -119,7 +118,7 @@ namespace fly::kinetic {
     public:
       env::Mechanism const &mech;  ///< A reference to the mechanism stored in the catalogue.
       int atom;                    ///< The index of the atom chosen
-      double dt;                   ///< Fetch the time elapsed if this mechanisms is carried out.
+      double dt;                   ///< The time elapsed if this mechanisms is carried out.
     };
 
     /**

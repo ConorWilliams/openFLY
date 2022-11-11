@@ -92,7 +92,7 @@ TEST_CASE("ortho_onto", "[env]") {
 
   std::random_device dev;
 
-  Xoshiro rng({dev(), dev(), dev(), dev()});
+  Xoshiro rng(dev);
 
   for (int i = 0; i < 100; i++) {
     //
@@ -158,7 +158,7 @@ TEST_CASE("center geo", "[env]") {
 
   std::uniform_real_distribution uni(-rad, rad);
 
-  Xoshiro rng({dev(), dev(), dev(), dev()});
+  Xoshiro rng(dev);
 
   for (int i = 0; i < 1000; i++) {
     env::Geometry<> geo;
@@ -178,7 +178,7 @@ TEST_CASE("for_equiv_perms one", "[env]") {
 
   std::random_device dev;
 
-  Xoshiro rng({dev(), dev(), dev(), dev()});
+  Xoshiro rng(dev);
 
   system::VoS<Position, Colour> ref = rand_geo(rng, 10);
 

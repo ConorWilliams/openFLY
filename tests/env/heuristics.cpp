@@ -82,7 +82,7 @@ TEST_CASE("Fingerprint", "[env]") {
   //
   std::random_device dev;
 
-  Xoshiro rng({dev(), dev(), dev(), dev()});
+  Xoshiro rng(dev);
 
   env::Geometry cell = hypercube();
   env::Geometry copy = cell;
@@ -104,7 +104,7 @@ TEST_CASE("nauty", "[env]") {
   //
   std::random_device dev;
 
-  Xoshiro rng({dev(), dev(), dev(), dev()});
+  Xoshiro rng(dev);
 
   env::Geometry ref = hypercube();
 

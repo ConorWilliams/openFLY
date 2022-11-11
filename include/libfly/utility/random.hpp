@@ -11,9 +11,11 @@
 // See <http://creativecommons.org/publicdomain/zero/1.0/>.
 
 #include <array>
+#include <climits>
 #include <cstddef>
 #include <cstdint>
 #include <limits>
+#include <random>
 
 #include "libfly/utility/core.hpp"
 
@@ -40,6 +42,26 @@ namespace fly {
   class Xoshiro {
   public:
     using result_type = std::uint64_t;  ///< Required by named requirement: UniformRandomBitGenerator
+
+  private:
+    static result_type gen(std::random_device& rd) {
+      static_assert(sizeof(result_type) % sizeof(std::random_device::result_type) == 0);
+
+      result_type x = rd();
+
+      for (std::size_t i = 0; i < sizeof(result_type) / sizeof(std::random_device::result_type); i++) {
+        x = x << CHAR_BIT * sizeof(std::random_device::result_type);
+        x += rd();
+      }
+
+      return x;
+    };
+
+  public:
+    /**
+     * @brief Construct and seed the PRNG from ``std::random_device``.
+     */
+    explicit Xoshiro(std::random_device& rd) : Xoshiro({gen(rd), gen(rd), gen(rd), gen(rd)}) {}
 
     /**
      * @brief Construct and seed the PRNG.

@@ -198,6 +198,11 @@ namespace fly::saddle {
     };
 
     /**
+     * @brief Convenience alias.
+     */
+    using SoA = system::SoA<Position const&, Frozen const&, TypeID const&>;
+
+    /**
      * @brief Construct a new Master Finder object to manage ``opt.num_threads`` openMP threads.
      *
      * This will create ``opt.num_threads`` copies of each of the input parameters, one for each thread.
@@ -215,17 +220,32 @@ namespace fly::saddle {
            saddle::Dimer const& dimer);
 
     /**
+     * @brief A structure which packages the data require to perform saddle point searches.
+     */
+    struct LocalisedGeo {
+      Index::scalar_t centre;                         ///< Central atom.
+      env::Geometry<Index> geo;                       ///< Geometry around central atom.
+      std::vector<env::Catalogue::SelfSymetry> syms;  ///< Symmetries of ``geo`` onto itself.
+    };
+
+    /**
+     * @brief Transform a list of atom indices, ``ix``, into a list of ``LocalisedGeo`` for use in ``find_mechs()``.
+     *
+     * @param ix List of indexes of environments which the mechanisms must be centred on.
+     * @param cat Catalogue in ready state.
+     * @param num_threads Number of openMP threads to use for this operation.
+     */
+    static auto package(std::vector<int> const& ix, env::Catalogue const& cat, int num_threads = 1) -> std::vector<LocalisedGeo>;
+
+    /**
      * @brief Find all the mechanisms centred on the ``unknown`` geometries.
      *
      * This will recursively schedule SP searches on the slave threads.
      *
-     * @param ix List of indexes of environments which the mechanisms must be centred on.
-     * @param cat Catalogue in ready state.
+     * @param geos A list of localised geometries encoding the atoms to centre the SP searches on and their local environments.
      * @param in Description of system to search in.
      */
-    auto find_mechs(std::vector<int> const& ix,
-                    env::Catalogue const& cat,
-                    system::SoA<Position const&, Frozen const&, TypeID const&> in) -> std::vector<Found>;
+    auto find_mechs(std::vector<LocalisedGeo> const& geos, SoA in) -> std::vector<Found>;
 
   private:
     // Per thread variables
@@ -236,13 +256,6 @@ namespace fly::saddle {
       Xoshiro prng;
       neigh::List pot_nl;
       system::Hessian hess;
-    };
-
-    // Per input geometry data
-    struct Data {
-      env::Geometry<Index> geo;                       // Geometry
-      Index::scalar_t centre;                         // Central atom
-      std::vector<env::Catalogue::SelfSymetry> syms;  // symmetries of geo onto itself.
     };
 
     // min->sp->min data
@@ -271,16 +284,13 @@ namespace fly::saddle {
     ///////////////////////////////////////////////////////////////////////////////////
 
     // Find all mechs and write to geo_data
-    void find_n(Found& out,
-                Data const& geo_data,
-                system::SoA<Position const&, Frozen const&, TypeID const&> in,
-                neigh::List const& nl_pert);
+    void find_n(Found& out, LocalisedGeo const& geo_data, SoA in, neigh::List const& nl_pert);
 
     bool find_batch(int tot,
                     Found& out,
                     std::vector<Batch>& batch,
-                    Data const& geo_data,
-                    system::SoA<Position const&, Frozen const&, TypeID const&> in,
+                    LocalisedGeo const& geo_data,
+                    SoA in,
                     neigh::List const& nl_pert,
                     std::vector<system::SoA<Position>>& sps_cache);
 
@@ -294,7 +304,7 @@ namespace fly::saddle {
      * @param theta_tol forwarded to Dimer::find_sp()
      * @param geo Centred of perturbation.
      */
-    std::optional<env::Mechanism> find_one(system::SoA<Position const&, Frozen const&, TypeID const&> in,
+    std::optional<env::Mechanism> find_one(SoA in,
                                            system::SoA<Position&, Axis&> dimer_in_out,
                                            Dimer::Exit& exit,
                                            env::Geometry<Index> const& geo,
@@ -323,13 +333,11 @@ namespace fly::saddle {
                     system::SoA<Position>& cache_slot,
                     env::Mechanism const& mech,
                     std::size_t sym_num,
-                    Data const& geo_data,
-                    system::SoA<Position const&, Frozen const&, TypeID const&> in);
+                    LocalisedGeo const& geo_data,
+                    SoA in);
 
     // Compute m_deg_free and m_log_prod_eigen.
-    void calc_minima_hess(system::SoA<Position const&, Frozen const&, TypeID const&> in);
-
-    std::vector<Data> process_geos(std::vector<int> const& ix, env::Catalogue const& cat) const;
+    void calc_minima_hess(SoA in);
 
     // Perturb in-place positions around centre and write axis,
     auto perturb(system::SoA<Position&, Axis&> out,

@@ -44,7 +44,7 @@ void benchmark(saddle::Master &master,
                system::SoA<Position const &, Frozen const &, TypeID const &> const &cell) {
   //
 
-  master.find_mechs(ix, cat, cell);
+  master.find_mechs(master.package(ix, cat), cell);
 }
 
 int main() {

@@ -150,7 +150,7 @@ int main() {
       dimer,
   };
 
-  std::vector found = mast.find_mechs({2}, cat, cell);
+  std::vector found = mast.find_mechs(mast.package({2}, cat), cell);
 
   for (std::size_t i = 0; i < found.size(); i++) {
     if (found[i]) {

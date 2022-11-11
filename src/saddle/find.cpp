@@ -206,11 +206,24 @@ namespace fly::saddle {
     }
   }
 
-  std::vector<Master::Found> Master::find_mechs(std::vector<int> const& ix,
-                                                env::Catalogue const& cat,
-                                                system::SoA<Position const&, Frozen const&, TypeID const&> in) {
+  std::vector<Master::LocalisedGeo> Master::package(std::vector<int> const& ix, env::Catalogue const& cat, int num_threads) {
+    //
+    std::vector<LocalisedGeo> out_data(ix.size());
+
+#pragma omp parallel for num_threads(num_threads) schedule(static)
+    for (std::size_t i = 0; i < ix.size(); i++) {
+      //
+      out_data[i].geo = cat.get_geo(ix[i]);
+      out_data[i].centre = out_data[i].geo[0][i_];
+      out_data[i].syms = cat.calc_self_syms(ix[i]);
+    }
+
+    return out_data;
+  }
+
+  std::vector<Master::Found> Master::find_mechs(std::vector<LocalisedGeo> const& geo_data, SoA in) {
     // Early exit!
-    if (ix.empty()) {
+    if (geo_data.empty()) {
       return {};
     }
 
@@ -219,9 +232,6 @@ namespace fly::saddle {
     nl_pert.rebuild(in, m_opt.num_threads);
 
     calc_minima_hess(in);
-
-    // Step one get the self symmetries of each geometry.
-    std::vector<Data> geo_data = process_geos(ix, cat);
 
     std::vector<Found> out(geo_data.size());
 
@@ -268,10 +278,7 @@ namespace fly::saddle {
 
   ///////////////////////////////////////////////////////
 
-  void Master::find_n(Found& out,
-                      Data const& geo_data,
-                      system::SoA<Position const&, Frozen const&, TypeID const&> in,
-                      neigh::List const& nl_pert) {
+  void Master::find_n(Found& out, LocalisedGeo const& geo_data, SoA in, neigh::List const& nl_pert) {
     //
 
     auto N = safe_cast<std::size_t>(m_opt.batch_size);
@@ -324,8 +331,8 @@ namespace fly::saddle {
                           system::SoA<Position>& cache_slot,
                           env::Mechanism const& mech,
                           std::size_t sym_indx,
-                          Data const& geo_data,
-                          system::SoA<Position const&, Frozen const&, TypeID const&> in) {
+                          LocalisedGeo const& geo_data,
+                          SoA in) {
     bool fail;
 
 #pragma omp atomic read
@@ -379,28 +386,25 @@ namespace fly::saddle {
     double frac_fwd = d_fwd / mech.err_fwd;
     double frac_sp = d_sp / mech.err_sp + err_sp;
 
-    fmt::print("FINDER: Recon @{:>4} Δ(ΔE#)={:.3f} [{:.4f}] Δ(ΔE)={:.3f} [{:.4f}], ΔR_min={:.3f} [{:.4f}], ΔR_sp={:.3f} [{:.4f}]\n",
-               geo_data.centre,
-               d_barrier,
-               frac_barrier,
-               d_delta,
-               frac_delta,
-               d_fwd,
-               frac_fwd,
-               d_sp,
-               frac_sp);
+    dprint(m_opt.debug,
+           "FINDER: Recon @{:>4} Δ(ΔE#)={:.3f} [{:.4f}] Δ(ΔE)={:.3f} [{:.4f}], ΔR_min={:.3f} [{:.4f}], ΔR_sp={:.3f} [{:.4f}]\n",
+           geo_data.centre,
+           d_barrier,
+           frac_barrier,
+           d_delta,
+           frac_delta,
+           d_fwd,
+           frac_fwd,
+           d_sp,
+           frac_sp);
 
     if (d_barrier > m_opt.recon_e_tol_abs && frac_barrier > m_opt.recon_e_tol_frac) {
-      fmt::print("error @{}\n", geo_data.centre);
       set_fail_flag();
     } else if (d_delta > m_opt.recon_e_tol_abs && frac_delta > m_opt.recon_e_tol_frac) {
-      fmt::print("error @{}\n", geo_data.centre);
       set_fail_flag();
     } else if (frac_fwd > m_opt.recon_norm_frac_tol && d_fwd > m_opt.recon_norm_abs_tol) {
-      fmt::print("error @{}\n", geo_data.centre);
       set_fail_flag();
     } else if (frac_sp > m_opt.recon_norm_frac_tol && d_sp > m_opt.recon_norm_abs_tol) {
-      fmt::print("error @{}\n", geo_data.centre);
       set_fail_flag();
     } else {
       cache_slot = std::move(*rel_sp);
@@ -410,8 +414,8 @@ namespace fly::saddle {
   bool Master::find_batch(int tot,
                           Found& out,
                           std::vector<Batch>& batch,
-                          Data const& geo_data,
-                          system::SoA<Position const&, Frozen const&, TypeID const&> in,
+                          LocalisedGeo const& geo_data,
+                          SoA in,
                           neigh::List const& nl_pert,
                           std::vector<system::SoA<Position>>& cache) {
     // Abort SPS if the cosine of the angle between the dimer and a known SP is greater than this.
@@ -619,31 +623,6 @@ namespace fly::saddle {
       }
     }
 
-    //     double sum_sq = 0;
-
-    //     for (auto&& elem : mech.delta_fwd) {
-    //       sum_sq += gnorm_sq(elem[del_]);
-    //     }
-
-    //     double cap = std::sqrt(sum_sq);
-    //     double tot = gnorm(fwd[r_] - rev[r_]);
-
-    //     fmt::print("cap={}, tot={}, uncap={}\n", cap, tot, tot - cap);
-
-    // #pragma omp critical
-    //     {
-    //       fly::io::BinaryFile file("crash_check.gsd", fly::io::create);
-
-    //       file.commit([&, rev = rev] {
-    //         file.write("particles/N", fly::safe_cast<std::uint32_t>(in.size()));
-    //         file.write(r_, rev);
-    //       });
-    //       file.commit([&] { file.write(r_, reconstruct(geo, mech.delta_fwd, in)); });
-    //       file.commit([&, fwd = fwd] { file.write(r_, fwd); });
-    //     }
-
-    //     mech.capture_frac = cap / tot;
-
     //////////////// Partial hessian compute. ////////////////
 
     thr.pot_nl.rebuild(sp, 1);
@@ -673,8 +652,7 @@ namespace fly::saddle {
     }
 
     if (m_opt.debug) {
-      //   fmt::print("FINDER: Mech ΔE={:.2e} f={:.4f}, uncap={:.2e}, N0={}\n", mech.barrier, mech.capture_frac, tot - cap,
-      //   count_zeros);
+      fmt::print("FINDER: Mech ΔE={:.2e}, N_zeros={}\n", mech.barrier, count_zeros);
 
       for (int i = 0; i < m_deg_free + 10; i++) {
         fmt::print("Finder: sp mode {} = {}\n", i, freq[i]);
@@ -839,21 +817,6 @@ namespace fly::saddle {
     }
   }
 
-  std::vector<Master::Data> Master::process_geos(std::vector<int> const& ix, env::Catalogue const& cat) const {
-    //
-    std::vector<Data> out_data(ix.size());
-
-#pragma omp parallel for num_threads(m_opt.num_threads) schedule(static)
-    for (std::size_t i = 0; i < ix.size(); i++) {
-      //
-      out_data[i].geo = cat.get_geo(ix[i]);
-      out_data[i].centre = out_data[i].geo[0][i_];
-      out_data[i].syms = cat.calc_self_syms(ix[i]);
-    }
-
-    return out_data;
-  }
-
   // Perturb in-place positions around centre and write axis,
   auto Master::perturb(system::SoA<Position&, Axis&> out,
                        system::SoA<Position const&, Frozen const&> in,
@@ -963,138 +926,5 @@ namespace fly::saddle {
 
     return count;
   }
-
-  //   bool Master::recon_min_relax(env::Geometry<Index> const& geo,
-  //                                env::Mechanism const& m,
-  //                                system::SoA<Position const&, TypeID const&, Frozen const&> in) {
-  //     //
-  //     system::SoA<Position> recon = reconstruct(geo, m.delta_fwd, in);
-
-  //     system::SoA<Position, PotentialGradient, TypeID const&, Frozen const&> minima(in.size());
-  //     minima.rebind(id_, in);
-  //     minima.rebind(fzn_, in);
-  //     minima[r_] = recon[r_];
-
-  //     auto& thr = thread();
-
-  //     auto err = thr.min.minimise(minima, minima, thr.pot, 1);
-
-  //     verify(!err, "When reconstructing a minima, minimiser failed to converge with err={}", err);
-
-  //     Vec shift = com(recon) - com(minima);
-  //     // COM correct for drift
-  //     for (int i = 0; i < minima.size(); i++) {
-  //       minima(r_, i) += shift;
-  //     }
-
-  //     auto lax = gnorm(recon[r_] - minima[r_]);
-
-  //     if (true || m_opt.debug) {
-  //       fmt::print("FINDER: Reconstruction error @{}, lax={}\n", geo[0][i_], lax);
-  //     }
-
-  //     if (lax > m_opt.min_relax_tol) {
-  // #pragma omp critical
-  //       {
-  //         fly::io::BinaryFile file("crash_min.gsd", fly::io::create);
-
-  //         fmt::print(stderr, "recon_min_relax poisoned\n");
-
-  //         file.commit([&] {
-  //           file.write("particles/N", fly::safe_cast<std::uint32_t>(in.size()));
-  //           file.write(r_, in);
-  //         });
-  //         file.commit([&] { file.write(r_, recon); });
-  //         file.commit([&] { file.write(r_, minima); });
-  //       }
-
-  //       exit(0);
-  //     }
-
-  //     return lax < m_opt.min_relax_tol;
-  //   }
-
-  //   std::optional<system::SoA<Position>> Master::recon_sp_relax(env::Geometry<Index> const& geo,
-  //                                                               env::Mechanism& m,
-  //                                                               system::SoA<Position const&, TypeID const&, Frozen const&> in) {
-  //     //
-  //     system::SoA<Position> recon = reconstruct(geo, m.delta_sp, in);
-
-  //     system::SoA<Position, Axis, TypeID const&, Frozen const&> dim(in.size());
-  //     dim.rebind(id_, in);
-  //     dim.rebind(fzn_, in);
-  //     dim[r_] = recon[r_];
-
-  //     std::normal_distribution<double> dist;
-
-  //     auto& thr = thread();
-
-  //     // Axis random and prop_to displacement.
-  //     for (int j = 0; j < in.size(); ++j) {
-  //       dim(ax_, j) = Vec::NullaryExpr([&] { return dist(thr.prng); }) * gnorm_sq(recon(r_, j) - in(r_, j));
-  //     }
-  //     // ... and randomise.
-  //     dim[ax_] /= gnorm(dim[ax_]);
-
-  //     auto err = thr.dimer.find_sp(dim, dim, in, thr.pot, {}, 1);
-
-  //     Vec shift = com(recon) - com(dim);
-  //     // COM correct for drift
-  //     for (int i = 0; i < dim.size(); i++) {
-  //       dim(r_, i) += shift;
-  //     }
-
-  //     if (auto lax = gnorm(recon[r_] - dim[r_]); err || lax > m_opt.sp_relax_tol) {
-  // #pragma omp atomic write
-  //       m.poison = true;
-
-  //       if (err || m_opt.debug) {
-  //         double sum = 0;
-
-  //         for (auto&& elem : m.delta_sp) {
-  //           sum += gnorm_sq(elem[del_]);
-  //         }
-
-  //         fmt::print(
-  //             "FINDER: Reconstructed saddle relaxing @{} failed with: err={}, dr_err={:.2f}, cap_frac={:.2f}, disp0={:.2f}, "
-  //             "dispTot={:.2f}, dispExp={:.2f}\n",
-  //             geo[0][i_],
-  //             err,
-  //             lax,
-  //             m.capture_frac,
-  //             gnorm(m.delta_sp[0][del_]),
-  //             std::sqrt(sum),
-  //             std::sqrt(sum) * (1. / m.capture_frac - 1.));
-  //       }
-  // #pragma omp critical
-  //       {
-  //         fly::io::BinaryFile file("crash_sp.gsd", fly::io::create);
-
-  //         fmt::print(stderr, "recon_sp_relax poisoned\n");
-
-  //         file.commit([&] {
-  //           file.write("particles/N", fly::safe_cast<std::uint32_t>(in.size()));
-  //           file.write(r_, in);
-  //         });
-  //         file.commit([&] { file.write(r_, recon); });
-  //         file.commit([&] { file.write(r_, dim); });
-  //       }
-
-  //       exit(0);
-  //     }
-
-  //     if (err) {
-  // #pragma omp critical
-  //       {
-  //         if (m_opt.fout) {
-  //           m_opt.fout->commit([&] { m_opt.fout->write(r_, recon); });
-  //           m_opt.fout->commit([&] { m_opt.fout->write(r_, dim); });
-  //         }
-  //       }
-  //       return {};
-  //     }
-
-  //     return system::SoA<Position>(std::move(dim));
-  //   }
 
 }  // namespace fly::saddle

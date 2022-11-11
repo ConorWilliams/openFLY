@@ -87,7 +87,7 @@ Update update_cat(saddle::Master& mast, env::Catalogue& cat, system::Supercell<M
 
     fmt::print("New envs @{} with {} refines\n", ix, refines);
 
-    std::vector found = mast.find_mechs(ix, cat, cell);
+    std::vector found = mast.find_mechs(mast.package(ix, cat), cell);
 
     /*
      * If find_mechs has failed, the failed environments must be too symmetric, we must refine them until they are less symmetric.
@@ -109,7 +109,10 @@ Update update_cat(saddle::Master& mast, env::Catalogue& cat, system::Supercell<M
 
     // Refine tolerance's
     for (auto const& f : fails) {
-      cat.refine_tol(f, cat.get_ref(f).delta_max() / 1.5);
+      auto n = cat.calc_self_syms(f).size();
+      do {
+        cat.refine_tol(f, cat.get_ref(f).delta_max() / 1.5);
+      } while (n == cat.calc_self_syms(f).size());
     }
 
     std::vector tmp = cat.rebuild(cell, omp_get_max_threads());

@@ -70,33 +70,31 @@ namespace fly::kinetic {
 
   auto Basin::kmc_choice(Xoshiro &psudo_rng) const -> Choice {
     //
-    std::uniform_real_distribution<double> uniform;
+    std::uniform_real_distribution<double> uniform{0, 1};
 
-    std::size_t const mech = [&]() {
-      double const lim = uniform(psudo_rng) * rate_sum();
+    LocalisedMech const &mech = [&]() -> LocalisedMech const & {
+      double lim = uniform(psudo_rng) * rate_sum();
       double sum = 0;
 
-      for (std::size_t i = 0; i < m_mechs.size(); ++i) {
-        sum += m_mechs[i].m_rate;
+      for (auto &&m : m_mechs) {
+        sum += m.m_rate;
         if (sum > lim) {
-          return i;
+          return m;
         }
       }
 
-      throw error("Hit end of normal choice, lim={}, rate_sum={}", lim, m_rate_sum);
+      throw error("Hit end of normal choice, lim={}, rate_sum={}", lim, rate_sum());
     }();
-
-    double const rate = m_mechs[mech].m_rate;
 
     if (m_opt.debug) {
       fmt::print("Basin: KMC choice @atom={}, rate={} : {}% of {} choices\n",
-                 m_mechs[mech].m_atom_index,
-                 rate,
-                 rate / m_rate_sum * 100.,
+                 mech.m_atom_index,
+                 mech.m_rate,
+                 mech.m_rate / rate_sum() * 100.,
                  m_mechs.size());
     }
 
-    return {*m_mechs[mech].m_mech, m_mechs[mech].m_atom_index, -std::log(uniform(psudo_rng)) / m_rate_sum};
+    return {*mech.m_mech, mech.m_atom_index, -std::log(uniform(psudo_rng)) / rate_sum()};
   }
 
   auto Basin::most_likely(double tol) -> std::vector<Choice> {

@@ -259,7 +259,7 @@ namespace fly::system {
      */
     template <typename T, typename = std::enable_if_t<different_SoA_v<T>>>
     SoA& operator=(T&& other) {
-      m_size = other.m_size();
+      m_size = other.m_size;
       (static_cast<void>(static_cast<detail::Adaptor<Pr>&>(*this) = std::forward<T>(other)), ...);
       return *this;
     }

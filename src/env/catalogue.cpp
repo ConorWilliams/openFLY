@@ -163,7 +163,7 @@ namespace fly::env {
 
     ASSERT(it != m_cat.end(), "Catalogue missing key!", 0);
 
-    it->second.emplace_back(Env{env.geo, env.f, m_size++, m_opt.delta_max});
+    it->second.emplace_back(Env{env.geo, env.f, m_size++, std::min(env.f.r_min() * 0.4, m_opt.delta_max)});
 
     return {it, xise(it->second) - 1};
   }

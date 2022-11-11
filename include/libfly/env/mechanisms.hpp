@@ -42,12 +42,13 @@ namespace fly::env {
    */
   class Mechanism {
   public:
-    double barrier;       ///< Energy barrier (``eSp - e0``).
-    double delta;         ///< Energy change (eF - e0).
-    double kinetic_pre;   ///< Arrhenius pre factor.
-    double capture_frac;  ///< ``norm(delta_fwd in local) / norm(delta_fwd in global)``
+    double barrier;      ///< Energy barrier (``eSp - e0``).
+    double delta;        ///< Energy change (eF - e0).
+    double kinetic_pre;  ///< Arrhenius pre factor.
 
-    bool poison = false;  ///< If true this mechanism cannot be reconstructed.
+    double err_fwd = std::numeric_limits<double>::max();  ///< Forward reconstruction error.
+    double err_sp = std::numeric_limits<double>::max();   ///< Saddle point reconstruction error.
+    bool poison = false;                                  ///< If true this mechanism cannot be reconstructed.
 
     system::VoS<Delta> delta_sp;   ///< Displacement vectors from initial to saddle-point.
     system::VoS<Delta> delta_fwd;  ///< Displacement vectors from initial to final.
@@ -57,7 +58,7 @@ namespace fly::env {
      */
     template <class Archive>
     void serialize(Archive& archive) {
-      archive(barrier, delta, kinetic_pre, capture_frac, poison, delta_sp, delta_fwd);
+      archive(barrier, delta, kinetic_pre, poison, delta_sp, delta_fwd);
     }
   };
 

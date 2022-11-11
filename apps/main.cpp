@@ -56,7 +56,6 @@ system::Supercell<system::TypeMap<>, Position, Frozen, T...> bcc_iron_motif() {
 
   motif[fzn_] = false;
   motif[id_] = 0;
-  motif[hash_] = 0;
 
   motif(r_, 0) = Vec::Zero();
   motif(r_, 1) = Vec::Constant(0.5);
@@ -64,12 +63,21 @@ system::Supercell<system::TypeMap<>, Position, Frozen, T...> bcc_iron_motif() {
   return motif;
 }
 
+struct Update {
+  bool new_envs = false;  ///< True if new environments encountered.
+  bool ref_envs = false;  ///< True if environment refinement occurred.
+};
+
 // Returns true it catalogue has been refined.
-template <typename Map, typename... T, typename F>
-bool update_cat(saddle::Master& mast, env::Catalogue& cat, system::Supercell<Map, T...> const& cell, F& dump) {
+template <typename Map, typename... T>
+Update update_cat(saddle::Master& mast, env::Catalogue& cat, system::Supercell<Map, T...> const& cell) {
   //
 
   std::vector<int> ix = timeit("cat.rebuild()", [&] { return cat.rebuild(cell, omp_get_max_threads()); });
+
+  if (ix.empty()) {
+    return {};
+  }
 
   int refines = 0;
 
@@ -81,21 +89,20 @@ bool update_cat(saddle::Master& mast, env::Catalogue& cat, system::Supercell<Map
 
     std::vector found = mast.find_mechs(ix, cat, cell);
 
+    /*
+     * If find_mechs has failed, the failed environments must be too symmetric, we must refine them until they are less symmetric.
+     */
+
     for (std::size_t i = 0; i < found.size(); i++) {
       if (found[i]) {
-        fmt::print("Found {} mechs at {}\n", found[i].mechs().size(), ix[i]);
         cat.set_mechs(ix[i], found[i].mechs());
       } else {
         fails.push_back(ix[i]);
       }
     }
 
-    if (!found.empty()) {
-      dump();
-    }
-
     if (fails.empty()) {
-      return refines == 0;
+      return {true, refines == 0};
     } else {
       ++refines;
     }
@@ -125,7 +132,11 @@ struct Options {};
 int main() {
   //
 
-  system::Supercell cell = remove_atoms(motif_to_lattice(bcc_iron_motif<Hash>(), {6, 6, 6}), {1, 3});
+  system::Supercell cell = remove_atoms(motif_to_lattice(bcc_iron_motif<Hash>(), {6, 6, 6}), {1});
+
+  //   cell
+  //       = add_atoms(cell, {system::Atom<TypeID, Position, Frozen, Hash>(1, {2.857 / 2 + 3.14, 2.857 / 2 + 3.14, 0.5 + 3.14}, false,
+  //       0)});
 
   fly::io::BinaryFile file("build/gsd/sim.gsd", fly::io::create);
 
@@ -162,15 +173,15 @@ int main() {
   file.commit([&] { file.write(r_, cell); });
 
   env::Catalogue cat = [&] {
-    if (std::ifstream fcat("build/gsd/cat.bin"); fcat.good()) {
-      return env::Catalogue{{.delta_max = 0.5}, fcat};
+    if (std::ifstream fcat("build/gsd/cat.h.bin"); fcat.good()) {
+      return env::Catalogue{{}, fcat};
     } else {
-      return env::Catalogue{{.delta_max = 0.5}};
+      return env::Catalogue{{}};
     }
   }();
 
   auto dump_cat = [&] {
-    std::ofstream fcat("build/gsd/cat.bin");
+    std::ofstream fcat("build/gsd/cat.h.bin");
     cat.dump(fcat);
   };
 
@@ -182,13 +193,15 @@ int main() {
       saddle::Dimer{{}, {}, cell.box()},
   };
 
-  update_cat(mast, cat, cell, dump_cat);
+  auto [new_env, _] = update_cat(mast, cat, cell);
 
-  dump_cat();
+  if (new_env) {
+    dump_cat();
+  }
 
   std::random_device rd;
 
-  Xoshiro rng({rd(), 2, rd(), 4});
+  Xoshiro rng(rd);
 
   double time = 0;
 
@@ -223,13 +236,17 @@ int main() {
 
       ///////////// Output data/logs /////////////
 
-      //   fmt::print("E0={}, Etmp={}, Ef={}\n", E0, Etmp, Ef);
+      fmt::print("E0={}, Etmp={}, Ef={}\n", E0, Etmp, Ef);
 
       file.commit([&] { file.write(r_, cell); });
 
       ///////////// Update catalogue /////////////
 
-      timeit("Update catalogue", [&] { update_cat(mast, cat, cell, dump_cat); });
+      auto [new_envs, refined] = timeit("Update catalogue", [&] { return update_cat(mast, cat, cell); });
+
+      if (new_envs) {
+        dump_cat();
+      }
     });
   }
 

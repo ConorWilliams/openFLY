@@ -117,6 +117,7 @@ namespace fly::saddle {
       convex = -1,     ///< Failed: stuck in +curvature region.
       iter_max = -2,   ///< Exceeded the maximum number of iterations but in -curvature region.
       collision = -3,  ///< Approached a known SP during search.
+      uninit = -4,     ///< Stand in for uninitialised exit code.
     };
 
     /**

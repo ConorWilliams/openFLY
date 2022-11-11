@@ -90,13 +90,42 @@ namespace fly::saddle {
        */
       double stationary_tol = basin_tol / 2;
       /**
-       * @brief Maximum error between reconstructed and relaxed saddle-points.
+       * @brief Maximum distance error between reconstructed+relaxed minima/saddle-points and their original discovery.
+       *
+       * After a min->sp->min pathway is found it is: converted into a mechanism; reconstructed onto the initial minima and then
+       * relaxed. These relaxed SP/minima must be within ``capture_r_tol`` of the pathway's sp and final min.
        */
-      double sp_relax_tol = 0.5;
+      double capture_r_tol = 0.05;
+      /**
+       * @brief Maximum energy error between reconstructed+relaxed minima/saddle-points and their original discovery.
+       *
+       * After a min->sp->min pathway is found it is: converted into a mechanism; reconstructed onto the initial minima and then
+       * relaxed. These relaxed SP/minima must have energies within ``capture_E_tol`` of the pathway's sp and final min.
+       */
+      double capture_E_tol = 0.05;
+
+      /**
+       * @brief The absolute energy tolerance for a mechanisms energy barrier & delta when reconstructed onto symmetries.
+       */
+      double recon_e_tol_abs = 0.01;
+      /**
+       * @brief The fractional energy tolerance for a mechanisms energy barrier & delta when reconstructed onto symmetries.
+       */
+      double recon_e_tol_frac = 0.01;
+      /**
+       * @brief The absolute difference between the expected relaxation and the measured relaxation of a reconstructed mechanism onto
+       * its symmetries.
+       */
+      double recon_norm_abs_tol = 0.25;
+      /**
+       * @brief The fractional difference between the expected relaxation and the measured relaxation of a reconstructed mechanism onto
+       * its symmetries.
+       */
+      double recon_norm_frac_tol = 0.5;
       /**
        * @brief Absolute eigen values of the mass-weighted hessian matrix, smaller than this, are considered zero.
        */
-      double hessian_eigen_zero_tol = 1e-5;
+      double hessian_eigen_zero_tol = 1e-4;
       /**
        * @brief Number of openMP threads to dispatch saddle-point finding to.
        */
@@ -211,9 +240,9 @@ namespace fly::saddle {
 
     // Per input geometry data
     struct Data {
-      env::Geometry<Index> geo;                                      // Geometry
-      Index::scalar_t centre;                                        // Central atom
-      std::vector<std::pair<Mat, std::vector<Index::scalar_t>>> tr;  // Perm + transformation.
+      env::Geometry<Index> geo;                       // Geometry
+      Index::scalar_t centre;                         // Central atom
+      std::vector<env::Catalogue::SelfSymetry> syms;  // symmetries of geo onto itself.
     };
 
     // min->sp->min data
@@ -224,7 +253,7 @@ namespace fly::saddle {
     };
 
     struct Batch {
-      bool collsion = false;
+      Dimer::Exit exit = Dimer::Exit::uninit;
       std::optional<env::Mechanism> mech = {};
       system::SoA<Position, Axis> dimer;
 
@@ -261,13 +290,13 @@ namespace fly::saddle {
      * @param in Initial basin
      * @param dimer_in_out Perturbed dimer as input and output.
      * @param hist_sp Previous saddle points.
-     * @param collision If dimer exits due to rediscovering a previous SP the this is set to true.
+     * @param exit Stores the return code of the SP search.
      * @param theta_tol forwarded to Dimer::find_sp()
      * @param geo Centred of perturbation.
      */
     std::optional<env::Mechanism> find_one(system::SoA<Position const&, Frozen const&, TypeID const&> in,
                                            system::SoA<Position&, Axis&> dimer_in_out,
-                                           bool& collision,
+                                           Dimer::Exit& exit,
                                            env::Geometry<Index> const& geo,
                                            std::vector<system::SoA<Position>> const& hist_sp,
                                            double theta_tol);
@@ -286,6 +315,16 @@ namespace fly::saddle {
                                       Index::scalar_t centre);
 
     //////////////////////////////////////////////
+
+    /**
+     * @brief Check a reconstructed mechanism is within tolerances, if it is cache the SP if not set out's fail flag and do not cache.
+     */
+    void check_mech(Found& out,
+                    system::SoA<Position>& cache_slot,
+                    env::Mechanism const& mech,
+                    std::size_t sym_num,
+                    Data const& geo_data,
+                    system::SoA<Position const&, Frozen const&, TypeID const&> in);
 
     // Compute m_deg_free and m_log_prod_eigen.
     void calc_minima_hess(system::SoA<Position const&, Frozen const&, TypeID const&> in);
@@ -306,15 +345,33 @@ namespace fly::saddle {
     /**
      * @brief Compute every symmetric version of new_mech (according to syms), if not in mechs append to mechs.
      */
-    std::size_t append_syms(std::vector<std::pair<Mat, std::vector<Index::scalar_t>>> const& syms,
+    std::size_t append_syms(std::vector<env::Catalogue::SelfSymetry> const& syms,
                             env::Mechanism const& new_mech,
                             std::vector<env::Mechanism>& mechs) const;
 
-    // Reconstruct saddle point according to geo and relax system to saddle,
-    // check we have not constructed a false SP, if we have mark mechanism as poisoned
-    std::optional<system::SoA<Position>> recon_sp_relax(env::Geometry<Index> const& geo,
-                                                        env::Mechanism& m,
-                                                        system::SoA<Position const&, TypeID const&, Frozen const&> in);
+    struct Recon {
+      system::SoA<Position> min;                     ///< Reconstructed minima
+      system::SoA<Position> sp;                      ///< Reconstructed sp
+      std::optional<system::SoA<Position>> rel_min;  ///< Relaxed reconstructed minima
+      std::optional<system::SoA<Position>> rel_sp;   ///< Relaxed reconstructed sp
+    };
+
+    /**
+     * @brief Reconstruct and relax a mechanism's saddle point and minima.
+     */
+    Recon recon_relax(env::Geometry<Index> const& geo,
+                      env::Mechanism const& m,
+                      system::SoA<Position const&, TypeID const&, Frozen const&> in);
+
+    // // Reconstruct saddle point according to geo and relax system to saddle,
+    // // check we have not constructed a false SP, if we have mark mechanism as poisoned
+    // std::optional<system::SoA<Position>> recon_sp_relax(env::Geometry<Index> const& geo,
+    //                                                     env::Mechanism& m,
+    //                                                     system::SoA<Position const&, TypeID const&, Frozen const&> in);
+    // // Check a relaxed minima is close to a true minima.
+    // bool recon_min_relax(env::Geometry<Index> const& geo,
+    //                      env::Mechanism const& m,
+    //                      system::SoA<Position const&, TypeID const&, Frozen const&> in);
 
     ThreadData& thread() { return m_data[safe_cast<std::size_t>(omp_get_thread_num())]; }
 

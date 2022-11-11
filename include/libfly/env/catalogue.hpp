@@ -142,6 +142,54 @@ namespace fly::env {
     };
 
     /**
+     * @brief Describes a transformation + permutation that maps a geometry onto itself.
+     *
+     * Explicitly this a the transformation such that:
+     */
+    struct SelfSymetry {
+      Mat O;                              ///< Transformation matrix.
+      std::vector<Index::scalar_t> perm;  ///< Permutation.
+    };
+
+    /**
+     * @brief Compute the permutation and transformation of the ``i``th geometry that maps it onto itself.
+
+     * This is according to the ``delta_max()`` of the environment it is currently equivalent to.
+     */
+    std::vector<SelfSymetry> calc_self_syms(int i) const {
+      //
+      env::Geometry<Index> const ref = get_geo(i);
+      env::Geometry<Index> mut = get_geo(i);
+
+      for (int j = 0; j < mut.size(); j++) {
+        mut[j][i_] = j;
+      }
+
+      std::vector<SelfSymetry> out;
+
+      double delta = calc_delta(m_real[safe_cast<std::size_t>(i)].f, get_ref(i));
+
+      env::for_equiv_perms(mut, ref, delta, 1, [&](fly::Mat const& O, double) {
+        //
+        SelfSymetry& last = out.emplace_back(SelfSymetry{O, {}});
+
+        for (auto const& elem : mut) {
+          last.perm.push_back(elem[i_]);
+        }
+
+        ASSERT(grmsd(O, mut, ref) < delta, "Not what you though grmsd={} delta={}!", grmsd(O, mut, ref), delta);
+
+        return false;
+      });
+
+      if (true || m_opt.debug) {
+        fmt::print("Cat: Env @{} has {} symmetries @tol={}\n", i, out.size(), delta);
+      }
+
+      return out;
+    }
+
+    /**
      * @brief Construct a new Catalogue object.
      */
     explicit Catalogue(Options const& opt) : m_opt(opt) {}
@@ -383,7 +431,9 @@ namespace fly::env {
      */
     std::optional<Pointer> canon_find(RelEnv& env);
 
-    /** Get delta for the reference environment of the ith atom and */
+    /**
+     * @brief Calculate the delta from the minimum fingerprint of f_mut and ref.m_finger and ref.delta_max
+     */
     double calc_delta(Fingerprint const& f_mut, Env const& ref) const {
       return std::min(0.4 * std::min(f_mut.r_min(), ref.m_finger.r_min()), ref.m_delta_max);
     }

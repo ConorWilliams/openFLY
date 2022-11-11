@@ -352,6 +352,18 @@ namespace fly {
   // ------------------- Small functions ---------------- //
 
   /**
+   * @brief Conditional printing utility.
+   *
+   * If ``cond`` is true forwards ``fmt`` and ``args...`` to ``fmt::print``. Useful for printing debug messages.
+   */
+  template <typename... Args>
+  auto dprint(bool cond, fmt::format_string<Args...> fmt, Args &&...args) -> void {
+    if (cond) {
+      fmt::print(fmt, std::forward<Args>(args)...);
+    }
+  }
+
+  /**
    * @brief Utility to reverse argument order to ``std::visit``.
    *
    * @param v A ``std::variant`` to pass to the visitor.

@@ -21,23 +21,44 @@ Unreleased
 Added
 ~~~~~
 
-- New ``add_atoms()`` lattice function.
-- New ``refine_tol()`` function in catalogue.
+- New ``Basin`` class for performing KMC simulations
+- New lattice functions: ``add_atoms()``, ``motif_to_lattice()``, ``remove_atoms()``, ``remove_sphere()``.
+- New ``refine_tol()`` function in Catalogue.
+- New ``reconstruct()`` method in Catalogue.
+- New ``dprint`` utility function.
+- Catalogue has serialisation support (hence all serialised members of the catalogue do to).
+- Catalogue environments expose their delta_max.
+- Catalogue has a method to calculate the (approximate) symmetries a geometry has.
+- Dimer::Exit has a new return code.
+- Many new options in Master::Options.
+- New Xoshiro constructor to properly seed from ``std::random_device``
 
 Changed
 ~~~~~~~
 
-- Exposed catalogues ``set_mechs()`` method
+- ``template_for()`` enhanced.
+- Catalogue now sets delta_max of environments as minimum of Options.delta_max and the appropriate function of Fingerprint.r_min() enabling a more general default.
+- Catalogue environment's ``set_mech`` function moved to a Catalogue method.
+- Mechanism's members tweaked to encode more reconstruction info.
+- Hessians now contain zeros for frozen atoms instead of only being n_active x n_active to facilitate future conditioning and make them more like gradients.
+- Master's default option mech_tol increased.
+- Master's API has changed to facilitate new features + MPI.
+- Changed the base type of Hash
 
 Removed
 ~~~~~~~
 Bugfixes
 ~~~~~~~~
-
-- Catalogue works correctly on the second pass
+- Typo in SoA::operator=
+- SoA::rebind made const correct.
+- Environments in the catalogue are allowed to have no mechanisms.
+- Catalogue works correctly on the second pass (memoization bug). 
 
 Meta 
 ~~~~
+- New dependency Cereal
+- Now uses ccache in developer mode.
+- Fixed openMP compilation in MacOS cloud.
 
 Version 0.7.0
 -------------------------------
@@ -59,7 +80,7 @@ Changed
 - ``Dimer``'s interface changed.
 - Generalised some geometry functions: ``rmsd()``, ``grmsd()``.
 - Potentials now compute mass weighted Hessians.
-- EAM hessian computation made more cache efficiant.
+- EAM hessian computation made more cache efficient.
 
 Removed
 ~~~~~~~

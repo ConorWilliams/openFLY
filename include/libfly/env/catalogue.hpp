@@ -305,7 +305,7 @@ namespace fly::env {
      * @param i The index of the atom to reconstruct the mechanism onto.
      * @param in The initial state of the system before the reconstruction.
      * @param in_ready_state If ``true`` this function will assume the currently loaded geo/ref of the ``i``th atom match the input
-     * ``in``.
+     * ``in`` otherwise, the geometry will be rebuilt.
      * @param num_threads Number of openMP threads to use.
      */
     template <typename Map, typename... T>

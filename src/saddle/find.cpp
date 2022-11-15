@@ -662,7 +662,7 @@ namespace fly::saddle {
     }
 
     if (mech.poison) {
-      verify(mech.barrier > 4, "Mechanism @{} with energy barrier = {}eV is poisoned!", geo[0][i_], mech.barrier);
+      verify(mech.barrier > 2., "Mechanism @{} with energy barrier = {}eV is poisoned!", geo[0][i_], mech.barrier);
     }
 
     //////////////// Partial hessian compute. ////////////////

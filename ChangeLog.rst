@@ -1,6 +1,8 @@
 Changelog
 ============================
 
+
+
 .. Unreleased
 .. -------------------------------
 .. Added
@@ -17,6 +19,19 @@ Changelog
 .. Version is specified in vcpkg.json, docs/index.rst and libfly/utility/version.hpp
 
 Unreleased
+-------------------------------
+Added
+~~~~~
+Changed
+~~~~~~~
+Removed
+~~~~~~~
+Bugfixes
+~~~~~~~~
+Meta 
+~~~~
+
+Version 0.8.0
 -------------------------------
 Added
 ~~~~~
@@ -46,8 +61,6 @@ Changed
 - Master's API has changed to facilitate new features + MPI.
 - Changed the base type of Hash
 
-Removed
-~~~~~~~
 Bugfixes
 ~~~~~~~~
 - Typo in SoA::operator=

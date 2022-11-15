@@ -16,6 +16,7 @@
 #include "libfly/saddle/find.hpp"
 
 #include <fmt/core.h>
+#include <fmt/format.h>
 #include <omp.h>
 
 #include <algorithm>
@@ -542,19 +543,26 @@ namespace fly::saddle {
 
     //  CHECK pathway is min->sp->min
 
-    if (double i2r = gnorm(rev[r_] - in[r_]); i2r > m_opt.basin_tol) {
+    double i2r = gnorm(rev[r_] - in[r_]);
+    double r2f = gnorm(fwd[r_] - rev[r_]);
+    double r2w = gnorm(rev[r_] - sp[r_]);
+    double w2f = gnorm(fwd[r_] - sp[r_]);
+
+    dprint(m_opt.debug, "FINDER: i2r={:.4f}, r2f={:.4f} r2sp={:.4f} sp2f={:.4f}\n", i2r, r2f, r2w, w2f);
+
+    if (i2r > m_opt.basin_tol) {
       dprint(m_opt.debug, "FINDER: Mech starting {}A from initial is unlinked\n", i2r);
       return {};
     }
-    if (double r2f = gnorm(fwd[r_] - rev[r_]); r2f < m_opt.basin_tol) {
+    if (r2f < m_opt.basin_tol) {
       dprint(m_opt.debug, "FINDER: Mech total displacement={} => converged back to initial\n", r2f);
       return {};
     }
-    if (double r2w = gnorm(rev[r_] - sp[r_]); r2w < m_opt.stationary_tol) {
+    if (r2w < m_opt.stationary_tol) {
       dprint(m_opt.debug, "FINDER: Min->Sp displacement={}\n", r2w);
       return {};
     }
-    if (double w2f = gnorm(fwd[r_] - sp[r_]); w2f < m_opt.stationary_tol) {
+    if (w2f < m_opt.stationary_tol) {
       dprint(m_opt.debug, "FINDER: Sp->Min displacement={}\n", w2f);
       return {};
     }
@@ -731,7 +739,7 @@ namespace fly::saddle {
     relax[fzn_] = dimer[fzn_];
     relax.rebind(id_, dimer);
 
-    if (m_count_frozen == 0) {
+    if (false && m_count_frozen == 0) {
       // Freeze minimally displaced atom to remove translational degrees of freedom.
 
       if (double dr = gnorm(in(r_, min) - dimer(r_, min)); dr > m_opt.freeze_tol) {

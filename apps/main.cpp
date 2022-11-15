@@ -87,9 +87,7 @@ Update update_cat(saddle::Master& mast, env::Catalogue& cat, system::Supercell<M
 
     fmt::print("New envs @{} with {} refines\n", ix, refines);
 
-    std::vector found = mast.find_mechs(saddle::Master::package({431}, cat), cell);
-
-    exit(0);
+    std::vector found = mast.find_mechs(saddle::Master::package({ix}, cat), cell);
 
     /*
      * If find_mechs has failed, the failed environments must be too symmetric, we must refine them until they are less symmetric.
@@ -143,8 +141,8 @@ int main() {
   cell
       = add_atoms(cell, {system::Atom<TypeID, Position, Frozen, Hash>(1, {2.857 / 2 + 3.14, 2.857 / 2 + 3.14, 0.5 + 3.14}, false, 0)});
 
-  cell(r_, 431) = Vec{4.5896, 4.5892, 5.91909};
-  cell(r_, 0) = Vec{4.45211, 4.45172, 4.2526};
+  //   cell(r_, 431) = Vec{4.5896, 4.5892, 5.91909};
+  //   cell(r_, 0) = Vec{4.45211, 4.45172, 4.2526};
 
   fly::io::BinaryFile file("build/gsd/sim.gsd", fly::io::create);
 
@@ -193,7 +191,7 @@ int main() {
   };
 
   saddle::Master mast{
-      {.num_threads = omp_get_max_threads(), .max_searches = 100, .max_failed_searches = 25, .debug = false},
+      {.num_threads = omp_get_max_threads(), .max_searches = 100, .max_failed_searches = 50, .debug = false},
       cell.box(),
       pot,
       minimiser,

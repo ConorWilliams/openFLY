@@ -103,7 +103,7 @@ namespace fly::saddle {
       /**
        * @brief Tolerance for basins to be considered distinct.
        */
-      double basin_tol = 0.25;
+      double basin_tol = 0.05;
       /**
        * @brief Tolerance for mechanisms to be considered distinct.
        */

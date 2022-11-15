@@ -97,12 +97,13 @@ target_link_libraries(libFLY PRIVATE Nauty xxHash::xxhash)
 target_link_libraries(libFLY PUBLIC Eigen3::Eigen fmt::fmt nonstd::span-lite OpenMP::OpenMP_CXX cereal::cereal)
 
 # Declare executable
-add_executable(openFLY apps/main.cpp)
-add_executable(openfly::exe ALIAS openFLY)
-set_target_properties(openFLY PROPERTIES OUTPUT_NAME openfly)
-target_compile_features(openFLY PRIVATE cxx_std_17)
-target_link_libraries(openFLY PRIVATE libFLY)
-target_link_libraries(openFLY PRIVATE fmt::fmt)
+add_executable(kmcFLY apps/kmc.cpp)
+target_compile_features(kmcFLY PRIVATE cxx_std_17)
+target_link_libraries(kmcFLY PRIVATE libFLY)
+
+add_executable(skmcFLY apps/skmc.cpp)
+target_compile_features(skmcFLY PRIVATE cxx_std_17)
+target_link_libraries(skmcFLY PRIVATE libFLY)
 
 add_executable(geoFLY apps/geo.cpp)
 target_compile_features(geoFLY PRIVATE cxx_std_17)

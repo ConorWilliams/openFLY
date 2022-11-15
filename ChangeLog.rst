@@ -33,6 +33,9 @@ Meta
 
 Version 0.8.0
 -------------------------------
+
+First release to actually do any KMC! This release introduces the ``Basin`` class for performing N-fold way KMC as well as: serialisation support for the catalogue; an adaptive catalogue and a ``Master``s API changed (again!).
+
 Added
 ~~~~~
 
@@ -77,9 +80,7 @@ Meta
 Version 0.7.0
 -------------------------------
 
-
 Overhauled saddle-point finding including: returning the new ``Mechanism`` class, automatic mechanisms symmetry identification and discovery and history dependant dimer searches.
-
 
 Added
 ~~~~~

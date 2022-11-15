@@ -14,6 +14,9 @@
 
 // You should have received a copy of the GNU General Public License along with openFLY. If not, see <https://www.gnu.org/licenses/>.
 
+#include <cmath>
+#include <limits>
+#include <utility>
 #include <variant>
 
 #include "libfly/system/boxes/orthorhombic.hpp"
@@ -145,6 +148,49 @@ namespace fly::system {
      * @brief Comparison operator, no surprises.
      */
     friend bool operator==(Box const& a, Box const& b) noexcept { return a.m_sys == b.m_sys; }
+
+    /**
+     * @brief Get a lambda that can compute the minimum image distance.
+     *
+     * Specifically this function returns a lambda, ``l``, such that ``l(a, b)`` (with ``a`` and ``b`` the position vectors of two
+     * atom) returns the norm of the minimum image vector connecting ``a`` and ``b``.
+     */
+    auto slow_min_image_computer() const {
+      // The displacement vectors move +/- 1 or zero supercells in each direction.
+      std::vector<Vec> disp_vectors;
+
+      Mat basis = this->basis();
+
+      template_for<int>(Arr<int>::Constant(-1), Arr<int>::Constant(2), [&](Arr<int> const& signs) {
+        //
+        Vec offset = Vec::Zero();
+
+        for (int i = 0; i < spatial_dims; i++) {
+          if (periodic(i)) {
+            offset += basis.col(i) * signs(i);
+          }
+        }
+
+        if ((signs == 0).all() || offset != Vec::Zero()) {
+          disp_vectors.push_back(offset);
+        }
+      });
+
+      return [disps = std::move(disp_vectors), *this](Vec const& a, Vec const& b) {
+        //
+        Vec ap = this->canon_image(a);
+        Vec bp = this->canon_image(b);
+
+        double min = std::numeric_limits<double>::max();
+
+        // Brute for min-image
+        for (auto const& d : disps) {
+          min = std::min(min, gnorm_sq(ap + d - bp));
+        }
+
+        return std::sqrt(min);
+      };
+    }
 
   private:
     std::variant<Orthorhombic, Triclinic> m_sys;

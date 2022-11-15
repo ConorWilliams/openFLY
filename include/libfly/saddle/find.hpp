@@ -39,11 +39,34 @@
 #include "libfly/utility/core.hpp"
 #include "libfly/utility/random.hpp"
 
+// clang-format off
+
 /**
  * \file find.hpp
  *
  * @brief Class to coordinate a group of saddle-point searches.
+ *
+ *
+ * \rst
+ *
+ * Saddle point (SP) searching is an involved process below is an outline of the stages:
+ * 
+ * 1. For each central atom ``i`` in the input the following steps are carried out.
+ * 2. Saddle point searches are carried out (in batches) until a stopping criterion (one of: reconstruction failure, consecutive failed search limit or hitting a total search limit) is reached. Each SP search requires the following series of steps. 
+ * 3. A random perturbation of atomic positions and the dimer axis (centred on ``i``)  is made. 
+ * 4. The dimer method is used to move the perturbed state to a SP of the potential. It uses a ``cache`` of previously discovered saddle points (SPs)to avoid previous SPs by cancelling the search if the angle between the current search and the historical SP falls below ``theta``. The angle ``theta`` is a decaying function of the number of SP searches.  
+ * 5. It is ensured that the maximally displaced atom is ``i`` and the minimally displaced atom is frozen (if there are translational degrees of freedom).
+ * 6. The LBFGS minimiser is used to find the adjacent minima, due to freezing the atom in the previous step we can guarantee no translation in the ``min->sp->min`` pathway.
+ * 7. It is ensured than the pathway starts at the initial basin and that all the stationary points are distinct points in space. 
+ * 8. A local mechanism is constructed from the displacements of the atoms around the central atom. 
+ * 9. It is ensured that the local mechanism can be reconstructed in the orientation and location it was discovered. If not it is marked as a poisoned mechanism.
+ * 10. It is ensured that the mechanism has not been encountered before.
+ * 11. The set of mechanisms related by the symmetries of the local environment are constructed and it is ensured that when these mechanisms are reconstructed the energy barriers are accurate.
+ *
+ * \endrst
  */
+
+// clang-format on
 
 namespace fly::saddle {
 
@@ -102,8 +125,7 @@ namespace fly::saddle {
        * After a min->sp->min pathway is found it is: converted into a mechanism; reconstructed onto the initial minima and then
        * relaxed. These relaxed SP/minima must have energies within ``capture_E_tol`` of the pathway's sp and final min.
        */
-      double capture_E_tol = 0.05;
-
+      double capture_E_tol = 0.01;
       /**
        * @brief The absolute energy tolerance for a mechanisms energy barrier & delta when reconstructed onto symmetries.
        */
@@ -278,7 +300,8 @@ namespace fly::saddle {
     Options m_opt;
     system::Box m_box;
 
-    int m_deg_free;           // Degree of freedom in each input
+    int m_num_zero_modes;     // Degree of freedom in each input
+    int m_count_frozen;       // The number of frozen atoms in the input.
     double m_log_prod_eigen;  // the log(prod e_i) with e_i the the eigen values of the mass weighted hessian matrix.
 
     ///////////////////////////////////////////////////////////////////////////////////

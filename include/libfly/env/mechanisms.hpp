@@ -58,7 +58,7 @@ namespace fly::env {
      */
     template <class Archive>
     void serialize(Archive& archive) {
-      archive(barrier, delta, kinetic_pre, poison, delta_sp, delta_fwd);
+      archive(barrier, delta, kinetic_pre, err_fwd, err_sp, poison, delta_sp, delta_fwd);
     }
   };
 

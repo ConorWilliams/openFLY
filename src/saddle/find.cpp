@@ -18,6 +18,7 @@
 #include <fmt/core.h>
 #include <omp.h>
 
+#include <algorithm>
 #include <cmath>
 #include <cstddef>
 #include <cstdio>
@@ -306,7 +307,7 @@ namespace fly::saddle {
 
       if (m_opt.debug) {
         //
-        double t_min = 180;
+        double t_min = 360;
 
         for (auto const& a : out.m_mechs) {
           for (auto const& b : out.m_mechs) {
@@ -316,7 +317,7 @@ namespace fly::saddle {
           }
         }
 
-        fmt::print("FINDER: {} mech(s) @{}: fail={}, tot={}, t_min={}, n-cache={}\n",
+        fmt::print("FINDER: {} mech(s) @{}: fail={}, tot={}, t_min={}deg, n-cache={}\n",
                    out.m_mechs.size(),
                    geo_data.centre,
                    fail,
@@ -452,7 +453,8 @@ namespace fly::saddle {
       // Found a mechanism.
 
       if (!is_new_mech(*elem.mech, out.m_mechs)) {
-        dprint(m_opt.debug, "FINDER: Duplicate mech\n");
+        dprint(m_opt.debug, "FINDER: Duplicate mech, caching\n");
+        cache.emplace_back(elem.dimer);
         continue;
       }
 
@@ -461,7 +463,7 @@ namespace fly::saddle {
       if (elem.mech->poison) {
         dprint(m_opt.debug, "FINDER: caching poisoned\n");
         out.m_mechs.push_back(std::move(*elem.mech));
-        cache.emplace_back(std::move(elem.dimer));
+        cache.emplace_back(elem.dimer);
         continue;
       }
 
@@ -476,10 +478,12 @@ namespace fly::saddle {
         {
           fly::io::BinaryFile file("crash.gsd", fly::io::create);
 
-          fmt::print(stderr,
-                     "Append symmetries threw @{}, this implies a symmetrical sp but sym-breaking minima, perhaps the minimiser "
-                     "reached the wrong minima i.e. failed to follow the minimum mode or the sp was higher order.",
-                     geo_data.centre);
+          fmt::print(
+              stderr,
+              "Append symmetries threw @{}, this implies a symmetrical saddle-point but sym-breaking minima, perhaps the minimiser "
+              "reached the wrong minima i.e. failed to follow the minimum mode or the sp was higher order. Failure was written to "
+              "\"crash.gsd\" in the current working directory\n",
+              geo_data.centre);
 
           file.commit([&] {
             file.write("particles/N", fly::safe_cast<std::uint32_t>(in.size()));
@@ -491,7 +495,7 @@ namespace fly::saddle {
         throw;
       }
 
-      ASSERT(num_new > 0, "Only found {} but should have had at least 1", num_new);
+      verify(num_new > 0, "Only found {} but should have had at least 1", num_new);
 
       std::size_t n = cache.size();
 
@@ -591,11 +595,13 @@ namespace fly::saddle {
     auto [re_min, re_sp, rel_min, rel_sp] = recon_relax(geo, mech, ref);
 
     if (!rel_min || !rel_sp) {
-      throw error("FINDER: Poisoned mech rel_min={}, rel_sp={}\n", bool(rel_min), bool(rel_sp));
+      dprint(m_opt.debug, "FINDER: Mech poisoned!\n");
       mech.poison = true;
     } else {
       mech.err_fwd = gnorm((*rel_min)[r_] - re_min[r_]);
       mech.err_sp = gnorm((*rel_sp)[r_] - re_sp[r_]);
+
+      dprint(m_opt.debug, "FINDER: In-place reconstruct, unaligned: err_fwd={}, err_sp={}\n", mech.err_fwd, mech.err_sp);
 
       com_align(*rel_min, fwd);
       com_align(*rel_sp, sp);
@@ -612,15 +618,21 @@ namespace fly::saddle {
       double r_tol = m_opt.capture_r_tol;
       double e_tol = m_opt.capture_E_tol;
 
-      dprint(m_opt.debug, "FINDER: In-place reconstruct: err_fwd={} err_sp={} r_tol={} e_tol={}\n", err_fwd, err_sp, r_tol, e_tol);
+      double del_Esp = std::abs(re_Esp - Esp);
+      double del_Efwd = std::abs(re_Ef - Ef);
 
-      if (err_fwd > r_tol || err_sp > r_tol || std::abs(re_Ef - Ef) > e_tol || std::abs(re_Esp - Esp) > e_tol) {
+      dprint(m_opt.debug, "FINDER: In-place reconstruct: err_fwd={} err_sp={} dEsp={} dEfwd={}\n", err_fwd, err_sp, del_Esp, del_Efwd);
+
+      if (err_fwd > r_tol || err_sp > r_tol || del_Efwd > e_tol || del_Esp > e_tol) {
         dprint(m_opt.debug, "FINDER: Mech poisoned!\n");
-        throw error("FINDER: Poisoned mech err_fwd={} err_sp={} r_tol={} e_tol={}\n", err_fwd, err_sp, r_tol, e_tol);
         mech.poison = true;
       } else {
         mech.poison = false;
       }
+    }
+
+    if (mech.poison) {
+      verify(mech.barrier > 4, "Mechanisms with energy barrier = {}eV is poisoned!", mech.barrier);
     }
 
     //////////////// Partial hessian compute. ////////////////
@@ -642,24 +654,27 @@ namespace fly::saddle {
       if (freq[i] < -m_opt.hessian_eigen_zero_tol) {
         dprint(m_opt.debug, "FINDER: Second order SP or higher, modes {} = {}\n", i, freq.head(i));
         return {};
-      }
-
-      if (freq[i] > m_opt.hessian_eigen_zero_tol) {
+      } else if (freq[i] > m_opt.hessian_eigen_zero_tol) {
         mech.kinetic_pre += std::log(freq[i]);
       } else {
         ++count_zeros;
       }
     }
 
-    if (m_opt.debug) {
-      fmt::print("FINDER: Mech ΔE={:.2e}, N_zeros={}\n", mech.barrier, count_zeros);
-
-      for (int i = 0; i < m_deg_free + 10; i++) {
-        fmt::print("Finder: sp mode {} = {}\n", i, freq[i]);
+    if (count_zeros != m_num_zero_modes) {
+      for (int j = 0; j < std::max(m_num_zero_modes, count_zeros) + 3; j++) {
+        fmt::print(stderr, "FINDER: [ERR] min mode {} = {}\n", j, freq[j]);
       }
+      throw error("Expecting {} zero modes but hessian has {}", m_num_zero_modes, count_zeros);
     }
 
-    ASSERT(count_zeros == m_deg_free, "Sp has {} zero modes but min has {}", count_zeros, m_deg_free);
+    if (m_opt.debug) {
+      fmt::print("FINDER: Mech ΔEsp={:.3e}, ΔEfwd={:.3e}, N_zeros={}\n", mech.barrier, mech.delta, count_zeros);
+
+      for (int i = 0; i < m_num_zero_modes + 3; i++) {
+        fmt::print("FINDER: sp mode {} = {}\n", i, freq[i]);
+      }
+    }
 
     return mech;
   }
@@ -716,7 +731,7 @@ namespace fly::saddle {
     relax[fzn_] = dimer[fzn_];
     relax.rebind(id_, dimer);
 
-    if (m_deg_free > 0) {
+    if (m_count_frozen == 0) {
       // Freeze minimally displaced atom to remove translational degrees of freedom.
 
       if (double dr = gnorm(in(r_, min) - dimer(r_, min)); dr > m_opt.freeze_tol) {
@@ -764,10 +779,12 @@ namespace fly::saddle {
     system::SoA<Position> sp_{dimer};
 
     for (int i = 0; i < in.size(); i++) {
-      fwd(r_, i) += drift;
-      sp_(r_, i) += drift;
-      rev(r_, i) += drift;
+      fwd(r_, i) -= drift;
+      sp_(r_, i) -= drift;
+      rev(r_, i) -= drift;
     }
+
+    ASSERT(gnorm(com(rev) - com(in)) < 1e-8, "Drift correction failed", 0);
 
     return Pathway{std::move(rev), std::move(sp_), std::move(fwd)};
   }
@@ -777,15 +794,15 @@ namespace fly::saddle {
   void Master::calc_minima_hess(system::SoA<Position const&, Frozen const&, TypeID const&> in) {
     //
 
-    int num_frozen = 0;
+    m_count_frozen = 0;
 
     for (int i = 0; i < in.size(); i++) {
       if (in(fzn_, i)) {
-        num_frozen++;
+        m_count_frozen++;
       }
     }
-
-    int exp_deg_free = num_frozen > 0 ? spatial_dims * num_frozen : spatial_dims;
+    // If all unfrozen then zero modes due to translational degrees of freedom.
+    int exp_zero_modes = m_count_frozen > 0 ? spatial_dims * m_count_frozen : spatial_dims;
 
     m_data[0].pot_nl.rebuild(in);
 
@@ -794,25 +811,32 @@ namespace fly::saddle {
     system::Hessian::Vector const& freq = m_data[0].hess.eigenvalues();
 
     m_log_prod_eigen = 0;
-    m_deg_free = 0;
+    m_num_zero_modes = 0;
 
     for (int i = 0; i < freq.size(); i++) {
       // Negative modes = not a minima.
-      verify(freq[i] > -m_opt.hessian_eigen_zero_tol, "Mode {} has eigenvalue = {}", i, freq.head(10));
+      verify(freq[i] > -m_opt.hessian_eigen_zero_tol, "Mode {} has eigenvalue = {}", i, freq[i]);
 
       // Sum non-zero modes.
       if (freq[i] > m_opt.hessian_eigen_zero_tol) {
         m_log_prod_eigen += std::log(freq[i]);
       } else {
-        ++m_deg_free;
+        ++m_num_zero_modes;
       }
     }
 
-    if (m_opt.debug) {
-      fmt::print("FINDER: Null space of Hessian has dimension  = {}, exp = {}\n", m_deg_free, exp_deg_free);
+    if (m_num_zero_modes != exp_zero_modes) {
+      for (int j = 0; j < std::max(m_num_zero_modes, exp_zero_modes) + 5; j++) {
+        fmt::print(stderr, "FINDER: [ERR ]min mode {} = {}\n", j, freq[j]);
+      }
+      throw error("Expecting {} zero modes but fount {}", exp_zero_modes, m_num_zero_modes);
+    }
 
-      for (int i = 0; i < m_deg_free + 10; i++) {
-        fmt::print("Finder: min mode {} = {}\n", i, freq[i]);
+    if (m_opt.debug) {
+      fmt::print("FINDER: Null space of Hessian has dimension  = {}, exp = {}\n", m_num_zero_modes, exp_zero_modes);
+
+      for (int i = 0; i < m_num_zero_modes + 5; i++) {
+        fmt::print("FINDER: Initial min mode {} = {}\n", i, freq[i]);
       }
     }
   }
@@ -889,16 +913,31 @@ namespace fly::saddle {
 
   bool Master::is_new_mech(env::Mechanism const& maybe, std::vector<env::Mechanism> const& hist) const {
     // All searches have been around same atom hence orientation is fixed.
+
+    if (hist.empty()) {
+      dprint(m_opt.debug, "FINDER: First mech must be new\n");
+      return true;
+    }
+
+    double min_d_sp = std::numeric_limits<double>::max();
+    double min_d_fwd = std::numeric_limits<double>::max();
+
     for (env::Mechanism const& m : hist) {
       //
+
       double d_sp = env::rmsd<Delta>(maybe.delta_sp, m.delta_sp);
       double d_fwd = env::rmsd<Delta>(maybe.delta_fwd, m.delta_fwd);
 
       if (d_sp < m_opt.mech_tol && d_fwd < m_opt.mech_tol) {
-        verify(d_fwd < m_opt.mech_tol, "Same sp, different final, d_fwd={}, d_sp={}, Esp={}", d_fwd, d_sp, maybe.barrier);
+        dprint(m_opt.debug, "FINDER: Mech is NOT new, distance: old-sp={:.5f} old-min={:.5f}\n", d_sp, d_fwd);
         return false;
       }
+
+      min_d_sp = std::min(min_d_sp, d_sp);
+      min_d_fwd = std::min(min_d_fwd, d_fwd);
     }
+
+    dprint(m_opt.debug, "FINDER: Mech is new, min distance: old-sp={:.5f} old-min={:.5f}\n", min_d_sp, min_d_fwd);
     return true;
   }
 

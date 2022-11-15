@@ -23,7 +23,6 @@
 
 #include "libfly/neigh/list.hpp"
 #include "libfly/potential/EAM/eam.hpp"
-#include "libfly/potential/counter.hpp"
 #include "libfly/system/SoA.hpp"
 #include "libfly/system/hessian.hpp"
 #include "libfly/system/property.hpp"

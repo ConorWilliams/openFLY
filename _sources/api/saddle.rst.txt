@@ -1,4 +1,4 @@
-Saddle-point searching
+Saddle-points
 ======================================
 
 Directory: ``libfly/saddle``

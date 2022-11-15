@@ -3,10 +3,10 @@
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
-<link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="Changelog" href="../ChangeLog-stub.html" /><link rel="prev" title="Minimisers" href="minimise.html" />
+<link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="Kinetics" href="kinetic.html" /><link rel="prev" title="Minimisers" href="minimise.html" />
 
     <link rel="shortcut icon" href="../_static/favicon.ico"/><meta name="generator" content="sphinx-5.3.0, furo 2022.09.29"/>
-        <title>Saddle-point searching - OpenFLY documentation</title>
+        <title>Saddle-points - OpenFLY documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?digest=d81277517bee4d6b0349d71bb2661d4890b5617c" />
     <link rel="stylesheet" type="text/css" href="../_static/tabs.css" />
@@ -186,7 +186,8 @@
 <li class="toctree-l2"><a class="reference internal" href="io.html">Input/Output (IO)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="potential.html">Potentials</a></li>
 <li class="toctree-l2"><a class="reference internal" href="minimise.html">Minimisers</a></li>
-<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">Saddle-point searching</a></li>
+<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">Saddle-points</a></li>
+<li class="toctree-l2"><a class="reference internal" href="kinetic.html">Kinetics</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../ChangeLog-stub.html">Changelog</a></li>
@@ -233,8 +234,8 @@
           </label>
         </div>
         <article role="main">
-          <section id="saddle-point-searching">
-<h1>Saddle-point searching<a class="headerlink" href="#saddle-point-searching" title="Permalink to this heading">#</a></h1>
+          <section id="saddle-points">
+<h1>Saddle-points<a class="headerlink" href="#saddle-points" title="Permalink to this heading">#</a></h1>
 <p>Directory: <code class="docutils literal notranslate"><span class="pre">libfly/saddle</span></code></p>
 <p>The <code class="docutils literal notranslate"><span class="pre">saddle</span></code> folder contains a collection of utilities for saddle-point finding. Everything is contained within the namespace <code class="docutils literal notranslate"><span class="pre">fly::saddle</span></code>.</p>
 <p>A (strictly first-order) saddle-point is a stationary point where the Hessian matrix has exactly one negative eigenvalue.</p>
@@ -242,6 +243,22 @@
 <h2>Master saddle-point finder<a class="headerlink" href="#master-saddle-point-finder" title="Permalink to this heading">#</a></h2>
 <p>File: <code class="docutils literal notranslate"><span class="pre">libfly/saddle/find.hpp</span></code></p>
 <p>Class to coordinate a group of saddle-point searches. </p>
+<p><p><p>Saddle point (SP) searching is an involved process below is an outline of the stages:</p>
+<ol class="arabic simple">
+<li><p>For each central atom <code class="docutils literal notranslate"><span class="pre">i</span></code> in the input the following steps are carried out.</p></li>
+<li><p>Saddle point searches are carried out (in batches) until a stopping criterion (one of: reconstruction failure, consecutive failed search limit or hitting a total search limit) is reached. Each SP search requires the following series of steps.</p></li>
+<li><p>A random perturbation of atomic positions and the dimer axis (centred on <code class="docutils literal notranslate"><span class="pre">i</span></code>)  is made.</p></li>
+<li><p>The dimer method is used to move the perturbed state to a SP of the potential. It uses a <code class="docutils literal notranslate"><span class="pre">cache</span></code> of previously discovered saddle points (SPs)to avoid previous SPs by cancelling the search if the angle between the current search and the historical SP falls below <code class="docutils literal notranslate"><span class="pre">theta</span></code>. The angle <code class="docutils literal notranslate"><span class="pre">theta</span></code> is a decaying function of the number of SP searches.</p></li>
+<li><p>It is ensured that the maximally displaced atom is <code class="docutils literal notranslate"><span class="pre">i</span></code> and the minimally displaced atom is frozen (if there are translational degrees of freedom).</p></li>
+<li><p>The LBFGS minimiser is used to find the adjacent minima, due to freezing the atom in the previous step we can guarantee no translation in the <code class="docutils literal notranslate"><span class="pre">min-&gt;sp-&gt;min</span></code> pathway.</p></li>
+<li><p>It is ensured than the pathway starts at the initial basin and that all the stationary points are distinct points in space.</p></li>
+<li><p>A local mechanism is constructed from the displacements of the atoms around the central atom.</p></li>
+<li><p>It is ensured that the local mechanism can be reconstructed in the orientation and location it was discovered. If not it is marked as a poisoned mechanism.</p></li>
+<li><p>It is ensured that the mechanism has not been encountered before.</p></li>
+<li><p>The set of mechanisms related by the symmetries of the local environment are constructed and it is ensured that when these mechanisms are reconstructed the energy barriers are accurate.</p></li>
+</ol>
+</p>
+ </p>
 <dl class="cpp class">
 <dt class="sig sig-object cpp" id="_CPPv4N3fly6saddle6MasterE">
 <span id="_CPPv3N3fly6saddle6MasterE"></span><span id="_CPPv2N3fly6saddle6MasterE"></span><span id="fly::saddle::Master"></span><span class="target" id="classfly_1_1saddle_1_1Master"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Master</span></span></span><a class="headerlink" href="#_CPPv4N3fly6saddle6MasterE" title="Permalink to this definition">#</a><br /></dt>
@@ -369,7 +386,7 @@
 <p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
 <dl class="cpp var">
 <dt class="sig sig-object cpp" id="_CPPv4N3fly6saddle6Master7Options9basin_tolE">
-<span id="_CPPv3N3fly6saddle6Master7Options9basin_tolE"></span><span id="_CPPv2N3fly6saddle6Master7Options9basin_tolE"></span><span id="fly::saddle::Master::Options::basin_tol__double"></span><span class="target" id="structfly_1_1saddle_1_1Master_1_1Options_1ad71cfa5187ed86a3b5d0a7df5c8018c1"></span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">basin_tol</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0.25</span></span><a class="headerlink" href="#_CPPv4N3fly6saddle6Master7Options9basin_tolE" title="Permalink to this definition">#</a><br /></dt>
+<span id="_CPPv3N3fly6saddle6Master7Options9basin_tolE"></span><span id="_CPPv2N3fly6saddle6Master7Options9basin_tolE"></span><span id="fly::saddle::Master::Options::basin_tol__double"></span><span class="target" id="structfly_1_1saddle_1_1Master_1_1Options_1ad71cfa5187ed86a3b5d0a7df5c8018c1"></span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">basin_tol</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0.05</span></span><a class="headerlink" href="#_CPPv4N3fly6saddle6Master7Options9basin_tolE" title="Permalink to this definition">#</a><br /></dt>
 <dd><p>Tolerance for basins to be considered distinct. </p>
 </dd></dl>
 
@@ -381,7 +398,7 @@
 
 <dl class="cpp var">
 <dt class="sig sig-object cpp" id="_CPPv4N3fly6saddle6Master7Options13capture_E_tolE">
-<span id="_CPPv3N3fly6saddle6Master7Options13capture_E_tolE"></span><span id="_CPPv2N3fly6saddle6Master7Options13capture_E_tolE"></span><span id="fly::saddle::Master::Options::capture_E_tol__double"></span><span class="target" id="structfly_1_1saddle_1_1Master_1_1Options_1a9063dd8497a51530099743bb0478ac12"></span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">capture_E_tol</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0.05</span></span><a class="headerlink" href="#_CPPv4N3fly6saddle6Master7Options13capture_E_tolE" title="Permalink to this definition">#</a><br /></dt>
+<span id="_CPPv3N3fly6saddle6Master7Options13capture_E_tolE"></span><span id="_CPPv2N3fly6saddle6Master7Options13capture_E_tolE"></span><span id="fly::saddle::Master::Options::capture_E_tol__double"></span><span class="target" id="structfly_1_1saddle_1_1Master_1_1Options_1a9063dd8497a51530099743bb0478ac12"></span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">capture_E_tol</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0.01</span></span><a class="headerlink" href="#_CPPv4N3fly6saddle6Master7Options13capture_E_tolE" title="Permalink to this definition">#</a><br /></dt>
 <dd><p>Maximum energy error between reconstructed+relaxed minima/saddle-points and their original discovery. </p>
 <p>After a min-&gt;sp-&gt;min pathway is found it is: converted into a mechanism; reconstructed onto the initial minima and then relaxed. These relaxed SP/minima must have energies within <code class="docutils literal notranslate"><span class="pre">capture_E_tol</span></code> of the pathway’s sp and final min. </p>
 </dd></dl>
@@ -825,12 +842,12 @@
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="../ChangeLog-stub.html">
+          <a class="next-page" href="kinetic.html">
               <div class="page-info">
                 <div class="context">
                   <span>Next</span>
                 </div>
-                <div class="title">Changelog</div>
+                <div class="title">Kinetics</div>
               </div>
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
             </a>
@@ -882,7 +899,7 @@
         <div class="toc-tree-container">
           <div class="toc-tree">
             <ul>
-<li><a class="reference internal" href="#">Saddle-point searching</a><ul>
+<li><a class="reference internal" href="#">Saddle-points</a><ul>
 <li><a class="reference internal" href="#master-saddle-point-finder">Master saddle-point finder</a></li>
 <li><a class="reference internal" href="#dimer">Dimer</a></li>
 <li><a class="reference internal" href="#rotor">Rotor</a></li>

@@ -3,7 +3,7 @@
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
-<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Todo!" href="todo.html" /><link rel="prev" title="Saddle-point searching" href="api/saddle.html" />
+<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Todo!" href="todo.html" /><link rel="prev" title="Kinetics" href="api/kinetic.html" />
 
     <link rel="shortcut icon" href="_static/favicon.ico"/><meta name="generator" content="sphinx-5.3.0, furo 2022.09.29"/>
         <title>Changelog - OpenFLY documentation</title>
@@ -186,7 +186,8 @@
 <li class="toctree-l2"><a class="reference internal" href="api/io.html">Input/Output (IO)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="api/potential.html">Potentials</a></li>
 <li class="toctree-l2"><a class="reference internal" href="api/minimise.html">Minimisers</a></li>
-<li class="toctree-l2"><a class="reference internal" href="api/saddle.html">Saddle-point searching</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/saddle.html">Saddle-points</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/kinetic.html">Kinetics</a></li>
 </ul>
 </li>
 <li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Changelog</a></li>
@@ -240,14 +241,31 @@
 <section id="added">
 <h3>Added<a class="headerlink" href="#added" title="Permalink to this heading">#</a></h3>
 <ul class="simple">
-<li><p>New <code class="docutils literal notranslate"><span class="pre">add_atoms()</span></code> lattice function.</p></li>
-<li><p>New <code class="docutils literal notranslate"><span class="pre">refine_tol()</span></code> function in catalogue.</p></li>
+<li><p>New <code class="docutils literal notranslate"><span class="pre">Basin</span></code> class for performing KMC simulations</p></li>
+<li><p>New lattice functions: <code class="docutils literal notranslate"><span class="pre">add_atoms()</span></code>, <code class="docutils literal notranslate"><span class="pre">motif_to_lattice()</span></code>, <code class="docutils literal notranslate"><span class="pre">remove_atoms()</span></code>, <code class="docutils literal notranslate"><span class="pre">remove_sphere()</span></code>.</p></li>
+<li><p>New <code class="docutils literal notranslate"><span class="pre">refine_tol()</span></code> function in Catalogue.</p></li>
+<li><p>New <code class="docutils literal notranslate"><span class="pre">reconstruct()</span></code> method in Catalogue.</p></li>
+<li><p>New <code class="docutils literal notranslate"><span class="pre">dprint</span></code> utility function.</p></li>
+<li><p>Catalogue has serialisation support (hence all serialised members of the catalogue do to).</p></li>
+<li><p>Catalogue environments expose their delta_max.</p></li>
+<li><p>Catalogue has a method to calculate the (approximate) symmetries a geometry has.</p></li>
+<li><p>Dimer::Exit has a new return code.</p></li>
+<li><p>Many new options in Master::Options.</p></li>
+<li><p>New Xoshiro constructor to properly seed from <code class="docutils literal notranslate"><span class="pre">std::random_device</span></code>.</p></li>
+<li><p>Box has a new min_image calculator method.</p></li>
 </ul>
 </section>
 <section id="changed">
 <h3>Changed<a class="headerlink" href="#changed" title="Permalink to this heading">#</a></h3>
 <ul class="simple">
-<li><p>Exposed catalogues <code class="docutils literal notranslate"><span class="pre">set_mechs()</span></code> method</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">template_for()</span></code> enhanced.</p></li>
+<li><p>Catalogue now sets delta_max of environments as minimum of Options.delta_max and the appropriate function of Fingerprint.r_min() enabling a more general default.</p></li>
+<li><p>Catalogue environment’s <code class="docutils literal notranslate"><span class="pre">set_mech</span></code> function moved to a Catalogue method.</p></li>
+<li><p>Mechanism’s members tweaked to encode more reconstruction info.</p></li>
+<li><p>Hessians now contain zeros for frozen atoms instead of only being n_active x n_active to facilitate future conditioning and make them more like gradients.</p></li>
+<li><p>Master’s default option mech_tol increased.</p></li>
+<li><p>Master’s API has changed to facilitate new features + MPI.</p></li>
+<li><p>Changed the base type of Hash</p></li>
 </ul>
 </section>
 <section id="removed">
@@ -256,11 +274,19 @@
 <section id="bugfixes">
 <h3>Bugfixes<a class="headerlink" href="#bugfixes" title="Permalink to this heading">#</a></h3>
 <ul class="simple">
-<li><p>Catalogue works correctly on the second pass</p></li>
+<li><p>Typo in SoA::operator=</p></li>
+<li><p>SoA::rebind made const correct.</p></li>
+<li><p>Environments in the catalogue are allowed to have no mechanisms.</p></li>
+<li><p>Catalogue works correctly on the second pass (memoization bug).</p></li>
 </ul>
 </section>
 <section id="meta">
 <h3>Meta<a class="headerlink" href="#meta" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p>New dependency Cereal</p></li>
+<li><p>Now uses ccache in developer mode.</p></li>
+<li><p>Fixed openMP compilation in MacOS cloud.</p></li>
+</ul>
 </section>
 </section>
 <section id="version-0-7-0">
@@ -280,7 +306,7 @@
 <li><p><code class="docutils literal notranslate"><span class="pre">Dimer</span></code>’s interface changed.</p></li>
 <li><p>Generalised some geometry functions: <code class="docutils literal notranslate"><span class="pre">rmsd()</span></code>, <code class="docutils literal notranslate"><span class="pre">grmsd()</span></code>.</p></li>
 <li><p>Potentials now compute mass weighted Hessians.</p></li>
-<li><p>EAM hessian computation made more cache efficiant.</p></li>
+<li><p>EAM hessian computation made more cache efficient.</p></li>
 </ul>
 </section>
 <section id="id3">
@@ -502,14 +528,14 @@
               </div>
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
             </a>
-          <a class="prev-page" href="api/saddle.html">
+          <a class="prev-page" href="api/kinetic.html">
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
               <div class="page-info">
                 <div class="context">
                   <span>Previous</span>
                 </div>
                 
-                <div class="title">Saddle-point searching</div>
+                <div class="title">Kinetics</div>
                 
               </div>
             </a>

@@ -186,7 +186,8 @@
 <li class="toctree-l2"><a class="reference internal" href="io.html">Input/Output (IO)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="potential.html">Potentials</a></li>
 <li class="toctree-l2"><a class="reference internal" href="minimise.html">Minimisers</a></li>
-<li class="toctree-l2"><a class="reference internal" href="saddle.html">Saddle-point searching</a></li>
+<li class="toctree-l2"><a class="reference internal" href="saddle.html">Saddle-points</a></li>
+<li class="toctree-l2"><a class="reference internal" href="kinetic.html">Kinetics</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../ChangeLog-stub.html">Changelog</a></li>
@@ -235,10 +236,11 @@
         <article role="main">
           <section id="utility">
 <h1>Utility<a class="headerlink" href="#utility" title="Permalink to this heading">#</a></h1>
+<p>Directory: <code class="docutils literal notranslate"><span class="pre">libfly/utility</span></code></p>
 <p>The <code class="docutils literal notranslate"><span class="pre">utility</span></code> folder contains a collection of non-specific utilities, it is documented by file.</p>
 <section id="versioning">
 <h2>Versioning<a class="headerlink" href="#versioning" title="Permalink to this heading">#</a></h2>
-<p>File: <code class="docutils literal notranslate"><span class="pre">version.hpp</span></code></p>
+<p>File: <code class="docutils literal notranslate"><span class="pre">libfly/version.hpp</span></code></p>
 <p>Defines a set of version macros, read by CMake. </p>
 <div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric" id="breathe-section-title-defines">Defines</p>
@@ -264,7 +266,7 @@
 </section>
 <section id="core">
 <h2>Core<a class="headerlink" href="#core" title="Permalink to this heading">#</a></h2>
-<p>File: <code class="docutils literal notranslate"><span class="pre">core.hpp</span></code></p>
+<p>File: <code class="docutils literal notranslate"><span class="pre">libfly/core.hpp</span></code></p>
 <p>Miscellaneous utilities. </p>
 <p><p><div class="admonition-todo admonition" id="id1">
 <p class="admonition-title">Todo</p>
@@ -543,6 +545,14 @@ step append:</p>
 </section>
 <section id="small-functions">
 <h3>Small functions<a class="headerlink" href="#small-functions" title="Permalink to this heading">#</a></h3>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4IDpEN3fly6dprintEvbN3fmt13format_stringIDp4ArgsEEDpRR4Args">
+<span id="_CPPv3IDpEN3fly6dprintEbN3fmt13format_stringIDp4ArgsEEDpRR4Args"></span><span id="_CPPv2IDpEN3fly6dprintEbN3fmt13format_stringIDp4ArgsEEDpRR4Args"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="sig-name descname"><span class="n"><span class="pre">Args</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="core_8hpp_1a0a4488f9a4e6e2037a81fe7b05f422d3"></span><span class="kt"><span class="pre">auto</span></span><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">fly</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">dprint</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">cond</span></span>, <a class="reference internal" href="#_CPPv4IDpEN3fly6dprintEvbN3fmt13format_stringIDp4ArgsEEDpRR4Args" title="fly::dprint::fmt"><span class="n"><span class="pre">fmt</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">format_string</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4IDpEN3fly6dprintEvbN3fmt13format_stringIDp4ArgsEEDpRR4Args" title="fly::dprint::Args"><span class="n"><span class="pre">Args</span></span></a><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">fmt</span></span>, <a class="reference internal" href="#_CPPv4IDpEN3fly6dprintEvbN3fmt13format_stringIDp4ArgsEEDpRR4Args" title="fly::dprint::Args"><span class="n"><span class="pre">Args</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">...</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">args</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="o"><span class="pre">-&gt;</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><a class="headerlink" href="#_CPPv4IDpEN3fly6dprintEvbN3fmt13format_stringIDp4ArgsEEDpRR4Args" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Conditional printing utility. </p>
+<p>If <code class="docutils literal notranslate"><span class="pre">cond</span></code> is true forwards <code class="docutils literal notranslate"><span class="pre">fmt</span></code> and <code class="docutils literal notranslate"><span class="pre">args...</span></code> to <code class="docutils literal notranslate"><span class="pre">fmt::print</span></code>. Useful for printing debug messages. </p>
+</dd></dl>
+
+<hr class="docutils" />
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4I00EN3fly9safe_castENSt11enable_if_tIXaaNSt13is_integral_vI1REENSt13is_integral_vI1TEEE1REE1T">
 <span id="_CPPv3I00EN3fly9safe_castE1T"></span><span id="_CPPv2I00EN3fly9safe_castE1T"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">R</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="core_8hpp_1ad2288aecf14a8a17a6174bf42483bace"></span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><span class="kt"><span class="pre">auto</span></span><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">fly</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">safe_cast</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I00EN3fly9safe_castENSt11enable_if_tIXaaNSt13is_integral_vI1REENSt13is_integral_vI1TEEE1REE1T" title="fly::safe_cast::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">x</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="o"><span class="pre">-&gt;</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">enable_if_t</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">is_integral_v</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I00EN3fly9safe_castENSt11enable_if_tIXaaNSt13is_integral_vI1REENSt13is_integral_vI1TEEE1REE1T" title="fly::safe_cast::R"><span class="n"><span class="pre">R</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="o"><span class="pre">&amp;&amp;</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">is_integral_v</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I00EN3fly9safe_castENSt11enable_if_tIXaaNSt13is_integral_vI1REENSt13is_integral_vI1TEEE1REE1T" title="fly::safe_cast::T"><span class="n"><span class="pre">T</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I00EN3fly9safe_castENSt11enable_if_tIXaaNSt13is_integral_vI1REENSt13is_integral_vI1TEEE1REE1T" title="fly::safe_cast::R"><span class="n"><span class="pre">R</span></span></a><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4I00EN3fly9safe_castENSt11enable_if_tIXaaNSt13is_integral_vI1REENSt13is_integral_vI1TEEE1REE1T" title="Permalink to this definition">#</a><br /></dt>
@@ -888,7 +898,7 @@ y_n &amp; = 1 \times x_1\times x_{2} \times \dots \times x_{n-1}\end{split}\]</d
 </section>
 <section id="timing">
 <h3>Timing<a class="headerlink" href="#timing" title="Permalink to this heading">#</a></h3>
-<p>File <code class="docutils literal notranslate"><span class="pre">timeit.hpp</span></code></p>
+<p>File: <code class="docutils literal notranslate"><span class="pre">libfly/timeit.hpp</span></code></p>
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4I0DpEN3fly6timeitENSt15invoke_result_tIRR1FDpRR4ArgsEENSt11string_viewERR1FDpRR4Args">
 <span id="_CPPv3I0DpEN3fly6timeitENSt11string_viewERR1FDpRR4Args"></span><span id="_CPPv2I0DpEN3fly6timeitENSt11string_viewERR1FDpRR4Args"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">F</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="sig-name descname"><span class="n"><span class="pre">Args</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="core_8hpp_1aa2b4df93882f4e73a6b5ccff8e85a6b5"></span><span class="kt"><span class="pre">auto</span></span><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">fly</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">timeit</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string_view</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">name</span></span>, <a class="reference internal" href="#_CPPv4I0DpEN3fly6timeitENSt15invoke_result_tIRR1FDpRR4ArgsEENSt11string_viewERR1FDpRR4Args" title="fly::timeit::F"><span class="n"><span class="pre">F</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">f</span></span>, <a class="reference internal" href="#_CPPv4I0DpEN3fly6timeitENSt15invoke_result_tIRR1FDpRR4ArgsEENSt11string_viewERR1FDpRR4Args" title="fly::timeit::Args"><span class="n"><span class="pre">Args</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">...</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">args</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="o"><span class="pre">-&gt;</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">invoke_result_t</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0DpEN3fly6timeitENSt15invoke_result_tIRR1FDpRR4ArgsEENSt11string_viewERR1FDpRR4Args" title="fly::timeit::F"><span class="n"><span class="pre">F</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0DpEN3fly6timeitENSt15invoke_result_tIRR1FDpRR4ArgsEENSt11string_viewERR1FDpRR4Args" title="fly::timeit::Args"><span class="n"><span class="pre">Args</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4I0DpEN3fly6timeitENSt15invoke_result_tIRR1FDpRR4ArgsEENSt11string_viewERR1FDpRR4Args" title="Permalink to this definition">#</a><br /></dt>
@@ -912,7 +922,7 @@ y_n &amp; = 1 \times x_1\times x_{2} \times \dots \times x_{n-1}\end{split}\]</d
 </section>
 <section id="random-numbers">
 <h2>Random numbers<a class="headerlink" href="#random-numbers" title="Permalink to this heading">#</a></h2>
-<p>File <code class="docutils literal notranslate"><span class="pre">random.hpp</span></code></p>
+<p>File <code class="docutils literal notranslate"><span class="pre">libfly/random.hpp</span></code></p>
 <p>Pseudo random number generators (PRNG). </p>
 <dl class="cpp class">
 <dt class="sig sig-object cpp" id="_CPPv4N3fly7XoshiroE">
@@ -1019,7 +1029,7 @@ that is large enough for any parallel application, and it passes all tests we ar
 </section>
 <section id="natural-splines">
 <h2>Natural Splines<a class="headerlink" href="#natural-splines" title="Permalink to this heading">#</a></h2>
-<p>File <code class="docutils literal notranslate"><span class="pre">spline.hpp</span></code></p>
+<p>File <code class="docutils literal notranslate"><span class="pre">libfly/spline.hpp</span></code></p>
 <p>Utility for working with natural cubic splines. </p>
 <dl class="cpp class">
 <dt class="sig sig-object cpp" id="_CPPv4N3fly6SplineE">
@@ -1113,7 +1123,7 @@ that is large enough for any parallel application, and it passes all tests we ar
 </section>
 <section id="lattices">
 <h2>Lattices<a class="headerlink" href="#lattices" title="Permalink to this heading">#</a></h2>
-<p>File <code class="docutils literal notranslate"><span class="pre">lattice.hpp</span></code></p>
+<p>File <code class="docutils literal notranslate"><span class="pre">libfly/lattice.hpp</span></code></p>
 <p>Utilities for building and manipulating basic lattices of atoms. </p>
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4I0DpEN3fly16motif_to_latticeEN6system9SupercellI3MapDp1TEEN6system9SupercellI3MapDp1TEERK3ArrIiE">

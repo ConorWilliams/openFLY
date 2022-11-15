@@ -184,7 +184,8 @@
 <li class="toctree-l2"><a class="reference internal" href="api/io.html">Input/Output (IO)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="api/potential.html">Potentials</a></li>
 <li class="toctree-l2"><a class="reference internal" href="api/minimise.html">Minimisers</a></li>
-<li class="toctree-l2"><a class="reference internal" href="api/saddle.html">Saddle-point searching</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/saddle.html">Saddle-points</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/kinetic.html">Kinetics</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="ChangeLog-stub.html">Changelog</a></li>
@@ -326,6 +327,8 @@
         <li><a href="api/utility.html#_CPPv4N3fly5DeferD0Ev">fly::Defer::~Defer (C++ function)</a>
 </li>
         <li><a href="api/utility.html#_CPPv4I0IDpE0DpEN3fly13detected_or_tE">fly::detected_or_t (C++ type)</a>
+</li>
+        <li><a href="api/utility.html#_CPPv4IDpEN3fly6dprintEvbN3fmt13format_stringIDp4ArgsEEDpRR4Args">fly::dprint (C++ function)</a>
 </li>
         <li><a href="api/env.html#_CPPv4N3fly3env10canon_hashER8GeometryI5IndexEdNSt6size_tEP8GeometryI5IndexE">fly::env::canon_hash (C++ function)</a>
 </li>
@@ -493,6 +496,32 @@
 </li>
         <li><a href="api/utility.html#_CPPv4I00EN3fly25is_narrowing_conversion_vE">fly::is_narrowing_conversion_v (C++ member)</a>
 </li>
+        <li><a href="api/kinetic.html#_CPPv4N3fly7kinetic5BasinE">fly::kinetic::Basin (C++ class)</a>
+</li>
+        <li><a href="api/kinetic.html#_CPPv4N3fly7kinetic5Basin5BasinERK7OptionsN6system3SoAIRK8PositionEERKN3fly3env9CatalogueE">fly::kinetic::Basin::Basin (C++ function)</a>
+</li>
+        <li><a href="api/kinetic.html#_CPPv4N3fly7kinetic5Basin6ChoiceE">fly::kinetic::Basin::Choice (C++ class)</a>
+</li>
+        <li><a href="api/kinetic.html#_CPPv4N3fly7kinetic5Basin6Choice4atomE">fly::kinetic::Basin::Choice::atom (C++ member)</a>
+</li>
+        <li><a href="api/kinetic.html#_CPPv4N3fly7kinetic5Basin6Choice2dtE">fly::kinetic::Basin::Choice::dt (C++ member)</a>
+</li>
+        <li><a href="api/kinetic.html#_CPPv4N3fly7kinetic5Basin6Choice4mechE">fly::kinetic::Basin::Choice::mech (C++ member)</a>
+</li>
+        <li><a href="api/kinetic.html#_CPPv4NK3fly7kinetic5Basin10kmc_choiceER7Xoshiro">fly::kinetic::Basin::kmc_choice (C++ function)</a>
+</li>
+        <li><a href="api/kinetic.html#_CPPv4N3fly7kinetic5Basin11most_likelyEd">fly::kinetic::Basin::most_likely (C++ function)</a>
+</li>
+        <li><a href="api/kinetic.html#_CPPv4N3fly7kinetic5Basin7OptionsE">fly::kinetic::Basin::Options (C++ struct)</a>
+</li>
+        <li><a href="api/kinetic.html#_CPPv4N3fly7kinetic5Basin7Options5debugE">fly::kinetic::Basin::Options::debug (C++ member)</a>
+</li>
+        <li><a href="api/kinetic.html#_CPPv4N3fly7kinetic5Basin7Options11max_barrierE">fly::kinetic::Basin::Options::max_barrier (C++ member)</a>
+</li>
+        <li><a href="api/kinetic.html#_CPPv4N3fly7kinetic5Basin7Options4tempE">fly::kinetic::Basin::Options::temp (C++ member)</a>
+</li>
+        <li><a href="api/kinetic.html#_CPPv4NK3fly7kinetic5Basin8rate_sumEv">fly::kinetic::Basin::rate_sum (C++ function)</a>
+</li>
         <li><a href="api/utility.html#_CPPv4N3fly3MatE">fly::Mat (C++ type)</a>
 </li>
         <li><a href="api/minimise.html#_CPPv4N3fly8minimise5LBFGSE">fly::minimise::LBFGS (C++ class)</a>
@@ -581,6 +610,8 @@
 </li>
         <li><a href="api/potential.html#_CPPv4N3fly9potential7GenericE">fly::potential::Generic (C++ class)</a>
 </li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="api/potential.html#_CPPv4N3fly9potential7Generic6energyEN6system3SoAIRK6TypeIDRK6FrozenEERKN5neigh4ListEi">fly::potential::Generic::energy (C++ function)</a>
 </li>
         <li><a href="api/potential.html#_CPPv4IDp0EN3fly9potential7Generic7GenericEDpRR4Args">fly::potential::Generic::Generic (C++ function)</a>, <a href="api/potential.html#_CPPv4N3fly9potential7Generic7GenericERK7Generic">[1]</a>, <a href="api/potential.html#_CPPv4N3fly9potential7Generic7GenericERR7Generic">[2]</a>
@@ -595,8 +626,6 @@
 </li>
         <li><a href="api/utility.html#_CPPv4I0DpEN3fly12remove_atomsEN6system9SupercellI3MapDp1TEERKN6system9SupercellI3MapDp1TEERKNSt6vectorIN5Eigen5IndexEEE">fly::remove_atoms (C++ function)</a>
 </li>
-    </ul></td>
-    <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="api/utility.html#_CPPv4I0EN3fly13remove_cref_tE">fly::remove_cref_t (C++ type)</a>
 </li>
         <li><a href="api/utility.html#_CPPv4I0DpEN3fly13remove_sphereEN6system9SupercellI3MapDp1TEERKN6system9SupercellI3MapDp1TEEN5Eigen5IndexEd">fly::remove_sphere (C++ function)</a>
@@ -784,6 +813,8 @@
         <li><a href="api/system.html#_CPPv4N3fly6system3BoxeqERK3BoxRK3Box">fly::system::Box::operator== (C++ function)</a>
 </li>
         <li><a href="api/system.html#_CPPv4NK3fly6system3Box8periodicEN5Eigen5IndexE">fly::system::Box::periodic (C++ function)</a>
+</li>
+        <li><a href="api/system.html#_CPPv4NK3fly6system3Box23slow_min_image_computerEv">fly::system::Box::slow_min_image_computer (C++ function)</a>
 </li>
         <li><a href="api/system.html#_CPPv4N3fly6system7HessianE">fly::system::Hessian (C++ class)</a>
 </li>

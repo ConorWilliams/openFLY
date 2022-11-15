@@ -186,7 +186,8 @@
 <li class="toctree-l2"><a class="reference internal" href="io.html">Input/Output (IO)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="potential.html">Potentials</a></li>
 <li class="toctree-l2"><a class="reference internal" href="minimise.html">Minimisers</a></li>
-<li class="toctree-l2"><a class="reference internal" href="saddle.html">Saddle-point searching</a></li>
+<li class="toctree-l2"><a class="reference internal" href="saddle.html">Saddle-points</a></li>
+<li class="toctree-l2"><a class="reference internal" href="kinetic.html">Kinetics</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../ChangeLog-stub.html">Changelog</a></li>
@@ -347,6 +348,13 @@ distance.</p>
 <dt class="sig sig-object cpp" id="_CPPv4NK3fly6system3Box8periodicEN5Eigen5IndexE">
 <span id="_CPPv3NK3fly6system3Box8periodicEN5Eigen5IndexE"></span><span id="_CPPv2NK3fly6system3Box8periodicEN5Eigen5IndexE"></span><span id="fly::system::Box::periodic__Eigen::IndexC"></span><span class="target" id="classfly_1_1system_1_1Box_1a31144fe33476e8b485f1f9b19d521e8e"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">periodic</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">Eigen</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">Index</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">i</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK3fly6system3Box8periodicEN5Eigen5IndexE" title="Permalink to this definition">#</a><br /></dt>
 <dd><p>Query if the <code class="docutils literal notranslate"><span class="pre">i</span></code>th axis is periodic. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK3fly6system3Box23slow_min_image_computerEv">
+<span id="_CPPv3NK3fly6system3Box23slow_min_image_computerEv"></span><span id="_CPPv2NK3fly6system3Box23slow_min_image_computerEv"></span><span id="fly::system::Box::slow_min_image_computerC"></span><span class="target" id="classfly_1_1system_1_1Box_1a324a859b9836de32de7bf6f4b7fc5a1d"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">auto</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">slow_min_image_computer</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK3fly6system3Box23slow_min_image_computerEv" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Get a lambda that can compute the minimum image distance. </p>
+<p>Specifically this function returns a lambda, <code class="docutils literal notranslate"><span class="pre">l</span></code>, such that <code class="docutils literal notranslate"><span class="pre">l(a,</span> <span class="pre">b)</span></code> (with <code class="docutils literal notranslate"><span class="pre">a</span></code> and <code class="docutils literal notranslate"><span class="pre">b</span></code> the position vectors of two atom) returns the norm of the minimum image vector connecting <code class="docutils literal notranslate"><span class="pre">a</span></code> and <code class="docutils literal notranslate"><span class="pre">b</span></code>. </p>
 </dd></dl>
 
 </div>

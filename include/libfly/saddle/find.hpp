@@ -300,9 +300,10 @@ namespace fly::saddle {
     Options m_opt;
     system::Box m_box;
 
-    int m_num_zero_modes;     // Degree of freedom in each input
-    int m_count_frozen;       // The number of frozen atoms in the input.
-    double m_log_prod_eigen;  // the log(prod e_i) with e_i the the eigen values of the mass weighted hessian matrix.
+    std::vector<Eigen::Index> m_sep_list;  // atom i is furthest from sep_list[i]
+    int m_num_zero_modes;                  // Degree of freedom in each input
+    int m_count_frozen;                    // The number of frozen atoms in the input.
+    double m_log_prod_eigen;               // the log(prod e_i) with e_i the the eigen values of the mass weighted hessian matrix.
 
     ///////////////////////////////////////////////////////////////////////////////////
 

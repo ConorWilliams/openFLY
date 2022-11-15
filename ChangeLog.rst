@@ -31,7 +31,8 @@ Added
 - Catalogue has a method to calculate the (approximate) symmetries a geometry has.
 - Dimer::Exit has a new return code.
 - Many new options in Master::Options.
-- New Xoshiro constructor to properly seed from ``std::random_device``
+- New Xoshiro constructor to properly seed from ``std::random_device``.
+- Box has a new min_image calculator method.
 
 Changed
 ~~~~~~~

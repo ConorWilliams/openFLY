@@ -142,7 +142,7 @@ namespace fly::saddle {
   static std::pair<int, int> min_max(system::SoA<Position const&> a, system::SoA<Position const&> b) {
     //
     ASSERT(a.size() > 0, "Input has only {} atoms?", a.size());
-    ASSERT(a.size() == b.size(), "min_max inputs are different lengths {} != {}", a.size(), b.size());
+    ASSERT(a.size() == b.size(), "min_max()'s inputs are different lengths {} != {}", a.size(), b.size());
 
     int min = 0;
     int max = 0;
@@ -234,6 +234,28 @@ namespace fly::saddle {
     nl_pert.rebuild(in, m_opt.num_threads);
 
     calc_minima_hess(in);
+
+    {
+      m_sep_list.resize(safe_cast<std::size_t>(in.size()));
+
+#pragma omp parallel for num_threads(m_opt.num_threads)
+      for (Eigen::Index i = 0; i < in.size(); i++) {
+        //
+        auto mi = m_box.slow_min_image_computer();
+
+        Eigen::Index k = 0;
+        double max = 0;
+
+        for (Eigen::Index j = 0; j < in.size(); j++) {
+          if (double dr = mi(in(r_, i), in(r_, j)); dr > max) {
+            k = j;
+            max = dr;
+          }
+        }
+
+        m_sep_list[safe_cast<std::size_t>(i)] = k;
+      }
+    }
 
     std::vector<Found> out(geo_data.size());
 
@@ -640,7 +662,7 @@ namespace fly::saddle {
     }
 
     if (mech.poison) {
-      verify(mech.barrier > 4, "Mechanisms with energy barrier = {}eV is poisoned!", mech.barrier);
+      verify(mech.barrier > 4, "Mechanism @{} with energy barrier = {}eV is poisoned!", geo[0][i_], mech.barrier);
     }
 
     //////////////// Partial hessian compute. ////////////////
@@ -723,7 +745,7 @@ namespace fly::saddle {
                                                     Index::scalar_t centre) {
     // Check sp centred on centre and freeze an atom.
 
-    auto [min, max] = min_max(dimer, in);
+    auto [_, max] = min_max(dimer, in);
 
     if (max != centre) {
       dprint(m_opt.debug, "FINDER: found mech at {} but wanted {}\n", max, centre);
@@ -739,14 +761,12 @@ namespace fly::saddle {
     relax[fzn_] = dimer[fzn_];
     relax.rebind(id_, dimer);
 
-    if (false && m_count_frozen == 0) {
+    if (m_count_frozen == 0) {
       // Freeze minimally displaced atom to remove translational degrees of freedom.
 
-      if (double dr = gnorm(in(r_, min) - dimer(r_, min)); dr > m_opt.freeze_tol) {
-        throw error("FINDER: Trying to freeze an atom {} that displaced {}", min, dr);
-      } else {
-        dprint(m_opt.debug, "FINDER: Freezing atom #{}\n", min);
-      }
+      auto min = m_sep_list[safe_cast<size_t>(max)];
+
+      dprint(m_opt.debug, "FINDER: Freezing atom #{}\n", min);
 
       relax(fzn_, min) = true;
     }

@@ -119,7 +119,7 @@ namespace fly::env {
        */
       template <class Archive>
       void serialize(Archive& archive) {
-        archive(static_cast<Geometry<>&>(*this), m_finger, m_mechs, m_freq, m_index, m_delta_max);
+        archive(static_cast<Geometry<>&>(*this), m_finger, m_mechs, m_freq, m_false_pos, m_index, m_delta_max);
       }
 
     private:
@@ -127,7 +127,8 @@ namespace fly::env {
 
       Fingerprint m_finger;              ///< The fingerprint of this environment.
       std::vector<Mechanism> m_mechs{};  ///< The mechanisms accessible, centred on this environment.
-      int m_freq = 0;                    ///< The number of times this environment has been discovered.
+      int m_freq = 1;                    ///< The number of times this environment has been discovered.
+      int m_false_pos = 0;               ///< The number of false positives encountered.
       int m_index;                       ///< The unique index in the catalogue.
       double m_delta_max;                ///< The maximum value norm for environments to be considered equivalent.
 
@@ -156,38 +157,7 @@ namespace fly::env {
 
      * This is according to the ``delta_max()`` of the environment it is currently equivalent to.
      */
-    std::vector<SelfSymetry> calc_self_syms(int i) const {
-      //
-      env::Geometry<Index> const ref = get_geo(i);
-      env::Geometry<Index> mut = get_geo(i);
-
-      for (int j = 0; j < mut.size(); j++) {
-        mut[j][i_] = j;
-      }
-
-      std::vector<SelfSymetry> out;
-
-      double delta = calc_delta(m_real[safe_cast<std::size_t>(i)].f, get_ref(i));
-
-      env::for_equiv_perms(mut, ref, delta, 1, [&](fly::Mat const& O, double) {
-        //
-        SelfSymetry& last = out.emplace_back(SelfSymetry{O, {}});
-
-        for (auto const& elem : mut) {
-          last.perm.push_back(elem[i_]);
-        }
-
-        ASSERT(grmsd(O, mut, ref) < delta, "Not what you though grmsd={} delta={}!", grmsd(O, mut, ref), delta);
-
-        return false;
-      });
-
-      if (true || m_opt.debug) {
-        fmt::print("Cat: Env @{} has {} symmetries @tol={}\n", i, out.size(), delta);
-      }
-
-      return out;
-    }
+    auto calc_self_syms(int i) const -> std::vector<SelfSymetry>;
 
     /**
      * @brief Construct a new Catalogue object.
@@ -271,13 +241,10 @@ namespace fly::env {
     auto set_mechs(int i, std::vector<Mechanism> const& m) -> void;
 
     /**
-     * @brief Refine the delta of the ``i``th environment
-     */
-
-    /**
      * @brief Tighten the tolerance of the ``i``th environment.
      *
-     * This is done such that the current geometry no longer matches the reference or ``delta_max = min_delta``.
+     * This is done such that the current geometry no longer matches the reference or ``delta_max = min_delta``. Additionally, this
+     * function resets the frequency and false positive counters of the reference environment.
      *
      * @return The new ``delta_max`` of the environment reference environment that atom ``i`` was equivalent to.
      */
@@ -445,7 +412,7 @@ namespace fly::env {
      */
     Pointer insert(RelEnv& env);
 
-    bool canon_equiv(RelEnv& mut, Env const& ref) const;
+    bool canon_equiv(RelEnv& mut, Env& ref) const;
 
     /**
      * @brief Rebuild the ith RelEnv.

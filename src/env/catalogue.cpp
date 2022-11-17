@@ -27,6 +27,39 @@
 
 namespace fly::env {
 
+  auto Catalogue::calc_self_syms(int i) const -> std::vector<SelfSymetry> {
+    //
+    env::Geometry<Index> const ref = get_geo(i);
+    env::Geometry<Index> mut = get_geo(i);
+
+    for (int j = 0; j < mut.size(); j++) {
+      mut[j][i_] = j;
+    }
+
+    std::vector<SelfSymetry> out;
+
+    double delta = calc_delta(m_real[safe_cast<std::size_t>(i)].f, get_ref(i));
+
+    env::for_equiv_perms(mut, ref, delta, 1, [&](fly::Mat const &O, double) {
+      //
+      SelfSymetry &last = out.emplace_back(SelfSymetry{O, {}});
+
+      for (auto const &elem : mut) {
+        last.perm.push_back(elem[i_]);
+      }
+
+      ASSERT(grmsd(O, mut, ref) < delta, "Not what you though grmsd={} delta={}!", grmsd(O, mut, ref), delta);
+
+      return false;
+    });
+
+    if (true || m_opt.debug) {
+      fmt::print("Cat: Env @{:<4} has {:<2} symmetries @tol={:.5e}\n", i, out.size(), delta);
+    }
+
+    return out;
+  }
+
   void Catalogue::rebuild_env(int i,
                               Eigen::Index num_types,
                               Geometry<Index> &scratch,
@@ -67,13 +100,16 @@ namespace fly::env {
     // Find in catalogue, optimising for found case
 #pragma omp parallel for num_threads(num_threads) schedule(static)
     for (std::size_t i = 0; i < m_real.size(); i++) {
-      //   if (!(m_real[i].ptr = timeit("canon", [&] { return canon_find(m_real[i]); }))) {
       if (!(m_real[i].ptr = canon_find(m_real[i]))) {
 #pragma omp atomic write
         flag = true;
+
         if (m_opt.debug) {
           fmt::print("CAT: environment around {} is new\n", i);
         }
+      } else {
+#pragma omp atomic update
+        (**(m_real[i].ptr)).m_freq += 1;
       }
     }
 
@@ -128,12 +164,6 @@ namespace fly::env {
       fmt::print("CAT: found {} new environments\n", new_idx.size());
     }
 
-    // Update frequencies
-    for (auto const &elem : m_real) {
-      ASSERT(elem.ptr, "Null pointer in catalogue\n", 0);
-      (**elem.ptr).m_freq++;
-    }
-
     return new_idx;
   }
 
@@ -144,7 +174,7 @@ namespace fly::env {
     ASSERT(it != m_cat.end(), "Catalogue missing key!", 0);
 
     // Existing key, must search bucket for explicit match
-    auto match = std::find_if(it->second.begin(), it->second.end(), [&](Env const &ref) { return canon_equiv(env, ref); });
+    auto match = std::find_if(it->second.begin(), it->second.end(), [&](Env &ref) { return canon_equiv(env, ref); });
 
     // If found a match, return it
     if (match != it->second.end()) {
@@ -165,11 +195,13 @@ namespace fly::env {
 
     it->second.emplace_back(Env{env.geo, env.f, m_size++, std::min(env.f.r_min() * 0.4, m_opt.delta_max)});
 
-    return {it, xise(it->second) - 1};
+    return {it, ssize(it->second) - 1};
   }
 
-  bool Catalogue::canon_equiv(Catalogue::RelEnv &mut, Env const &ref) const {
+  bool Catalogue::canon_equiv(Catalogue::RelEnv &mut, Env &ref_in) const {
     //
+    Env const &ref = ref_in;
+
     double delta = calc_delta(mut.f, ref);
 
     // Test if fuzzy keys match (fast)
@@ -180,7 +212,8 @@ namespace fly::env {
     if (mut.geo.permute_onto(ref, delta)) {
       return true;
     } else {
-      //   fmt::print("False positive\n");
+#pragma omp atomic update
+      ref_in.m_false_pos += 1;
       return false;
     }
   }
@@ -215,10 +248,12 @@ namespace fly::env {
     double new_delta_max = std::max(min_delta, res->rmsd / 1.5);
 
     if (m_opt.debug) {
-      fmt::print("Refining delta_max @{} from {} to {}\n", i, get_ref(i).m_delta_max, new_delta_max);
+      fmt::print("CAT: Refining delta_max @{} from {} to {}\n", i, get_ref(i).m_delta_max, new_delta_max);
     }
 
     (**(m_real[si].ptr)).m_delta_max = new_delta_max;
+    (**(m_real[si].ptr)).m_freq = 1;
+    (**(m_real[si].ptr)).m_false_pos = 0;
 
     return new_delta_max;
   }
@@ -239,6 +274,7 @@ namespace fly::env {
     std::size_t si = safe_cast<std::size_t>(i);
 
     if (!in_ready_state) {
+      dprint(m_opt.debug, "CAT: Rebuilding the geometry @{}", i);
       // Prepare memory.
       m_real.resize(std::size_t(in.size()));
       // Prep neigh list.

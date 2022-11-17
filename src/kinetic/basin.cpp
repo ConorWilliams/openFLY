@@ -87,7 +87,7 @@ namespace fly::kinetic {
     }();
 
     if (m_opt.debug) {
-      fmt::print("Basin: KMC choice @atom={}, rate={} : {}% of {} choices\n",
+      fmt::print("Basin: KMC choice @atom={} : {:.2f}% of {} choices\n",
                  mech.m_atom_index,
                  mech.m_rate,
                  mech.m_rate / rate_sum() * 100.,

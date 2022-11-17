@@ -36,6 +36,10 @@
 #include "libfly/utility/lattice.hpp"
 #include "libfly/utility/random.hpp"
 
+//
+
+#include "update.hpp"
+
 using namespace fly;
 
 template <typename... T>
@@ -63,74 +67,6 @@ system::Supercell<system::TypeMap<>, Position, Frozen, T...> bcc_iron_motif() {
   return motif;
 }
 
-struct Update {
-  bool new_envs = false;  ///< True if new environments encountered.
-  bool ref_envs = false;  ///< True if environment refinement occurred.
-};
-
-// Returns true it catalogue has been refined.
-template <typename Map, typename... T>
-Update update_cat(saddle::Master& mast, env::Catalogue& cat, system::Supercell<Map, T...> const& cell) {
-  //
-
-  std::vector<int> ix = timeit("cat.rebuild()", [&] { return cat.rebuild(cell, omp_get_max_threads()); });
-
-  if (ix.empty()) {
-    return {};
-  }
-
-  int refines = 0;
-
-  while (true) {
-    //
-    std::vector<int> fails;
-
-    fmt::print("New envs @{} with {} refines\n", ix, refines);
-
-    std::vector found = mast.find_mechs(saddle::Master::package({ix}, cat), cell);
-
-    /*
-     * If find_mechs has failed, the failed environments must be too symmetric, we must refine them until they are less symmetric.
-     */
-
-    for (std::size_t i = 0; i < found.size(); i++) {
-      if (found[i]) {
-        cat.set_mechs(ix[i], found[i].mechs());
-      } else {
-        fails.push_back(ix[i]);
-      }
-    }
-
-    if (fails.empty()) {
-      return {true, refines == 0};
-    } else {
-      ++refines;
-    }
-
-    // Refine tolerance's
-    for (auto const& f : fails) {
-      auto n = cat.calc_self_syms(f).size();
-      do {
-        double new_tol = cat.refine_tol(f, cat.get_ref(f).delta_max() / 1.5);
-        verify(new_tol > 1e-6, "Probably converging to a true symmetry!");
-      } while (n == cat.calc_self_syms(f).size());
-    }
-
-    std::vector tmp = cat.rebuild(cell, omp_get_max_threads());
-
-    // The atom whose symmetry tolerance increased still needs to be searched alongside any atoms that now no longer match that
-    // environment.
-    for (auto const& elem : tmp) {
-      verify(std::find(fails.begin(), fails.end(), elem) == fails.end(), "Atom #{} found twice", elem);
-    }
-
-    // tmp now stores previous fails + new environments that don't match the refined tolerance.
-    tmp.insert(tmp.end(), fails.begin(), fails.end());
-
-    ix = std::move(tmp);
-  }
-};
-
 struct Options {};
 
 int main() {
@@ -138,8 +74,11 @@ int main() {
 
   system::Supercell cell = remove_atoms(motif_to_lattice(bcc_iron_motif<Hash>(), {6, 6, 6}), {1});
 
-  cell
-      = add_atoms(cell, {system::Atom<TypeID, Position, Frozen, Hash>(1, {2.857 / 2 + 3.14, 2.857 / 2 + 3.14, 0.5 + 3.14}, false, 0)});
+  //   cell
+  //       = add_atoms(cell, {system::Atom<TypeID, Position, Frozen, Hash>(1, {2.857 / 2 + 3.14, 2.857 / 2 + 3.14, 0.5 + 3.14}, false,
+  //       0)});
+
+  //   cell = add_atoms(cell, {system::Atom<TypeID, Position, Frozen, Hash>(1, {0.992116, 6.01736, 4.56979}, false, 0)});
 
   //   cell(r_, 431) = Vec{4.5896, 4.5892, 5.91909};
   //   cell(r_, 0) = Vec{4.45211, 4.45172, 4.2526};
@@ -198,7 +137,7 @@ int main() {
       saddle::Dimer{{}, {}, cell.box()},
   };
   //
-  auto [new_env, _] = update_cat(mast, cat, cell);
+  auto [new_env, _] = update_cat(mast, cat, cell, omp_get_max_threads());
 
   if (new_env) {
     dump_cat();
@@ -226,7 +165,7 @@ int main() {
 
       kinetic::Basin basin = timeit("kinetic::Basin", [&] { return kinetic::Basin({.debug = true, .temp = 1000}, cell, cat); });
 
-      auto const& [m, atom, dt] = basin.kmc_choice(rng);
+      auto [m, atom, dt] = basin.kmc_choice(rng);
 
       ///////////// Reconstruct mech /////////////
 
@@ -273,7 +212,7 @@ int main() {
           double new_tol = cat.refine_tol(atom);
           fmt::print("Refined tolerance to {}\n", new_tol);
           verify(new_tol > 1e-7, "A reconstruction failed on its original environment (new_tol = {}), poisoned?", new_tol);
-          new_envs |= update_cat(mast, cat, cell).new_envs;
+          new_envs |= update_cat(mast, cat, cell, omp_get_max_threads()).new_envs;
         } while (initial_assign == cat.get_ref(atom).cat_index());
 
         // fmt::print("Press any key to continue...");
@@ -294,7 +233,7 @@ int main() {
 
       ///////////// Update catalogue /////////////
 
-      auto [new_envs, refined] = timeit("Update catalogue", [&] { return update_cat(mast, cat, cell); });
+      auto [new_envs, refined] = timeit("Update catalogue", [&] { return update_cat(mast, cat, cell, omp_get_max_threads()); });
 
       if (new_envs) {
         dump_cat();

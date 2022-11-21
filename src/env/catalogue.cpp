@@ -195,7 +195,7 @@ namespace fly::env {
 
     it->second.emplace_back(Env{env.geo, env.f, m_size++, std::min(env.f.r_min() * 0.4, m_opt.delta_max)});
 
-    return {it, ssize(it->second) - 1};
+    return {it, fly::ssize(it->second) - 1};
   }
 
   bool Catalogue::canon_equiv(Catalogue::RelEnv &mut, Env &ref_in) const {

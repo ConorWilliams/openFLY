@@ -98,7 +98,7 @@ namespace fly::kinetic {
      */
     auto expand_occupy(Basin &&basin) -> std::size_t {
       m_super.push_back(std::move(basin));
-      m_prob.conservativeResizeLike(Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>::Zero(ssize(*this), ssize(*this)));
+      m_prob.conservativeResizeLike(Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>::Zero(fly::ssize(*this), fly::ssize(*this)));
       return std::exchange(m_occupied, size() - 1);
     }
 

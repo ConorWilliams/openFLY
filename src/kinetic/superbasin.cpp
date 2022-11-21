@@ -37,9 +37,9 @@ namespace fly::kinetic {
     using V = Eigen::Vector<double, Eigen::Dynamic>;
 
     // Non-allocating Eigen3-objects: theta_{i} = Kroneker_{is}
-    auto theta = V::NullaryExpr(ssize(m_super), [o = safe_cast<Eigen::Index>(m_occupied)](auto i) { return i == o; });
+    auto theta = V::NullaryExpr(fly::ssize(m_super), [o = safe_cast<Eigen::Index>(m_occupied)](auto i) { return i == o; });
 
-    auto identity = Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>::Identity(ssize(m_super), ssize(m_super));
+    auto identity = Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>::Identity(fly::ssize(m_super), fly::ssize(m_super));
 
     // Calc theta^{sum}
     V tau = (identity - m_prob).colPivHouseholderQr().solve(theta);

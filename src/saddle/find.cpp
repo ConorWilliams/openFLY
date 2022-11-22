@@ -314,7 +314,9 @@ namespace fly::saddle {
     int tot = 0;
     int fail = 0;
 
-    while (tot < m_opt.max_searches && fail < m_opt.max_failed_searches) {
+    int mod = in(id_, geo_data.centre) == 1 ? 2 : 1;
+
+    while (tot < m_opt.max_searches * mod && fail < m_opt.max_failed_searches * mod) {
       //
       if (find_batch(tot, out, batch, geo_data, in, nl_pert, cache)) {
         fail = 0;

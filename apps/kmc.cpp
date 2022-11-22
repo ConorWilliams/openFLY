@@ -137,7 +137,7 @@ int main() {
       saddle::Dimer{{}, {}, cell.box()},
   };
   //
-  auto [new_env, _] = update_cat(mast, cat, cell, omp_get_max_threads());
+  auto new_env = update_cat(mast, cat, cell, omp_get_max_threads());
 
   if (new_env) {
     dump_cat();
@@ -212,7 +212,7 @@ int main() {
           double new_tol = cat.refine_tol(atom);
           fmt::print("Refined tolerance to {}\n", new_tol);
           verify(new_tol > 1e-7, "A reconstruction failed on its original environment (new_tol = {}), poisoned?", new_tol);
-          new_envs |= update_cat(mast, cat, cell, omp_get_max_threads()).new_envs;
+          new_envs = new_env || update_cat(mast, cat, cell, omp_get_max_threads());
         } while (initial_assign == cat.get_ref(atom).cat_index());
 
         // fmt::print("Press any key to continue...");
@@ -233,9 +233,7 @@ int main() {
 
       ///////////// Update catalogue /////////////
 
-      auto [new_envs, refined] = timeit("Update catalogue", [&] { return update_cat(mast, cat, cell, omp_get_max_threads()); });
-
-      if (new_envs) {
+      if (timeit("Update catalogue", [&] { return update_cat(mast, cat, cell, omp_get_max_threads()); })) {
         dump_cat();
       }
     });

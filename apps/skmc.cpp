@@ -75,11 +75,10 @@ int main() {
 
   system::Supercell cell = remove_atoms(motif_to_lattice(bcc_iron_motif<Hash>(), {6, 6, 6}), {1});
 
-  //   cell
-  //       = add_atoms(cell, {system::Atom<TypeID, Position, Frozen, Hash>(1, {2.857 / 2 + 3.14, 2.857 / 2 + 3.14, 0.5 + 3.14}, false,
-  //       0)});
+  cell
+      = add_atoms(cell, {system::Atom<TypeID, Position, Frozen, Hash>(1, {2.857 / 2 + 3.14, 2.857 / 2 + 3.14, 0.5 + 3.14}, false, 0)});
 
-  cell = add_atoms(cell, {system::Atom<TypeID, Position, Frozen, Hash>(1, {0.992116, 6.01736, 4.56979}, false, 0)});
+  //   cell = add_atoms(cell, {system::Atom<TypeID, Position, Frozen, Hash>(1, {0.992116, 6.01736, 4.56979}, false, 0)});
 
   //   cell(r_, 431) = Vec{4.5896, 4.5892, 5.91909};
   //   cell(r_, 0) = Vec{4.45211, 4.45172, 4.2526};
@@ -130,7 +129,7 @@ int main() {
   }();
 
   auto dump_cat = [&] {
-    exit(0);
+    // exit(0);
     std::ofstream fcat(fname);
     cat.dump(fcat);
   };
@@ -143,9 +142,8 @@ int main() {
       saddle::Dimer{{}, {}, cell.box()},
   };
   //
-  auto [new_env, _] = update_cat(mast, cat, cell, omp_get_max_threads());
 
-  if (new_env) {
+  if (update_cat(mast, cat, cell, omp_get_max_threads())) {
     dump_cat();
   }
 
@@ -165,7 +163,17 @@ int main() {
     return pot.energy(cell, neigh_list, omp_get_max_threads());
   };
 
-  kinetic::SuperBasin sb({.debug = true}, {{.debug = true, .temp = 200}, cell, cat});
+  double temp = 300;
+
+  /**
+   * @brief Build a new superbasin from the cell/catalogue.
+   */
+  auto new_sb = [&]() -> kinetic::SuperBasin {
+    fmt::print("New superbasin!\n");
+    return {{.debug = true}, {{.debug = true, .temp = temp}, cell, cat}};
+  };
+
+  kinetic::SuperBasin sb = new_sb();
 
   for (int i = 0; i < 10'000; i++) {
     timeit("TOTAL", [&] {
@@ -174,11 +182,11 @@ int main() {
       auto const& [m, atom, dt, basin, changed] = timeit("Super::choice", [&] { return sb.kmc_choice(rng); });
 
       if (changed) {
-        fmt::print("Basin changed\n");
+        fmt::print("Basin changed to {}\n", basin);
         cell[r_] = sb.current_basin().state()[r_];
         file.commit([&] { file.write(r_, cell); });
       } else {
-        fmt::print("Basin did NOT changed\n");
+        fmt::print("Basin did NOT changed, still at {}\n", basin);
       }
 
       ///////////// Reconstruct mech /////////////
@@ -227,14 +235,16 @@ int main() {
           double new_tol = cat.refine_tol(atom);
           fmt::print("Refined tolerance to {}\n", new_tol);
           verify(new_tol > 1e-7, "A reconstruction failed on its original environment (new_tol = {}), poisoned?", new_tol);
-          new_envs |= update_cat(mast, cat, cell, omp_get_max_threads()).new_envs;
+          new_envs = new_envs || update_cat(mast, cat, cell, omp_get_max_threads());
         } while (initial_assign == cat.get_ref(atom).cat_index());
 
         if (new_envs) {
           dump_cat();
         }
 
-        throw error("superbasin not ready for this|");
+        sb = new_sb();
+
+        // throw error("superbasin not ready for this|");
 
         return;  // Effectively continue.
       }
@@ -245,9 +255,7 @@ int main() {
 
       ///////////// Update catalogue /////////////
 
-      auto [new_envs, refined] = timeit("Update catalogue", [&] { return update_cat(mast, cat, cell, omp_get_max_threads()); });
-
-      if (new_envs) {
+      if (timeit("Update catalogue", [&] { return update_cat(mast, cat, cell, omp_get_max_threads()); })) {
         dump_cat();
       }
 
@@ -256,13 +264,13 @@ int main() {
       if (sb.find_occupy(kinetic::hash(cell.size(), cat), cell, 0.1)) {
         fmt::print("Old basin in SuperBasin, size={}\n", sb.size());
       } else {
+        sb.expand_occupy({{.debug = true, .temp = temp}, cell, cat});
         fmt::print("New basin in SuperBasin, size={}\n", sb.size());
-        sb.expand_occupy({{.debug = true, .temp = 200}, cell, cat});
       }
 
       sb.connect_from(basin, m);
     });
-    fmt::print("Iteration #{} time = {:.3e}\n\n", i, time);
+    fmt::print("Iteration #{} time = {:.3e}, frames={}\n\n", i, time, file.n_frames());
   }
 
   return 0;

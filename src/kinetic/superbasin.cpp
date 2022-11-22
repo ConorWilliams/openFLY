@@ -58,6 +58,8 @@ namespace fly::kinetic {
 
     auto tau = compute_tau();
 
+    dprint(m_opt.debug, "SuperBasin: Density={::.4f}\n", tau / tau.sum());
+
     int count = 0;
 
     // Sum over all basin->escape rate times basin modifiers, omit normalising factor of 1/tau.sum()
@@ -78,6 +80,7 @@ namespace fly::kinetic {
 
         sum += tau[safe_cast<Eigen::Index>(i)] * basin_exit_sum;
       }
+
       return sum;
     }();
 
@@ -109,7 +112,7 @@ namespace fly::kinetic {
     double const eff_rate = tau[safe_cast<Eigen::Index>(basin)] * inv_tau * exit_mech.m_rate;
     double const prob = 100 * eff_rate / (inv_tau * r_sum);
 
-    dprint(m_opt.debug, "SuperBasin: SKMC choice @atom={} : {:.2f}% of {}\n", exit_mech.m_atom_index, prob, count);
+    dprint(m_opt.debug, "SuperBasin: SKMC choice @atom={} : {:.3f}% of {}\n", exit_mech.m_atom_index, prob, count);
 
     // Must normalize by inv_tau
     return {

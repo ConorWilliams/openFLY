@@ -25,14 +25,6 @@
 namespace fly::env {
 
   /**
-   * @brief Return type for ``update_cat()``.
-   */
-  struct Update {
-    bool new_envs = false;  ///< True if new environments encountered.
-    bool ref_envs = false;  ///< True if environment refinement occurred.
-  };
-
-  /**
    * @brief Updates/rebuilds a catalogue from a ``cell``.
    *
    * This function repeatedly calls ``.rebuild()`` on ``cat`` and coordinates saddle-point searches using ``mast`` to find the
@@ -41,15 +33,18 @@ namespace fly::env {
    * @param mast The saddle-point/mechanism finder.
    * @param cat The catalogue to update
    * @param cell The cell to rebuild the catalogue from.
+   * @return true If new environments encountered.
+   * @return false If no new environments encountered.
    */
+
   template <typename Map, typename... T>
-  Update update_cat(saddle::Master& mast, env::Catalogue& cat, system::Supercell<Map, T...> const& cell, int num_threads) {
+  bool update_cat(saddle::Master& mast, env::Catalogue& cat, system::Supercell<Map, T...> const& cell, int num_threads) {
     //
 
     std::vector<int> ix = cat.rebuild(cell, num_threads);
 
     if (ix.empty()) {
-      return {};
+      return false;
     }
 
     int refines = 0;
@@ -75,12 +70,12 @@ namespace fly::env {
       }
 
       if (fails.empty()) {
-        return {true, refines == 0};
+        return true;
       } else {
         ++refines;
       }
 
-      // Refine tolerance's
+      // Refine tolerance's, Refines only occur at new environments
       for (auto const& f : fails) {
         auto n = cat.calc_self_syms(f).size();
         verify(n > 1, "Env @{} cannot get any less symmetric!", f);

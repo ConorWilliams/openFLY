@@ -70,6 +70,8 @@ namespace fly::env {
       double r_env = 5.2;
       /** @brief Maximum distance for atoms to be considered connected in the canonisation neighbour graph. */
       double r_edge = 3.0;
+      /** @brief Minimum value of delta_max during refinement (smaller is considered an error). */
+      double min_delta_max = 1e-7;
       /** @brief If true prints debugging info. */
       bool debug = false;
 

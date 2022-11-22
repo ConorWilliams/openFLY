@@ -251,6 +251,8 @@ namespace fly::env {
       fmt::print("CAT: Refining delta_max @{} from {} to {}\n", i, get_ref(i).m_delta_max, new_delta_max);
     }
 
+    verify(new_delta_max > m_opt.min_delta_max, "delta_max too small: {}->{}!", (**(m_real[si].ptr)).m_delta_max, new_delta_max);
+
     (**(m_real[si].ptr)).m_delta_max = new_delta_max;
     (**(m_real[si].ptr)).m_freq = 1;
     (**(m_real[si].ptr)).m_false_pos = 0;

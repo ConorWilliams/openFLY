@@ -134,8 +134,15 @@ int main() {
     cat.dump(fcat);
   };
 
+  saddle::Master::Options opt{
+      .num_threads = omp_get_max_threads(),
+      .max_searches = 100,
+      .max_failed_searches = 50,
+      .debug = false,
+  };
+
   saddle::Master mast{
-      {.num_threads = omp_get_max_threads(), .max_searches = 100, .max_failed_searches = 50, .debug = false},
+      opt,
       cell.box(),
       pot,
       minimiser,
@@ -213,9 +220,9 @@ int main() {
 
       if (err) {
         fail = true;
-      } else if (dE_err > 1e-5 && dE_err_frac > 0.01) {
+      } else if (dE_err > opt.recon_e_tol_abs && dE_err_frac > opt.recon_e_tol_frac) {
         fail = true;
-      } else if (dR_err > 0.25 && dR_err_frac > 0.50) {
+      } else if (dR_err > opt.recon_norm_frac_tol && dR_err_frac > opt.recon_norm_abs_tol) {
         fail = true;
       } else {
         cell[r_] = rel_recon[r_];
@@ -234,7 +241,6 @@ int main() {
         do {
           double new_tol = cat.refine_tol(atom);
           fmt::print("Refined tolerance to {}\n", new_tol);
-          verify(new_tol > 1e-7, "A reconstruction failed on its original environment (new_tol = {}), poisoned?", new_tol);
           new_envs = new_envs || update_cat(mast, cat, cell, omp_get_max_threads());
         } while (initial_assign == cat.get_ref(atom).cat_index());
 

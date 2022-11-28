@@ -112,7 +112,12 @@ namespace fly::kinetic {
     double const eff_rate = tau[safe_cast<Eigen::Index>(basin)] * inv_tau * exit_mech.m_rate;
     double const prob = 100 * eff_rate / (inv_tau * r_sum);
 
-    dprint(m_opt.debug, "SuperBasin: SKMC choice @atom={} : {:.3f}% of {}\n", exit_mech.m_atom_index, prob, count);
+    dprint(m_opt.debug,
+           "SuperBasin: SKMC choice @atom={} ΔE={:.3f}eV : {:.3f}% of {}\n",
+           exit_mech.m_atom_index,
+           exit_mech.m_mech->barrier,
+           prob,
+           count);
 
     // Must normalize by inv_tau
     return {

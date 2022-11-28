@@ -10,10 +10,12 @@
 #include <ctime>
 #include <fstream>
 #include <iostream>
+#include <limits>
 #include <random>
 #include <string_view>
 #include <utility>
 #include <variant>
+#include <vector>
 
 #include "libfly/env/catalogue.hpp"
 #include "libfly/io/gsd.hpp"
@@ -67,8 +69,6 @@ system::Supercell<system::TypeMap<>, Position, Frozen, T...> bcc_iron_motif() {
 
   return motif;
 }
-
-struct Options {};
 
 int main() {
   //
@@ -186,7 +186,59 @@ int main() {
 
   kinetic::SuperBasin sb = new_sb();
 
-  for (int i = 0; i < 10'000; i++) {
+  //   Trap detection!
+
+  struct Traps {
+  public:
+    double try_push(double E, Vec h_atom) {
+      //
+      if (reset && E < E_trap) {
+        fmt::print("Resetting traps\n");
+        m_traps.clear();
+        reset = false;
+      }
+
+      double min = std::numeric_limits<double>::max();
+
+      for (auto const& elem : m_traps) {
+        min = std::min(min, gnorm(h_atom - elem));
+      }
+
+      if (E < E_trap) {
+        if (min < lim) {
+          fmt::print("Known trap\n");
+          return min;
+        } else {
+          fmt::print("New trap\n");
+          m_traps.push_back(h_atom);
+          return 0;
+        }
+      } else {
+        fmt::print("H is {} from trap\n", min);
+        // Not a trapping state return min.
+        return min;
+      }
+    }
+
+    // Once this function has been called at the next try_push that is a trapping state the traps will be cleared
+    void reset_at_next_trap() { reset = true; }
+
+    std::size_t size() const noexcept { return m_traps.size(); }
+
+  private:
+    bool reset = false;
+    double lim = 0.1;
+    double E_trap = -1731.56;  // v2 = -1726.05;  // v3 = -1720.68;  // V1 = -1731.56;
+    std::vector<Vec> m_traps;
+  };
+
+  Traps traps;
+
+  fmt::print("E0 = {}\n", energy(cell));
+
+  double dtrap = traps.try_push(energy(cell), cell(r_, cell.size() - 1));
+
+  for (int i = 0; dtrap < 6; i++) {
     timeit("TOTAL", [&] {
       ///////////// Select mechanism /////////////
 
@@ -259,9 +311,21 @@ int main() {
         return;  // Effectively continue.
       }
 
-      ///////////// IO /////////////
+      ///////////// Time /////////////
 
       time += dt;
+
+      ///////////// Custom /////////////
+
+      fmt::print("E_eff={}\n", Ef);
+
+      if (atom != cell.size() - 1) {
+        traps.reset_at_next_trap();
+      }
+
+      dtrap = traps.try_push(Ef, cell(r_, cell.size() - 1));
+
+      fmt::print("The superbasin has {} traps\n", traps.size());
 
       ///////////// Update catalogue /////////////
 
@@ -280,6 +344,7 @@ int main() {
 
       sb.connect_from(basin, atom, m);
     });
+
     fmt::print("Iteration #{} time = {:.3e}, frames={}\n\n", i, time, file.n_frames());
   }
 

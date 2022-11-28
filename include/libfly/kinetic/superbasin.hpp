@@ -14,6 +14,7 @@
 
 // You should have received a copy of the GNU General Public License along with openFLY. If not, see <https://www.gnu.org/licenses/>.
 
+#include <algorithm>
 #include <cmath>
 #include <cstddef>
 #include <limits>
@@ -72,20 +73,32 @@ namespace fly::kinetic {
     /**
      * @brief Connect to mechanism 'mech' from basin 'basin' to the currently occupied basin.
      *
-     * @param i
+     * @param basin
+     * @param atom
      * @param m
      */
-    auto connect_from(std::size_t i, env::Mechanism const &m) -> void {
+    auto connect_from(std::size_t basin, int atom, env::Mechanism const &m) -> void {
       //
-      m_super[i].connected = true;
 
-      for (auto &elem : m_super[i].m_mechs) {
-        if (&m == elem.m_mech) {
-          m_prob(safe_cast<Eigen::Index>(m_occupied), safe_cast<Eigen::Index>(i)) = elem.m_rate / m_super[i].rate_sum();
-          elem.m_exit_mech = false;
+      std::vector<Basin::LocalisedMech> &mechs = m_super[basin].m_mechs;
+
+      auto it = std::lower_bound(mechs.begin(), mechs.end(), atom, [](Basin::LocalisedMech const &elem, int val) {
+        //
+        return elem.m_atom_index < val;
+      });
+
+      ASSERT(it == mechs.end() || it->m_atom_index == atom, "Got {}, wanted {}", it == mechs.end() ? -1 : it->m_atom_index, atom);
+
+      for (; it != mechs.end() && it->m_atom_index == atom; ++it) {
+        if (&m == it->m_mech) {
+          m_prob(safe_cast<Eigen::Index>(m_occupied), safe_cast<Eigen::Index>(basin)) = it->m_rate / m_super[basin].rate_sum();
+          ASSERT(it->m_exit_mech == true, "Chose an exit mech?", 0);
+          it->m_exit_mech = false;
+          m_super[basin].connected = true;
           return;
         }
       }
+
       throw error("Mech not in basin?");
     }
 

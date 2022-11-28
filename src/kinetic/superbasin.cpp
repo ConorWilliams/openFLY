@@ -154,9 +154,11 @@ namespace fly::kinetic {
 
         if (sum_sq < tol * tol) {
           return std::exchange(m_occupied, i);
+        } else {
+          fmt::print("Matching hash but different basin? Check this!\n");
         }
 
-        throw error("Matching hash but different basin? Check this!");
+        // throw error();
       }
     }
     return std::nullopt;

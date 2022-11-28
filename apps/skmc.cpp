@@ -75,8 +75,12 @@ int main() {
 
   system::Supercell cell = remove_atoms(motif_to_lattice(bcc_iron_motif<Hash>(), {6, 6, 6}), {1});
 
-  cell
-      = add_atoms(cell, {system::Atom<TypeID, Position, Frozen, Hash>(1, {2.857 / 2 + 3.14, 2.857 / 2 + 3.14, 0.5 + 3.14}, false, 0)});
+  cell = add_atoms(
+      cell, {system::Atom<TypeID, Position, Frozen, Hash>(1, {2.857 / 2 + 3.14, 2.857 / 2 + 3.14, 2.857 / 4 + 3.14}, false, 0)});
+
+  //   cell = add_atoms(
+  //       cell, {system::Atom<TypeID, Position, Frozen, Hash>(1, {2.857 / 2 + 3.14, 2.857 / 2 + 3.14, 2.857 / 4 * 2 + 3.14}, false,
+  //       0)});
 
   //   cell = add_atoms(cell, {system::Atom<TypeID, Position, Frozen, Hash>(1, {0.992116, 6.01736, 4.56979}, false, 0)});
 
@@ -274,7 +278,7 @@ int main() {
         fmt::print("New basin in SuperBasin, size={}\n", sb.size());
       }
 
-      sb.connect_from(basin, m);
+      sb.connect_from(basin, atom, m);
     });
     fmt::print("Iteration #{} time = {:.3e}, frames={}\n\n", i, time, file.n_frames());
   }

@@ -106,7 +106,7 @@ namespace fly::kinetic {
     /**
      * @brief Fetch the state (positions if the atoms in the basin).
      */
-    auto state() const noexcept -> system::SoA<Position> const { return m_state; }
+    auto state() const noexcept -> system::SoA<Position> const & { return m_state; }
 
     /**
      * @brief Fetch every mechanisms that is accessible that with a probability greater than ``tol``.

@@ -144,17 +144,48 @@ namespace fly::kinetic {
 
     auto it
         = std::lower_bound(mechs.begin(), mechs.end(), atom, [](Basin::LocalisedMech const &elem, int val) {
-            //
             return elem.m_atom_index < val;
           });
 
     for (; it != mechs.end() && it->m_atom_index == atom; ++it) {
       if (&m == it->m_mech) {
-        m_prob(safe_cast<Eigen::Index>(m_occupied), safe_cast<Eigen::Index>(basin))
-            = it->m_rate / m_super[basin].rate_sum();
+        //
         ASSERT(it->m_exit_mech == true, "Chose an exit mech?", 0);
+
+        auto to = safe_cast<Eigen::Index>(m_occupied);
+        auto from = safe_cast<Eigen::Index>(basin);
+
+        // Forward connection
+        m_prob(to, from) = it->m_rate / m_super[basin].rate_sum();
         it->m_exit_mech = false;
         m_super[basin].connected = true;
+
+        // Reverse Detection - experimental
+
+        // std::vector<Basin::LocalisedMech> &mechs2 = m_super[basin].m_mechs;
+
+        // auto itx = std::lower_bound(
+        //     mechs2.begin(), mechs2.end(), atom, [](Basin::LocalisedMech const &elem, int val) {
+        //       return elem.m_atom_index < val;
+        //     });
+
+        // double dE = m.barrier - m.delta;
+
+        // for (auto it2 = itx; it2 != mechs2.end() && it2->m_atom_index == atom; ++it2) {
+        //   if (std::abs(it2->m_mech->barrier - dE) < 0.01) {
+        //     return;
+        //   }
+        // }
+
+        // for (auto it2 = itx; it2 != mechs2.end() && it2->m_atom_index == atom; ++it2) {
+        //   fmt::print("dE={} ddE={}[{}]\n",
+        //              it2->m_mech->barrier,
+        //              std::abs(it2->m_mech->barrier - dE),
+        //              std::abs(it2->m_mech->barrier - dE) / dE);
+        // }
+
+        // throw error("Possible non-ergodicity detected!");
+
         return;
       }
     }

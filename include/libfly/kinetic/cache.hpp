@@ -62,6 +62,7 @@ namespace fly::kinetic {
       double tol_grow = 1.5;                  ///< Multiplier by which ``barrier_tol`` increases by.
       double tol_shrink = 0.5;                ///< Multiplier by which ``barrier_tol`` decreases by.
       bool debug = false;                     ///< Controls debug printing.
+      bool debug_pause = false;               ///< If true waits for input when ``barrier_tol`` is adjusted.
       Basin::Options opt_basin = {};          ///< Basin::Options options.
       SuperBasin::Options opt_sb = {};        ///< SuperBasin::Options options.
     };

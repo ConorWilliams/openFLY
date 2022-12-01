@@ -71,7 +71,7 @@ system::Supercell<system::TypeMap<>, Position, Frozen, T...> bcc_iron_motif() {
 int main() {
   //
 
-  system::Supercell cell = remove_atoms(motif_to_lattice(bcc_iron_motif<Hash>(), {6, 6, 6}), {1, 3});
+  system::Supercell cell = remove_atoms(motif_to_lattice(bcc_iron_motif<Hash>(), {6, 6, 6}), {1});
 
   cell = add_atoms(cell,
                    {system::Atom<TypeID, Position, Frozen, Hash>(

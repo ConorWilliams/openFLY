@@ -54,8 +54,10 @@ namespace fly::kinetic {
                prev_tol,
                m_opt.barrier_tol);
 
-        fmt::print("Press ENTER to continue...");
-        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+        if (m_opt.debug_pause) {
+          fmt::print("Press ENTER to continue...");
+          std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+        }
 
         reset({m_opt.opt_sb, {m_opt.opt_basin, cell, cat}});
 
@@ -108,8 +110,10 @@ namespace fly::kinetic {
              prev_tol,
              m_opt.barrier_tol);
 
-      fmt::print("Press ENTER to continue...");
-      std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+      if (m_opt.debug_pause) {
+        fmt::print("Press ENTER to continue...");
+        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+      }
 
       reset({m_opt.opt_sb, {m_opt.opt_basin, cell, cat}});
     }

@@ -6,13 +6,16 @@
 
 // This file is part of openFLY.
 
-// OpenFLY is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License
-// as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+// OpenFLY is free software: you can redistribute it and/or modify it under the terms of the GNU General
+// Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
+// option) any later version.
 
-// OpenFLY is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
-// warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+// OpenFLY is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the
+// implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+// for more details.
 
-// You should have received a copy of the GNU General Public License along with openFLY. If not, see <https://www.gnu.org/licenses/>.
+// You should have received a copy of the GNU General Public License along with openFLY. If not, see
+// <https://www.gnu.org/licenses/>.
 
 #include <utility>
 
@@ -39,8 +42,8 @@ namespace fly::kinetic {
   /**
    * @brief Updates/rebuilds a catalogue from a ``cell``.
    *
-   * This function repeatedly calls ``.rebuild()`` on ``cat`` and coordinates saddle-point searches using ``mast`` to find the
-   * mechanisms for the newly encountered environments.
+   * This function repeatedly calls ``.rebuild()`` on ``cat`` and coordinates saddle-point searches using
+   * ``mast`` to find the mechanisms for the newly encountered environments.
    *
    * @param mast The saddle-point/mechanism finder.
    * @param cat The catalogue to update
@@ -50,7 +53,10 @@ namespace fly::kinetic {
    * @return false If no new environments encountered.
    */
   template <typename Map, typename... T>
-  bool update_cat(saddle::Master& mast, env::Catalogue& cat, system::Supercell<Map, T...> const& cell, int num_threads) {
+  bool update_cat(saddle::Master& mast,
+                  env::Catalogue& cat,
+                  system::Supercell<Map, T...> const& cell,
+                  int num_threads) {
     //
     std::vector<int> ix = cat.rebuild(cell, num_threads);
 
@@ -69,7 +75,8 @@ namespace fly::kinetic {
       std::vector found = mast.find_mechs(saddle::Master::package({ix}, cat), cell);
 
       /*
-       * If find_mechs has failed, the failed environments must be too symmetric, we must refine them until they are less symmetric.
+       * If find_mechs has failed, the failed environments must be too symmetric, we must refine them until
+       * they are less symmetric.
        */
 
       for (std::size_t i = 0; i < found.size(); i++) {
@@ -98,8 +105,8 @@ namespace fly::kinetic {
 
       std::vector tmp = cat.rebuild(cell, num_threads);
 
-      // The atom whose symmetry tolerance increased still needs to be searched alongside any atoms that now no longer match that
-      // environment.
+      // The atom whose symmetry tolerance increased still needs to be searched alongside any atoms that now
+      // no longer match that environment.
       for (auto const& elem : tmp) {
         verify(std::find(fails.begin(), fails.end(), elem) == fails.end(), "Atom #{} found twice", elem);
       }
@@ -147,8 +154,8 @@ namespace fly::kinetic {
   //   private:
   //   };
 
-  // comments, documentation for kinetic/, skmc call lambda with more arguments, skmc object interface (minimise, pot, mast, cat
-  // (read-write) all owned ).
+  // comments, documentation for kinetic/, skmc call lambda with more arguments, skmc object interface
+  // (minimise, pot, mast, cat (read-write) all owned ).
 
   /**
    * @brief
@@ -292,7 +299,7 @@ namespace fly::kinetic {
 
       ///////////// Update SuperBasin /////////////
 
-      super.connect_via(basin, atom, m, cell, cat);
+      super.connect_from(basin, atom, m, cell, cat);
 
       fmt::print("Iteration #{} time = {:.3e}\n\n", i, time);
     }

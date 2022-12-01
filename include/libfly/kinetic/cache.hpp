@@ -6,13 +6,16 @@
 
 // This file is part of openFLY.
 
-// OpenFLY is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License
-// as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+// OpenFLY is free software: you can redistribute it and/or modify it under the terms of the GNU General
+// Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
+// option) any later version.
 
-// OpenFLY is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
-// warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+// OpenFLY is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the
+// implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+// for more details.
 
-// You should have received a copy of the GNU General Public License along with openFLY. If not, see <https://www.gnu.org/licenses/>.
+// You should have received a copy of the GNU General Public License along with openFLY. If not, see
+// <https://www.gnu.org/licenses/>.
 
 #include <fmt/core.h>
 
@@ -34,13 +37,16 @@
 /**
  * \file cache.hpp
  *
- * @brief d
+ * @brief Representation of a collection of basins.
  */
 
 namespace fly::kinetic {
 
   /**
    * @brief Manages a collection of superbasins.
+   *
+   * A SuperCache dynamically manages a collection of superbasin to remove the overhead of exploring/building
+   * a superbasin. The is particularly useful when superbasins are frequently re-entered upon exit.
    */
   class SuperCache {
   public:
@@ -56,140 +62,58 @@ namespace fly::kinetic {
       double tol_grow = 1.5;                  ///< Multiplier by which ``barrier_tol`` increases by.
       double tol_shrink = 0.5;                ///< Multiplier by which ``barrier_tol`` decreases by.
       bool debug = false;                     ///< Controls debug printing.
-      Basin::Options opt_basin = {};          ///< Basin options.
-      SuperBasin::Options opt_sb = {};        ///< Superbasin options.
+      Basin::Options opt_basin = {};          ///< Basin::Options options.
+      SuperBasin::Options opt_sb = {};        ///< SuperBasin::Options options.
     };
 
     /**
-     * @brief Construct a new Super Cache object
+     * @brief Construct a new SuperCache object initialised with a single superbasin.
      *
-     * @param opt
-     * @param sb
+     * @param opt The options for this SuperCache.
+     * @param sb The initial superbasin.
      */
     SuperCache(Options const &opt, SuperBasin &&sb) : m_opt(opt), m_sb(std::move(sb)) {}
 
     /**
-     * @brief
-     *
-     * @param basin
-     * @return auto const&
+     * @brief Get the state of the Basin indexed by ``basin`` in the active basin.
      */
     auto const &state(std::size_t basin) const { return m_sb.state(basin); }
 
     // Pre condition: _sb's occupied basin's state matches 'cell'.
     // Select a mechanism using appropriate KMC algorithm from active superbasin, if mechanism
     // starts from a different basin cell's active atoms are updated accordingly.
+
     /**
-     * @brief
-     *
-     * @param psudo_rng
-     * @return SuperBasin::Choice
+     * @brief Forward the call to the active superbasin's ``fly::kinetic::SuperBasin::kmc_choice()``.
      */
     auto kmc_choice(Xoshiro &psudo_rng) const -> SuperBasin::Choice { return m_sb.kmc_choice(psudo_rng); }
 
-    // Connect _sb's active basin to the basin 'cell' is currently in via mechanism 'mech', updates
-    // active basin to match 'cell'/'env'.
-    // Post condition: _sb's occupied basin's state matches 'cell'.
-
     /**
-     * @brief
+     * @brief Manages the internal superbasins.
      *
-     * @param basin
-     * @param atom
-     * @param m
-     * @param cell
-     * @param cat
+     * Identifies which (if any) basin ``cell`` matches, makes that basins's superbasin the active superbasin
+     * and then connects the mechanism ``mech`` with ``fly::kinetic::SuperBasin::connect_from()`` if this was
+     * a low barrier mechanism.
+
+     * @param basin The index of the basin which the mechanism starts from in the active superbasin.
+     * @param atom The index of the atom which the mechanism is centred on.
+     * @param mech The mechanism that was chosen.
+     * @param cell The system after reconstructing ``mech`` onto the previous state.
+     * @param cat The catalogue in the ready state (i.e. called ``cat.rebuild()`` with argument ``cell``).
      */
-    void connect_via(std::size_t basin,
-                     int atom,
-                     env::Mechanism const &m,
-                     system::SoA<Position const &> cell,
-                     env::Catalogue const &cat) {
-      //
-
-      auto hash = kinetic::hash(cell.size(), cat);
-
-      if (std::optional<std::size_t> found = m_sb.find_occupy(hash, cell, m_opt.state_tol)) {
-        // Did internal jump -> connect states
-        m_sb.connect_from(basin, atom, m);
-
-        dprint(m_opt.debug, "SuperCache: Existing basin in SB, size={}\n", m_sb.size());
-
-        return;
-      }
-
-      if (std::max(m.barrier, m.barrier - m.delta) < m_opt.barrier_tol) {
-        // Followed low barrier to get here -> must add basin to SB.
-
-        if (m_opt.dynamic_tol && m_sb.size() >= m_opt.max_superbasin_size) {
-          // Overflowing SB -> must lower barrier_tol
-
-          double prev_tol = std::exchange(m_opt.barrier_tol, std::max(0.0, m_opt.barrier_tol * m_opt.tol_shrink));
-
-          dprint(m_opt.debug, "Dynamically adjusting barrier tolerance : {:.3f} -> {:.3f}\n", prev_tol, m_opt.barrier_tol);
-
-          m_sb = SuperBasin{m_opt.opt_sb, {m_opt.opt_basin, cell, cat}};
-          m_cache.clear();
-
-        } else {
-          // Can expand and occupy
-          m_sb.expand_occupy({m_opt.opt_basin, cell, cat});
-          m_sb.connect_from(basin, atom, m);
-
-          dprint(m_opt.debug, "SuperCache: New basin in SB, size={}\n", m_sb.size());
-        }
-
-        return;
-      }
-
-      // Therefore followed high-barrier out of basin
-
-      // Try and retrieve cached SB
-      auto cached = [&]() -> std::optional<SuperBasin> {
-        for (auto it = m_cache.begin(); it != m_cache.end(); ++it) {
-          if (std::optional prev_basin = it->find_occupy(hash, cell, m_opt.state_tol)) {
-            SuperBasin tmp = std::move(*it);
-            m_cache.erase(it);
-            return tmp;
-          }
-        }
-        return {};
-      }();
-
-      if (cached) {
-        dprint(m_opt.debug, "SuperCache: LOADED CACHED SB with {} basins, cache size = {}\n", cached->size(), 1 + size());
-
-        cache(std::exchange(m_sb, std::move(*cached)));
-        m_in_cache_count += 1;
-      } else {
-        dprint(m_opt.debug, "SuperCache: NEW SB, cache size = {}\n", 1 + size());
-
-        cache(std::exchange(m_sb, SuperBasin{m_opt.opt_sb, {m_opt.opt_basin, cell, cat}}));
-        m_in_cache_count = 0;
-      }
-
-      if (m_opt.dynamic_tol && m_in_cache_count > m_opt.cache_size) {
-        //
-        double prev_tol = std::exchange(m_opt.barrier_tol, m_opt.barrier_tol * m_opt.tol_grow);
-
-        dprint(m_opt.debug, "Dynamically adjusting barrier tolerance : {:.3f} -> {:.3f}\n", prev_tol, m_opt.barrier_tol);
-
-        m_sb = SuperBasin{m_opt.opt_sb, {m_opt.opt_basin, cell, cat}};
-        m_cache.clear();
-      }
-    }
+    void connect_from(std::size_t basin,
+                      int atom,
+                      env::Mechanism const &mech,
+                      system::SoA<Position const &> cell,
+                      env::Catalogue const &cat);
 
     /**
-     * @brief
-     *
-     * @return std::size_t
+     * @brief Get the number of superbasins in the SuperCache.
      */
     std::size_t size() const noexcept { return 1 + m_cache.size(); }
 
     /**
-     * @brief
-     *
-     * @param sb
+     * @brief Reset the cache to contain only a single superbasin ``sb``.
      */
     void reset(SuperBasin &&sb) {
       m_sb = std::move(sb);

@@ -4,13 +4,16 @@
 
 // This file is part of openFLY.
 
-// OpenFLY is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License
-// as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+// OpenFLY is free software: you can redistribute it and/or modify it under the terms of the GNU General
+// Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
+// option) any later version.
 
-// OpenFLY is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
-// warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+// OpenFLY is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the
+// implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+// for more details.
 
-// You should have received a copy of the GNU General Public License along with openFLY. If not, see <https://www.gnu.org/licenses/>.
+// You should have received a copy of the GNU General Public License along with openFLY. If not, see
+// <https://www.gnu.org/licenses/>.
 
 #include "libfly/kinetic/superbasin.hpp"
 
@@ -37,9 +40,11 @@ namespace fly::kinetic {
     using V = Eigen::Vector<double, Eigen::Dynamic>;
 
     // Non-allocating Eigen3-objects: theta_{i} = Kroneker_{is}
-    auto theta = V::NullaryExpr(fly::ssize(m_super), [o = safe_cast<Eigen::Index>(m_occupied)](auto i) { return i == o; });
+    auto theta = V::NullaryExpr(fly::ssize(m_super),
+                                [o = safe_cast<Eigen::Index>(m_occupied)](auto i) { return i == o; });
 
-    auto identity = Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>::Identity(fly::ssize(m_super), fly::ssize(m_super));
+    auto identity = Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>::Identity(fly::ssize(m_super),
+                                                                                    fly::ssize(m_super));
 
     // Calc theta^{sum}
     V tau = (identity - m_prob).colPivHouseholderQr().solve(theta);
@@ -110,9 +115,6 @@ namespace fly::kinetic {
       throw error("Hit end of super choice");
     }();
 
-    // // Must occupy new basin (this is why method is not const)
-    // std::size_t old_basin = std::exchange(m_occupied, basin);
-
     double const inv_tau = 1 / tau.sum();
     double const eff_rate = tau[safe_cast<Eigen::Index>(basin)] * inv_tau * exit_mech.m_rate;
     double const prob = 100 * eff_rate / (inv_tau * r_sum);
@@ -140,14 +142,16 @@ namespace fly::kinetic {
 
     std::vector<Basin::LocalisedMech> &mechs = m_super[basin].m_mechs;
 
-    auto it = std::lower_bound(mechs.begin(), mechs.end(), atom, [](Basin::LocalisedMech const &elem, int val) {
-      //
-      return elem.m_atom_index < val;
-    });
+    auto it
+        = std::lower_bound(mechs.begin(), mechs.end(), atom, [](Basin::LocalisedMech const &elem, int val) {
+            //
+            return elem.m_atom_index < val;
+          });
 
     for (; it != mechs.end() && it->m_atom_index == atom; ++it) {
       if (&m == it->m_mech) {
-        m_prob(safe_cast<Eigen::Index>(m_occupied), safe_cast<Eigen::Index>(basin)) = it->m_rate / m_super[basin].rate_sum();
+        m_prob(safe_cast<Eigen::Index>(m_occupied), safe_cast<Eigen::Index>(basin))
+            = it->m_rate / m_super[basin].rate_sum();
         ASSERT(it->m_exit_mech == true, "Chose an exit mech?", 0);
         it->m_exit_mech = false;
         m_super[basin].connected = true;
@@ -158,7 +162,8 @@ namespace fly::kinetic {
     throw error("Mech/atom not in basin?");
   }
 
-  auto SuperBasin::find_occupy(std::size_t hash, system::SoA<Position const &> in, double tol) -> std::optional<std::size_t> {
+  auto SuperBasin::find_occupy(std::size_t hash, system::SoA<Position const &> in, double tol)
+      -> std::optional<std::size_t> {
     //
     auto com = [](system::SoA<Position const &> x) -> Vec {
       Vec sum = Vec::Zero();
@@ -183,7 +188,8 @@ namespace fly::kinetic {
           sum_sq += gnorm_sq(in(r_, j) - m_super[i].state()(r_, j) - delta);
         }
 
-        dprint(m_opt.debug, "Super: Hashes match at @{}: dr={}, drift={}\n", i, std::sqrt(sum_sq), gnorm(delta));
+        dprint(
+            m_opt.debug, "Super: Hashes match at @{}: dr={}, drift={}\n", i, std::sqrt(sum_sq), gnorm(delta));
 
         if (sum_sq < tol * tol) {
           return std::exchange(m_occupied, i);

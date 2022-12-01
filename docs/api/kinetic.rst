@@ -37,4 +37,14 @@ File: ``libfly/kinetic/superbasin.hpp``
     :undoc-members:
 
 
+Super(super)basins
+---------------------------------------
 
+File: ``libfly/kinetic/cache.hpp``
+
+.. doxygenfile:: libfly/kinetic/cache.hpp
+    :sections: briefdescription detaileddescription
+
+.. doxygenclass:: fly::kinetic::SuperCache
+    :members:
+    :undoc-members:

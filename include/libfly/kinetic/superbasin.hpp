@@ -6,13 +6,16 @@
 
 // This file is part of openFLY.
 
-// OpenFLY is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License
-// as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+// OpenFLY is free software: you can redistribute it and/or modify it under the terms of the GNU General
+// Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
+// option) any later version.
 
-// OpenFLY is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
-// warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+// OpenFLY is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the
+// implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+// for more details.
 
-// You should have received a copy of the GNU General Public License along with openFLY. If not, see <https://www.gnu.org/licenses/>.
+// You should have received a copy of the GNU General Public License along with openFLY. If not, see
+// <https://www.gnu.org/licenses/>.
 
 #include <algorithm>
 #include <cmath>
@@ -37,8 +40,11 @@
 namespace fly::kinetic {
 
   /**
-   * @brief Manages a superbasin: a collection of low-barrier-linked basins. This implements a variation of bac-MRM, the basin
-   * auto-constructing mean rate method, to analytically accelerate KMC.
+   * @brief Manages a superbasin: a collection of low-barrier-linked basins.
+   *
+   * This implements a variation of bac-MRM, the basin auto-constructing mean rate method, to analytically
+   * accelerate KMC. This solves the "low-barrier problem" for small numbers (< a few hundred) of flickering
+   * states.
    */
   class SuperBasin {
   public:
@@ -69,8 +75,8 @@ namespace fly::kinetic {
     /**
      * @brief Choose a mechanism using the modified mean-rate-method.
      *
-     * This will pick a non-transient mechanism, e.g. a mechanisms that "escapes" the superbasin (although it may be an internal
-     * mechanisms that has not been traversed yet).
+     * This will pick a non-transient mechanism, e.g. a mechanisms that "escapes" the superbasin (although it
+     * may be an internal mechanisms that has not been traversed yet).
      *
      * \rst
      *
@@ -100,7 +106,8 @@ namespace fly::kinetic {
     /**
      * @brief Connect mechanism ``mech`` from basin ``basin`` to the currently occupied basin.
      *
-     * This marks ``mech`` as an internal, transient mechanism and fills in the internal transition probability matrix.
+     * This marks ``mech`` as an internal, transient mechanism and fills in the internal transition
+     * probability matrix.
      *
      * @param basin The index of the basin which the mechanism starts from.
      * @param atom The index of the atom which the mechanism is centred on.
@@ -109,14 +116,16 @@ namespace fly::kinetic {
     auto connect_from(std::size_t basin, int atom, env::Mechanism const &m) -> void;
 
     /**
-     * @brief Expand the SuperBasin by adding ``basin`` to it and setting ``basin`` as the currently occupied basin.
+     * @brief Expand the SuperBasin by adding ``basin`` to it and setting ``basin`` as the currently occupied
+     * basin.
      *
      * @param basin The basin to add to the SuperBasin.
      * @return Returns the previously occupied basin's index.
      */
     auto expand_occupy(Basin &&basin) -> std::size_t {
       m_super.push_back(std::move(basin));
-      m_prob.conservativeResizeLike(Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>::Zero(fly::ssize(*this), fly::ssize(*this)));
+      using Dmat = Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>;
+      m_prob.conservativeResizeLike(Dmat::Zero(fly::ssize(*this), fly::ssize(*this)));
       return std::exchange(m_occupied, size() - 1);
     }
 
@@ -125,15 +134,16 @@ namespace fly::kinetic {
     /**
      * @brief Find and occupy a basin in the SuperBasin whose state matches ``in``.
      *
-     * Searches through the basins in the superbasin, if one is found that matches (all active atoms within L2 tolerance ``tol``)
-     * make it the occupied basin.
+     * Searches through the basins in the superbasin, if one is found that matches (all active atoms within L2
+     * tolerance ``tol``) make it the occupied basin.
      *
      * @param hash Of ``in`` as computed by ``fly::kinetic::hash()``.
      * @param in The input state.
      * @param tol The L2 tolerance between ``in`` and a basin state for them to be considered "the same".
      * @return Returns the previously occupied basin's index or ``std::nullopt`` if no match is found.
      */
-    auto find_occupy(std::size_t hash, system::SoA<Position const &> in, double tol) -> std::optional<std::size_t>;
+    auto find_occupy(std::size_t hash, system::SoA<Position const &> in, double tol)
+        -> std::optional<std::size_t>;
 
   private:
     Options m_opt;

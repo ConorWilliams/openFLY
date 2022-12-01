@@ -241,7 +241,23 @@
 <section id="basins">
 <h2>Basins<a class="headerlink" href="#basins" title="Permalink to this heading">#</a></h2>
 <p>File: <code class="docutils literal notranslate"><span class="pre">libfly/kinetic/basin.hpp</span></code></p>
-<p>Representation of a state in a Markov chain. </p>
+<p>Representation of a state in a Markov chain and utilities for discretising states. </p>
+<hr class="docutils" />
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3fly7kinetic4hashEN5Eigen5IndexERKN3fly3env9CatalogueE">
+<span id="_CPPv3N3fly7kinetic4hashEN5Eigen5IndexERKN3fly3env9CatalogueE"></span><span id="_CPPv2N3fly7kinetic4hashEN5Eigen5IndexERKN3fly3env9CatalogueE"></span><span id="fly::kinetic::hash__Eigen::Index.fly::env::CatalogueCR"></span><span class="target" id="basin_8hpp_1ab3089e46284735c30cd80a60a910f290"></span><span class="kt"><span class="pre">auto</span></span><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">fly</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">kinetic</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">hash</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">Eigen</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">Index</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">num_atoms</span></span>, <span class="n"><span class="pre">fly</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">env</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="env.html#_CPPv4N3fly3env9CatalogueE" title="fly::env::Catalogue"><span class="n"><span class="pre">Catalogue</span></span></a><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">cat</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="o"><span class="pre">-&gt;</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">size_t</span></span><a class="headerlink" href="#_CPPv4N3fly7kinetic4hashEN5Eigen5IndexERKN3fly3env9CatalogueE" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Compute a hash encoding the ID’s of the local environments of each atom loaded into the catalogue. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>num_atoms</strong> – Number of atoms loaded into the catalogue. </p></li>
+<li><p><strong>cat</strong> – A catalogue in the ready state. </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<hr class="docutils" />
 <dl class="cpp class">
 <dt class="sig sig-object cpp" id="_CPPv4N3fly7kinetic5BasinE">
 <span id="_CPPv3N3fly7kinetic5BasinE"></span><span id="_CPPv2N3fly7kinetic5BasinE"></span><span id="fly::kinetic::Basin"></span><span class="target" id="classfly_1_1kinetic_1_1Basin"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Basin</span></span></span><a class="headerlink" href="#_CPPv4N3fly7kinetic5BasinE" title="Permalink to this definition">#</a><br /></dt>
@@ -285,7 +301,7 @@
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4NK3fly7kinetic5Basin5stateEv">
 <span id="_CPPv3NK3fly7kinetic5Basin5stateEv"></span><span id="_CPPv2NK3fly7kinetic5Basin5stateEv"></span><span id="fly::kinetic::Basin::stateC"></span><span class="target" id="classfly_1_1kinetic_1_1Basin_1afb2d71852efb043bb7d11d0fdc1d3a70"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">auto</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">state</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="k"><span class="pre">noexcept</span></span><span class="w"> </span><span class="o"><span class="pre">-&gt;</span></span><span class="w"> </span><span class="n"><span class="pre">system</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="system.html#_CPPv4IDpEN3fly6system3SoAE" title="fly::system::SoA"><span class="n"><span class="pre">SoA</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">Position</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="p"><span class="pre">&amp;</span></span><a class="headerlink" href="#_CPPv4NK3fly7kinetic5Basin5stateEv" title="Permalink to this definition">#</a><br /></dt>
-<dd><p>Fetch the state (positions if the atoms in the basin). </p>
+<dd><p>Fetch the state (positions of the atoms in the basin). </p>
 </dd></dl>
 
 </div>
@@ -309,7 +325,7 @@
 
 <dl class="cpp var">
 <dt class="sig sig-object cpp" id="_CPPv4N3fly7kinetic5Basin6Choice4mechE">
-<span id="_CPPv3N3fly7kinetic5Basin6Choice4mechE"></span><span id="_CPPv2N3fly7kinetic5Basin6Choice4mechE"></span><span id="fly::kinetic::Basin::Choice::mech__env::MechanismCR"></span><span class="target" id="classfly_1_1kinetic_1_1Basin_1_1Choice_1a023978306073902b3b1db2b45dd22b2d"></span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">env</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="env.html#_CPPv4N3fly3env9MechanismE" title="fly::env::Mechanism"><span class="n"><span class="pre">Mechanism</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">mech</span></span></span><a class="headerlink" href="#_CPPv4N3fly7kinetic5Basin6Choice4mechE" title="Permalink to this definition">#</a><br /></dt>
+<span id="_CPPv3N3fly7kinetic5Basin6Choice4mechE"></span><span id="_CPPv2N3fly7kinetic5Basin6Choice4mechE"></span><span id="fly::kinetic::Basin::Choice::mech__env::MechanismCR"></span><span class="target" id="classfly_1_1kinetic_1_1Basin_1_1Choice_1a1ccd1bbe34460cdbad77da100d8660b5"></span><span class="n"><span class="pre">env</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="env.html#_CPPv4N3fly3env9MechanismE" title="fly::env::Mechanism"><span class="n"><span class="pre">Mechanism</span></span></a><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">mech</span></span></span><a class="headerlink" href="#_CPPv4N3fly7kinetic5Basin6Choice4mechE" title="Permalink to this definition">#</a><br /></dt>
 <dd><p>A reference to the mechanism stored in the catalogue. </p>
 </dd></dl>
 
@@ -338,6 +354,304 @@
 <dt class="sig sig-object cpp" id="_CPPv4N3fly7kinetic5Basin7Options4tempE">
 <span id="_CPPv3N3fly7kinetic5Basin7Options4tempE"></span><span id="_CPPv2N3fly7kinetic5Basin7Options4tempE"></span><span id="fly::kinetic::Basin::Options::temp__double"></span><span class="target" id="structfly_1_1kinetic_1_1Basin_1_1Options_1a72fc17b56c1287f867ab66157cb90dba"></span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">temp</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">300</span></span><a class="headerlink" href="#_CPPv4N3fly7kinetic5Basin7Options4tempE" title="Permalink to this definition">#</a><br /></dt>
 <dd><p>Temperature of simulation in kelvin. </p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="superbasins">
+<h2>Superbasins<a class="headerlink" href="#superbasins" title="Permalink to this heading">#</a></h2>
+<p>File: <code class="docutils literal notranslate"><span class="pre">libfly/kinetic/superbasin.hpp</span></code></p>
+<p>Representation of a collection of basins. </p>
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv4N3fly7kinetic10SuperBasinE">
+<span id="_CPPv3N3fly7kinetic10SuperBasinE"></span><span id="_CPPv2N3fly7kinetic10SuperBasinE"></span><span id="fly::kinetic::SuperBasin"></span><span class="target" id="classfly_1_1kinetic_1_1SuperBasin"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SuperBasin</span></span></span><a class="headerlink" href="#_CPPv4N3fly7kinetic10SuperBasinE" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Manages a superbasin: a collection of low-barrier-linked basins. </p>
+<p>This implements a variation of bac-MRM, the basin auto-constructing mean rate method, to analytically accelerate KMC. This solves the “low-barrier problem” for small numbers (&lt; a few hundred) of flickering states. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3fly7kinetic10SuperBasin10SuperBasinERK7OptionsRR5Basin">
+<span id="_CPPv3N3fly7kinetic10SuperBasin10SuperBasinERK7OptionsRR5Basin"></span><span id="_CPPv2N3fly7kinetic10SuperBasin10SuperBasinERK7OptionsRR5Basin"></span><span id="fly::kinetic::SuperBasin::SuperBasin__OptionsCR.BasinRR"></span><span class="target" id="classfly_1_1kinetic_1_1SuperBasin_1a768a824e9f6ad864656272952ae4b9bd"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SuperBasin</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N3fly7kinetic10SuperBasin7OptionsE" title="fly::kinetic::SuperBasin::Options"><span class="n"><span class="pre">Options</span></span></a><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">opt</span></span>, <a class="reference internal" href="#_CPPv4N3fly7kinetic5BasinE" title="fly::kinetic::Basin"><span class="n"><span class="pre">Basin</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">basin</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3fly7kinetic10SuperBasin10SuperBasinERK7OptionsRR5Basin" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Construct a new <a class="reference internal" href="#classfly_1_1kinetic_1_1SuperBasin"><span class="std std-ref">SuperBasin</span></a> object containing a single basin. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3fly7kinetic10SuperBasin12connect_fromENSt6size_tEiRKN3env9MechanismE">
+<span id="_CPPv3N3fly7kinetic10SuperBasin12connect_fromENSt6size_tEiRKN3env9MechanismE"></span><span id="_CPPv2N3fly7kinetic10SuperBasin12connect_fromENSt6size_tEiRKN3env9MechanismE"></span><span id="fly::kinetic::SuperBasin::connect_from__std::s.i.env::MechanismCR"></span><span class="target" id="classfly_1_1kinetic_1_1SuperBasin_1a943b03fcfd9a32da2918e32075380e8f"></span><span class="kt"><span class="pre">auto</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">connect_from</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">basin</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">atom</span></span>, <span class="n"><span class="pre">env</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="env.html#_CPPv4N3fly3env9MechanismE" title="fly::env::Mechanism"><span class="n"><span class="pre">Mechanism</span></span></a><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">m</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="o"><span class="pre">-&gt;</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><a class="headerlink" href="#_CPPv4N3fly7kinetic10SuperBasin12connect_fromENSt6size_tEiRKN3env9MechanismE" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Connect mechanism <code class="docutils literal notranslate"><span class="pre">mech</span></code> from basin <code class="docutils literal notranslate"><span class="pre">basin</span></code> to the currently occupied basin. </p>
+<p>This marks <code class="docutils literal notranslate"><span class="pre">mech</span></code> as an internal, transient mechanism and fills in the internal transition probability matrix.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>basin</strong> – The index of the basin which the mechanism starts from. </p></li>
+<li><p><strong>atom</strong> – The index of the atom which the mechanism is centred on. </p></li>
+<li><p><strong>m</strong> – The mechanism that connect <code class="docutils literal notranslate"><span class="pre">basin</span></code> to the currently occupied basin. </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3fly7kinetic10SuperBasin13expand_occupyERR5Basin">
+<span id="_CPPv3N3fly7kinetic10SuperBasin13expand_occupyERR5Basin"></span><span id="_CPPv2N3fly7kinetic10SuperBasin13expand_occupyERR5Basin"></span><span id="fly::kinetic::SuperBasin::expand_occupy__BasinRR"></span><span class="target" id="classfly_1_1kinetic_1_1SuperBasin_1a594a5cb4163f2174d24ae0ad5ddfce74"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">auto</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">expand_occupy</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N3fly7kinetic5BasinE" title="fly::kinetic::Basin"><span class="n"><span class="pre">Basin</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">basin</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="o"><span class="pre">-&gt;</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">size_t</span></span><a class="headerlink" href="#_CPPv4N3fly7kinetic10SuperBasin13expand_occupyERR5Basin" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Expand the <a class="reference internal" href="#classfly_1_1kinetic_1_1SuperBasin"><span class="std std-ref">SuperBasin</span></a> by adding <code class="docutils literal notranslate"><span class="pre">basin</span></code> to it and setting <code class="docutils literal notranslate"><span class="pre">basin</span></code> as the currently occupied basin. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>basin</strong> – The basin to add to the <a class="reference internal" href="#classfly_1_1kinetic_1_1SuperBasin"><span class="std std-ref">SuperBasin</span></a>. </p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Returns the previously occupied basin’s index. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3fly7kinetic10SuperBasin11find_occupyENSt6size_tEN6system3SoAIRK8PositionEEd">
+<span id="_CPPv3N3fly7kinetic10SuperBasin11find_occupyENSt6size_tEN6system3SoAIRK8PositionEEd"></span><span id="_CPPv2N3fly7kinetic10SuperBasin11find_occupyENSt6size_tEN6system3SoAIRK8PositionEEd"></span><span id="fly::kinetic::SuperBasin::find_occupy__std::s.system::SoA:PositionCR:.double"></span><span class="target" id="classfly_1_1kinetic_1_1SuperBasin_1ae6afb6991c0e6868d2524a81312a10db"></span><span class="kt"><span class="pre">auto</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">find_occupy</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">hash</span></span>, <span class="n"><span class="pre">system</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="system.html#_CPPv4IDpEN3fly6system3SoAE" title="fly::system::SoA"><span class="n"><span class="pre">SoA</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">Position</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">in</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">tol</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="o"><span class="pre">-&gt;</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">optional</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">size_t</span></span><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4N3fly7kinetic10SuperBasin11find_occupyENSt6size_tEN6system3SoAIRK8PositionEEd" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Find and occupy a basin in the <a class="reference internal" href="#classfly_1_1kinetic_1_1SuperBasin"><span class="std std-ref">SuperBasin</span></a> whose state matches <code class="docutils literal notranslate"><span class="pre">in</span></code>. </p>
+<p>Searches through the basins in the superbasin, if one is found that matches (all active atoms within L2 tolerance <code class="docutils literal notranslate"><span class="pre">tol</span></code>) make it the occupied basin.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>hash</strong> – Of <code class="docutils literal notranslate"><span class="pre">in</span></code> as computed by <code class="docutils literal notranslate"><a class="reference internal" href="#basin_8hpp_1ab3089e46284735c30cd80a60a910f290"><span class="std std-ref"><span class="pre">fly::kinetic::hash()</span></span></a></code>. </p></li>
+<li><p><strong>in</strong> – The input state. </p></li>
+<li><p><strong>tol</strong> – The L2 tolerance between <code class="docutils literal notranslate"><span class="pre">in</span></code> and a basin state for them to be considered “the same”. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Returns the previously occupied basin’s index or <code class="docutils literal notranslate"><span class="pre">std::nullopt</span></code> if no match is found. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK3fly7kinetic10SuperBasin10kmc_choiceER7Xoshiro">
+<span id="_CPPv3NK3fly7kinetic10SuperBasin10kmc_choiceER7Xoshiro"></span><span id="_CPPv2NK3fly7kinetic10SuperBasin10kmc_choiceER7Xoshiro"></span><span id="fly::kinetic::SuperBasin::kmc_choice__XoshiroRC"></span><span class="target" id="classfly_1_1kinetic_1_1SuperBasin_1a39c28d1d77c1473038e2ce47d7b3ddf6"></span><span class="kt"><span class="pre">auto</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">kmc_choice</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="utility.html#_CPPv4N3fly7XoshiroE" title="fly::Xoshiro"><span class="n"><span class="pre">Xoshiro</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">pseudo_rng</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="o"><span class="pre">-&gt;</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N3fly7kinetic10SuperBasin6ChoiceE" title="fly::kinetic::SuperBasin::Choice"><span class="n"><span class="pre">Choice</span></span></a><a class="headerlink" href="#_CPPv4NK3fly7kinetic10SuperBasin10kmc_choiceER7Xoshiro" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Choose a mechanism using the modified mean-rate-method. </p>
+<p>This will pick a non-transient mechanism, e.g. a mechanisms that “escapes” the superbasin (although it may be an internal mechanisms that has not been traversed yet).</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The mechanism may start from a basin that the system is not currently in.</p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>pseudo_rng</strong> – The pseudo random number generator to use. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK3fly7kinetic10SuperBasin4sizeEv">
+<span id="_CPPv3NK3fly7kinetic10SuperBasin4sizeEv"></span><span id="_CPPv2NK3fly7kinetic10SuperBasin4sizeEv"></span><span id="fly::kinetic::SuperBasin::sizeC"></span><span class="target" id="classfly_1_1kinetic_1_1SuperBasin_1a2124af66595cd0bf5d8970997c2d153b"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">auto</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">size</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="o"><span class="pre">-&gt;</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">size_t</span></span><a class="headerlink" href="#_CPPv4NK3fly7kinetic10SuperBasin4sizeEv" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Get the number of basins in the <a class="reference internal" href="#classfly_1_1kinetic_1_1SuperBasin"><span class="std std-ref">SuperBasin</span></a>. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK3fly7kinetic10SuperBasin5stateENSt6size_tE">
+<span id="_CPPv3NK3fly7kinetic10SuperBasin5stateENSt6size_tE"></span><span id="_CPPv2NK3fly7kinetic10SuperBasin5stateENSt6size_tE"></span><span id="fly::kinetic::SuperBasin::state__std::sC"></span><span class="target" id="classfly_1_1kinetic_1_1SuperBasin_1a55bca80f5af51342eb5b981051e34744"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">auto</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">state</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">basin</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="o"><span class="pre">-&gt;</span></span><span class="w"> </span><span class="n"><span class="pre">system</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="system.html#_CPPv4IDpEN3fly6system3SoAE" title="fly::system::SoA"><span class="n"><span class="pre">SoA</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">Position</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="p"><span class="pre">&amp;</span></span><a class="headerlink" href="#_CPPv4NK3fly7kinetic10SuperBasin5stateENSt6size_tE" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Get the state of the <a class="reference internal" href="#classfly_1_1kinetic_1_1Basin"><span class="std std-ref">Basin</span></a> indexed by <code class="docutils literal notranslate"><span class="pre">basin</span></code>. </p>
+</dd></dl>
+
+</div>
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv4N3fly7kinetic10SuperBasin6ChoiceE">
+<span id="_CPPv3N3fly7kinetic10SuperBasin6ChoiceE"></span><span id="_CPPv2N3fly7kinetic10SuperBasin6ChoiceE"></span><span id="fly::kinetic::SuperBasin::Choice"></span><span class="target" id="classfly_1_1kinetic_1_1SuperBasin_1_1Choice"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Choice</span></span></span><a class="headerlink" href="#_CPPv4N3fly7kinetic10SuperBasin6ChoiceE" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>A result type to indicate a randomly selected mechanism in a basin/superbasin. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N3fly7kinetic10SuperBasin6Choice4atomE">
+<span id="_CPPv3N3fly7kinetic10SuperBasin6Choice4atomE"></span><span id="_CPPv2N3fly7kinetic10SuperBasin6Choice4atomE"></span><span id="fly::kinetic::SuperBasin::Choice::atom__i"></span><span class="target" id="classfly_1_1kinetic_1_1SuperBasin_1_1Choice_1a3df395abfcc4d44cedc05882ae95bd12"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">atom</span></span></span><a class="headerlink" href="#_CPPv4N3fly7kinetic10SuperBasin6Choice4atomE" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>The index of the atom chosen. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N3fly7kinetic10SuperBasin6Choice5basinE">
+<span id="_CPPv3N3fly7kinetic10SuperBasin6Choice5basinE"></span><span id="_CPPv2N3fly7kinetic10SuperBasin6Choice5basinE"></span><span id="fly::kinetic::SuperBasin::Choice::basin__std::s"></span><span class="target" id="classfly_1_1kinetic_1_1SuperBasin_1_1Choice_1aef2d189a1c5fb913a893c98689383a79"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">basin</span></span></span><a class="headerlink" href="#_CPPv4N3fly7kinetic10SuperBasin6Choice5basinE" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>The index of the basin that <code class="docutils literal notranslate"><span class="pre">mech</span></code> starts from. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N3fly7kinetic10SuperBasin6Choice13basin_changedE">
+<span id="_CPPv3N3fly7kinetic10SuperBasin6Choice13basin_changedE"></span><span id="_CPPv2N3fly7kinetic10SuperBasin6Choice13basin_changedE"></span><span id="fly::kinetic::SuperBasin::Choice::basin_changed__b"></span><span class="target" id="classfly_1_1kinetic_1_1SuperBasin_1_1Choice_1a034c75facf4066ca01ee4640894937f0"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">basin_changed</span></span></span><a class="headerlink" href="#_CPPv4N3fly7kinetic10SuperBasin6Choice13basin_changedE" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>True if occupied basin changed during selection. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N3fly7kinetic10SuperBasin6Choice2dtE">
+<span id="_CPPv3N3fly7kinetic10SuperBasin6Choice2dtE"></span><span id="_CPPv2N3fly7kinetic10SuperBasin6Choice2dtE"></span><span id="fly::kinetic::SuperBasin::Choice::dt__double"></span><span class="target" id="classfly_1_1kinetic_1_1SuperBasin_1_1Choice_1a2935cbf23e0ecd7ca9e892c5f1778022"></span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">dt</span></span></span><a class="headerlink" href="#_CPPv4N3fly7kinetic10SuperBasin6Choice2dtE" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>The time elapsed if this mechanisms is carried out. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N3fly7kinetic10SuperBasin6Choice4mechE">
+<span id="_CPPv3N3fly7kinetic10SuperBasin6Choice4mechE"></span><span id="_CPPv2N3fly7kinetic10SuperBasin6Choice4mechE"></span><span id="fly::kinetic::SuperBasin::Choice::mech__env::MechanismCR"></span><span class="target" id="classfly_1_1kinetic_1_1SuperBasin_1_1Choice_1a85dbf140fa30f3a2456e1dbb9974651a"></span><span class="n"><span class="pre">env</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="env.html#_CPPv4N3fly3env9MechanismE" title="fly::env::Mechanism"><span class="n"><span class="pre">Mechanism</span></span></a><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">mech</span></span></span><a class="headerlink" href="#_CPPv4N3fly7kinetic10SuperBasin6Choice4mechE" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>A reference to the mechanism stored in the catalogue. </p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv4N3fly7kinetic10SuperBasin7OptionsE">
+<span id="_CPPv3N3fly7kinetic10SuperBasin7OptionsE"></span><span id="_CPPv2N3fly7kinetic10SuperBasin7OptionsE"></span><span id="fly::kinetic::SuperBasin::Options"></span><span class="target" id="structfly_1_1kinetic_1_1SuperBasin_1_1Options"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Options</span></span></span><a class="headerlink" href="#_CPPv4N3fly7kinetic10SuperBasin7OptionsE" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Configure the <code class="docutils literal notranslate"><a class="reference internal" href="#classfly_1_1kinetic_1_1SuperBasin"><span class="std std-ref"><span class="pre">SuperBasin</span></span></a></code> class. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N3fly7kinetic10SuperBasin7Options5debugE">
+<span id="_CPPv3N3fly7kinetic10SuperBasin7Options5debugE"></span><span id="_CPPv2N3fly7kinetic10SuperBasin7Options5debugE"></span><span id="fly::kinetic::SuperBasin::Options::debug__b"></span><span class="target" id="structfly_1_1kinetic_1_1SuperBasin_1_1Options_1a7586e2725019f03b4728f32039cb9ce9"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">debug</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">false</span></span><a class="headerlink" href="#_CPPv4N3fly7kinetic10SuperBasin7Options5debugE" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Controls printing of debugging data. </p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="super-super-basins">
+<h2>Super(super)basins<a class="headerlink" href="#super-super-basins" title="Permalink to this heading">#</a></h2>
+<p>File: <code class="docutils literal notranslate"><span class="pre">libfly/kinetic/cache.hpp</span></code></p>
+<p>Representation of a collection of basins. </p>
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv4N3fly7kinetic10SuperCacheE">
+<span id="_CPPv3N3fly7kinetic10SuperCacheE"></span><span id="_CPPv2N3fly7kinetic10SuperCacheE"></span><span id="fly::kinetic::SuperCache"></span><span class="target" id="classfly_1_1kinetic_1_1SuperCache"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SuperCache</span></span></span><a class="headerlink" href="#_CPPv4N3fly7kinetic10SuperCacheE" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Manages a collection of superbasins. </p>
+<p>A <a class="reference internal" href="#classfly_1_1kinetic_1_1SuperCache"><span class="std std-ref">SuperCache</span></a> dynamically manages a collection of superbasin to remove the overhead of exploring/building a superbasin. The is particularly useful when superbasins are frequently re-entered upon exit. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3fly7kinetic10SuperCache10SuperCacheERK7OptionsRR10SuperBasin">
+<span id="_CPPv3N3fly7kinetic10SuperCache10SuperCacheERK7OptionsRR10SuperBasin"></span><span id="_CPPv2N3fly7kinetic10SuperCache10SuperCacheERK7OptionsRR10SuperBasin"></span><span id="fly::kinetic::SuperCache::SuperCache__OptionsCR.SuperBasinRR"></span><span class="target" id="classfly_1_1kinetic_1_1SuperCache_1a51b2bf5fdf5296a610ce40c91711872d"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SuperCache</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N3fly7kinetic10SuperCache7OptionsE" title="fly::kinetic::SuperCache::Options"><span class="n"><span class="pre">Options</span></span></a><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">opt</span></span>, <a class="reference internal" href="#_CPPv4N3fly7kinetic10SuperBasinE" title="fly::kinetic::SuperBasin"><span class="n"><span class="pre">SuperBasin</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">sb</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3fly7kinetic10SuperCache10SuperCacheERK7OptionsRR10SuperBasin" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Construct a new <a class="reference internal" href="#classfly_1_1kinetic_1_1SuperCache"><span class="std std-ref">SuperCache</span></a> object initialised with a single superbasin. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>opt</strong> – The options for this <a class="reference internal" href="#classfly_1_1kinetic_1_1SuperCache"><span class="std std-ref">SuperCache</span></a>. </p></li>
+<li><p><strong>sb</strong> – The initial superbasin. </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3fly7kinetic10SuperCache12connect_fromENSt6size_tEiRKN3env9MechanismEN6system3SoAIRK8PositionEERKN3env9CatalogueE">
+<span id="_CPPv3N3fly7kinetic10SuperCache12connect_fromENSt6size_tEiRKN3env9MechanismEN6system3SoAIRK8PositionEERKN3env9CatalogueE"></span><span id="_CPPv2N3fly7kinetic10SuperCache12connect_fromENSt6size_tEiRKN3env9MechanismEN6system3SoAIRK8PositionEERKN3env9CatalogueE"></span><span id="fly::kinetic::SuperCache::connect_from__std::s.i.env::MechanismCR.system::SoA:PositionCR:.env::CatalogueCR"></span><span class="target" id="classfly_1_1kinetic_1_1SuperCache_1ae85e1b851eb431964494ccbdf0c553b7"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">connect_from</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">basin</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">atom</span></span>, <span class="n"><span class="pre">env</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="env.html#_CPPv4N3fly3env9MechanismE" title="fly::env::Mechanism"><span class="n"><span class="pre">Mechanism</span></span></a><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">mech</span></span>, <span class="n"><span class="pre">system</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="system.html#_CPPv4IDpEN3fly6system3SoAE" title="fly::system::SoA"><span class="n"><span class="pre">SoA</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">Position</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">cell</span></span>, <span class="n"><span class="pre">env</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="env.html#_CPPv4N3fly3env9CatalogueE" title="fly::env::Catalogue"><span class="n"><span class="pre">Catalogue</span></span></a><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">cat</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3fly7kinetic10SuperCache12connect_fromENSt6size_tEiRKN3env9MechanismEN6system3SoAIRK8PositionEERKN3env9CatalogueE" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Manages the internal superbasins. </p>
+<p>Identifies which (if any) basin <code class="docutils literal notranslate"><span class="pre">cell</span></code> matches, makes that basins’s superbasin the active superbasin and then connects the mechanism <code class="docutils literal notranslate"><span class="pre">mech</span></code> with <code class="docutils literal notranslate"><a class="reference internal" href="#classfly_1_1kinetic_1_1SuperBasin_1a943b03fcfd9a32da2918e32075380e8f"><span class="std std-ref"><span class="pre">fly::kinetic::SuperBasin::connect_from()</span></span></a></code> if this was a low barrier mechanism.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>basin</strong> – The index of the basin which the mechanism starts from in the active superbasin. </p></li>
+<li><p><strong>atom</strong> – The index of the atom which the mechanism is centred on. </p></li>
+<li><p><strong>mech</strong> – The mechanism that was chosen. </p></li>
+<li><p><strong>cell</strong> – The system after reconstructing <code class="docutils literal notranslate"><span class="pre">mech</span></code> onto the previous state. </p></li>
+<li><p><strong>cat</strong> – The catalogue in the ready state (i.e. called <code class="docutils literal notranslate"><span class="pre">cat.rebuild()</span></code> with argument <code class="docutils literal notranslate"><span class="pre">cell</span></code>). </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK3fly7kinetic10SuperCache10kmc_choiceER7Xoshiro">
+<span id="_CPPv3NK3fly7kinetic10SuperCache10kmc_choiceER7Xoshiro"></span><span id="_CPPv2NK3fly7kinetic10SuperCache10kmc_choiceER7Xoshiro"></span><span id="fly::kinetic::SuperCache::kmc_choice__XoshiroRC"></span><span class="target" id="classfly_1_1kinetic_1_1SuperCache_1a7e8ccf634cb986eca8a2cb5b2b0b9bee"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">auto</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">kmc_choice</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="utility.html#_CPPv4N3fly7XoshiroE" title="fly::Xoshiro"><span class="n"><span class="pre">Xoshiro</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">psudo_rng</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="o"><span class="pre">-&gt;</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N3fly7kinetic10SuperBasinE" title="fly::kinetic::SuperBasin"><span class="n"><span class="pre">SuperBasin</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N3fly7kinetic10SuperBasin6ChoiceE" title="fly::kinetic::SuperBasin::Choice"><span class="n"><span class="pre">Choice</span></span></a><a class="headerlink" href="#_CPPv4NK3fly7kinetic10SuperCache10kmc_choiceER7Xoshiro" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Forward the call to the active superbasin’s <code class="docutils literal notranslate"><a class="reference internal" href="#classfly_1_1kinetic_1_1SuperBasin_1a39c28d1d77c1473038e2ce47d7b3ddf6"><span class="std std-ref"><span class="pre">fly::kinetic::SuperBasin::kmc_choice()</span></span></a></code>. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3fly7kinetic10SuperCache5resetERR10SuperBasin">
+<span id="_CPPv3N3fly7kinetic10SuperCache5resetERR10SuperBasin"></span><span id="_CPPv2N3fly7kinetic10SuperCache5resetERR10SuperBasin"></span><span id="fly::kinetic::SuperCache::reset__SuperBasinRR"></span><span class="target" id="classfly_1_1kinetic_1_1SuperCache_1acd093b1bb886325c9d9045c5933f3d54"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">reset</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N3fly7kinetic10SuperBasinE" title="fly::kinetic::SuperBasin"><span class="n"><span class="pre">SuperBasin</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">sb</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3fly7kinetic10SuperCache5resetERR10SuperBasin" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Reset the cache to contain only a single superbasin <code class="docutils literal notranslate"><span class="pre">sb</span></code>. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK3fly7kinetic10SuperCache4sizeEv">
+<span id="_CPPv3NK3fly7kinetic10SuperCache4sizeEv"></span><span id="_CPPv2NK3fly7kinetic10SuperCache4sizeEv"></span><span id="fly::kinetic::SuperCache::sizeC"></span><span class="target" id="classfly_1_1kinetic_1_1SuperCache_1a0fc1d7235cc5a753e750af2e1e8a4779"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">size</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="k"><span class="pre">noexcept</span></span><a class="headerlink" href="#_CPPv4NK3fly7kinetic10SuperCache4sizeEv" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Get the number of superbasins in the <a class="reference internal" href="#classfly_1_1kinetic_1_1SuperCache"><span class="std std-ref">SuperCache</span></a>. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK3fly7kinetic10SuperCache5stateENSt6size_tE">
+<span id="_CPPv3NK3fly7kinetic10SuperCache5stateENSt6size_tE"></span><span id="_CPPv2NK3fly7kinetic10SuperCache5stateENSt6size_tE"></span><span id="fly::kinetic::SuperCache::state__std::sC"></span><span class="target" id="classfly_1_1kinetic_1_1SuperCache_1a2ec69cef9c353ecb4f70b72cbb842860"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">auto</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">state</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">basin</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK3fly7kinetic10SuperCache5stateENSt6size_tE" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Get the state of the <a class="reference internal" href="#classfly_1_1kinetic_1_1Basin"><span class="std std-ref">Basin</span></a> indexed by <code class="docutils literal notranslate"><span class="pre">basin</span></code> in the active basin. </p>
+</dd></dl>
+
+</div>
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv4N3fly7kinetic10SuperCache7OptionsE">
+<span id="_CPPv3N3fly7kinetic10SuperCache7OptionsE"></span><span id="_CPPv2N3fly7kinetic10SuperCache7OptionsE"></span><span id="fly::kinetic::SuperCache::Options"></span><span class="target" id="structfly_1_1kinetic_1_1SuperCache_1_1Options"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Options</span></span></span><a class="headerlink" href="#_CPPv4N3fly7kinetic10SuperCache7OptionsE" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Configure the <code class="docutils literal notranslate"><a class="reference internal" href="#classfly_1_1kinetic_1_1SuperCache"><span class="std std-ref"><span class="pre">SuperCache</span></span></a></code> class. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N3fly7kinetic10SuperCache7Options11barrier_tolE">
+<span id="_CPPv3N3fly7kinetic10SuperCache7Options11barrier_tolE"></span><span id="_CPPv2N3fly7kinetic10SuperCache7Options11barrier_tolE"></span><span id="fly::kinetic::SuperCache::Options::barrier_tol__double"></span><span class="target" id="structfly_1_1kinetic_1_1SuperCache_1_1Options_1a33b48dc40e1d3dcc71cfc98afc33cbf5"></span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">barrier_tol</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0.3</span></span><a class="headerlink" href="#_CPPv4N3fly7kinetic10SuperCache7Options11barrier_tolE" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Tolerance for mechanisms to be considered high-barrier. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N3fly7kinetic10SuperCache7Options10cache_sizeE">
+<span id="_CPPv3N3fly7kinetic10SuperCache7Options10cache_sizeE"></span><span id="_CPPv2N3fly7kinetic10SuperCache7Options10cache_sizeE"></span><span id="fly::kinetic::SuperCache::Options::cache_size__std::s"></span><span class="target" id="structfly_1_1kinetic_1_1SuperCache_1_1Options_1ad5ecf618f7d16b2459c66fe5e5dbd666"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">cache_size</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">128</span></span><a class="headerlink" href="#_CPPv4N3fly7kinetic10SuperCache7Options10cache_sizeE" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Max number of SuperBasins in the cache. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N3fly7kinetic10SuperCache7Options5debugE">
+<span id="_CPPv3N3fly7kinetic10SuperCache7Options5debugE"></span><span id="_CPPv2N3fly7kinetic10SuperCache7Options5debugE"></span><span id="fly::kinetic::SuperCache::Options::debug__b"></span><span class="target" id="structfly_1_1kinetic_1_1SuperCache_1_1Options_1a74888396befc9f30b457560d014917d4"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">debug</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">false</span></span><a class="headerlink" href="#_CPPv4N3fly7kinetic10SuperCache7Options5debugE" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Controls debug printing. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N3fly7kinetic10SuperCache7Options11debug_pauseE">
+<span id="_CPPv3N3fly7kinetic10SuperCache7Options11debug_pauseE"></span><span id="_CPPv2N3fly7kinetic10SuperCache7Options11debug_pauseE"></span><span id="fly::kinetic::SuperCache::Options::debug_pause__b"></span><span class="target" id="structfly_1_1kinetic_1_1SuperCache_1_1Options_1a62ae87d6578ad34cded79e8b0768273d"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">debug_pause</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">false</span></span><a class="headerlink" href="#_CPPv4N3fly7kinetic10SuperCache7Options11debug_pauseE" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>If true waits for input when <code class="docutils literal notranslate"><span class="pre">barrier_tol</span></code> is adjusted. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N3fly7kinetic10SuperCache7Options11dynamic_tolE">
+<span id="_CPPv3N3fly7kinetic10SuperCache7Options11dynamic_tolE"></span><span id="_CPPv2N3fly7kinetic10SuperCache7Options11dynamic_tolE"></span><span id="fly::kinetic::SuperCache::Options::dynamic_tol__b"></span><span class="target" id="structfly_1_1kinetic_1_1SuperCache_1_1Options_1aefe8e054bf7d98cab61122abb99f7d41"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">dynamic_tol</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">true</span></span><a class="headerlink" href="#_CPPv4N3fly7kinetic10SuperCache7Options11dynamic_tolE" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>If true <code class="docutils literal notranslate"><span class="pre">barrier_tol</span></code> is dynamically adjusted. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N3fly7kinetic10SuperCache7Options19max_superbasin_sizeE">
+<span id="_CPPv3N3fly7kinetic10SuperCache7Options19max_superbasin_sizeE"></span><span id="_CPPv2N3fly7kinetic10SuperCache7Options19max_superbasin_sizeE"></span><span id="fly::kinetic::SuperCache::Options::max_superbasin_size__std::s"></span><span class="target" id="structfly_1_1kinetic_1_1SuperCache_1_1Options_1a860bc68807eb1686cb4c6e7d46c05c41"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">max_superbasin_size</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">256</span></span><a class="headerlink" href="#_CPPv4N3fly7kinetic10SuperCache7Options19max_superbasin_sizeE" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Maximum number basins in SB before <code class="docutils literal notranslate"><span class="pre">tol_shrink</span></code>. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N3fly7kinetic10SuperCache7Options9opt_basinE">
+<span id="_CPPv3N3fly7kinetic10SuperCache7Options9opt_basinE"></span><span id="_CPPv2N3fly7kinetic10SuperCache7Options9opt_basinE"></span><span id="fly::kinetic::SuperCache::Options::opt_basin__Basin::Options"></span><span class="target" id="structfly_1_1kinetic_1_1SuperCache_1_1Options_1aa1e14968d6fd14601fd7de0796f755fe"></span><a class="reference internal" href="#_CPPv4N3fly7kinetic5BasinE" title="fly::kinetic::Basin"><span class="n"><span class="pre">Basin</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N3fly7kinetic5Basin7OptionsE" title="fly::kinetic::Basin::Options"><span class="n"><span class="pre">Options</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">opt_basin</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="p"><span class="pre">{</span></span><span class="p"><span class="pre">}</span></span><a class="headerlink" href="#_CPPv4N3fly7kinetic10SuperCache7Options9opt_basinE" title="Permalink to this definition">#</a><br /></dt>
+<dd><p><a class="reference internal" href="#structfly_1_1kinetic_1_1Basin_1_1Options"><span class="std std-ref">Basin::Options</span></a> options. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N3fly7kinetic10SuperCache7Options6opt_sbE">
+<span id="_CPPv3N3fly7kinetic10SuperCache7Options6opt_sbE"></span><span id="_CPPv2N3fly7kinetic10SuperCache7Options6opt_sbE"></span><span id="fly::kinetic::SuperCache::Options::opt_sb__SuperBasin::Options"></span><span class="target" id="structfly_1_1kinetic_1_1SuperCache_1_1Options_1a305fa7b8b1d397e500c136c5be583b86"></span><a class="reference internal" href="#_CPPv4N3fly7kinetic10SuperBasinE" title="fly::kinetic::SuperBasin"><span class="n"><span class="pre">SuperBasin</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N3fly7kinetic10SuperBasin7OptionsE" title="fly::kinetic::SuperBasin::Options"><span class="n"><span class="pre">Options</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">opt_sb</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="p"><span class="pre">{</span></span><span class="p"><span class="pre">}</span></span><a class="headerlink" href="#_CPPv4N3fly7kinetic10SuperCache7Options6opt_sbE" title="Permalink to this definition">#</a><br /></dt>
+<dd><p><a class="reference internal" href="#structfly_1_1kinetic_1_1SuperBasin_1_1Options"><span class="std std-ref">SuperBasin::Options</span></a> options. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N3fly7kinetic10SuperCache7Options9state_tolE">
+<span id="_CPPv3N3fly7kinetic10SuperCache7Options9state_tolE"></span><span id="_CPPv2N3fly7kinetic10SuperCache7Options9state_tolE"></span><span id="fly::kinetic::SuperCache::Options::state_tol__double"></span><span class="target" id="structfly_1_1kinetic_1_1SuperCache_1_1Options_1a6748a908c83243445a28afae9fb8c6e4"></span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">state_tol</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0.1</span></span><a class="headerlink" href="#_CPPv4N3fly7kinetic10SuperCache7Options9state_tolE" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>L2 norm between atoms for basins to be considered the same. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N3fly7kinetic10SuperCache7Options8tol_growE">
+<span id="_CPPv3N3fly7kinetic10SuperCache7Options8tol_growE"></span><span id="_CPPv2N3fly7kinetic10SuperCache7Options8tol_growE"></span><span id="fly::kinetic::SuperCache::Options::tol_grow__double"></span><span class="target" id="structfly_1_1kinetic_1_1SuperCache_1_1Options_1a5ff806eb08def9ab575ac956c6a5fd17"></span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">tol_grow</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">1.5</span></span><a class="headerlink" href="#_CPPv4N3fly7kinetic10SuperCache7Options8tol_growE" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Multiplier by which <code class="docutils literal notranslate"><span class="pre">barrier_tol</span></code> increases by. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N3fly7kinetic10SuperCache7Options10tol_shrinkE">
+<span id="_CPPv3N3fly7kinetic10SuperCache7Options10tol_shrinkE"></span><span id="_CPPv2N3fly7kinetic10SuperCache7Options10tol_shrinkE"></span><span id="fly::kinetic::SuperCache::Options::tol_shrink__double"></span><span class="target" id="structfly_1_1kinetic_1_1SuperCache_1_1Options_1acad0386cd3bf4b04c616592f84651ef4"></span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">tol_shrink</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0.5</span></span><a class="headerlink" href="#_CPPv4N3fly7kinetic10SuperCache7Options10tol_shrinkE" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Multiplier by which <code class="docutils literal notranslate"><span class="pre">barrier_tol</span></code> decreases by. </p>
 </dd></dl>
 
 </div>
@@ -412,6 +726,8 @@
             <ul>
 <li><a class="reference internal" href="#">Kinetics</a><ul>
 <li><a class="reference internal" href="#basins">Basins</a></li>
+<li><a class="reference internal" href="#superbasins">Superbasins</a></li>
+<li><a class="reference internal" href="#super-super-basins">Super(super)basins</a></li>
 </ul>
 </li>
 </ul>

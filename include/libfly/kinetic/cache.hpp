@@ -56,7 +56,7 @@ namespace fly::kinetic {
     struct Options {
       double state_tol = 0.1;                 ///< L2 norm between atoms for basins to be considered the same.
       double barrier_tol = 0.3;               ///< Tolerance for mechanisms to be considered high-barrier.
-      std::size_t cache_size = 64;            ///< Max number of SuperBasins in the cache.
+      std::size_t cache_size = 128;           ///< Max number of SuperBasins in the cache.
       bool dynamic_tol = true;                ///< If true ``barrier_tol`` is dynamically adjusted.
       std::size_t max_superbasin_size = 256;  ///< Maximum number basins in SB before ``tol_shrink``.
       double tol_grow = 1.5;                  ///< Multiplier by which ``barrier_tol`` increases by.

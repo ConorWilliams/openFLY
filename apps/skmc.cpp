@@ -56,7 +56,8 @@ system::Supercell<system::TypeMap<>, Position, Frozen, T...> bcc_iron_motif() {
       {0.000000, 0.000000, 2.855300},
   };
 
-  system::Supercell motif = system::make_supercell<Position, Frozen, T...>({basis, Arr<bool>::Constant(true)}, FeH, 2);
+  system::Supercell motif
+      = system::make_supercell<Position, Frozen, T...>({basis, Arr<bool>::Constant(true)}, FeH, 2);
 
   motif[fzn_] = false;
   motif[id_] = 0;
@@ -72,14 +73,16 @@ int main() {
 
   system::Supercell cell = remove_atoms(motif_to_lattice(bcc_iron_motif<Hash>(), {6, 6, 6}), {1, 3});
 
-  cell = add_atoms(
-      cell, {system::Atom<TypeID, Position, Frozen, Hash>(1, {2.857 / 2 + 3.14, 2.857 / 2 + 3.14, 2.857 / 4 + 3.14}, false, 0)});
+  cell = add_atoms(cell,
+                   {system::Atom<TypeID, Position, Frozen, Hash>(
+                       1, {2.857 / 2 + 3.14, 2.857 / 2 + 3.14, 2.857 / 4 + 3.14}, false, 0)});
 
   //   cell = add_atoms(
-  //       cell, {system::Atom<TypeID, Position, Frozen, Hash>(1, {2.857 / 2 + 3.14, 2.857 / 2 + 3.14, 2.857 / 4 * 2 + 3.14}, false,
-  //       0)});
+  //       cell, {system::Atom<TypeID, Position, Frozen, Hash>(1, {2.857 / 2 + 3.14, 2.857 / 2 + 3.14, 2.857 /
+  //       4 * 2 + 3.14}, false, 0)});
 
-  //   cell = add_atoms(cell, {system::Atom<TypeID, Position, Frozen, Hash>(1, {0.992116, 6.01736, 4.56979}, false, 0)});
+  //   cell = add_atoms(cell, {system::Atom<TypeID, Position, Frozen, Hash>(1, {0.992116, 6.01736, 4.56979},
+  //   false, 0)});
 
   //   cell(r_, 431) = Vec{4.5896, 4.5892, 5.91909};
   //   cell(r_, 0) = Vec{4.45211, 4.45172, 4.2526};
@@ -134,7 +137,7 @@ int main() {
                 pot,
                 mast,
                 cat,
-                {.debug = true, .opt_basin = {.debug = true}, .opt_sb = {.debug = true}},
+                {.debug = true, .opt_basin = {.debug = true, .temp = 300}, .opt_sb = {.debug = true}},
                 omp_get_max_threads(),
                 [&](system::SoA<Position const &> pre, system::SoA<Position const &> post) {
                   file.commit([&] { file.write(r_, pre); });

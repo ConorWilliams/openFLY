@@ -18,6 +18,8 @@
 
 #include "libfly/kinetic/cache.hpp"
 
+#include <fmt/core.h>
+
 namespace fly::kinetic {
 
   void SuperCache::connect_from(std::size_t basin,
@@ -48,12 +50,14 @@ namespace fly::kinetic {
             = std::exchange(m_opt.barrier_tol, std::max(0.0, m_opt.barrier_tol * m_opt.tol_shrink));
 
         dprint(m_opt.debug,
-               "Dynamically adjusting barrier tolerance : {:.3f} -> {:.3f}\n",
+               "SuperCache: Dynamically decreasing barrier tolerance : {:.3f} -> {:.3f}\n",
                prev_tol,
                m_opt.barrier_tol);
 
-        m_sb = SuperBasin{m_opt.opt_sb, {m_opt.opt_basin, cell, cat}};
-        m_cache.clear();
+        fmt::print("Press ENTER to continue...");
+        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+
+        reset({m_opt.opt_sb, {m_opt.opt_basin, cell, cat}});
 
       } else {
         // Can expand and occupy
@@ -100,12 +104,14 @@ namespace fly::kinetic {
       double prev_tol = std::exchange(m_opt.barrier_tol, m_opt.barrier_tol * m_opt.tol_grow);
 
       dprint(m_opt.debug,
-             "Dynamically adjusting barrier tolerance : {:.3f} -> {:.3f}\n",
+             "SuperCache: Dynamically increasing barrier tolerance : {:.3f} -> {:.3f}\n",
              prev_tol,
              m_opt.barrier_tol);
 
-      m_sb = SuperBasin{m_opt.opt_sb, {m_opt.opt_basin, cell, cat}};
-      m_cache.clear();
+      fmt::print("Press ENTER to continue...");
+      std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+
+      reset({m_opt.opt_sb, {m_opt.opt_basin, cell, cat}});
     }
   }
 

@@ -1,6 +1,6 @@
 #pragma once
 
-// Copyright © 2020 Conor Williams <conorwilliams@outlook.centroid>
+// Copyright © 2020-2022 Conor Williams <conorwilliams@outlook.centroid>
 
 // SPDX-License-Identifier: GPL-3.0-or-later
 

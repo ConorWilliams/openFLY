@@ -1,6 +1,6 @@
 #pragma once
 
-// Copyright © 2020 Conor Williams <conorwilliams@outlook.com>
+// Copyright © 2020-2022 Conor Williams <conorwilliams@outlook.com>
 
 // SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -31,13 +31,14 @@
 /**
  * \file superbasin.hpp
  *
- * @brief Representation of a collection of transient states in a Markov chain.
+ * @brief Representation of a collection of basins.
  */
 
 namespace fly::kinetic {
 
   /**
-   * @brief Manages a superbasin: a collection of low-barrier-linked basins.
+   * @brief Manages a superbasin: a collection of low-barrier-linked basins. This implements a variation of bac-MRM, the basin
+   * auto-constructing mean rate method, to analytically accelerate KMC.
    */
   class SuperBasin {
   public:
@@ -54,81 +55,6 @@ namespace fly::kinetic {
     SuperBasin(Options const &opt, Basin &&basin) : m_opt(opt) { expand_occupy(std::move(basin)); }
 
     /**
-     * @brief Get the number of basins in the SuperBasin.
-     */
-    auto size() const -> std::size_t { return m_super.size(); }
-
-    /**
-     * @brief Get the current basin i.e. the basin corresponding to the state of the system.
-     */
-    auto current_basin() const noexcept -> Basin const & { return m_super[m_occupied]; }
-
-    // Basin const &operator[](std::size_t i) { return _super[i]; }
-
-    /**
-     * @brief Get the index of current basin i.e. the basin corresponding to the state of the system.
-     */
-    auto occupied() const noexcept -> std::size_t { return m_occupied; }
-
-    /**
-     * @brief Connect to mechanism 'mech' from basin 'basin' to the currently occupied basin.
-     *
-     * @param basin
-     * @param atom
-     * @param m
-     */
-    auto connect_from(std::size_t basin, int atom, env::Mechanism const &m) -> void {
-      //
-
-      std::vector<Basin::LocalisedMech> &mechs = m_super[basin].m_mechs;
-
-      auto it = std::lower_bound(mechs.begin(), mechs.end(), atom, [](Basin::LocalisedMech const &elem, int val) {
-        //
-        return elem.m_atom_index < val;
-      });
-
-      ASSERT(it == mechs.end() || it->m_atom_index == atom, "Got {}, wanted {}", it == mechs.end() ? -1 : it->m_atom_index, atom);
-
-      for (; it != mechs.end() && it->m_atom_index == atom; ++it) {
-        if (&m == it->m_mech) {
-          m_prob(safe_cast<Eigen::Index>(m_occupied), safe_cast<Eigen::Index>(basin)) = it->m_rate / m_super[basin].rate_sum();
-          ASSERT(it->m_exit_mech == true, "Chose an exit mech?", 0);
-          it->m_exit_mech = false;
-          m_super[basin].connected = true;
-          return;
-        }
-      }
-
-      throw error("Mech not in basin?");
-    }
-
-    /**
-     * @brief Expand the superbasin by adding 'basin' to it and setting 'basin' as the currently occupied basin. Returns the previously
-     * occupied basin's index.
-     *
-     * @param basin
-     * @return std::size_t
-     */
-    auto expand_occupy(Basin &&basin) -> std::size_t {
-      m_super.push_back(std::move(basin));
-      m_prob.conservativeResizeLike(Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>::Zero(fly::ssize(*this), fly::ssize(*this)));
-      return std::exchange(m_occupied, size() - 1);
-    }
-
-    //
-
-    /**
-     * @brief Search through the basins in the superbasin, if one is found that matches (all active atoms within L2 tolerance 'tol')
-     * make it the occupied basin. Returns the previously occupied basin's index.
-     *
-     * @param hash
-     * @param in
-     * @param tol
-     * @return std::optional<std::size_t>
-     */
-    auto find_occupy(std::size_t hash, system::SoA<Position const &> in, double tol) -> std::optional<std::size_t>;
-
-    /**
      * @brief A result type to indicate a randomly selected mechanism in a basin/superbasin.
      */
     class Choice {
@@ -141,13 +67,73 @@ namespace fly::kinetic {
     };
 
     /**
-     * @brief Choose a mechanism using the modified mean-rate-method, the mechanism may start from a basin that the system is not
-     * currently in, if this is the case the occupied basin is updated and choice.basin_changed is set to true.
+     * @brief Choose a mechanism using the modified mean-rate-method.
      *
-     * @param psudo_rng
-     * @return Choice
+     * This will pick a non-transient mechanism, e.g. a mechanisms that "escapes" the superbasin (although it may be an internal
+     * mechanisms that has not been traversed yet).
+     *
+     * \rst
+     *
+     * .. note::
+     *
+     *   The mechanism may start from a basin that the system is not currently in.
+     *
+     * \endrst
+     *
+     * @param pseudo_rng The pseudo random number generator to use.
      */
-    auto kmc_choice(Xoshiro &psudo_rng) -> Choice;
+    auto kmc_choice(Xoshiro &pseudo_rng) const -> Choice;
+
+    /**
+     * @brief Get the number of basins in the SuperBasin.
+     */
+    auto size() const -> std::size_t { return m_super.size(); }
+
+    /**
+     * @brief Get the state of the Basin indexed by ``basin``.
+     */
+    auto state(std::size_t basin) const -> system::SoA<Position> const & {
+      ASSERT(basin < m_super.size(), "Basin with index {} is OOB.", basin);
+      return m_super[basin].state();
+    }
+
+    /**
+     * @brief Connect mechanism ``mech`` from basin ``basin`` to the currently occupied basin.
+     *
+     * This marks ``mech`` as an internal, transient mechanism and fills in the internal transition probability matrix.
+     *
+     * @param basin The index of the basin which the mechanism starts from.
+     * @param atom The index of the atom which the mechanism is centred on.
+     * @param m The mechanism that connect ``basin`` to the currently occupied basin.
+     */
+    auto connect_from(std::size_t basin, int atom, env::Mechanism const &m) -> void;
+
+    /**
+     * @brief Expand the SuperBasin by adding ``basin`` to it and setting ``basin`` as the currently occupied basin.
+     *
+     * @param basin The basin to add to the SuperBasin.
+     * @return Returns the previously occupied basin's index.
+     */
+    auto expand_occupy(Basin &&basin) -> std::size_t {
+      m_super.push_back(std::move(basin));
+      m_prob.conservativeResizeLike(Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>::Zero(fly::ssize(*this), fly::ssize(*this)));
+      return std::exchange(m_occupied, size() - 1);
+    }
+
+    //
+
+    /**
+     * @brief Find and occupy a basin in the SuperBasin whose state matches ``in``.
+     *
+     * Searches through the basins in the superbasin, if one is found that matches (all active atoms within L2 tolerance ``tol``)
+     * make it the occupied basin.
+     *
+     * @param hash Of ``in`` as computed by ``fly::kinetic::hash()``.
+     * @param in The input state.
+     * @param tol The L2 tolerance between ``in`` and a basin state for them to be considered "the same".
+     * @return Returns the previously occupied basin's index or ``std::nullopt`` if no match is found.
+     */
+    auto find_occupy(std::size_t hash, system::SoA<Position const &> in, double tol) -> std::optional<std::size_t>;
 
   private:
     Options m_opt;

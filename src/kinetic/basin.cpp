@@ -1,4 +1,4 @@
-// Copyright © 2020 Conor Williams <conorwilliams@outlook.com>
+// Copyright © 2020-2022 Conor Williams <conorwilliams@outlook.com>
 
 // SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -90,7 +90,6 @@ namespace fly::kinetic {
       fmt::print("Basin: KMC choice @atom={} ΔE={:.3f}eV : {:.3f}% of {} choices\n",
                  mech.m_atom_index,
                  mech.m_mech->barrier,
-                 mech.m_rate,
                  mech.m_rate / rate_sum() * 100.,
                  m_mechs.size());
     }

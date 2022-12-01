@@ -1,6 +1,6 @@
 #pragma once
 
-// Copyright © 2020 Conor Williams <conorwilliams@outlooK.com>
+// Copyright © 2020-2022 Conor Williams <conorwilliams@outlooK.com>
 
 // SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -105,8 +105,9 @@ namespace fly::system {
     /**
      * @brief Construct a new TypeMap by slicing a different kind of TypeMap.
      */
-    template <typename... U, typename = std::enable_if_t<!detail::same_properties<TypeMap, U...>::value
-                                                         && std::is_constructible_v<SOA, SoA<Type, U...> const&>>>
+    template <typename... U,
+              typename = std::enable_if_t<!detail::same_properties<TypeMap, U...>::value
+                                          && std::is_constructible_v<SOA, SoA<Type, U...> const&>>>
     explicit TypeMap(TypeMap<U...> const& map) : SOA(static_cast<SoA<Type, U...> const&>(map)) {}
 
     /**

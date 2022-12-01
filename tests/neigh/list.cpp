@@ -1,4 +1,4 @@
-// Copyright © 2020 Conor Williams <conorwilliams@outlook.com>
+// Copyright © 2020-2022 Conor Williams <conorwilliams@outlook.com>
 
 // SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -188,7 +188,8 @@ TEST_CASE("List fuzz-testing", "[neigh]") {
       sum += elem.size();
     }
 
-    fmt::print("{} atoms and shaped={}, avg_num_neigh={}\n", cell.size(),
+    fmt::print("{} atoms and shaped={}, avg_num_neigh={}\n",
+               cell.size(),
                visit(box.make_grid(r_cut), [](auto const g) { return g.shape(); }) - 2,
                static_cast<double>(sum) / static_cast<double>(nl.size()));
 

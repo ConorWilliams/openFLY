@@ -96,11 +96,7 @@ target_link_libraries(libFLY PRIVATE Nauty xxHash::xxhash)
 
 target_link_libraries(libFLY PUBLIC Eigen3::Eigen fmt::fmt nonstd::span-lite OpenMP::OpenMP_CXX cereal::cereal)
 
-# Declare executable
-add_executable(kmcFLY apps/kmc.cpp)
-target_compile_features(kmcFLY PRIVATE cxx_std_17)
-target_link_libraries(kmcFLY PRIVATE libFLY)
-
+# Declare executable(s)
 add_executable(skmcFLY apps/skmc.cpp)
 target_compile_features(skmcFLY PRIVATE cxx_std_17)
 target_link_libraries(skmcFLY PRIVATE libFLY)

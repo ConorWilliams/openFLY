@@ -1,6 +1,6 @@
 #pragma once
 
-// Copyright © 2020 Conor Williams <conorwilliams@outlook.com>
+// Copyright © 2020-2022 Conor Williams <conorwilliams@outlook.com>
 
 // SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -133,8 +133,8 @@ namespace fly::system {
     Vec canon_image(Eigen::MatrixBase<E> const& x) const {
       // Non-periodic atoms are within the simulation box extents so x[i] * inv_extents less than 1 and x[i]
       // remains unaffected, hence no non-periodic switch/select.
-      ASSERT((m_periodic || (x.array() >= Arr<double>::Zero() && x.array() < m_extents)).all(), "{} is not inside box {}", x,
-             m_extents);
+      ASSERT(
+          (m_periodic || (x.array() >= Arr<double>::Zero() && x.array() < m_extents)).all(), "{} is not inside box {}", x, m_extents);
       return x.array() - m_extents * (x.array() * m_inv_extents).floor();
     }
 

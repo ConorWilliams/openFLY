@@ -14,8 +14,27 @@ File: ``libfly/kinetic/basin.hpp``
     :sections: briefdescription detaileddescription
 
 
+---------------------------------------
+
+.. doxygenfunction:: fly::kinetic::hash
+
+---------------------------------------
+
 .. doxygenclass:: fly::kinetic::Basin
     :members:
     :undoc-members:
+
+Superbasins
+---------------------------------------
+
+File: ``libfly/kinetic/superbasin.hpp``
+
+.. doxygenfile:: libfly/kinetic/superbasin.hpp
+    :sections: briefdescription detaileddescription
+
+.. doxygenclass:: fly::kinetic::SuperBasin
+    :members:
+    :undoc-members:
+
 
 

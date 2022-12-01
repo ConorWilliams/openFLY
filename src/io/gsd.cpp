@@ -1,4 +1,4 @@
-// Copyright © 2020 Conor Williams <conorwilliams@outlook.com>
+// Copyright © 2020-2022 Conor Williams <conorwilliams@outlook.com>
 
 // SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -98,7 +98,12 @@ namespace fly::io {
 
       // L_x, L_y, L_z , xy, xz, yz
       std::array<float, 6> const hoomd_basis = {
-          basis(0, 0), basis(1, 1), basis(2, 2), basis(0, 1), basis(0, 2), basis(1, 2),
+          basis(0, 0),
+          basis(1, 1),
+          basis(2, 2),
+          basis(0, 1),
+          basis(0, 2),
+          basis(1, 2),
       };
 
       write_chunk("configuration/box", 6, 1, hoomd_basis.data());

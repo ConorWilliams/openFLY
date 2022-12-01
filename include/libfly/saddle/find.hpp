@@ -1,6 +1,6 @@
 #pragma once
 
-// Copyright © 2020 Conor Williams <conorwilliams@outlooK.com>
+// Copyright © 2020-2022 Conor Williams <conorwilliams@outlooK.com>
 
 // SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -181,6 +181,11 @@ namespace fly::saddle {
        */
       io::BinaryFile* fout = nullptr;
     };
+
+    /**
+     * @brief Get the options object.
+     */
+    auto get_options() const noexcept -> Options const& { return m_opt; }
 
     /**
      * @brief A collection of mechanisms centred on a central atom.

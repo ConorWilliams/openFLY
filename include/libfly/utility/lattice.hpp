@@ -1,6 +1,6 @@
 #pragma once
 
-// Copyright © 2020 Conor Williams <conorwilliams@outlook.com>
+// Copyright © 2020-2022 Conor Williams <conorwilliams@outlook.com>
 
 // SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -128,12 +128,12 @@ namespace fly {
     return out_cell;
   }
 
-/**
- * @brief Add atoms to a supercell.
- * 
- * @param cell Input ``SuperCell``.
- * @param atoms Atoms to add to ``cell``.
- */
+  /**
+   * @brief Add atoms to a supercell.
+   *
+   * @param cell Input ``SuperCell``.
+   * @param atoms Atoms to add to ``cell``.
+   */
   template <typename Map, typename... T>
   auto add_atoms(system::Supercell<Map, T...> const& cell, std::vector<system::Atom<TypeID, T...>> const& atoms) {
     //
@@ -147,10 +147,9 @@ namespace fly {
 
     // Copy new atoms.
     for (std::size_t i = 0; i < atoms.size(); i++) {
-
       Eigen::Index x = cell.size() + safe_cast<Eigen::Index>(i);
 
-      out_cell(id_,  x) =  atoms[i][id_];
+      out_cell(id_, x) = atoms[i][id_];
       ((out_cell(T{}, x) = atoms[i][T{}]), ...);
     }
 

@@ -1,6 +1,6 @@
 #pragma once
 
-// Copyright © 2020 Conor Williams <conorwilliams@outlook.com>
+// Copyright © 2020-2022 Conor Williams <conorwilliams@outlook.com>
 
 // SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -28,7 +28,7 @@
 /**
  * \file basin.hpp
  *
- * @brief Representation of a state in a Markov chain.
+ * @brief Representation of a state in a Markov chain and utilities for discretising states.
  */
 
 namespace fly::kinetic {
@@ -40,21 +40,6 @@ namespace fly::kinetic {
    * @param cat A catalogue in the ready state.
    */
   auto hash(Eigen::Index num_atoms, fly::env::Catalogue const &cat) -> std::size_t;
-
-  //   class SuperChoice : private Choice {
-  //   public:
-  //     /**
-  //      * @brief True if the chosen mechanism starts from a basin different than the current one.
-  //      */
-  //     auto basin_changed() const noexcept -> bool { return m_basin_changed; }
-
-  //   private:
-  //     friend class SuperBasin;
-  //     friend class SuperCache;
-
-  //     bool m_basin_changed;  // True if mech starts from different basin.
-  //     std::size_t m_basin;   // Current basin in superbasin
-  //   };
 
   /**
    * @brief  Represents a basin of the potential energy of the entire system.
@@ -104,7 +89,7 @@ namespace fly::kinetic {
     auto rate_sum() const noexcept -> double { return m_rate_sum; }
 
     /**
-     * @brief Fetch the state (positions if the atoms in the basin).
+     * @brief Fetch the state (positions of the atoms in the basin).
      */
     auto state() const noexcept -> system::SoA<Position> const & { return m_state; }
 
@@ -125,7 +110,6 @@ namespace fly::kinetic {
       int m_atom_index;                   // The index of the atom in the supercell this mechanisms is centred on.
       fly::env::Mechanism const *m_mech;  // The actual mechanism.
       double m_rate;                      // (Hz)
-      double m_barrier;                   // Maximum of forward/reverse barriers.
       bool m_exit_mech = true;            // If true it is thought *mech links: inside SB -> outside SB.
 
       /**
@@ -135,8 +119,7 @@ namespace fly::kinetic {
        * @param rate The rate (frequency) of this mechanism.
        * @param mech Pointer to the mechanism.
        */
-      LocalisedMech(int i, double rate, fly::env::Mechanism const *mech)
-          : m_atom_index(i), m_mech(mech), m_rate(rate), m_barrier(mech->barrier - std::min(0.0, mech->delta)) {
+      LocalisedMech(int i, double rate, fly::env::Mechanism const *mech) : m_atom_index(i), m_mech(mech), m_rate(rate) {
         ASSERT(mech, "Null mechanisms is invalid", 0);
       }
     };

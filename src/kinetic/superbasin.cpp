@@ -1,4 +1,4 @@
-// Copyright © 2020 Conor Williams <conorwilliams@outlook.com>
+// Copyright © 2020-2022 Conor Williams <conorwilliams@outlook.com>
 
 // SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -52,13 +52,18 @@ namespace fly::kinetic {
     return tau;
   }
 
-  SuperBasin::Choice SuperBasin::kmc_choice(Xoshiro &psudo_rng) {
+  SuperBasin::Choice SuperBasin::kmc_choice(Xoshiro &psudo_rng) const {
+    if (!m_super[m_occupied].connected) {
+      Basin::Choice ch = m_super[m_occupied].kmc_choice(psudo_rng);
+      return {ch.mech, ch.atom, ch.dt, m_occupied, false};
+    }
+
     //
     std::uniform_real_distribution<double> uniform{0, 1};
 
     auto tau = compute_tau();
 
-    dprint(m_opt.debug, "SuperBasin: Density={::.4f}\n", tau / tau.sum());
+    fmt::print("SuperBasin: density={::.3f}\n", tau.cwiseAbs() / tau.sum());
 
     int count = 0;
 
@@ -105,8 +110,8 @@ namespace fly::kinetic {
       throw error("Hit end of super choice");
     }();
 
-    // Must occupy new basin (this is why method is not const)
-    std::size_t old_basin = std::exchange(m_occupied, basin);
+    // // Must occupy new basin (this is why method is not const)
+    // std::size_t old_basin = std::exchange(m_occupied, basin);
 
     double const inv_tau = 1 / tau.sum();
     double const eff_rate = tau[safe_cast<Eigen::Index>(basin)] * inv_tau * exit_mech.m_rate;
@@ -125,8 +130,32 @@ namespace fly::kinetic {
         exit_mech.m_atom_index,
         -std::log(uniform(psudo_rng)) / (r_sum * inv_tau),
         basin,
-        old_basin != basin,
+        m_occupied != basin,
     };
+  }
+
+  auto SuperBasin::connect_from(std::size_t basin, int atom, env::Mechanism const &m) -> void {
+    //
+    ASSERT(basin < m_super.size(), "Basin with index {} is OOB.", basin);
+
+    std::vector<Basin::LocalisedMech> &mechs = m_super[basin].m_mechs;
+
+    auto it = std::lower_bound(mechs.begin(), mechs.end(), atom, [](Basin::LocalisedMech const &elem, int val) {
+      //
+      return elem.m_atom_index < val;
+    });
+
+    for (; it != mechs.end() && it->m_atom_index == atom; ++it) {
+      if (&m == it->m_mech) {
+        m_prob(safe_cast<Eigen::Index>(m_occupied), safe_cast<Eigen::Index>(basin)) = it->m_rate / m_super[basin].rate_sum();
+        ASSERT(it->m_exit_mech == true, "Chose an exit mech?", 0);
+        it->m_exit_mech = false;
+        m_super[basin].connected = true;
+        return;
+      }
+    }
+
+    throw error("Mech/atom not in basin?");
   }
 
   auto SuperBasin::find_occupy(std::size_t hash, system::SoA<Position const &> in, double tol) -> std::optional<std::size_t> {
@@ -144,7 +173,6 @@ namespace fly::kinetic {
     for (std::size_t i = 0; i < size(); ++i) {
       if (hash == m_super[i].m_state_hash) {
         //
-
         Vec delta = com_x - com(m_super[i].state());
 
         double sum_sq = 0;
@@ -162,8 +190,6 @@ namespace fly::kinetic {
         } else {
           fmt::print("Matching hash but different basin? Check this!\n");
         }
-
-        // throw error();
       }
     }
     return std::nullopt;

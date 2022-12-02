@@ -68,7 +68,7 @@ namespace fly::kinetic {
 
     auto tau = compute_tau();
 
-    fmt::print("SuperBasin: density={::.3f}\n", tau.cwiseAbs() / tau.sum());
+    dprint(m_opt.debug, "SuperBasin: density={::.3f}\n", tau.cwiseAbs() / tau.sum());
 
     int count = 0;
 

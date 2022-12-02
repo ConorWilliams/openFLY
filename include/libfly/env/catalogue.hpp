@@ -27,7 +27,7 @@
 #include <vector>
 
 //
-#include <cereal/archives/binary.hpp>
+#include <cereal/archives/portable_binary.hpp>
 #include <cereal/types/base_class.hpp>
 #include <cereal/types/map.hpp>
 #include <cereal/types/vector.hpp>
@@ -53,8 +53,9 @@ namespace fly::env {
   /**
    * @brief The Catalogue is a mapping from ``Geometry`` to local environments and mechanisms.
    *
-   * The Catalogue is responsible for building geometries from a ``Supercell`` and associating them with equivalent, historically-seen
-   * geometries via a three step matching process detailed in ``Catalogue::rebuild()``.
+   * The Catalogue is responsible for building geometries from a ``Supercell`` and associating them with
+   * equivalent, historically-seen geometries via a three step matching process detailed in
+   * ``Catalogue::rebuild()``.
    */
   class Catalogue {
   public:
@@ -64,7 +65,8 @@ namespace fly::env {
     struct Options {
       /** @brief Initial maximum difference in L2 norm between LEs for them to be considered the same. */
       double delta_max = std::numeric_limits<double>::max();
-      /** @brief Smaller to decrease false positives during fingerprint equivalence but, values < 1.0 introduce false negatives. */
+      /** @brief Smaller to decrease false positives during fingerprint equivalence but, values < 1.0
+       * introduce false negatives. */
       double overfuzz = 0.5;
       /** @brief Radius of a local environment. */
       double r_env = 5.2;
@@ -107,7 +109,8 @@ namespace fly::env {
       auto cat_index() const noexcept -> int { return m_index; }
 
       /**
-       * @brief Get the internal maximum norm between this environment and a geometry for them to be considered equivalent.
+       * @brief Get the internal maximum norm between this environment and a geometry for them to be
+       * considered equivalent.
        */
       auto delta_max() const noexcept -> double { return m_delta_max; }
 
@@ -121,7 +124,8 @@ namespace fly::env {
        */
       template <class Archive>
       void serialize(Archive& archive) {
-        archive(static_cast<Geometry<>&>(*this), m_finger, m_mechs, m_freq, m_false_pos, m_index, m_delta_max);
+        archive(
+            static_cast<Geometry<>&>(*this), m_finger, m_mechs, m_freq, m_false_pos, m_index, m_delta_max);
       }
 
     private:
@@ -132,12 +136,13 @@ namespace fly::env {
       int m_freq = 1;                    ///< The number of times this environment has been discovered.
       int m_false_pos = 0;               ///< The number of false positives encountered.
       int m_index;                       ///< The unique index in the catalogue.
-      double m_delta_max;                ///< The maximum value norm for environments to be considered equivalent.
+      double m_delta_max;  ///< The maximum value norm for environments to be considered equivalent.
 
       /**
        * @brief Construct a new ``Env`` object.
        */
-      Env(Geometry<Index> const& geo, Fingerprint const& f, int index, double del) : m_finger(f), m_index(index), m_delta_max(del) {
+      Env(Geometry<Index> const& geo, Fingerprint const& f, int index, double del)
+          : m_finger(f), m_index(index), m_delta_max(del) {
         for (auto const& elem : geo) {
           this->emplace_back(elem[r_], elem[col_]);
         }
@@ -177,11 +182,11 @@ namespace fly::env {
      * 2. Geometries with equal discrete keys are compared for equivalence of their fingerprints.
      * 3. If they are equivalent under (2) they are compared for equivalence via ``geometry::permute_onto()``.
      *
-     * Any new geometries that have not been encountered before are inserted into the catalogue and the index of the atom atom which
-     * the unknown geometry is centred on is returned.
+     * Any new geometries that have not been encountered before are inserted into the catalogue and the index
+     * of the atom atom which the unknown geometry is centred on is returned.
      *
-     * This process is deterministic, providing none of the reference geometries are modified (allowing new ones to be inserted) the
-     * same match will always be returned.
+     * This process is deterministic, providing none of the reference geometries are modified (allowing new
+     * ones to be inserted) the same match will always be returned.
      *
      * \endrst
      *
@@ -218,19 +223,26 @@ namespace fly::env {
       //
       std::size_t si = safe_cast<std::size_t>(i);
 
-      ASSERT(si < m_real.size(), "Accessing atom {} in catalogue, out of bounds as cat has {} active atoms", i, m_real.size());
+      ASSERT(si < m_real.size(),
+             "Accessing atom {} in catalogue, out of bounds as cat has {} active atoms",
+             i,
+             m_real.size());
 
       return m_real[si].geo;
     }
 
     /**
-     * @brief Get the reference geometry stored in the catalogue that is equivalent to the geometry around atom ``i``.
+     * @brief Get the reference geometry stored in the catalogue that is equivalent to the geometry around
+     * atom ``i``.
      */
     auto get_ref(int i) const -> Env const& {
       //
       std::size_t si = safe_cast<std::size_t>(i);
 
-      ASSERT(si < m_real.size(), "Accessing atom {} in catalogue, out of bounds as cat has {} active atoms", i, m_real.size());
+      ASSERT(si < m_real.size(),
+             "Accessing atom {} in catalogue, out of bounds as cat has {} active atoms",
+             i,
+             m_real.size());
 
       return **(m_real[si].ptr);
     }
@@ -245,10 +257,12 @@ namespace fly::env {
     /**
      * @brief Tighten the tolerance of the ``i``th environment.
      *
-     * This is done such that the current geometry no longer matches the reference or ``delta_max = min_delta``. Additionally, this
-     * function resets the frequency and false positive counters of the reference environment.
+     * This is done such that the current geometry no longer matches the reference or ``delta_max =
+     * min_delta``. Additionally, this function resets the frequency and false positive counters of the
+     * reference environment.
      *
-     * @return The new ``delta_max`` of the environment reference environment that atom ``i`` was equivalent to.
+     * @return The new ``delta_max`` of the environment reference environment that atom ``i`` was equivalent
+     * to.
      */
     auto refine_tol(int i, double min_delta = 0) -> double;
 
@@ -273,7 +287,8 @@ namespace fly::env {
      * @param mech The mechanism to reconstruct.
      * @param i The index of the atom to reconstruct the mechanism onto.
      * @param in The initial state of the system before the reconstruction.
-     * @param in_ready_state If ``true`` this function will assume the currently loaded geo/ref of the ``i``th atom match the input
+     * @param in_ready_state If ``true`` this function will assume the currently loaded geo/ref of the ``i``th
+     * atom match the input
      * ``in`` otherwise, the geometry will be rebuilt.
      * @param num_threads Number of openMP threads to use.
      */
@@ -300,7 +315,7 @@ namespace fly::env {
      */
     Catalogue(Options const& opt, std::ifstream& fin) {
       //
-      cereal::BinaryInputArchive iarchive(fin);
+      cereal::PortableBinaryInputArchive iarchive(fin);
 
       Catalogue loaded(opt);
 
@@ -323,7 +338,7 @@ namespace fly::env {
         fmt::print("Dump catalogue\n");
       }
 
-      cereal::BinaryOutputArchive iarchive(fout);
+      cereal::PortableBinaryOutputArchive iarchive(fout);
       iarchive(*this);
     }
 
@@ -384,15 +399,18 @@ namespace fly::env {
       }
     }
 
-    auto rebuild_impl(system::SoA<Position const&, TypeID const&, Frozen const&> const& info, Eigen::Index num_types, int num_threads)
-        -> std::vector<int>;
+    auto rebuild_impl(system::SoA<Position const&, TypeID const&, Frozen const&> const& info,
+                      Eigen::Index num_types,
+                      int num_threads) -> std::vector<int>;
 
     /**
-     * @brief Simultaneously canonise the input local environment, ``env.geo``, and find its match in the catalogue.
+     * @brief Simultaneously canonise the input local environment, ``env.geo``, and find its match in the
+     * catalogue.
      *
      * This is a deterministic search and will find the first match that is equivalent to ``env``.
      *
-     * This function is effectively ``const`` but cannot be marked as so as it returns a mutable reference to the match.
+     * This function is effectively ``const`` but cannot be marked as so as it returns a mutable reference to
+     * the match.
      *
      * This function requires ``env.hash exists in the map``.
      *

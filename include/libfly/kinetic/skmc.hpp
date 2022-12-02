@@ -17,6 +17,7 @@
 // You should have received a copy of the GNU General Public License along with openFLY. If not, see
 // <https://www.gnu.org/licenses/>.
 
+#include <fstream>
 #include <utility>
 
 #include "libfly/env/catalogue.hpp"
@@ -26,7 +27,9 @@
 #include "libfly/minimise/LBFGS/lbfgs.hpp"
 #include "libfly/neigh/list.hpp"
 #include "libfly/potential/generic.hpp"
+#include "libfly/saddle/dimer.hpp"
 #include "libfly/saddle/find.hpp"
+#include "libfly/system/box.hpp"
 #include "libfly/system/supercell.hpp"
 #include "libfly/utility/core.hpp"
 #include "libfly/utility/random.hpp"
@@ -70,7 +73,7 @@ namespace fly::kinetic {
       //
       std::vector<int> fails;
 
-      fmt::print("New envs @{} with {} refines\n", ix, refines);
+      fmt::print("Update: New envs @{} with {} refines\n", ix, refines);
 
       std::vector found = mast.find_mechs(saddle::Master::package({ix}, cat), cell);
 
@@ -118,92 +121,106 @@ namespace fly::kinetic {
     }
   };
 
-  //   /**
-  //    * @brief
-  //    */
-  //   class SKMC {
-  //   public:
-  //     /**
-  //      * @brief Configure the ``SKMC`` class.
-  //      */
-  //     struct Options {
-  //       /**
-  //        * @brief Configure debug printing.
-  //        */
-  //       bool debug = false;
-  //       /**
-  //        * @brief Options for the super basin.
-  //        */
-  //       SuperCache::Options opt_super = {};
-  //       /**
-  //        * @brief Options for saddle-point finder.
-  //        */
-  //       saddle::Master::Options opt_master = {};
-  //     };
-
-  //     template <typename Map, typename... T, typename F>
-  //   auto skmc(system::Supercell<Map, T...>& cell,
-  //             minimise::LBFGS& minimiser,
-  //             potential::Generic& pot,
-  //             saddle::Master& mast,
-  //             env::Catalogue& cat,
-  //             SuperCache::Options const& opt,
-  //             int num_threads,
-  //             F const& f)
-
-  //   private:
-  //   };
-
-  // comments, documentation for kinetic/, skmc call lambda with more arguments, skmc object interface
-  // (minimise, pot, mast, cat (read-write) all owned ).
-
   /**
-   * @brief
-   *
-   * @tparam Map
-   * @tparam T
-   * @tparam F
-   * @param cell
-   * @param minimiser
-   * @param pot
-   * @param mast
-   * @param cat
-   * @param opt
-   * @param num_threads
-   * @param f
+   * @brief Coordinate the running of a OLKMC simulation.
    */
+  class SKMC {
+  public:
+    /**
+     * @brief Configure the ``SKMC`` class.
+     */
+    struct Options {
+      /**
+       * @brief Configure debug printing.
+       */
+      bool debug = false;
+      /**
+       * @brief The name of the file to read the catalogue from.
+       */
+      std::string fread = "cat.bin";
+      /**
+       * @brief The name of the file to write the catalogue to.
+       */
+      std::string fwrite = fread;
+      /**
+       * @brief Options for the superbasin.
+       */
+      SuperCache::Options opt_cache = {};
+      /**
+       * @brief Options for the saddle-point finder.
+       */
+      saddle::Master::Options opt_master = {};
+    };
+
+    /**
+     * @brief Construct a new SKMC object.
+     */
+    SKMC(Options const& opt,
+         system::Box const& box,
+         minimise::LBFGS const& min,
+         potential::Generic const& pot,
+         saddle::Dimer const& dimer)
+        : m_opt(opt),
+          m_mast{
+              opt.opt_master,
+              box,
+              pot,
+              min,
+              dimer,
+          },
+          m_minimiser(min),
+          m_pot(pot),
+          m_cat([&] {
+            if (std::ifstream fcat(m_opt.fread); fcat.good()) {
+              dprint(m_opt.debug, "SKMC: Opening existing catalogue: \"{}\"\n", m_opt.fread);
+              return env::Catalogue{{}, fcat};
+            } else {
+              dprint(m_opt.debug, "SKMC: Could not open catalogue: \"{}\"\n", m_opt.fread);
+              return env::Catalogue{{}};
+            }
+          }()) {}
+
+    /**
+     * @brief
+     *
+     * @param cell
+     * @param num_threads
+     * @param f
+     */
+    template <typename Map, typename... T, typename F>
+    auto skmc(system::Supercell<Map, T...>& cell, int num_threads, F const& f) -> void;
+
+  private:
+    Options m_opt;
+    saddle::Master m_mast;
+    minimise::LBFGS m_minimiser;
+    potential::Generic m_pot;
+    env::Catalogue m_cat;
+
+    void dump_cat() const {
+      std::ofstream file(m_opt.fwrite);
+      m_cat.dump(file);
+    };
+  };
+
   template <typename Map, typename... T, typename F>
-  auto skmc(system::Supercell<Map, T...>& cell,
-            minimise::LBFGS& minimiser,
-            potential::Generic& pot,
-            saddle::Master& mast,
-            env::Catalogue& cat,
-            SuperCache::Options const& opt,
-            int num_threads,
-            F const& f) -> void {
+  auto SKMC::skmc(system::Supercell<Map, T...>& cell, int num_threads, F const& f) -> void {
     //
-    neigh::List neigh_list(cell.box(), pot.r_cut());
+    neigh::List neigh_list(cell.box(), m_pot.r_cut());
 
     {  // Initial minimisation
       system::SoA<Position, PotentialGradient> out(cell.size());
-      bool err = timeit("Minimise", [&] { return minimiser.minimise(out, cell, pot, num_threads); });
+      bool err = timeit("Minimise", [&] { return m_minimiser.minimise(out, cell, m_pot, num_threads); });
       cell[r_] = out[r_];
       verify(!err, "Minimiser failed");
     }
 
-    auto dump_cat = [&cat, count = 0]() mutable {
-      //   std::ofstream fcat(fmt::format("cat_v{}.bin", count).c_str());
-      std::ofstream fcat("build/gsd/cat.bin");
-      cat.dump(fcat);
-      count += 1;
-    };
-
     auto energy = [&](system::SoA<Position const&> x) {
       neigh_list.rebuild(x, num_threads);
-      return pot.energy(cell, neigh_list, num_threads);
+      return m_pot.energy(cell, neigh_list, num_threads);
     };
 
-    if (kinetic::update_cat(mast, cat, cell, num_threads)) {
+    if (kinetic::update_cat(m_mast, m_cat, cell, num_threads)) {
       dump_cat();
     }
 
@@ -220,11 +237,11 @@ namespace fly::kinetic {
     // For relaxed raw_recon
     system::SoA<Position, PotentialGradient> rel_recon(cell.size());
 
-    SuperCache super(opt, {opt.opt_sb, {opt.opt_basin, cell, cat}});
+    SuperCache super(m_opt.opt_cache, {m_opt.opt_cache.opt_sb, {m_opt.opt_cache.opt_basin, cell, m_cat}});
 
     for (int i = 0;; ++i) {
       ///////////// Select mechanism /////////////
-      auto const& [m, atom, dt, basin, changed] = timeit("kmc choice", [&] { return super.kmc_choice(rng); });
+      auto const& [m, atom, dt, basin, changed] = super.kmc_choice(rng);
 
       cell[r_] = super.state(basin)[r_];
 
@@ -234,9 +251,9 @@ namespace fly::kinetic {
 
       double E0 = energy(cell);  // Energy before mechanism
 
-      cat.reconstruct(raw_recon, m, atom, cell, !changed, num_threads);
+      m_cat.reconstruct(raw_recon, m, atom, cell, !changed, num_threads);
 
-      auto err = minimiser.minimise(rel_recon, raw_recon, pot, num_threads);
+      auto err = m_minimiser.minimise(rel_recon, raw_recon, m_pot, num_threads);
 
       double Ef = energy(rel_recon);  // Energy after relax
 
@@ -246,38 +263,43 @@ namespace fly::kinetic {
       double dR_err_frac = dR_err / m.err_fwd;
       double dE_err_frac = dE_err / std::abs(m.delta);
 
-      fmt::print("dE_err={:.3f}[{:.3f}], dR_err={:.3f}[{:.3f}]\n", dE_err, dE_err_frac, dR_err, dR_err_frac);
+      dprint(m_opt.debug,
+             "SKMC: dE_err={:.3f}[{:.3f}], dR_err={:.3f}[{:.3f}]\n",
+             dE_err,
+             dE_err_frac,
+             dR_err,
+             dR_err_frac);
 
       {
         bool fail = false;
 
-        auto const& m_opt = mast.get_options();
+        auto const& opt = m_mast.get_options();
 
         if (err) {
           fail = true;
-        } else if (dE_err > m_opt.recon_e_tol_abs && dE_err_frac > m_opt.recon_e_tol_frac) {
+        } else if (dE_err > opt.recon_e_tol_abs && dE_err_frac > opt.recon_e_tol_frac) {
           fail = true;
-        } else if (dR_err > m_opt.recon_norm_frac_tol && dR_err_frac > m_opt.recon_norm_abs_tol) {
+        } else if (dR_err > opt.recon_norm_frac_tol && dR_err_frac > opt.recon_norm_abs_tol) {
           fail = true;
         }
 
         if (fail) {
-          fmt::print("Reconstruction failed @{}\n", atom);
+          dprint(m_opt.debug, "SKMC: Reconstruction failed @{}\n", atom);
 
-          auto initial_assign = cat.get_ref(atom).cat_index();
+          auto initial_assign = m_cat.get_ref(atom).cat_index();
           bool new_envs = false;
 
           do {
-            double new_tol = cat.refine_tol(atom);
-            fmt::print("Refined tolerance to {}\n", new_tol);
-            new_envs = new_envs || kinetic::update_cat(mast, cat, cell, num_threads);
-          } while (initial_assign == cat.get_ref(atom).cat_index());
+            double new_tol = m_cat.refine_tol(atom);
+            dprint(m_opt.debug, "SKMC: Refined tolerance to {}\n", new_tol);
+            new_envs = new_envs || kinetic::update_cat(m_mast, m_cat, cell, num_threads);
+          } while (initial_assign == m_cat.get_ref(atom).cat_index());
 
           if (new_envs) {
             dump_cat();
           }
 
-          super.reset({opt.opt_sb, {opt.opt_basin, cell, cat}});
+          super.reset({m_opt.opt_cache.opt_sb, {m_opt.opt_cache.opt_basin, cell, m_cat}});
 
           continue;
         }
@@ -287,21 +309,21 @@ namespace fly::kinetic {
 
       time += dt;
 
-      std::invoke(f, std::as_const(cell), system::SoA<Position const&>{rel_recon});
+      std::invoke(f, time, std::as_const(cell), atom, m, system::SoA<Position const&>{rel_recon});
 
       cell[r_] = rel_recon[r_];
 
       ///////////// Update catalogue /////////////
 
-      if (timeit("Update catalogue", [&] { return kinetic::update_cat(mast, cat, cell, num_threads); })) {
+      if (kinetic::update_cat(m_mast, m_cat, cell, num_threads)) {
         dump_cat();
       }
 
       ///////////// Update SuperBasin /////////////
 
-      super.connect_from(basin, atom, m, cell, cat);
+      super.connect_from(basin, atom, m, cell, m_cat);
 
-      fmt::print("Iteration #{} time = {:.3e}\n\n", i, time);
+      dprint(m_opt.debug, "SKMC: Iteration #{} time = {:.3e}\n\n", i, time);
     }
   }
 

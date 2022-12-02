@@ -107,42 +107,67 @@ int main() {
       },
   };
 
-  static constexpr char fname[] = "build/gsd/cat.bin";
+  //   static constexpr char fname[] = "build/gsd/cat.bin";
 
-  env::Catalogue cat = [&] {
-    if (std::ifstream fcat(fname); fcat.good()) {
-      fmt::print("Opening existing catalogue: \"{}\"\n", fname);
-      return env::Catalogue{{}, fcat};
-    } else {
-      fmt::print("Could not open catalogue: \"{}\"\n", fname);
-      return env::Catalogue{{}};
-    }
-  }();
+  //   env::Catalogue cat = [&] {
+  //     if (std::ifstream fcat(fname); fcat.good()) {
+  //       fmt::print("Opening existing catalogue: \"{}\"\n", fname);
+  //       return env::Catalogue{{}, fcat};
+  //     } else {
+  //       fmt::print("Could not open catalogue: \"{}\"\n", fname);
+  //       return env::Catalogue{{}};
+  //     }
+  //   }();
 
-  saddle::Master mast{
+  kinetic::SKMC runner = {
       {
-          .num_threads = omp_get_max_threads(),
-          .max_searches = 100,
-          .max_failed_searches = 50,
-          .debug = false,
+          .debug = true,
+          .fread = "build/gsd/cat.bin",
+          .opt_cache = {
+              .debug = true,
+              .opt_basin = {
+                  .debug = true,
+              },
+              .opt_sb = {
+                  .debug = true,
+              },
+          },
+          .opt_master = {
+              .num_threads = omp_get_max_threads(),
+              .max_searches = 100,
+              .max_failed_searches = 50,
+              .debug = false,
+          }
       },
       cell.box(),
-      pot,
-      minimiser,
-      saddle::Dimer{{}, {}, cell.box()},
+      {
+          {},
+          cell.box(),
+      },
+      potential::Generic{
+          potential::EAM{
+              cell.map(),
+              std::make_shared<potential::DataEAM>(std::ifstream{"data/wen.eam.fs"}),
+          },
+      },
+      {
+          {},
+          {},
+          cell.box(),
+      },
+
   };
 
-  kinetic::skmc(cell,
-                minimiser,
-                pot,
-                mast,
-                cat,
-                {.debug = true, .opt_basin = {.debug = true, .temp = 300}, .opt_sb = {.debug = true}},
-                omp_get_max_threads(),
-                [&](system::SoA<Position const &> pre, system::SoA<Position const &> post) {
-                  file.commit([&] { file.write(r_, pre); });
-                  file.commit([&] { file.write(r_, post); });
-                });
+  runner.skmc(cell,
+              omp_get_max_threads(),
+              [&]([[maybe_unused]] double time,
+                  [[maybe_unused]] system::SoA<Position const &> pre,
+                  [[maybe_unused]] int atom,
+                  [[maybe_unused]] env::Mechanism const &mech,
+                  [[maybe_unused]] system::SoA<Position const &> post) {
+                file.commit([&] { file.write(r_, pre); });
+                file.commit([&] { file.write(r_, post); });
+              });
 
   return 0;
 }

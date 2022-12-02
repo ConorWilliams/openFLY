@@ -6,14 +6,16 @@
 
 // This file is part of openFLY.
 
-// OpenFLY is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License
-// as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+// OpenFLY is free software: you can redistribute it and/or modify it under the terms of the GNU General
+// Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
+// option) any later version.
 
-// OpenFLY is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
-// warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+// OpenFLY is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the
+// implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+// for more details.
 
-// You should have received a copy of the GNU General Public License along with openFLY. If not, see https :  //
-// www.gnu.org/licenses/>.
+// You should have received a copy of the GNU General Public License along with openFLY. If not, see https :
+// // www.gnu.org/licenses/>.
 
 #include <fmt/core.h>
 #include <omp.h>
@@ -73,8 +75,9 @@ namespace fly::saddle {
   /**
    * @brief Coordinate saddle-point searches on a (compute) node.
    *
-   * The ``Master`` coordinates saddle-point finding for a set of openMP threads, typically one ``Master`` should be
-   * instantiated per compute node. Each ``Master`` stores all the threads reusable objects: minimiser, prng, etc.
+   * The ``Master`` coordinates saddle-point finding for a set of openMP threads, typically one ``Master``
+   * should be instantiated per compute node. Each ``Master`` stores all the threads reusable objects:
+   * minimiser, prng, etc.
    */
   class Master {
   public:
@@ -85,9 +88,10 @@ namespace fly::saddle {
       /**
        * @brief The cut-off radius of the random perturbation (centred on an atom).
        *
-       * The initial system randomly perturbed to produce a starting-point for saddle-point finding. The perturbation is Gaussian in
-       * each coordinate axis with standard deviation ``stddev``. An envelope function will linearly decrease the size of each atoms
-       * perturbation based off its distance to a central atom. Only atoms closer than ``r_pert`` will be perturbed.
+       * The initial system randomly perturbed to produce a starting-point for saddle-point finding. The
+       * perturbation is Gaussian in each coordinate axis with standard deviation ``stddev``. An envelope
+       * function will linearly decrease the size of each atoms perturbation based off its distance to a
+       * central atom. Only atoms closer than ``r_pert`` will be perturbed.
        */
       double r_pert = 4;
       /**
@@ -95,7 +99,8 @@ namespace fly::saddle {
        */
       double stddev = 0.6;
       /**
-       * @brief Tolerance for minimally displaced atom to be frozen (to remove translational error accumulation).
+       * @brief Tolerance for minimally displaced atom to be frozen (to remove translational error
+       * accumulation).
        *
        * If the minimally displaced atom displaces further than this then an error will be raised.
        */
@@ -113,39 +118,46 @@ namespace fly::saddle {
        */
       double stationary_tol = basin_tol / 2;
       /**
-       * @brief Maximum distance error between reconstructed+relaxed minima/saddle-points and their original discovery.
+       * @brief Maximum distance error between reconstructed+relaxed minima/saddle-points and their original
+       * discovery.
        *
-       * After a min->sp->min pathway is found it is: converted into a mechanism; reconstructed onto the initial minima and then
-       * relaxed. These relaxed SP/minima must be within ``capture_r_tol`` of the pathway's sp and final min.
+       * After a min->sp->min pathway is found it is: converted into a mechanism; reconstructed onto the
+       * initial minima and then relaxed. These relaxed SP/minima must be within ``capture_r_tol`` of the
+       * pathway's sp and final min.
        */
       double capture_r_tol = 0.05;
       /**
-       * @brief Maximum energy error between reconstructed+relaxed minima/saddle-points and their original discovery.
+       * @brief Maximum energy error between reconstructed+relaxed minima/saddle-points and their original
+       * discovery.
        *
-       * After a min->sp->min pathway is found it is: converted into a mechanism; reconstructed onto the initial minima and then
-       * relaxed. These relaxed SP/minima must have energies within ``capture_E_tol`` of the pathway's sp and final min.
+       * After a min->sp->min pathway is found it is: converted into a mechanism; reconstructed onto the
+       * initial minima and then relaxed. These relaxed SP/minima must have energies within ``capture_E_tol``
+       * of the pathway's sp and final min.
        */
       double capture_E_tol = 0.01;
       /**
-       * @brief The absolute energy tolerance for a mechanisms energy barrier & delta when reconstructed onto symmetries.
+       * @brief The absolute energy tolerance for a mechanisms energy barrier & delta when reconstructed onto
+       * symmetries.
        */
       double recon_e_tol_abs = 0.01;
       /**
-       * @brief The fractional energy tolerance for a mechanisms energy barrier & delta when reconstructed onto symmetries.
+       * @brief The fractional energy tolerance for a mechanisms energy barrier & delta when reconstructed
+       * onto symmetries.
        */
       double recon_e_tol_frac = 0.01;
       /**
-       * @brief The absolute difference between the expected relaxation and the measured relaxation of a reconstructed mechanism onto
-       * its symmetries.
+       * @brief The absolute difference between the expected relaxation and the measured relaxation of a
+       * reconstructed mechanism onto its symmetries.
        */
       double recon_norm_abs_tol = 0.25;
       /**
-       * @brief The fractional difference between the expected relaxation and the measured relaxation of a reconstructed mechanism onto
-       * its symmetries.
+       * @brief The fractional difference between the expected relaxation and the measured relaxation of a
+       * reconstructed mechanism onto its symmetries.
        */
       double recon_norm_frac_tol = 0.5;
       /**
-       * @brief Absolute eigen values of the mass-weighted hessian matrix, smaller than this, are considered zero.
+       * @brief Absolute eigen values of the mass-weighted hessian matrix, smaller than this, are considered
+       * zero.
        */
       double hessian_eigen_zero_tol = 1e-4;
       /**
@@ -165,7 +177,8 @@ namespace fly::saddle {
        */
       int batch_size = std::min(max_failed_searches, num_threads);
       /**
-       * @brief Fraction of distance between initial position and SP that dimer is displaced along its axis before minimisation.
+       * @brief Fraction of distance between initial position and SP that dimer is displaced along its axis
+       * before minimisation.
        */
       double nudge_frac = 0.02;
       /**
@@ -176,8 +189,9 @@ namespace fly::saddle {
       /**
        * @brief If provided write debugging data here.
        *
-       * It is the users responsibility to ensure the lifetime of ``fout`` is at least as long as the lifetime of the this object
-       * and ensure only a single thread writes to ``fout`` at any one time. This really only exist for debugging purposes...
+       * It is the users responsibility to ensure the lifetime of ``fout`` is at least as long as the lifetime
+       * of the this object and ensure only a single thread writes to ``fout`` at any one time. This really
+       * only exist for debugging purposes...
        */
       io::BinaryFile* fout = nullptr;
     };
@@ -195,12 +209,13 @@ namespace fly::saddle {
       /**
        * @brief Truthy if search was successful.
        *
-       * If during the SPS, a reconstruction was attempted onto a supposedly symmetric state and the dimer-method failed to converge
-       * that reconstruction to a SP then the searches in that environment will be cancelled and this will return false.
+       * If during the SPS, a reconstruction was attempted onto a supposedly symmetric state and the
+       * dimer-method failed to converge that reconstruction to a SP then the searches in that environment
+       * will be cancelled and this will return false.
        *
-       * This probably occurred because the symmetry tolerance was not tight enough e.g. this geometry was associated to the wrong
-       * reference LE. The best course of action is to tighten the corresponding reference LE's ``delta_max``, reclassify
-       * system and re-run the SP searches.
+       * This probably occurred because the symmetry tolerance was not tight enough e.g. this geometry was
+       * associated to the wrong reference LE. The best course of action is to tighten the corresponding
+       * reference LE's ``delta_max``, reclassify system and re-run the SP searches.
        */
       explicit operator bool() const noexcept { return !m_fail; }
 
@@ -256,20 +271,23 @@ namespace fly::saddle {
     };
 
     /**
-     * @brief Transform a list of atom indices, ``ix``, into a list of ``LocalisedGeo`` for use in ``find_mechs()``.
+     * @brief Transform a list of atom indices, ``ix``, into a list of ``LocalisedGeo`` for use in
+     * ``find_mechs()``.
      *
      * @param ix List of indexes of environments which the mechanisms must be centred on.
      * @param cat Catalogue in ready state.
      * @param num_threads Number of openMP threads to use for this operation.
      */
-    static auto package(std::vector<int> const& ix, env::Catalogue const& cat, int num_threads = 1) -> std::vector<LocalisedGeo>;
+    static auto package(std::vector<int> const& ix, env::Catalogue const& cat, int num_threads = 1)
+        -> std::vector<LocalisedGeo>;
 
     /**
      * @brief Find all the mechanisms centred on the ``unknown`` geometries.
      *
      * This will recursively schedule SP searches on the slave threads.
      *
-     * @param geos A list of localised geometries encoding the atoms to centre the SP searches on and their local environments.
+     * @param geos A list of localised geometries encoding the atoms to centre the SP searches on and their
+     * local environments.
      * @param in Description of system to search in.
      */
     auto find_mechs(std::vector<LocalisedGeo> const& geos, SoA in) -> std::vector<Found>;
@@ -308,7 +326,8 @@ namespace fly::saddle {
     std::vector<Eigen::Index> m_sep_list;  // atom i is furthest from sep_list[i]
     int m_num_zero_modes;                  // Degree of freedom in each input
     int m_count_frozen;                    // The number of frozen atoms in the input.
-    double m_log_prod_eigen;               // the log(prod e_i) with e_i the the eigen values of the mass weighted hessian matrix.
+    double m_log_prod_eigen;  // the log(prod e_i) with e_i the the eigen values of the mass weighted hessian
+                              // matrix.
 
     ///////////////////////////////////////////////////////////////////////////////////
 
@@ -349,17 +368,20 @@ namespace fly::saddle {
     /**
      * @brief Given a saddle point produce a min->sp->min pathway
      */
-    std::optional<Pathway> do_adj_min(system::SoA<Position const&, Axis const&, Frozen const&, TypeID const&> dimer,
-                                      system::SoA<Position const&> in,
-                                      Index::scalar_t centre);
+    std::optional<Pathway> do_adj_min(
+        system::SoA<Position const&, Axis const&, Frozen const&, TypeID const&> dimer,
+        system::SoA<Position const&> in,
+        Index::scalar_t centre);
 
     //////////////////////////////////////////////
 
     /**
-     * @brief Check a reconstructed mechanism is within tolerances, if it is cache the SP if not set out's fail flag and do not cache.
+     * @brief Check a reconstructed mechanism is within tolerances, if it is cache the SP if not set out's
+     * fail flag and do not cache.
      */
     void check_mech(Found& out,
                     system::SoA<Position>& cache_slot,
+                    system::SoA<Position const&> dimer,
                     env::Mechanism const& mech,
                     std::size_t sym_num,
                     LocalisedGeo const& geo_data,
@@ -380,7 +402,8 @@ namespace fly::saddle {
     bool is_new_mech(env::Mechanism const& maybe, std::vector<env::Mechanism> const& hist) const;
 
     /**
-     * @brief Compute every symmetric version of new_mech (according to syms), if not in mechs append to mechs.
+     * @brief Compute every symmetric version of new_mech (according to syms), if not in mechs append to
+     * mechs.
      */
     std::size_t append_syms(std::vector<env::Catalogue::SelfSymetry> const& syms,
                             env::Mechanism const& new_mech,
@@ -404,7 +427,8 @@ namespace fly::saddle {
     // // check we have not constructed a false SP, if we have mark mechanism as poisoned
     // std::optional<system::SoA<Position>> recon_sp_relax(env::Geometry<Index> const& geo,
     //                                                     env::Mechanism& m,
-    //                                                     system::SoA<Position const&, TypeID const&, Frozen const&> in);
+    //                                                     system::SoA<Position const&, TypeID const&, Frozen
+    //                                                     const&> in);
     // // Check a relaxed minima is close to a true minima.
     // bool recon_min_relax(env::Geometry<Index> const& geo,
     //                      env::Mechanism const& m,

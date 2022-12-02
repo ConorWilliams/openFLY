@@ -4,14 +4,16 @@
 
 // This file is part of openFLY.
 
-// OpenFLY is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License
-// as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+// OpenFLY is free software: you can redistribute it and/or modify it under the terms of the GNU General
+// Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
+// option) any later version.
 
-// OpenFLY is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
-// warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+// OpenFLY is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the
+// implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+// for more details.
 
-// You should have received a copy of the GNU General Public License along with openFLY. If not, see https :  //
-// www.gnu.org/licenses/>.
+// You should have received a copy of the GNU General Public License along with openFLY. If not, see https :
+// // www.gnu.org/licenses/>.
 
 #include "libfly/saddle/find.hpp"
 
@@ -103,7 +105,8 @@ namespace fly::saddle {
       // Axis random and prop_to displacement.
       for (int j = 0; j < in.size(); ++j) {
         if (!in(fzn_, j)) {
-          dim(ax_, j) = Vec::NullaryExpr([&] { return dist(thr.prng); }) * gnorm_sq(res.sp(r_, j) - in(r_, j));
+          dim(ax_, j)
+              = Vec::NullaryExpr([&] { return dist(thr.prng); }) * gnorm_sq(res.sp(r_, j) - in(r_, j));
         }
       }
       // ... and randomise.
@@ -208,7 +211,9 @@ namespace fly::saddle {
     }
   }
 
-  std::vector<Master::LocalisedGeo> Master::package(std::vector<int> const& ix, env::Catalogue const& cat, int num_threads) {
+  std::vector<Master::LocalisedGeo> Master::package(std::vector<int> const& ix,
+                                                    env::Catalogue const& cat,
+                                                    int num_threads) {
     //
     std::vector<LocalisedGeo> out_data(ix.size());
 
@@ -267,7 +272,9 @@ namespace fly::saddle {
 #pragma omp task untied default(none) firstprivate(j) shared(out, in, nl_pert, geo_data)
         {
           find_n(out[j], geo_data[j], in, nl_pert);
-          fmt::print("FINDER: Done @{:<4} found {} mechs\n", geo_data[j].centre, out[j] ? int(out[j].mechs().size()) : -1);
+          fmt::print("FINDER: Done @{:<4} found {} mechs\n",
+                     geo_data[j].centre,
+                     out[j] ? int(out[j].mechs().size()) : -1);
         }
       }
     }
@@ -276,7 +283,8 @@ namespace fly::saddle {
     for (auto& f : out) {
       if (f) {
         for (auto& m : f.m_mechs) {
-          m.kinetic_pre = std::sqrt(std::exp(m_log_prod_eigen - m.kinetic_pre) / (2 * M_PI * 1.6605390666050e-27));
+          m.kinetic_pre
+              = std::sqrt(std::exp(m_log_prod_eigen - m.kinetic_pre) / (2 * M_PI * 1.6605390666050e-27));
         }
       }
     }
@@ -289,9 +297,14 @@ namespace fly::saddle {
         if (out[i]) {
           for (auto& mech : out[i].m_mechs) {
             if (m_opt.fout) {
-              m_opt.fout->commit([&] { m_opt.fout->write(r_, reconstruct(geo_data[i].geo, mech.delta_sp, in)); });
+              m_opt.fout->commit(
+                  [&] { m_opt.fout->write(r_, reconstruct(geo_data[i].geo, mech.delta_sp, in)); });
             }
-            fmt::print("FINDER: @{} frame={}, Delta={}eV, A={:e}Hz\n", geo_data[i].centre, c++, mech.barrier, mech.kinetic_pre);
+            fmt::print("FINDER: @{} frame={}, Delta={}eV, A={:e}Hz\n",
+                       geo_data[i].centre,
+                       c++,
+                       mech.barrier,
+                       mech.kinetic_pre);
           }
         }
       }
@@ -355,6 +368,7 @@ namespace fly::saddle {
 
   void Master::check_mech(Found& out,
                           system::SoA<Position>& cache_slot,
+                          system::SoA<Position const&> dimer,
                           env::Mechanism const& mech,
                           std::size_t sym_indx,
                           LocalisedGeo const& geo_data,
@@ -371,14 +385,50 @@ namespace fly::saddle {
     //
     auto [re_min, re_sp, rel_min, rel_sp] = recon_relax(geo_data.geo, mech, in);
 
-    auto set_fail_flag = [&out, sym_indx] {
-      verify(sym_indx != 0, "First symmetry (identity) should be guaranteed to reconstruct");
+    auto set_fail_flag = [&, sym_indx] {
+      if (sym_indx != 0) {
+#pragma omp critical
+        {
+          constexpr char const* fname = "crash.check.gsd";
+
+          fly::io::BinaryFile file(fname, fly::io::create);
+
+          fmt::print(stderr,
+                     "ERROR: First symmetry (identity) should be guaranteed to reconstruct at atom {}. "
+                     "Failure was written to \"{}\" "
+                     "in the current working directory whose frames are: initial configuration, dimer "
+                     "final configuration, reconstructed saddle-point, reconstructed final-minima\n",
+                     fname,
+                     geo_data.centre);
+
+          file.commit([&] {
+            file.write("particles/N", fly::safe_cast<std::uint32_t>(in.size()));
+            file.write(r_, in);
+          });
+
+          file.commit([&] { file.write(r_, dimer); });
+
+          file.commit([&] { file.write(r_, re_sp; });
+
+          file.commit([&] { file.write(r_, re_min; });
+        }
+        throw error("First symmetry (identity) should be guaranteed to reconstruct");
+      }
+
 #pragma omp atomic write
       out.m_fail = true;
     };
 
     if (!rel_min || !rel_sp) {
-      dprint(m_opt.debug, "FINDER: @ symmetry #{} recon_relax()->[{},{}]\n", sym_indx, bool(rel_min), bool(rel_sp));
+      dprint(m_opt.debug,
+             "FINDER: @ symmetry #{} recon_relax()->[{},{}]\n",
+             sym_indx,
+             bool(rel_min),
+             bool(rel_sp));
+
+      if (sym_indx == 0) {
+      }
+
       set_fail_flag();
       return;
     }
@@ -413,7 +463,8 @@ namespace fly::saddle {
     double frac_sp = d_sp / mech.err_sp + err_sp;
 
     dprint(m_opt.debug,
-           "FINDER: Recon @{:>4} Δ(ΔE#)={:.3f} [{:.4f}] Δ(ΔE)={:.3f} [{:.4f}], ΔR_min={:.3f} [{:.4f}], ΔR_sp={:.3f} [{:.4f}]\n",
+           "FINDER: Recon @{:>4} Δ(ΔE#)={:.3f} [{:.4f}] Δ(ΔE)={:.3f} [{:.4f}], ΔR_min={:.3f} [{:.4f}], "
+           "ΔR_sp={:.3f} [{:.4f}]\n",
            geo_data.centre,
            d_barrier,
            frac_barrier,
@@ -451,7 +502,8 @@ namespace fly::saddle {
 
     //  Do batch_size SP searches
     for (Batch& elem : batch) {
-#pragma omp task untied default(none) firstprivate(theta_tol) shared(elem, in, nl_pert, batch, cache, geo_data)
+#pragma omp task untied default(none) firstprivate(theta_tol) \
+    shared(elem, in, nl_pert, batch, cache, geo_data)
       {
         perturb(elem.dimer, in, geo_data.centre, nl_pert);
         elem.mech = find_one(in, elem.dimer, elem.exit, geo_data.geo, cache, theta_tol);
@@ -503,12 +555,13 @@ namespace fly::saddle {
         {
           fly::io::BinaryFile file("crash.gsd", fly::io::create);
 
-          fmt::print(
-              stderr,
-              "Append symmetries threw @{}, this implies a symmetrical saddle-point but sym-breaking minima, perhaps the minimiser "
-              "reached the wrong minima i.e. failed to follow the minimum mode or the sp was higher order. Failure was written to "
-              "\"crash.gsd\" in the current working directory\n",
-              geo_data.centre);
+          fmt::print(stderr,
+                     "Append symmetries threw @{}, this implies a symmetrical saddle-point but sym-breaking "
+                     "minima, perhaps the minimiser "
+                     "reached the wrong minima i.e. failed to follow the minimum mode or the sp was higher "
+                     "order. Failure was written to "
+                     "\"crash.gsd\" in the current working directory\n",
+                     geo_data.centre);
 
           file.commit([&] {
             file.write("particles/N", fly::safe_cast<std::uint32_t>(in.size()));
@@ -528,7 +581,8 @@ namespace fly::saddle {
 
       for (std::size_t k = 0; k < num_new; k++) {
 #pragma omp task untied default(none) firstprivate(n, k, num_new) shared(out, in, cache, geo_data, elem)
-        check_mech(out, cache[n + k], out.m_mechs[out.m_mechs.size() - num_new + k], k, geo_data, in);
+        check_mech(
+            out, cache[n + k], elem.dimer, out.m_mechs[out.m_mechs.size() - num_new + k], k, geo_data, in);
       }
 #pragma omp taskwait
 
@@ -538,12 +592,13 @@ namespace fly::saddle {
     return found_one_or_more;
   }
 
-  std::optional<env::Mechanism> Master::find_one(system::SoA<Position const&, Frozen const&, TypeID const&> in,
-                                                 system::SoA<Position&, Axis&> dimer_in_out,
-                                                 Dimer::Exit& exit,
-                                                 env::Geometry<Index> const& geo,
-                                                 std::vector<system::SoA<Position>> const& hist_sp,
-                                                 double theta_tol) {
+  std::optional<env::Mechanism> Master::find_one(
+      system::SoA<Position const&, Frozen const&, TypeID const&> in,
+      system::SoA<Position&, Axis&> dimer_in_out,
+      Dimer::Exit& exit,
+      env::Geometry<Index> const& geo,
+      std::vector<system::SoA<Position>> const& hist_sp,
+      double theta_tol) {
     // Saddle search
 
     system::SoA<Position&, Axis&, Frozen const&, TypeID const&> dimer(in.size());
@@ -633,7 +688,10 @@ namespace fly::saddle {
       mech.err_fwd = gnorm((*rel_min)[r_] - re_min[r_]);
       mech.err_sp = gnorm((*rel_sp)[r_] - re_sp[r_]);
 
-      dprint(m_opt.debug, "FINDER: In-place reconstruct, unaligned: err_fwd={}, err_sp={}\n", mech.err_fwd, mech.err_sp);
+      dprint(m_opt.debug,
+             "FINDER: In-place reconstruct, unaligned: err_fwd={}, err_sp={}\n",
+             mech.err_fwd,
+             mech.err_sp);
 
       com_align(*rel_min, fwd);
       com_align(*rel_sp, sp);
@@ -653,7 +711,12 @@ namespace fly::saddle {
       double del_Esp = std::abs(re_Esp - Esp);
       double del_Efwd = std::abs(re_Ef - Ef);
 
-      dprint(m_opt.debug, "FINDER: In-place reconstruct: err_fwd={} err_sp={} dEsp={} dEfwd={}\n", err_fwd, err_sp, del_Esp, del_Efwd);
+      dprint(m_opt.debug,
+             "FINDER: In-place reconstruct: err_fwd={} err_sp={} dEsp={} dEfwd={}\n",
+             err_fwd,
+             err_sp,
+             del_Esp,
+             del_Efwd);
 
       if (err_fwd > r_tol || err_sp > r_tol || del_Efwd > e_tol || del_Esp > e_tol) {
         dprint(m_opt.debug, "FINDER: Mech poisoned!\n");
@@ -664,7 +727,8 @@ namespace fly::saddle {
     }
 
     if (mech.poison) {
-      //   verify(mech.barrier > 2., "Mechanism @{} with energy barrier = {}eV is poisoned!", geo[0][i_], mech.barrier);
+      //   verify(mech.barrier > 2., "Mechanism @{} with energy barrier = {}eV is poisoned!", geo[0][i_],
+      //   mech.barrier);
     }
 
     //////////////// Partial hessian compute. ////////////////
@@ -701,7 +765,8 @@ namespace fly::saddle {
     }
 
     if (m_opt.debug) {
-      fmt::print("FINDER: Mech ΔEsp={:.3e}, ΔEfwd={:.3e}, N_zeros={}\n", mech.barrier, mech.delta, count_zeros);
+      fmt::print(
+          "FINDER: Mech ΔEsp={:.3e}, ΔEfwd={:.3e}, N_zeros={}\n", mech.barrier, mech.delta, count_zeros);
 
       for (int i = 0; i < m_num_zero_modes + 3; i++) {
         fmt::print("FINDER: sp mode {} = {}\n", i, freq[i]);
@@ -742,9 +807,10 @@ namespace fly::saddle {
   /**
    * @brief Given a saddle point produce a min->sp->min pathway
    */
-  std::optional<Master::Pathway> Master::do_adj_min(system::SoA<Position const&, Axis const&, Frozen const&, TypeID const&> dimer,
-                                                    system::SoA<Position const&> in,
-                                                    Index::scalar_t centre) {
+  std::optional<Master::Pathway> Master::do_adj_min(
+      system::SoA<Position const&, Axis const&, Frozen const&, TypeID const&> dimer,
+      system::SoA<Position const&> in,
+      Index::scalar_t centre) {
     // Check sp centred on centre and freeze an atom.
 
     auto [_, max] = min_max(dimer, in);
@@ -797,7 +863,8 @@ namespace fly::saddle {
       swap(fwd, rev);
     }
 
-    // We now have a min->sp->min pathway with no translation (due to freeze). Need to correct for COM drift during SPS.
+    // We now have a min->sp->min pathway with no translation (due to freeze). Need to correct for COM drift
+    // during SPS.
 
     Vec in_com = com(in);
     Vec rev_com = com(rev);
@@ -863,7 +930,8 @@ namespace fly::saddle {
     }
 
     if (m_opt.debug) {
-      fmt::print("FINDER: Null space of Hessian has dimension  = {}, exp = {}\n", m_num_zero_modes, exp_zero_modes);
+      fmt::print(
+          "FINDER: Null space of Hessian has dimension  = {}, exp = {}\n", m_num_zero_modes, exp_zero_modes);
 
       for (int i = 0; i < m_num_zero_modes + 5; i++) {
         fmt::print("FINDER: Initial min mode {} = {}\n", i, freq[i]);
@@ -935,7 +1003,8 @@ namespace fly::saddle {
 
     ASSERT(!in(Frozen{}, centre), "perturbation centred on a frozen atom {}", centre);
 
-    out(r_, centre) += Vec::NullaryExpr([&] { return gauss(prng); });  // p * std::abs(gauss(prng)) * std::sqrt(3);
+    out(r_, centre)
+        += Vec::NullaryExpr([&] { return gauss(prng); });  // p * std::abs(gauss(prng)) * std::sqrt(3);
     out(ax_, centre) += Vec::NullaryExpr([&] { return normal(prng); });
 
     out[ax_] /= gnorm(out[ax_]);  // normalize
@@ -967,7 +1036,10 @@ namespace fly::saddle {
       min_d_fwd = std::min(min_d_fwd, d_fwd);
     }
 
-    dprint(m_opt.debug, "FINDER: Mech is new, min distance: old-sp={:.5f} old-min={:.5f}\n", min_d_sp, min_d_fwd);
+    dprint(m_opt.debug,
+           "FINDER: Mech is new, min distance: old-sp={:.5f} old-min={:.5f}\n",
+           min_d_sp,
+           min_d_fwd);
     return true;
   }
 

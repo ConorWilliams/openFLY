@@ -741,7 +741,9 @@ namespace fly::saddle {
 
     thr.pot_nl.rebuild(sp, 1);
 
-    thr.pot.hessian(thr.hess, in, thr.pot_nl);
+    thr.pot.hessian(thr.hess, in, thr.pot_nl, 1);
+
+    thr.pot.mw_hessian(thr.hess, in, 1);
 
     system::Hessian::Vector const& freq = thr.hess.eigenvalues();
 
@@ -909,7 +911,9 @@ namespace fly::saddle {
 
     m_data[0].pot_nl.rebuild(in);
 
-    m_data[0].pot.hessian(m_data[0].hess, in, m_data[0].pot_nl);
+    m_data[0].pot.hessian(m_data[0].hess, in, m_data[0].pot_nl, m_opt.num_threads);
+
+    m_data[0].pot.mw_hessian(m_data[0].hess, in, m_opt.num_threads);
 
     system::Hessian::Vector const& freq = m_data[0].hess.eigenvalues();
 

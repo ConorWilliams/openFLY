@@ -99,7 +99,7 @@ namespace fly::potential {
                   int threads = 1) -> void;
 
     /**
-     * @brief Compute mass weighted hessian matrix of the active atoms.
+     * @brief Compute hessian matrix.
      *
      * Assumes the neighbour list are ready. The resulting hessian will be  n by n (n = number of atoms) and
      * only include contributions from the m active atoms i.e. have zeros for frozen atoms. As hessian
@@ -115,6 +115,18 @@ namespace fly::potential {
                  system::SoA<TypeID const&, Frozen const&> in,
                  neigh::List const& nl,
                  int threads = 1) -> void;
+
+    /**
+     * @brief Mass weight hessian matrix.
+     *
+     * As hessian matrices are always symmetric this function only acts on the lower diagonal portion.
+     *
+     * @param in Input data.
+     * @param out Hessian matrix (computed with .hessian()).
+     * @param threads Number of openMP threads to use.
+     */
+    auto mw_hessian(system::Hessian& out, system::SoA<TypeID const&, Frozen const&> in, int threads = 1)
+        -> void;
 
   private:
     std::shared_ptr<DataEAM const> m_data;

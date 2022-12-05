@@ -416,6 +416,11 @@ namespace fly::saddle {
       std::optional<system::SoA<Position>> rel_sp;   ///< Relaxed reconstructed sp
     };
 
+    void dump_recon(system::SoA<Position const&> in,
+                    Index::scalar_t centre,
+                    Recon const& recon,
+                    system::SoA<Position const&> dimer) const;
+
     /**
      * @brief Reconstruct and relax a mechanism's saddle point and minima.
      */

@@ -366,6 +366,44 @@ namespace fly::saddle {
     }
   }
 
+  void Master::dump_recon(system::SoA<Position const&> in,
+                          Index::scalar_t centre,
+                          Recon const& recon,
+                          system::SoA<Position const&> dimer) const {
+    //
+    constexpr char const* fname = "crash.check.gsd";
+
+    fly::io::BinaryFile file(fname, fly::io::create);
+
+    fmt::print(stderr,
+               "ERROR: First symmetry (identity) should be guaranteed to reconstruct at atom {}. Failure was "
+               "written to \"{}\" in the current working directory whose frames are: initial configuration, "
+               "dimer final configuration, reconstructed saddle-point, reconstructed final-minima.\n",
+               fname,
+               centre);
+
+    file.commit([&] {
+      file.write("particles/N", fly::safe_cast<std::uint32_t>(in.size()));
+      file.write(r_, in);
+    });
+
+    file.commit([&] { file.write(r_, dimer); });
+
+    file.commit([&] { file.write(r_, recon.sp); });
+
+    file.commit([&] { file.write(r_, recon.min); });
+
+    if (recon.rel_sp) {
+      fmt::print(stderr, "ERROR: and relaxed saddle, \n");
+      file.commit([&] { file.write(r_, *recon.rel_sp); });
+    }
+
+    if (recon.rel_min) {
+      fmt::print(stderr, "ERROR: and relaxed min, \n");
+      file.commit([&] { file.write(r_, *recon.rel_min); });
+    }
+  }
+
   void Master::check_mech(Found& out,
                           system::SoA<Position>& cache_slot,
                           system::SoA<Position const&> dimer,
@@ -383,35 +421,12 @@ namespace fly::saddle {
     }
 
     //
-    auto [re_min, re_sp, rel_min, rel_sp] = recon_relax(geo_data.geo, mech, in);
+    auto recon = recon_relax(geo_data.geo, mech, in);
 
     auto set_fail_flag = [&, sym_indx] {
       if (sym_indx != 0) {
 #pragma omp critical
-        {
-          constexpr char const* fname = "crash.check.gsd";
-
-          fly::io::BinaryFile file(fname, fly::io::create);
-
-          fmt::print(stderr,
-                     "ERROR: First symmetry (identity) should be guaranteed to reconstruct at atom {}. "
-                     "Failure was written to \"{}\" "
-                     "in the current working directory whose frames are: initial configuration, dimer "
-                     "final configuration, reconstructed saddle-point, reconstructed final-minima\n",
-                     fname,
-                     geo_data.centre);
-
-          file.commit([&] {
-            file.write("particles/N", fly::safe_cast<std::uint32_t>(in.size()));
-            file.write(r_, in);
-          });
-
-          file.commit([&] { file.write(r_, dimer); });
-
-          file.commit([&] { file.write(r_, re_sp; });
-
-          file.commit([&] { file.write(r_, re_min; });
-        }
+        dump_recon(in, geo_data.centre, recon, dimer);
         throw error("First symmetry (identity) should be guaranteed to reconstruct");
       }
 
@@ -419,15 +434,12 @@ namespace fly::saddle {
       out.m_fail = true;
     };
 
-    if (!rel_min || !rel_sp) {
+    if (!recon.rel_min || !recon.rel_sp) {
       dprint(m_opt.debug,
              "FINDER: @ symmetry #{} recon_relax()->[{},{}]\n",
              sym_indx,
-             bool(rel_min),
-             bool(rel_sp));
-
-      if (sym_indx == 0) {
-      }
+             bool(recon.rel_min),
+             bool(recon.rel_sp));
 
       set_fail_flag();
       return;
@@ -438,10 +450,10 @@ namespace fly::saddle {
     thr.pot_nl.rebuild(in);
     double E0 = thr.pot.energy(in, thr.pot_nl, 1);
 
-    thr.pot_nl.rebuild(*rel_min);
+    thr.pot_nl.rebuild(*recon.rel_min);
     double Ef = thr.pot.energy(in, thr.pot_nl, 1);
 
-    thr.pot_nl.rebuild(*rel_sp);
+    thr.pot_nl.rebuild(*recon.rel_sp);
     double Esp = thr.pot.energy(in, thr.pot_nl, 1);
 
     double re_barrier = Esp - E0;
@@ -453,8 +465,8 @@ namespace fly::saddle {
     double frac_barrier = d_barrier / std::abs(mech.barrier);
     double frac_delta = d_delta / std::abs(mech.delta);
 
-    double err_fwd = gnorm((*rel_min)[r_] - re_min[r_]);
-    double err_sp = gnorm((*rel_sp)[r_] - re_sp[r_]);
+    double err_fwd = gnorm((*recon.rel_min)[r_] - recon.min[r_]);
+    double err_sp = gnorm((*recon.rel_sp)[r_] - recon.sp[r_]);
 
     double d_fwd = std::abs(mech.err_fwd - err_fwd);
     double d_sp = std::abs(mech.err_sp - err_sp);
@@ -484,7 +496,7 @@ namespace fly::saddle {
     } else if (frac_sp > m_opt.recon_norm_frac_tol && d_sp > m_opt.recon_norm_abs_tol) {
       set_fail_flag();
     } else {
-      cache_slot = std::move(*rel_sp);
+      cache_slot = std::move(*recon.rel_sp);
     }
   }
 

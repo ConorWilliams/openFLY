@@ -379,8 +379,8 @@ namespace fly::saddle {
                "ERROR: First symmetry (identity) should be guaranteed to reconstruct at atom {}. Failure was "
                "written to \"{}\" in the current working directory whose frames are: initial configuration, "
                "dimer final configuration, reconstructed saddle-point, reconstructed final-minima.\n",
-               fname,
-               centre);
+               centre,
+               fname);
 
     file.commit([&] {
       file.write("particles/N", fly::safe_cast<std::uint32_t>(in.size()));
@@ -424,7 +424,7 @@ namespace fly::saddle {
     auto recon = recon_relax(geo_data.geo, mech, in);
 
     auto set_fail_flag = [&, sym_indx] {
-      if (sym_indx != 0) {
+      if (sym_indx == 0) {
 #pragma omp critical
         dump_recon(in, geo_data.centre, recon, dimer);
         throw error("First symmetry (identity) should be guaranteed to reconstruct");
@@ -567,13 +567,12 @@ namespace fly::saddle {
         {
           fly::io::BinaryFile file("crash.gsd", fly::io::create);
 
-          fmt::print(stderr,
-                     "Append symmetries threw @{}, this implies a symmetrical saddle-point but sym-breaking "
-                     "minima, perhaps the minimiser "
-                     "reached the wrong minima i.e. failed to follow the minimum mode or the sp was higher "
-                     "order. Failure was written to "
-                     "\"crash.gsd\" in the current working directory\n",
-                     geo_data.centre);
+          fmt::print(
+              stderr,
+              "Append symmetries threw @{}, this implies a symmetrical saddle-point but sym-breaking minima, "
+              "perhaps the minimiser reached the wrong minima i.e. failed to follow the minimum mode or the "
+              "sp was higher order. Failure was written to \"crash.gsd\" in the current working directory\n",
+              geo_data.centre);
 
           file.commit([&] {
             file.write("particles/N", fly::safe_cast<std::uint32_t>(in.size()));

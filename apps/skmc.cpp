@@ -107,18 +107,6 @@ int main() {
       },
   };
 
-  //   static constexpr char fname[] = "build/gsd/cat.bin";
-
-  //   env::Catalogue cat = [&] {
-  //     if (std::ifstream fcat(fname); fcat.good()) {
-  //       fmt::print("Opening existing catalogue: \"{}\"\n", fname);
-  //       return env::Catalogue{{}, fcat};
-  //     } else {
-  //       fmt::print("Could not open catalogue: \"{}\"\n", fname);
-  //       return env::Catalogue{{}};
-  //     }
-  //   }();
-
   kinetic::SKMC runner = {
       {
           .debug = true,

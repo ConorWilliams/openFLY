@@ -46,6 +46,7 @@
 #include "libfly/system/hessian.hpp"
 #include "libfly/system/property.hpp"
 #include "libfly/utility/core.hpp"
+#include "libfly/utility/lattice.hpp"
 #include "libfly/utility/random.hpp"
 
 /**
@@ -170,26 +171,20 @@ namespace fly::saddle {
     return {min, max};
   }
 
-  // Centre of mass of a SoA
-  static Vec com(system::SoA<Position const&> p) {
-    Vec vsum = Vec::Zero();
-    for (int i = 0; i < p.size(); i++) {
-      vsum += p(r_, i);
-    }
-    return vsum / p.size();
-  }
-
-  static void com_align(system::SoA<Position&> x, system::SoA<Position&> with) {
+  static void com_align(system::SoA<Position&> x, system::SoA<Position const&> with) {
     //
     ASSERT(x.size() == with.size(), "Different number of atoms {}!={}", x.size(), with.size());
 
-    Vec delta = com(with) - com(x);
+    Vec delta = centroid(with) - centroid(x);
 
     for (int i = 0; i < with.size(); i++) {
       x(r_, i) += delta;
     }
 
-    ASSERT(gnorm(com(with) - com(x)) < 1e-10, "Norms should be aligned but {}!={}", com(with), com(x));
+    ASSERT(gnorm(centroid(with) - centroid(x)) < 1e-10,
+           "Norms should be aligned but {}!={}",
+           centroid(with),
+           centroid(x));
   }
 
   ////////////////////////////////////////
@@ -841,7 +836,7 @@ namespace fly::saddle {
     relax.rebind(id_, dimer);
 
     if (m_count_frozen == 0) {
-      // Freeze minimally displaced atom to remove translational degrees of freedom.
+      // Freeze furthest atom to remove translational degrees of freedom.
 
       auto min = m_sep_list[safe_cast<size_t>(max)];
 
@@ -877,8 +872,8 @@ namespace fly::saddle {
     // We now have a min->sp->min pathway with no translation (due to freeze). Need to correct for COM drift
     // during SPS.
 
-    Vec in_com = com(in);
-    Vec rev_com = com(rev);
+    Vec in_com = centroid(in);
+    Vec rev_com = centroid(rev);
 
     Vec drift = rev_com - in_com;
 
@@ -892,7 +887,7 @@ namespace fly::saddle {
       rev(r_, i) -= drift;
     }
 
-    ASSERT(gnorm(com(rev) - com(in)) < 1e-8, "Drift correction failed", 0);
+    ASSERT(gnorm(centroid(rev) - centroid(in)) < 1e-8, "Drift correction failed", 0);
 
     return Pathway{std::move(rev), std::move(sp_), std::move(fwd)};
   }

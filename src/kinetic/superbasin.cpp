@@ -31,6 +31,7 @@
 #include "libfly/system/SoA.hpp"
 #include "libfly/system/property.hpp"
 #include "libfly/utility/core.hpp"
+#include "libfly/utility/lattice.hpp"
 
 namespace fly::kinetic {
 
@@ -196,20 +197,12 @@ namespace fly::kinetic {
   auto SuperBasin::find_occupy(std::size_t hash, system::SoA<Position const &> in, double tol)
       -> std::optional<std::size_t> {
     //
-    auto com = [](system::SoA<Position const &> x) -> Vec {
-      Vec sum = Vec::Zero();
-      for (Eigen::Index i = 0; i < x.size(); i++) {
-        sum += x(r_, i);
-      }
-      return sum / x.size();
-    };
-
-    Vec com_x = com(in);
+    Vec com_x = centroid(in);
 
     for (std::size_t i = 0; i < size(); ++i) {
       if (hash == m_super[i].m_state_hash) {
         //
-        Vec delta = com_x - com(m_super[i].state());
+        Vec delta = com_x - centroid(m_super[i].state());
 
         double sum_sq = 0;
 

@@ -42,12 +42,13 @@ namespace fly {
   /**
    * @brief Utility to build a supercell by replicating a ``motif`` along each axis ``extents`` times.
    *
-   * @param motif Containing the ``TypeMap`` and positions of the atoms - in fractional coordinates - the box is interpreted as the
-   * primitive cell.
+   * @param motif Containing the ``TypeMap`` and positions of the atoms - in fractional coordinates - the box
+   * is interpreted as the primitive cell.
    * @param extents Number of primitive-cells along each axis of the supercell.
    */
   template <typename Map, typename... T>
-  auto motif_to_lattice(system::Supercell<Map, T...> motif, Arr<int> const& extents) -> system::Supercell<Map, T...> {
+  auto motif_to_lattice(system::Supercell<Map, T...> motif, Arr<int> const& extents)
+      -> system::Supercell<Map, T...> {
     //
     verify((extents > 0).all(), "Invalid extents={}", extents);
 
@@ -57,7 +58,9 @@ namespace fly {
 
     for (int i = 0; i < motif.size(); i++) {
       if ((motif(r_, i).array() < 0).any() || (motif(r_, i).array() >= 1).any()) {
-        throw error("Atom #{} in motif is outside unit cell, r={}, are you using fractional coordinates?", i, motif(r_, i));
+        throw error("Atom #{} in motif is outside unit cell, r={}, are you using fractional coordinates?",
+                    i,
+                    motif(r_, i));
       }
       motif(r_, i) = cell * motif(r_, i);
     }
@@ -78,7 +81,8 @@ namespace fly {
       }
     }
 
-    system::Supercell supercell = system::make_supercell<T...>({super_basis, periodic}, motif.map(), extents.prod() * motif.size());
+    system::Supercell supercell
+        = system::make_supercell<T...>({super_basis, periodic}, motif.map(), extents.prod() * motif.size());
 
     // Fill supercell
 
@@ -110,10 +114,12 @@ namespace fly {
    * @param bad Indexes of atoms to remove.
    */
   template <typename Map, typename... T>
-  auto remove_atoms(system::Supercell<Map, T...> const& cell, std::vector<Eigen::Index> const& bad) -> system::Supercell<Map, T...> {
+  auto remove_atoms(system::Supercell<Map, T...> const& cell, std::vector<Eigen::Index> const& bad)
+      -> system::Supercell<Map, T...> {
     //
 
-    auto out_cell = system::make_supercell<T...>(cell.box(), cell.map(), cell.size() - safe_cast<Eigen::Index>(bad.size()));
+    auto out_cell = system::make_supercell<T...>(
+        cell.box(), cell.map(), cell.size() - safe_cast<Eigen::Index>(bad.size()));
 
     Eigen::Index x = 0;
 
@@ -135,9 +141,11 @@ namespace fly {
    * @param atoms Atoms to add to ``cell``.
    */
   template <typename Map, typename... T>
-  auto add_atoms(system::Supercell<Map, T...> const& cell, std::vector<system::Atom<TypeID, T...>> const& atoms) {
+  auto add_atoms(system::Supercell<Map, T...> const& cell,
+                 std::vector<system::Atom<TypeID, T...>> const& atoms) {
     //
-    auto out_cell = system::make_supercell<T...>(cell.box(), cell.map(), cell.size() + safe_cast<Eigen::Index>(atoms.size()));
+    auto out_cell = system::make_supercell<T...>(
+        cell.box(), cell.map(), cell.size() + safe_cast<Eigen::Index>(atoms.size()));
 
     // Copy old atoms.
     for (Eigen::Index i = 0; i < cell.size(); i++) {
@@ -157,14 +165,16 @@ namespace fly {
   }
 
   /**
-   * @brief Create a new supercell identical to ``cell`` but with the atoms within ``r`` of the atom ``centre`` removed.
+   * @brief Create a new supercell identical to ``cell`` but with the atoms within ``r`` of the atom
+   * ``centre`` removed.
    *
    * @param cell Input ``SuperCell``.
    * @param centre Index of central atom.
    * @param r Distance from ``centre`` to qualify for removal.
    */
   template <typename Map, typename... T>
-  auto remove_sphere(system::Supercell<Map, T...> const& cell, Eigen::Index centre, double r) -> system::Supercell<Map, T...> {
+  auto remove_sphere(system::Supercell<Map, T...> const& cell, Eigen::Index centre, double r)
+      -> system::Supercell<Map, T...> {
     //
     neigh::List nl(cell.box(), r);
 
@@ -175,6 +185,26 @@ namespace fly {
     nl.for_neighbours(centre, r, [&bad](auto n, auto const&...) { bad.push_back(n); });
 
     return remove_atoms(cell, bad);
+  }
+
+  /**
+   * @brief Compute the centroid of a vector of atoms, ``x``.
+   *
+   * \rst
+   *
+   * For a set of atoms with positions :math:`x_i` this is defined as:
+   *
+   * .. math::
+   *    \frac{1}{N} \sum_{i=1}^{N}{x_i}
+   *
+   * \endrst
+   */
+  inline Vec centroid(system::SoA<Position const&> x) {
+    Vec vsum = Vec::Zero();
+    for (int i = 0; i < x.size(); i++) {
+      vsum += x(r_, i);
+    }
+    return vsum / x.size();
   }
 
 }  // namespace fly

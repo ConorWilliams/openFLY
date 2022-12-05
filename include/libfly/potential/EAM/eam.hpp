@@ -6,13 +6,16 @@
 
 // This file is part of openFLY.
 
-// OpenFLY is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License
-// as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+// OpenFLY is free software: you can redistribute it and/or modify it under the terms of the GNU General
+// Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
+// option) any later version.
 
-// OpenFLY is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
-// warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+// OpenFLY is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the
+// implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+// for more details.
 
-// You should have received a copy of the GNU General Public License along with openFLY. If not, see <https://www.gnu.org/licenses/>.
+// You should have received a copy of the GNU General Public License along with openFLY. If not, see
+// <https://www.gnu.org/licenses/>.
 
 #include <cstddef>
 #include <memory>
@@ -46,11 +49,11 @@ namespace fly::potential {
      */
     EAM(system::TypeMap<> const& map, std::shared_ptr<DataEAM const> data) : m_data(std::move(data)) {
       //
-      if (map.num_types() != m_data->type_map().num_types()) {
-        throw error("Different number of types in eam data file: {} != {}", map.num_types(), m_data->type_map().num_types());
+      if (auto n = map.num_types(); n < m_data->type_map().num_types()) {
+        throw error("Not enough types in eam data file: {} < {}", n, m_data->type_map().num_types());
       }
 
-      for (TypeID::scalar_t i = 0; i < map.num_types(); i++) {
+      for (TypeID::scalar_t i = 0; i < m_data->type_map().num_types(); i++) {
         std::string_view exp = m_data->type_map().get(i, tp_);
         std::string_view got = map.get(i, tp_);
         if (exp != got) {
@@ -62,8 +65,8 @@ namespace fly::potential {
     /**
      * @brief Get this potentials cut-off radius.
      *
-     * This is the maximum distance two atom can interact. The neighbour::List passed to the other functions should be configured with
-     * a cut-off equal or greater than this.
+     * This is the maximum distance two atom can interact. The neighbour::List passed to the other functions
+     * should be configured with a cut-off equal or greater than this.
      */
     auto r_cut() const noexcept -> double { return m_data->r_cut(); }
 
@@ -77,7 +80,8 @@ namespace fly::potential {
      * @param threads Number of openMP threads to use.
      * @return double The potential energy of the system of atoms.
      */
-    auto energy(system::SoA<TypeID const&, Frozen const&> in, neigh::List const& nl, int threads = 1) -> double;
+    auto energy(system::SoA<TypeID const&, Frozen const&> in, neigh::List const& nl, int threads = 1)
+        -> double;
 
     /**
      * @brief Compute potential energy gradient.
@@ -97,9 +101,9 @@ namespace fly::potential {
     /**
      * @brief Compute mass weighted hessian matrix of the active atoms.
      *
-     * Assumes the neighbour list are ready. The resulting hessian will be  n by n (n = number of atoms) and only include
-     * contributions from the m active atoms i.e. have zeros for frozen atoms. As hessian matrices are always symmetric this function
-     * only computes the lower diagonal portion.
+     * Assumes the neighbour list are ready. The resulting hessian will be  n by n (n = number of atoms) and
+     * only include contributions from the m active atoms i.e. have zeros for frozen atoms. As hessian
+     * matrices are always symmetric this function only computes the lower diagonal portion.
      *
      *
      * @param in Input data.
@@ -107,7 +111,10 @@ namespace fly::potential {
      * @param nl Neighbour list (in ready state i.e. neigh::List::update() or neigh::List::rebuild() called).
      * @param threads Number of openMP threads to use.
      */
-    auto hessian(system::Hessian& out, system::SoA<TypeID const&, Frozen const&> in, neigh::List const& nl, int threads = 1) -> void;
+    auto hessian(system::Hessian& out,
+                 system::SoA<TypeID const&, Frozen const&> in,
+                 neigh::List const& nl,
+                 int threads = 1) -> void;
 
   private:
     std::shared_ptr<DataEAM const> m_data;

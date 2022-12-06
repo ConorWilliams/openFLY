@@ -178,7 +178,7 @@ int main() {
 
   DetectVacancies detect(perfect.box(), perfect);
 
-  system::Supercell cell = remove_atoms(perfect, {1});
+  system::Supercell cell = remove_atoms(perfect, {1, 3});
 
   Vec r_H = {2.857 / 2 + 3.14, 2.857 / 2 + 3.14, 2.857 / 4 + 3.14};
 

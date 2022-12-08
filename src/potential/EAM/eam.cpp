@@ -128,26 +128,24 @@ namespace fly::potential {
       m_aux(Mu{}, b) = mu;
     }
 
-    for (Eigen::Index a = 0; a < in.size(); ++a) {
-      // Finally compute overlap terms of z coupling to active atom g via a. Each thread only writes to
-      // e^th column blocks.
+    // for (Eigen::Index a = 0; a < in.size(); ++a) {
+    //   //
+    //   double ddFa = m_data->f(in(id_, a)).fpp(m_aux(Rho{}, a));
 
-      double ddFa = m_data->f(in(id_, a)).fpp(m_aux(Rho{}, a));
+    //   nl.for_neighbours(a, r_cut(), [&](auto n, double r_an, Vec const& dr_an) {
+    //     nl.for_neighbours(a, r_cut(), [&](auto g, double r_ag, Vec const& dr_ag) {
+    //       if (n > g && !in(fzn_, n) && !in(fzn_, g)) {
+    //         double ddFg = ddFa * m_data->phi(in(id_, g), in(id_, a)).fp(r_ag)
+    //                       * m_data->phi(in(id_, n), in(id_, a)).fp(r_an);
 
-      nl.for_neighbours(a, r_cut(), [&](auto n, double r_an, Vec const& dr_an) {
-        nl.for_neighbours(a, r_cut(), [&](auto g, double r_ag, Vec const& dr_ag) {
-          if (n > g && !in(fzn_, n) && !in(fzn_, g)) {
-            double ddFg = ddFa * m_data->phi(in(id_, g), in(id_, a)).fp(r_ag)
-                          * m_data->phi(in(id_, n), in(id_, a)).fp(r_an);
+    //         // Now iterating over all pair of unfrozen neighbours of a
+    //         double mag = ddFg / (r_ag * r_an);
 
-            // Now iterating over all pair of unfrozen neighbours of a
-            double mag = ddFg / (r_ag * r_an);
-
-            out(n, g).noalias() += mag * dr_an * dr_ag.transpose();
-          }
-        });
-      });
-    }
+    //         out(n, g).noalias() += mag * dr_an * dr_ag.transpose();
+    //       }
+    //     });
+    //   });
+    // }
 
     // Second sums computes hessian, running over all atoms, only writing to z^th column block. As responsible
     // for LOWER z^th column use dynamic scheduling.
@@ -157,6 +155,7 @@ namespace fly::potential {
 
       if (!in(fzn_, z)) {
         //
+
         Vec v = m_aux(Mu{}, z);
         // A.15 pre sum term, including off-diagonal elements along block diagonal make code simpler.
         out(z, z).noalias() = m_data->f(in(id_, z)).fpp(m_aux(Rho{}, z)) * v * v.transpose();
@@ -193,7 +192,7 @@ namespace fly::potential {
           // hence, drop writes to out(a, z) with a < z.
           ASSERT(z != a, "Atoms {} is interacting with itself", z);
 
-          if (a >= z && !in(fzn_, a)) {
+          if (a > z && !in(fzn_, a)) {
             double BArr = (B - A) / (r * r);
 
             double ur
@@ -202,26 +201,27 @@ namespace fly::potential {
             double ru
                 = m_data->f(in(id_, a)).fpp(m_aux(Rho{}, a)) * m_data->phi(in(id_, z), in(id_, a)).fp(r) / r;
 
-            out(a, z).noalias() += BArr * dr * dr.transpose() - A * Mat::Identity()
-                                   + ur * m_aux(Mu{}, z) * dr.transpose()
+            out(a, z).noalias() += -BArr * dr * dr.transpose() - A * Mat::Identity()
+                                   + ur * dr * m_aux(Mu{}, z).transpose()
                                    - ru * m_aux(Mu{}, a) * dr.transpose();
           }
 
-          //   // Finally compute overlap terms of z coupling to active atom g via a. Each thread only writes
-          //   to
-          //   // e^th column blocks.
+          // Finally compute overlap terms of z coupling to active atom g via a. Each thread only writes to
+          // e^th column blocks.
 
-          //   double ddFg
-          //       = m_data->f(in(id_, a)).fpp(m_aux(Rho{}, a)) * m_data->phi(in(id_, z), in(id_, a)).fp(r);
+          double ddFg
+              = m_data->f(in(id_, a)).fpp(m_aux(Rho{}, a)) * m_data->phi(in(id_, z), in(id_, a)).fp(r);
 
-          //   nl.for_neighbours(a, r_cut(), [&](auto g, double r_g, Vec const& dr_ag) {
-          //     if (g > z && !in(fzn_, g)) {
-          //       // Now iterating over all pair of unfrozen neighbours of a
-          //       double mag = ddFg / (r * r_g) * m_data->phi(in(id_, g), in(id_, a)).fp(r_g);
+          nl.for_neighbours(a, r_cut(), [&](auto g, double r_ag, Vec const& dr_ag) {
+            if (g > z && !in(fzn_, g)) {
+              // Now iterating over all pair of unfrozen neighbours of a
+              double mag = ddFg / (r * r_ag) * m_data->phi(in(id_, g), in(id_, a)).fp(r_ag);
 
-          //       out(g, z).noalias() -= mag * dr * dr_ag.transpose();
-          //     }
-          //   });
+              fmt::print("{} couples via {} to {}\n", z, a, g);
+
+              out(g, z).noalias() -= mag * dr_ag * dr.transpose();
+            }
+          });
         });
       }
     }

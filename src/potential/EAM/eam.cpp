@@ -128,6 +128,27 @@ namespace fly::potential {
       m_aux(Mu{}, b) = mu;
     }
 
+    for (Eigen::Index a = 0; a < in.size(); ++a) {
+      // Finally compute overlap terms of z coupling to active atom g via a. Each thread only writes to
+      // e^th column blocks.
+
+      double ddFa = m_data->f(in(id_, a)).fpp(m_aux(Rho{}, a));
+
+      nl.for_neighbours(a, r_cut(), [&](auto n, double r_an, Vec const& dr_an) {
+        nl.for_neighbours(a, r_cut(), [&](auto g, double r_ag, Vec const& dr_ag) {
+          if (n > g && !in(fzn_, n) && !in(fzn_, g)) {
+            double ddFg = ddFa * m_data->phi(in(id_, g), in(id_, a)).fp(r_ag)
+                          * m_data->phi(in(id_, n), in(id_, a)).fp(r_an);
+
+            // Now iterating over all pair of unfrozen neighbours of a
+            double mag = ddFg / (r_ag * r_an);
+
+            out(n, g).noalias() += mag * dr_an * dr_ag.transpose();
+          }
+        });
+      });
+    }
+
     // Second sums computes hessian, running over all atoms, only writing to z^th column block. As responsible
     // for LOWER z^th column use dynamic scheduling.
 #pragma omp parallel for num_threads(num_threads) schedule(dynamic)
@@ -181,25 +202,26 @@ namespace fly::potential {
             double ru
                 = m_data->f(in(id_, a)).fpp(m_aux(Rho{}, a)) * m_data->phi(in(id_, z), in(id_, a)).fp(r) / r;
 
-            out(a, z).noalias() += -BArr * dr * dr.transpose() - A * Mat::Identity()
+            out(a, z).noalias() += BArr * dr * dr.transpose() - A * Mat::Identity()
                                    + ur * m_aux(Mu{}, z) * dr.transpose()
                                    - ru * m_aux(Mu{}, a) * dr.transpose();
           }
 
-          // Finally compute overlap terms of z coupling to active atom g via a. Each thread only writes to
-          // e^th column blocks.
+          //   // Finally compute overlap terms of z coupling to active atom g via a. Each thread only writes
+          //   to
+          //   // e^th column blocks.
 
-          double ddFg
-              = m_data->f(in(id_, a)).fpp(m_aux(Rho{}, a)) * m_data->phi(in(id_, z), in(id_, a)).fp(r);
+          //   double ddFg
+          //       = m_data->f(in(id_, a)).fpp(m_aux(Rho{}, a)) * m_data->phi(in(id_, z), in(id_, a)).fp(r);
 
-          nl.for_neighbours(a, r_cut(), [&](auto g, double r_g, Vec const& dr_ag) {
-            if (g > z && !in(fzn_, g)) {
-              // Now iterating over all pair of unfrozen neighbours of a
-              double mag = ddFg / (r * r_g) * m_data->phi(in(id_, g), in(id_, a)).fp(r_g);
+          //   nl.for_neighbours(a, r_cut(), [&](auto g, double r_g, Vec const& dr_ag) {
+          //     if (g > z && !in(fzn_, g)) {
+          //       // Now iterating over all pair of unfrozen neighbours of a
+          //       double mag = ddFg / (r * r_g) * m_data->phi(in(id_, g), in(id_, a)).fp(r_g);
 
-              out(g, z).noalias() -= mag * dr * dr_ag.transpose();
-            }
-          });
+          //       out(g, z).noalias() -= mag * dr * dr_ag.transpose();
+          //     }
+          //   });
         });
       }
     }

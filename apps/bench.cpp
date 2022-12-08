@@ -134,18 +134,11 @@ Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> fd_hess(system::Box const 
 int main() {
   /////////////////   Initialise cell   /////////////////
 
-  int N = 2;
+  int N = 6;
 
   //   std::cin >> N;
 
-  system::Supercell cellg = remove_atoms(motif_to_lattice(bcc_iron_motif(), {1, 2, 1}), {0});
-
-  fly::system::Supercell cell = system::make_supercell<Position, Frozen>(
-      {Mat::Identity() * 100, Arr<bool>::Constant(false)}, cellg.map(), cellg.size());
-
-  cell[r_] = cellg[r_];
-  cell[id_] = cellg[id_];
-  cell[fzn_] = cellg[fzn_];
+  system::Supercell cell = remove_atoms(motif_to_lattice(bcc_iron_motif(), {N, N, N}), {0});
 
   //
 
@@ -170,15 +163,8 @@ int main() {
 
   mirror.rebind(r_, cell);
 
-  //   for (size_t i = 0; i < 10; i++) {
-  //     for (auto &&elem : cell[r_]) {
-  //       elem += d(prng);
-  //     }
-
-  //     fmt::print("FoundMin?={}\n",
-  //                !timeit("Min", [&] { return minimiser.minimise(mirror, cell, pot, omp_get_max_threads());
-  //                }));
-  //   }
+  fmt::print("FoundMin?={}\n",
+             !timeit("Min", [&] { return minimiser.minimise(mirror, cell, pot, omp_get_max_threads()); }));
 
   io::BinaryFile fout("build/gsd/bench.gsd", io::create);
 
@@ -198,29 +184,15 @@ int main() {
 
   nl.rebuild(cell, omp_get_max_threads());
 
-  fmt::print("mat is {} by {}\n", cell.size() * 3, cell.size() * 3);
-
   system::Hessian H;
 
   timeit("hess comp", [&] { pot.hessian(H, cell, nl, omp_get_max_threads()); });
 
-  std::cout << "analytic hess\n" << H.get() << std::endl;
-
   auto H2 = fd_hess(cell.box(), pot, cell);
-
-  std::cout << "Finite diff hess\n" << H2 << std::endl;
 
   Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> dH = (H2 - H.get()).triangularView<Eigen::Lower>();
 
-  //   for (Eigen::Index i = 0; i < dH.rows(); i++) {
-  //     for (Eigen::Index j = 0; j < dH.cols(); j++) {
-  //       if (dH(j, i) < 1e-6) {
-  //         dH(j, i) = 0;
-  //       }
-  //     }
-  //   }
-
-  std::cout << "delta hess\n" << dH << std::endl;
+  fmt::print("hess ERROR = {}\n", gnorm(dH));
 
   auto [val, vec] = timeit("eigen", [&] { return H.eigen(); });
 
@@ -234,21 +206,11 @@ int main() {
 
   fmt::print("analytic eigen values:\n");
 
-  for (auto &&v : val) {
+  for (auto &&v : val.head(10)) {
     fmt::print("{}\n", v);
   }
 
   //   ////
-
-  Eigen::SelfAdjointEigenSolver<Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>> solve(H2);
-
-  fmt::print("FD eigen values:\n");
-
-  for (auto &&v : solve.eigenvalues()) {
-    fmt::print("{}\n", v);
-  }
-
-  exit(0);
 
   system::Hessian::Matrix R = vec.rightCols(val.size() - count);
 

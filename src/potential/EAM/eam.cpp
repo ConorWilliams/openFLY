@@ -217,8 +217,6 @@ namespace fly::potential {
               // Now iterating over all pair of unfrozen neighbours of a
               double mag = ddFg / (r * r_ag) * m_data->phi(in(id_, g), in(id_, a)).fp(r_ag);
 
-              fmt::print("{} couples via {} to {}\n", z, a, g);
-
               out(g, z).noalias() -= mag * dr_ag * dr.transpose();
             }
           });

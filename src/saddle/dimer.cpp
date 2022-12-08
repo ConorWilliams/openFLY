@@ -4,13 +4,16 @@
 
 // This file is part of openFLY.
 
-// OpenFLY is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License
-// as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+// OpenFLY is free software: you can redistribute it and/or modify it under the terms of the GNU General
+// Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
+// option) any later version.
 
-// OpenFLY is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
-// warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+// OpenFLY is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the
+// implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+// for more details.
 
-// You should have received a copy of the GNU General Public License along with openFLY. If not, see <https://www.gnu.org/licenses/>.
+// You should have received a copy of the GNU General Public License along with openFLY. If not, see
+// <https://www.gnu.org/licenses/>.
 
 #include "libfly/saddle/dimer.hpp"
 
@@ -18,6 +21,7 @@
 #include <limits>
 
 #include "libfly/io/gsd.hpp"
+#include "libfly/system/property.hpp"
 #include "libfly/utility/core.hpp"
 
 namespace fly::saddle {
@@ -28,14 +32,30 @@ namespace fly::saddle {
                       potential::Generic &pot,
                       std::vector<system::SoA<Position>> const &hist_sp,
                       double theta_tol,
-                      int num_threads) -> Exit {
-    // Check inputs
+                      int num_threads,
+                      system::Hessian::Matrix const *R,
+                      system::Hessian::Matrix const *Rt) -> Exit {
+    // /////////////// Check inputs
+    verify((R && Rt) || (!R && !Rt), "Only one transformation provided!");
 
-    verify(in.size() == out.size(), "Dimer stepper inputs size mismatch, in={} out={}", in.size(), out.size());
+    if (R && Rt) {
+      verify(R->rows() == Rt->cols(), "R and Rt are not the same shape");
+      verify(R->cols() == Rt->rows(), "R and Rt are not the same shape");
+    }
 
-    m_eff_grad.destructive_resize(in.size());
+    verify(in.size() == out.size(), "Dimer inputs size mismatch, in={} out={}", in.size(), out.size());
+
+    // /////////////// Allocate
+
+    // Number of reduced coordinates
+    Eigen::Index n = R ? R->cols() / Position::size() : in.size();
+
+    m_q.destructive_resize(n);
+    m_eff_grad.destructive_resize(n);
 
     m_core.clear();  // Clear history from previous runs.
+
+    // /////////////// Set up neigh list
 
     // Avoid floating point comparison warnings.
     constexpr std::equal_to<> eq;
@@ -47,12 +67,15 @@ namespace fly::saddle {
     }
 
     if (double r_cut = m_rotor.r_cut(pot) + skin; !eq(std::exchange(m_r_cut, r_cut), r_cut) || !m_nl) {
+      //
       m_nl = neigh::List(m_box, r_cut);
 
       if (m_opt.debug) {
         fmt::print("Dimer: Reallocating neigh list\n");
       }
     }
+
+    // /////////////// Find SP main loop
 
     out[r_] = in[r_];    // Initialise out = in
     out[ax_] = in[ax_];  // Initialise out = in
@@ -93,7 +116,7 @@ namespace fly::saddle {
         return convex;
       }
 
-      if (i % m_opt.hist_check_freq == 0) {
+      if (m_opt.use_history && i % m_opt.hist_check_freq == 0) {
         double ctheta = -1;
         double l2 = std::numeric_limits<double>::max();
 
@@ -116,7 +139,11 @@ namespace fly::saddle {
         }
 
         if (m_opt.debug && !hist_sp.empty()) {
-          fmt::print("Dimer: i = {}, norm={}, cos(θ)={}, θ={}\n", i, l2, ctheta, std::acos(ctheta) / (2 * M_PI) * 360);
+          fmt::print("Dimer: i = {}, norm={}, cos(θ)={}, θ={}\n",
+                     i,
+                     l2,
+                     ctheta,
+                     std::acos(ctheta) / (2 * M_PI) * 360);
         }
       }
 

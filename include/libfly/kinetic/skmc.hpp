@@ -32,6 +32,7 @@
 #include "libfly/system/box.hpp"
 #include "libfly/system/supercell.hpp"
 #include "libfly/utility/core.hpp"
+#include "libfly/utility/lattice.hpp"
 #include "libfly/utility/random.hpp"
 
 /**
@@ -254,6 +255,8 @@ namespace fly::kinetic {
       m_cat.reconstruct(raw_recon, m, atom, cell, !changed, num_threads);
 
       auto err = m_minimiser.minimise(rel_recon, raw_recon, m_pot, num_threads);
+
+      centroid_align(rel_recon, raw_recon);
 
       double Ef = energy(rel_recon);  // Energy after relax
 

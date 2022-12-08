@@ -171,22 +171,6 @@ namespace fly::saddle {
     return {min, max};
   }
 
-  static void com_align(system::SoA<Position&> x, system::SoA<Position const&> with) {
-    //
-    ASSERT(x.size() == with.size(), "Different number of atoms {}!={}", x.size(), with.size());
-
-    Vec delta = centroid(with) - centroid(x);
-
-    for (int i = 0; i < with.size(); i++) {
-      x(r_, i) += delta;
-    }
-
-    ASSERT(gnorm(centroid(with) - centroid(x)) < 1e-10,
-           "Norms should be aligned but {}!={}",
-           centroid(with),
-           centroid(x));
-  }
-
   ////////////////////////////////////////
 
   Master::Master(Master::Options const& opt,
@@ -327,6 +311,7 @@ namespace fly::saddle {
     while (tot < m_opt.max_searches * mod && fail < m_opt.max_failed_searches * mod) {
       //
       if (find_batch(tot, out, batch, geo_data, in, nl_pert, cache)) {
+        return;
         fail = 0;
       } else {
         fail += m_opt.batch_size;
@@ -439,6 +424,9 @@ namespace fly::saddle {
       set_fail_flag();
       return;
     }
+
+    centroid_align(*recon.rel_min, recon.min);
+    centroid_align(*recon.rel_sp, recon.sp);
 
     ThreadData& thr = thread();
 
@@ -699,8 +687,8 @@ namespace fly::saddle {
              mech.err_fwd,
              mech.err_sp);
 
-      com_align(*rel_min, fwd);
-      com_align(*rel_sp, sp);
+      centroid_align(*rel_min, fwd);
+      centroid_align(*rel_sp, sp);
 
       thr.pot_nl.rebuild(*rel_min);
       double re_Ef = thr.pot.energy(in, thr.pot_nl, 1);

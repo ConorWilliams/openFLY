@@ -6,13 +6,16 @@
 
 // This file is part of openFLY.
 
-// OpenFLY is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License
-// as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+// OpenFLY is free software: you can redistribute it and/or modify it under the terms of the GNU General
+// Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
+// option) any later version.
 
-// OpenFLY is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
-// warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+// OpenFLY is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the
+// implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+// for more details.
 
-// You should have received a copy of the GNU General Public License along with openFLY. If not, see <https://www.gnu.org/licenses/>.
+// You should have received a copy of the GNU General Public License along with openFLY. If not, see
+// <https://www.gnu.org/licenses/>.
 
 #include <cmath>
 #include <cstddef>
@@ -23,6 +26,7 @@
 #include "libfly/potential/generic.hpp"
 #include "libfly/saddle/rotor.hpp"
 #include "libfly/system/SoA.hpp"
+#include "libfly/system/hessian.hpp"
 #include "libfly/system/property.hpp"
 #include "libfly/utility/core.hpp"
 
@@ -37,11 +41,13 @@ namespace fly::saddle {
   /**
    * @brief Saddle point locator.
    *
-   * A dimer is two images of a system. These images have a centre point and a unit axis. The images are (conceptually) located
+   * A dimer is two images of a system. These images have a centre point and a unit axis. The images are
+   * (conceptually) located
    * ``delta_r`` in the plus/minus directions along the axis.
    *
-   * This implementation uses the superlinear dimer method to find saddle-points. This alternates optimizing the orientation of the
-   * dimer along the minimum eigen-mode then translating the dimer along an effective potential to find the SP.
+   * This implementation uses the superlinear dimer method to find saddle-points. This alternates optimizing
+   * the orientation of the dimer along the minimum eigen-mode then translating the dimer along an effective
+   * potential to find the SP.
    */
   class Dimer {
   public:
@@ -78,13 +84,16 @@ namespace fly::saddle {
       double shrink_trust = 0.5;
       /** @brief If  ``convex_max`` steps with +Ve curvature then exit early. */
       double convex_max = 3;
+      /** @brief If true the search will abort if it approaches too close to to a previous SP. */
+      bool use_history = true;
       /** @brief Print out debug info. */
       bool debug = false;
       /**
        * @brief If provided at each frame of the translation ``out`` will be written to this file.
        *
-       * It is the users responsibility to ensure the lifetime of ``fout`` is at least as long as the lifetime of the ``LBFGS`` object
-       * and ensure only a single ``LBFGS`` object writes to ``fout`` at any one time. This really only exist for debugging purposes...
+       * It is the users responsibility to ensure the lifetime of ``fout`` is at least as long as the lifetime
+       * of the ``LBFGS`` object and ensure only a single ``LBFGS`` object writes to ``fout`` at any one time.
+       * This really only exist for debugging purposes...
        */
       io::BinaryFile *fout = nullptr;
     };
@@ -123,16 +132,19 @@ namespace fly::saddle {
     /**
      * @brief Advance the dimer towards a saddle-point.
      *
-     * Performs at most ``max_find_sp`` translation steps. The translation uses the LBFGS algorithm with a trust-radius limited step
-     * size and an early-exit condition if the curvature is positive for too long.
+     * Performs at most ``max_find_sp`` translation steps. The translation uses the LBFGS algorithm with a
+     * trust-radius limited step size and an early-exit condition if the curvature is positive for too long.
      *
      * @param out Final position and axis orientation written here.
      * @param in Initial position, axis and per-particle data forwarded to potential.
      * @param pot Potential energy function.
      * @param in_min initial minima that dimer is climbing FROM.
      * @param hist_sp Previously discovered saddle points.
-     * @param theta_tol If the angle (Radians) between this SPS and a previous SP is less than theta_tol then abort.
+     * @param theta_tol If the angle (Radians) between this SPS and a previous SP is less than theta_tol then
+     * abort.
      * @param num_threads Number of openMP threads to use.
+     * @param R
+     * @param Rt
      * @return Exit-code.
      */
     auto find_sp(system::SoA<Position &, Axis &> out,
@@ -141,14 +153,17 @@ namespace fly::saddle {
                  potential::Generic &pot,
                  std::vector<system::SoA<Position>> const &hist_sp,
                  double theta_tol,
-                 int num_threads = 1) -> Exit;
+                 int num_threads = 1,
+                 system::Hessian::Matrix const *R = nullptr,
+                 system::Hessian::Matrix const *Rt = nullptr) -> Exit;
 
   private:
     Options m_opt;
 
     minimise::StepLBFGS m_core;
 
-    system::SoA<PotentialGradient> m_eff_grad;
+    system::SoA<PotentialGradient> m_q;         // reduced coordinates
+    system::SoA<PotentialGradient> m_eff_grad;  // reduced coordinates
 
     Rotor m_rotor;
 

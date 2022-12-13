@@ -213,7 +213,8 @@ namespace fly::potential {
               = m_data->f(in(id_, a)).fpp(m_aux(Rho{}, a)) * m_data->phi(in(id_, z), in(id_, a)).fp(r);
 
           nl.for_neighbours(a, r_cut(), [&](auto g, double r_ag, Vec const& dr_ag) {
-            if (g > z && !in(fzn_, g)) {
+            // If interacting with a periodic image of ones-self then we need to include this term.
+            if ((g > z && !in(fzn_, g)) || (g == z && gnorm(dr + dr_ag) > 1e-6)) {
               // Now iterating over all pair of unfrozen neighbours of a
               double mag = ddFg / (r * r_ag) * m_data->phi(in(id_, g), in(id_, a)).fp(r_ag);
 

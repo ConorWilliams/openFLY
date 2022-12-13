@@ -127,11 +127,11 @@ namespace fly {
 
       auto i = std::min(static_cast<std::size_t>(x * m_inv_dx), m_spines.size() - 1);
 
-      ASSERT(static_cast<std::size_t>(x * m_inv_dx) < m_spines.size(),
-             "x={} is outside tabulated region with i={}, len={}",
-             x,
-             i,
-             m_spines.size());
+      //   ASSERT(static_cast<std::size_t>(x * m_inv_dx) < m_spines.size(),
+      //          "x={} is outside tabulated region with i={}, len={}",
+      //          x,
+      //          i,
+      //          m_spines.size());
 
       return {x - static_cast<double>(i) * m_dx, m_spines[i]};
     }

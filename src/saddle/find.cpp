@@ -222,10 +222,11 @@ namespace fly::saddle {
     {
       m_sep_list.resize(safe_cast<std::size_t>(in.size()));
 
+      auto mi = m_box.slow_min_image_computer();
+
 #pragma omp parallel for num_threads(m_opt.num_threads)
       for (Eigen::Index i = 0; i < in.size(); i++) {
         //
-        auto mi = m_box.slow_min_image_computer();
 
         Eigen::Index k = 0;
         double max = 0;

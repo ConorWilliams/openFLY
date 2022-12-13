@@ -3,6 +3,7 @@
 #include <fmt/core.h>
 #include <omp.h>
 
+#include <cstdlib>
 #include <random>
 
 #include "libfly/env/catalogue.hpp"
@@ -134,11 +135,14 @@ Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> fd_hess(system::Box const 
 int main() {
   /////////////////   Initialise cell   /////////////////
 
-  int N = 6;
+  int N = 2;
 
-  //   std::cin >> N;
+  std::cin >> N;
 
-  system::Supercell cell = remove_atoms(motif_to_lattice(bcc_iron_motif(), {N, N, N}), {0});
+  system::Supercell cell = remove_atoms(motif_to_lattice(bcc_iron_motif(), {N, N, N}), {});
+
+  cell(fzn_, 1) = true;
+  cell(fzn_, 2) = true;
 
   //
 
@@ -184,6 +188,8 @@ int main() {
 
   nl.rebuild(cell, omp_get_max_threads());
 
+  timeit("Bench gradient single threaded", [&] { pot.gradient(mirror, cell, nl, 1); });
+
   system::Hessian H;
 
   timeit("hess comp", [&] { pot.hessian(H, cell, nl, omp_get_max_threads()); });
@@ -193,6 +199,43 @@ int main() {
   Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> dH = (H2 - H.get()).triangularView<Eigen::Lower>();
 
   fmt::print("hess ERROR = {}\n", gnorm(dH));
+
+  Eigen::Index active = 0;
+
+  for (auto const &elem : cell[fzn_]) {
+    if (!elem) {
+      ++active;
+    }
+  }
+
+  using M = Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>;
+
+  M r2a = M::Zero(active * Position::size(), cell.size() * Position::size());
+
+  Eigen::Index j = 0;
+
+  for (Eigen::Index i = 0; i < cell.size(); i++) {
+    if (!cell(fzn_, i)) {
+      r2a.block<3, 3>(j, i * 3) = Mat::Identity();
+      j += 3;
+    }
+  }
+
+  //   std::cout << "r2a\n" << r2a << std::endl;
+
+  Position::array_t act;
+
+  timeit("bench  mat * vec", [&] { act = r2a * cell[r_].matrix(); });
+
+  M reduced = r2a * H.get() * r2a.transpose();
+
+  Eigen::SelfAdjointEigenSolver<M> quick{reduced};
+
+  fmt::print("quick eigen values:\n");
+
+  for (auto &&v : quick.eigenvalues().head(10)) {
+    fmt::print("{}\n", v);
+  }
 
   auto [val, vec] = timeit("eigen", [&] { return H.eigen(); });
 
@@ -206,7 +249,7 @@ int main() {
 
   fmt::print("analytic eigen values:\n");
 
-  for (auto &&v : val.head(10)) {
+  for (auto &&v : val.head(13)) {
     fmt::print("{}\n", v);
   }
 
@@ -219,6 +262,8 @@ int main() {
   }
 
   system::Hessian::Matrix Rt = R.transpose();
+
+  exit(0);
 
   env::Catalogue cat({});
 

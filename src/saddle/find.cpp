@@ -171,22 +171,6 @@ namespace fly::saddle {
     return {min, max};
   }
 
-  static void com_align(system::SoA<Position&> x, system::SoA<Position const&> with) {
-    //
-    ASSERT(x.size() == with.size(), "Different number of atoms {}!={}", x.size(), with.size());
-
-    Vec delta = centroid(with) - centroid(x);
-
-    for (int i = 0; i < with.size(); i++) {
-      x(r_, i) += delta;
-    }
-
-    ASSERT(gnorm(centroid(with) - centroid(x)) < 1e-10,
-           "Norms should be aligned but {}!={}",
-           centroid(with),
-           centroid(x));
-  }
-
   ////////////////////////////////////////
 
   Master::Master(Master::Options const& opt,
@@ -238,10 +222,11 @@ namespace fly::saddle {
     {
       m_sep_list.resize(safe_cast<std::size_t>(in.size()));
 
+      auto mi = m_box.slow_min_image_computer();
+
 #pragma omp parallel for num_threads(m_opt.num_threads)
       for (Eigen::Index i = 0; i < in.size(); i++) {
         //
-        auto mi = m_box.slow_min_image_computer();
 
         Eigen::Index k = 0;
         double max = 0;
@@ -327,6 +312,7 @@ namespace fly::saddle {
     while (tot < m_opt.max_searches * mod && fail < m_opt.max_failed_searches * mod) {
       //
       if (find_batch(tot, out, batch, geo_data, in, nl_pert, cache)) {
+        return;
         fail = 0;
       } else {
         fail += m_opt.batch_size;
@@ -439,6 +425,9 @@ namespace fly::saddle {
       set_fail_flag();
       return;
     }
+
+    centroid_align(*recon.rel_min, recon.min);
+    centroid_align(*recon.rel_sp, recon.sp);
 
     ThreadData& thr = thread();
 
@@ -699,8 +688,8 @@ namespace fly::saddle {
              mech.err_fwd,
              mech.err_sp);
 
-      com_align(*rel_min, fwd);
-      com_align(*rel_sp, sp);
+      centroid_align(*rel_min, fwd);
+      centroid_align(*rel_sp, sp);
 
       thr.pot_nl.rebuild(*rel_min);
       double re_Ef = thr.pot.energy(in, thr.pot_nl, 1);
@@ -741,7 +730,9 @@ namespace fly::saddle {
 
     thr.pot_nl.rebuild(sp, 1);
 
-    thr.pot.hessian(thr.hess, in, thr.pot_nl);
+    thr.pot.hessian(thr.hess, in, thr.pot_nl, 1);
+
+    thr.pot.mw_hessian(thr.hess, in, 1);
 
     system::Hessian::Vector const& freq = thr.hess.eigenvalues();
 
@@ -909,7 +900,9 @@ namespace fly::saddle {
 
     m_data[0].pot_nl.rebuild(in);
 
-    m_data[0].pot.hessian(m_data[0].hess, in, m_data[0].pot_nl);
+    m_data[0].pot.hessian(m_data[0].hess, in, m_data[0].pot_nl, m_opt.num_threads);
+
+    m_data[0].pot.mw_hessian(m_data[0].hess, in, m_opt.num_threads);
 
     system::Hessian::Vector const& freq = m_data[0].hess.eigenvalues();
 

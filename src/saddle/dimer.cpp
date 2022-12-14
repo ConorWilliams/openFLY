@@ -93,7 +93,7 @@ namespace fly::saddle {
         return convex;
       }
 
-      if (i % m_opt.hist_check_freq == 0) {
+      if (m_opt.use_history && i % m_opt.hist_check_freq == 0) {
         double ctheta = -1;
         double l2 = std::numeric_limits<double>::max();
 

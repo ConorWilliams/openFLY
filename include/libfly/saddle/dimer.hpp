@@ -78,6 +78,8 @@ namespace fly::saddle {
       double shrink_trust = 0.5;
       /** @brief If  ``convex_max`` steps with +Ve curvature then exit early. */
       double convex_max = 3;
+      /** @brief If true the search will abort if it approaches too close to to a previous SP. */
+      bool use_history = true;
       /** @brief Print out debug info. */
       bool debug = false;
       /**

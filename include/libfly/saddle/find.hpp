@@ -159,7 +159,7 @@ namespace fly::saddle {
        * @brief Absolute eigen values of the mass-weighted hessian matrix, smaller than this, are considered
        * zero.
        */
-      double hessian_eigen_zero_tol = 1e-4;
+      double hessian_eigen_zero_tol = 1e-6;
       /**
        * @brief Number of openMP threads to dispatch saddle-point finding to.
        */

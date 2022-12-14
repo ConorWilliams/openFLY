@@ -6,13 +6,16 @@
 
 // This file is part of openFLY.
 
-// OpenFLY is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License
-// as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+// OpenFLY is free software: you can redistribute it and/or modify it under the terms of the GNU General
+// Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
+// option) any later version.
 
-// OpenFLY is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
-// warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+// OpenFLY is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the
+// implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+// for more details.
 
-// You should have received a copy of the GNU General Public License along with openFLY. If not, see <https://www.gnu.org/licenses/>.
+// You should have received a copy of the GNU General Public License along with openFLY. If not, see
+// <https://www.gnu.org/licenses/>.
 
 #include <cstddef>
 #include <exception>
@@ -33,7 +36,8 @@
  *
  * @brief Generic potential energy class.
  *
- * Potentials get info about atoms via a ``SoA``. This allows potentials to slice generic supercells while remaining concrete.
+ * Potentials get info about atoms via a ``SoA``. This allows potentials to slice generic supercells while
+ * remaining concrete.
  */
 
 namespace fly::potential {
@@ -78,8 +82,8 @@ namespace fly::potential {
     /**
      * @brief Get this potentials cut-off radius.
      *
-     * This is the maximum distance two atoms can interact. The neighbour::List passed to the other functions should be configured with
-     * a cut-off equal or greater than this.
+     * This is the maximum distance two atoms can interact. The neighbour::List passed to the other functions
+     * should be configured with a cut-off equal or greater than this.
      */
     auto r_cut() const noexcept -> double {
       return ::fly::visit(m_pot, [](auto const& pot) -> double { return pot.r_cut(); });
@@ -91,12 +95,13 @@ namespace fly::potential {
      * Can assume the neighbour list are ready.
      *
      * @param in Per-atom data used by potential for computation.
-     * @param nl Neighbour list (in ready state i.e. neigh::List::update() or neigh::List::rebuild() called) configured with a cut-off
-     * at least ``r_cut()``.
+     * @param nl Neighbour list (in ready state i.e. neigh::List::update() or neigh::List::rebuild() called)
+     * configured with a cut-off at least ``r_cut()``.
      * @param threads Number of openMP threads to use.
      * @return The potential energy of the system of atoms.
      */
-    auto energy(system::SoA<TypeID const&, Frozen const&> in, neigh::List const& nl, int threads = 1) -> double {
+    auto energy(system::SoA<TypeID const&, Frozen const&> in, neigh::List const& nl, int threads = 1)
+        -> double {
       return ::fly::visit(m_pot, [&, threads](auto& pot) -> double {
         if constexpr (is_detected_v<Energy, decltype(pot), decltype(in), decltype(nl), decltype(threads)>) {
           return pot.energy(in, nl, threads);
@@ -114,8 +119,8 @@ namespace fly::potential {
      *
      * @param out Result is written here.
      * @param in Per-atom data used by potential for computation.
-     * @param nl Neighbour list (in ready state i.e. neigh::List::update() or neigh::List::rebuild() called) configured with a cut-off
-     * at least ``r_cut()``.
+     * @param nl Neighbour list (in ready state i.e. neigh::List::update() or neigh::List::rebuild() called)
+     * configured with a cut-off at least ``r_cut()``.
      * @param threads Number of openMP threads to use.
      */
     auto gradient(system::SoA<PotentialGradient&> out,
@@ -123,7 +128,12 @@ namespace fly::potential {
                   neigh::List const& nl,
                   int threads = 1) -> void {
       return ::fly::visit(m_pot, [&, threads](auto& pot) {
-        if constexpr (is_detected_v<Gradient, decltype(pot), decltype(out), decltype(in), decltype(nl), decltype(threads)>) {
+        if constexpr (is_detected_v<Gradient,
+                                    decltype(pot),
+                                    decltype(out),
+                                    decltype(in),
+                                    decltype(nl),
+                                    decltype(threads)>) {
           pot.gradient(out, in, nl, threads);
         } else {
           throw error("Generic potential {}, does not support .gradient(...) of this system.", m_pot.index());
@@ -132,26 +142,48 @@ namespace fly::potential {
     }
 
     /**
-     * @brief Compute hessian matrix..
+     * @brief Compute hessian matrix.
      *
-     * Can assume the neighbour list are ready. The resulting hessian must be n by n (n = number of atoms) and only include
-     * contributions from the m active atoms i.e. have zeros for frozen atoms. As hessian matrices are always symmetric this function
-     * is only required to compute the lower diagonal portion.
+     * Can assume the neighbour list are ready. The resulting hessian must be n by n (n = number of atoms) and
+     * only include contributions from the m active atoms i.e. have zeros for frozen atoms. As hessian
+     * matrices are always symmetric this function is only required to compute the lower diagonal portion.
      *
      * @param in Per-atom data used by hessian for computation.
      * @param out Hessian matrix to write output to.
-     * @param nl Neighbour list (in ready state i.e. neigh::List::update() or neigh::List::rebuild() called) configured with a cut-off
-     * at least ``r_cut()``.
+     * @param nl Neighbour list (in ready state i.e. neigh::List::update() or neigh::List::rebuild() called)
+     * configured with a cut-off at least ``r_cut()``.
      * @param threads Number of openMP threads to use.
      */
-    auto hessian(system::Hessian& out, system::SoA<TypeID const&, Frozen const&> in, neigh::List const& nl, int threads = 1) -> void {
+    auto hessian(system::Hessian& out,
+                 system::SoA<TypeID const&, Frozen const&> in,
+                 neigh::List const& nl,
+                 int threads = 1) -> void {
       return ::fly::visit(m_pot, [&](auto& pot) {
-        if constexpr (is_detected_v<Hessian, decltype(pot), decltype(out), decltype(in), decltype(nl), decltype(threads)>) {
+        if constexpr (is_detected_v<Hessian,
+                                    decltype(pot),
+                                    decltype(out),
+                                    decltype(in),
+                                    decltype(nl),
+                                    decltype(threads)>) {
           pot.hessian(out, in, nl, threads);
         } else {
           throw error("Generic potential {}, does not support .hessian(...) of this system.", m_pot.index());
         }
       });
+    }
+
+    /**
+     * @brief Mass weight a hessian matrix.
+     *
+     * As hessian matrices are always symmetric this function only acts on the lower diagonal portion.
+     *
+     * @param in Input data.
+     * @param out Hessian matrix (computed with .hessian()).
+     * @param threads Number of openMP threads to use.
+     */
+    auto mw_hessian(system::Hessian& out, system::SoA<TypeID const&, Frozen const&> in, int threads = 1)
+        -> void {
+      ::fly::visit(m_pot, [&](auto& pot) { pot.mw_hessian(out, in, threads); });
     }
 
   private:

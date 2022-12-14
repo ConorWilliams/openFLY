@@ -4,13 +4,16 @@
 
 // This file is part of openFLY.
 
-// OpenFLY is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License
-// as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+// OpenFLY is free software: you can redistribute it and/or modify it under the terms of the GNU General
+// Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
+// option) any later version.
 
-// OpenFLY is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
-// warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+// OpenFLY is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the
+// implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+// for more details.
 
-// You should have received a copy of the GNU General Public License along with openFLY. If not, see <https://www.gnu.org/licenses/>.
+// You should have received a copy of the GNU General Public License along with openFLY. If not, see
+// <https://www.gnu.org/licenses/>.
 
 #include "libfly/potential/EAM/eam.hpp"
 
@@ -87,7 +90,8 @@ namespace fly::potential {
         nl.for_neighbours(g, r_cut(), [&](auto a, double r, Vec const& dr) {
           //
 
-          double mag = m_data->v(in(id_, a), in(id_, g)).fp(r) + m_aux(Fprime{}, g) * m_data->phi(in(id_, a), in(id_, g)).fp(r)
+          double mag = m_data->v(in(id_, a), in(id_, g)).fp(r)
+                       + m_aux(Fprime{}, g) * m_data->phi(in(id_, a), in(id_, g)).fp(r)
                        + m_aux(Fprime{}, a) * m_data->phi(in(id_, g), in(id_, a)).fp(r);
 
           grad -= (mag / r) * dr;
@@ -99,7 +103,10 @@ namespace fly::potential {
     }
   }
 
-  void EAM::hessian(system::Hessian& out, system::SoA<TypeID const&, Frozen const&> in, neigh::List const& nl, int num_threads) {
+  void EAM::hessian(system::Hessian& out,
+                    system::SoA<TypeID const&, Frozen const&> in,
+                    neigh::List const& nl,
+                    int num_threads) {
     // Usually a noop, make space in aux
     m_aux.destructive_resize(in.size());
 
@@ -121,14 +128,34 @@ namespace fly::potential {
       m_aux(Mu{}, b) = mu;
     }
 
-    // Second sums computes hessian, running over all atoms, only writing to z^th column block. As responsible for LOWER z^th column
-    // use dynamic scheduling.
+    // for (Eigen::Index a = 0; a < in.size(); ++a) {
+    //   //
+    //   double ddFa = m_data->f(in(id_, a)).fpp(m_aux(Rho{}, a));
+
+    //   nl.for_neighbours(a, r_cut(), [&](auto n, double r_an, Vec const& dr_an) {
+    //     nl.for_neighbours(a, r_cut(), [&](auto g, double r_ag, Vec const& dr_ag) {
+    //       if (n > g && !in(fzn_, n) && !in(fzn_, g)) {
+    //         double ddFg = ddFa * m_data->phi(in(id_, g), in(id_, a)).fp(r_ag)
+    //                       * m_data->phi(in(id_, n), in(id_, a)).fp(r_an);
+
+    //         // Now iterating over all pair of unfrozen neighbours of a
+    //         double mag = ddFg / (r_ag * r_an);
+
+    //         out(n, g).noalias() += mag * dr_an * dr_ag.transpose();
+    //       }
+    //     });
+    //   });
+    // }
+
+    // Second sums computes hessian, running over all atoms, only writing to z^th column block. As responsible
+    // for LOWER z^th column use dynamic scheduling.
 #pragma omp parallel for num_threads(num_threads) schedule(dynamic)
     for (Eigen::Index z = 0; z < in.size(); ++z) {
       // During this section we only write to the z^th column block
 
       if (!in(fzn_, z)) {
         //
+
         Vec v = m_aux(Mu{}, z);
         // A.15 pre sum term, including off-diagonal elements along block diagonal make code simpler.
         out(z, z).noalias() = m_data->f(in(id_, z)).fpp(m_aux(Rho{}, z)) * v * v.transpose();
@@ -153,43 +180,54 @@ namespace fly::potential {
 
                      m_data->f(in(id_, a)).fp(m_aux(Rho{}, a)) * m_data->phi(in(id_, z), in(id_, a)).fpp(r);
 
-          double ABFpp
-              = (A - B - m_data->f(in(id_, a)).fpp(m_aux(Rho{}, a)) * ipow<2>(m_data->phi(in(id_, z), in(id_, a)).fp(r))) / (r * r);
+          double ABFpp = (A - B
+                          - m_data->f(in(id_, a)).fpp(m_aux(Rho{}, a))
+                                * ipow<2>(m_data->phi(in(id_, z), in(id_, a)).fp(r)))
+                         / (r * r);
 
           out(z, z) += A * Mat::Identity() - ABFpp * dr * dr.transpose();
 
-          // Now we will compute the off diagonal element in this column block of H, the a's must now not be frozen, we do not
-          // compute overlap here. Only need to compute lower triangular part of hessian hence, drop writes to out(a, z) with a < z.
+          // Now we will compute the off diagonal element in this column block of H, the a's must now not be
+          // frozen, we do not compute overlap here. Only need to compute lower triangular part of hessian
+          // hence, drop writes to out(a, z) with a < z.
           ASSERT(z != a, "Atoms {} is interacting with itself", z);
 
-          if (a >= z && !in(fzn_, a)) {
+          if (a > z && !in(fzn_, a)) {
             double BArr = (B - A) / (r * r);
 
-            double ur = m_data->f(in(id_, z)).fpp(m_aux(Rho{}, z)) * m_data->phi(in(id_, a), in(id_, z)).fp(r) / r;
+            double ur
+                = m_data->f(in(id_, z)).fpp(m_aux(Rho{}, z)) * m_data->phi(in(id_, a), in(id_, z)).fp(r) / r;
 
-            double ru = m_data->f(in(id_, a)).fpp(m_aux(Rho{}, a)) * m_data->phi(in(id_, z), in(id_, a)).fp(r) / r;
+            double ru
+                = m_data->f(in(id_, a)).fpp(m_aux(Rho{}, a)) * m_data->phi(in(id_, z), in(id_, a)).fp(r) / r;
 
-            out(a, z).noalias() += -BArr * dr * dr.transpose() - A * Mat::Identity() + ur * m_aux(Mu{}, z) * dr.transpose()
+            out(a, z).noalias() += -BArr * dr * dr.transpose() - A * Mat::Identity()
+                                   + ur * dr * m_aux(Mu{}, z).transpose()
                                    - ru * m_aux(Mu{}, a) * dr.transpose();
           }
 
-          // Finally compute overlap terms of z coupling to active atom g via a. Each thread only writes to e^th column blocks.
+          // Finally compute overlap terms of z coupling to active atom g via a. Each thread only writes to
+          // e^th column blocks.
 
-          double ddFg = m_data->f(in(id_, a)).fpp(m_aux(Rho{}, a)) * m_data->phi(in(id_, z), in(id_, a)).fp(r);
+          double ddFg
+              = m_data->f(in(id_, a)).fpp(m_aux(Rho{}, a)) * m_data->phi(in(id_, z), in(id_, a)).fp(r);
 
-          nl.for_neighbours(a, r_cut(), [&](auto g, double r_g, Vec const& dr_ag) {
-            if (g > z && !in(fzn_, g)) {
+          nl.for_neighbours(a, r_cut(), [&](auto g, double r_ag, Vec const& dr_ag) {
+            // If interacting with a periodic image of ones-self then we need to include this term.
+            if ((g > z && !in(fzn_, g)) || (g == z && gnorm(dr + dr_ag) > 1e-6)) {
               // Now iterating over all pair of unfrozen neighbours of a
-              double mag = ddFg / (r * r_g) * m_data->phi(in(id_, g), in(id_, a)).fp(r_g);
+              double mag = ddFg / (r * r_ag) * m_data->phi(in(id_, g), in(id_, a)).fp(r_ag);
 
-              out(g, z).noalias() -= mag * dr * dr_ag.transpose();
+              out(g, z).noalias() -= mag * dr_ag * dr.transpose();
             }
           });
         });
       }
     }
+  }
 
-// Transform into mass-weighted hessian
+  void EAM::mw_hessian(system::Hessian& out, system::SoA<TypeID const&, Frozen const&> in, int num_threads) {
+    // Transform into mass-weighted hessian
 #pragma omp parallel for num_threads(num_threads) schedule(dynamic)
     for (Eigen::Index i = 0; i < in.size(); ++i) {
       //

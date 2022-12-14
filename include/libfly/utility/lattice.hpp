@@ -207,4 +207,23 @@ namespace fly {
     return vsum / x.size();
   }
 
+  /**
+   * @brief Translate the atoms in ``x`` such that the centroid of ``x`` is the centroid of ``with``.
+   */
+  inline void centroid_align(system::SoA<Position&> x, system::SoA<Position const&> with) {
+    //
+    ASSERT(x.size() == with.size(), "Different number of atoms {}!={}", x.size(), with.size());
+
+    Vec delta = centroid(with) - centroid(x);
+
+    for (int i = 0; i < with.size(); i++) {
+      x(r_, i) += delta;
+    }
+
+    ASSERT(gnorm(centroid(with) - centroid(x)) < 1e-10,
+           "Norms should be aligned but {}!={}",
+           centroid(with),
+           centroid(x));
+  }
+
 }  // namespace fly

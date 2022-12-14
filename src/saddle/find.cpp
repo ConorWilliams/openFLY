@@ -312,7 +312,6 @@ namespace fly::saddle {
     while (tot < m_opt.max_searches * mod && fail < m_opt.max_failed_searches * mod) {
       //
       if (find_batch(tot, out, batch, geo_data, in, nl_pert, cache)) {
-        return;
         fail = 0;
       } else {
         fail += m_opt.batch_size;

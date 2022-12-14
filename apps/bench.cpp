@@ -285,7 +285,7 @@ int main() {
 
     perturb(dim, cell, 61, nl, prng);
 
-    dimer.find_sp(dim, dim, cell, pot, {}, 0, omp_get_max_threads(), &R, &Rt);
+    dimer.find_sp(dim, dim, cell, pot, {}, 0, omp_get_max_threads());
 
     fout.commit([&fout, &dim] { fout.write(r_, dim); });
   }

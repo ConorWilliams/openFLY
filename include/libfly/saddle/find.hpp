@@ -312,7 +312,6 @@ namespace fly::saddle {
 
     struct Batch {
       Dimer::Exit exit = Dimer::Exit::uninit;
-      double stddev = 0;
       std::optional<env::Mechanism> mech = {};
       system::SoA<Position, Axis> dimer;
 

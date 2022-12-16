@@ -50,7 +50,7 @@ namespace fly::saddle {
       /** @brief Maximum number of iterations during rotation minimization. */
       int iter_max_rot = 20;
       /** @brief Half dimer length. */
-      double delta_r = 0.01;
+      double delta_r = 0.001;
       /** @brief (Rad) rotation convergence criterion. */
       double theta_tol = 1 * M_PI / 360.;
       /** @brief If false when in convex region we return only the component parallel to the min mode. */

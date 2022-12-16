@@ -17,9 +17,6 @@
 
 #include "libfly/saddle/rotor.hpp"
 
-#include <fmt/core.h>
-#include <math.h>
-
 #include <cmath>
 #include <cstddef>
 #include <memory>

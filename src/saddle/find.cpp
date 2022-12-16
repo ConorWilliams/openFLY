@@ -26,7 +26,6 @@
 #include <cstddef>
 #include <cstdio>
 #include <cstdlib>
-#include <exception>
 #include <limits>
 #include <optional>
 #include <random>
@@ -505,15 +504,13 @@ namespace fly::saddle {
 #pragma omp task untied default(none) firstprivate(theta_tol) \
     shared(elem, in, nl_pert, batch, cache, geo_data)
       {
-        elem.stddev = perturb(elem.dimer, in, geo_data.centre, nl_pert);
+        perturb(elem.dimer, in, geo_data.centre, nl_pert);
         elem.mech = find_one(in, elem.dimer, elem.exit, geo_data.geo, cache, theta_tol);
       }
     }
 #pragma omp taskwait
 
     bool found_one_or_more = false;
-
-    std::vector<double> stddevs;
 
     // Process batch
     for (auto&& elem : batch) {
@@ -588,26 +585,8 @@ namespace fly::saddle {
       }
 #pragma omp taskwait
 
-      stddevs.push_back(elem.stddev);
-
       found_one_or_more = true;
     }
-
-    fmt::print(stderr, "Successful stddevs @{} are:{}\n", geo_data.centre, stddevs);
-
-    // double mean = 0;
-
-    // for (auto&& elem : stddevs) {
-    //   mean += elem;
-    // }
-
-    // mean /= static_cast<double>(stddevs.size());
-
-    // if (!stddevs.empty()) {
-    //   m_opt.stddev = mean;
-    // } else {
-
-    // }
 
     return found_one_or_more;
   }
@@ -757,33 +736,6 @@ namespace fly::saddle {
 
     thr.pot.hessian(thr.hess, in, thr.pot_nl, 1);
 
-    auto E = thr.hess.eigen();
-
-    system::Hessian::Vector min = E.vectors.col(0);
-
-    min /= gnorm(min);
-    dimer[ax_] /= gnorm(dimer[ax_]);
-
-    fmt::print("\n\nTheta={}, E={}, l={}\n\n", std::acos(gdot(min, dimer[ax_])), mech.barrier, E.values[0]);
-
-    {
-      m_opt.fout->commit([&] {
-        system::SoA<Position> tmp{dimer};
-        tmp[r_].matrix() += min * 20;
-        m_opt.fout->write(r_, tmp);
-      });
-
-      m_opt.fout->commit([&] { m_opt.fout->write(r_, dimer); });
-
-      m_opt.fout->commit([&] {
-        system::SoA<Position> tmp{dimer};
-        tmp[r_].matrix() -= min * 20;
-        m_opt.fout->write(r_, tmp);
-      });
-    }
-
-    // system::Hessian::Vector fr1 = thr.hess.eigenvalues();
-
     thr.pot.mw_hessian(thr.hess, in, 1);
 
     system::Hessian::Vector const& freq = thr.hess.eigenvalues();
@@ -820,10 +772,6 @@ namespace fly::saddle {
       for (int i = 0; i < m_num_zero_modes + 3; i++) {
         fmt::print("FINDER: sp mode {} = {}\n", i, freq[i]);
       }
-    }
-
-    if (std::abs(mech.barrier - 0.57) < 0.01) {
-      std::terminate();
     }
 
     return mech;
@@ -881,22 +829,6 @@ namespace fly::saddle {
     relax[r_] = dimer[r_] + dimer[ax_] * disp * m_opt.nudge_frac;
     relax[fzn_] = dimer[fzn_];
     relax.rebind(id_, dimer);
-
-    {
-      m_opt.fout->commit([&] {
-        system::SoA<Position> tmp{dimer};
-        tmp[r_] += dimer[ax_] * 0.5;
-        m_opt.fout->write(r_, tmp);
-      });
-
-      m_opt.fout->commit([&] { m_opt.fout->write(r_, dimer); });
-
-      m_opt.fout->commit([&] {
-        system::SoA<Position> tmp{dimer};
-        tmp[r_] -= dimer[ax_] * 0.5;
-        m_opt.fout->write(r_, tmp);
-      });
-    }
 
     if (m_count_frozen == 0) {
       // Freeze furthest atom to remove translational degrees of freedom.
@@ -1099,11 +1031,6 @@ namespace fly::saddle {
 
       double d_sp = env::rmsd<Delta>(maybe.delta_sp, m.delta_sp);
       double d_fwd = env::rmsd<Delta>(maybe.delta_fwd, m.delta_fwd);
-
-      //   if (d_sp < m_opt.mech_tol) {
-      //     ASSERT(d_fwd < m_opt.mech_tol, "One SP different basins: old-sp={:.5f} old-min={:.5f}", d_sp,
-      //     d_fwd);
-      //   }
 
       if (d_sp < m_opt.mech_tol && d_fwd < m_opt.mech_tol) {
         dprint(m_opt.debug, "FINDER: Mech is NOT new, distance: old-sp={:.5f} old-min={:.5f}\n", d_sp, d_fwd);

@@ -4,15 +4,21 @@
 
 // This file is part of openFLY.
 
-// OpenFLY is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License
-// as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+// OpenFLY is free software: you can redistribute it and/or modify it under the terms of the GNU General
+// Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
+// option) any later version.
 
-// OpenFLY is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
-// warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+// OpenFLY is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the
+// implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+// for more details.
 
-// You should have received a copy of the GNU General Public License along with openFLY. If not, see <https://www.gnu.org/licenses/>.
+// You should have received a copy of the GNU General Public License along with openFLY. If not, see
+// <https://www.gnu.org/licenses/>.
 
 #include "libfly/saddle/rotor.hpp"
+
+#include <fmt/core.h>
+#include <math.h>
 
 #include <cmath>
 #include <cstddef>
@@ -27,6 +33,22 @@
 
 namespace fly::saddle {
 
+  template <typename T>
+  static void trans_proj(system::SoA<T &> x) {
+    //
+    Vec proj = Vec::Zero();
+
+    for (Eigen::Index i = 0; i < x.size(); ++i) {
+      proj += x(T{}, i);
+    }
+
+    proj *= 1.0 / static_cast<typename T::scalar_t>(x.size());
+
+    for (Eigen::Index i = 0; i < x.size(); ++i) {
+      x(T{}, i) -= proj;
+    }
+  }
+
   auto Rotor::eff_gradient(system::SoA<PotentialGradient &> out,
                            system::SoA<Axis &> inout,
                            system::SoA<TypeID const &, Frozen const &> in,
@@ -35,7 +57,8 @@ namespace fly::saddle {
                            int num_threads) -> double {
     //
     verify(in.size() == out.size(), "Effective gradient size mismatch in={} out={}", in.size(), out.size());
-    verify(inout.size() == out.size(), "Axis gradient size mismatch inout={} out={}", inout.size(), out.size());
+    verify(
+        inout.size() == out.size(), "Axis gradient size mismatch inout={} out={}", inout.size(), out.size());
 
     m_delta.destructive_resize(in.size());       // Store displacement for updates
     m_delta_prev.destructive_resize(in.size());  // Store previous displacement for updates
@@ -68,6 +91,8 @@ namespace fly::saddle {
         m_delta_g[del_] = m_g1[g_] - m_g0[g_];
         m_delta_g[del_] -= gdot(m_delta_g[del_], inout[ax_]) * inout[ax_];  // Torque
 
+        trans_proj<Delta>(m_delta_g);
+
         // Use lbfgs to find rotation plane
         auto &theta = m_core.newton_step<Axis, Delta>(inout, m_delta_g);
 
@@ -78,7 +103,8 @@ namespace fly::saddle {
         double c_x0 = gdot(m_g1[g_] - m_g0[g_], inout[ax_]) / m_opt.delta_r;
         double theta_1 = -0.5 * std::atan(b_1 / std::abs(c_x0));  // Trial rotation angle
 
-        if (std::abs(theta_1) < m_opt.theta_tol || (i >= m_opt.iter_max_rot && c_x0 < 0) || i > 10 * m_opt.iter_max_rot) {
+        if (std::abs(theta_1) < m_opt.theta_tol || (i >= m_opt.iter_max_rot && c_x0 < 0)
+            || i > 10 * m_opt.iter_max_rot) {
           return c_x0;
         } else {
           // Trial rotation
@@ -129,6 +155,8 @@ namespace fly::saddle {
     } else {
       out[g_] = m_g0[g_] - 2 * gdot(m_g0[g_], inout[ax_]) * inout[ax_];
     }
+
+    trans_proj<PotentialGradient>(out);
 
     return m_curv;
   }

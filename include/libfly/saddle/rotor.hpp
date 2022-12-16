@@ -6,13 +6,16 @@
 
 // This file is part of openFLY.
 
-// OpenFLY is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License
-// as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+// OpenFLY is free software: you can redistribute it and/or modify it under the terms of the GNU General
+// Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
+// option) any later version.
 
-// OpenFLY is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
-// warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+// OpenFLY is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the
+// implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+// for more details.
 
-// You should have received a copy of the GNU General Public License along with openFLY. If not, see <https://www.gnu.org/licenses/>.
+// You should have received a copy of the GNU General Public License along with openFLY. If not, see
+// <https://www.gnu.org/licenses/>.
 
 #include <cmath>
 #include <cstddef>
@@ -47,10 +50,10 @@ namespace fly::saddle {
       /** @brief Maximum number of iterations during rotation minimization. */
       int iter_max_rot = 20;
       /** @brief Half dimer length. */
-      double delta_r = 0.001;
+      double delta_r = 0.01;
       /** @brief (Rad) rotation convergence criterion. */
       double theta_tol = 1 * M_PI / 360.;
-      /** @brief If true when convex we return only the component parallel to the min mode. */
+      /** @brief If false when in convex region we return only the component parallel to the min mode. */
       bool relax_in_convex = true;
       /** @brief Print out debug info. */
       bool debug = false;
@@ -76,24 +79,24 @@ namespace fly::saddle {
     /**
      * @brief Compute the effective potential's gradient.
      *
-     * This is achieved by inverting the component of the gradient parallel to the minimum eigen-mode of the potential. The dimer is
-     * rotated using the LBFGS algorithm to make it align with the minimum eigen-mode.
+     * This is achieved by inverting the component of the gradient parallel to the minimum eigen-mode of the
+     * potential. The dimer is rotated using the LBFGS algorithm to make it align with the minimum eigen-mode.
      *
      * Assumes the neighbour list is ready, force on frozen atoms will be zero.
      *
      * \rst
      *
      * .. note::
-     *    This function does actually modify neighbour but returns it to an identical state after it is done. It guarantees not to call
-     *    ``neigh::List::rebuild()``.
+     *    This function does actually modify neighbour but returns it to an identical state after it is done.
+     *    It guarantees not to call ``neigh::List::rebuild()``.
      *
      * \endrst
      *
      * @param in Per-atom input properties
      * @param out Write effective gradient here.
      * @param inout The axis input and output.
-     * @param nl Neighbour list (in ready state i.e. neigh::List::update() or neigh::List::rebuild() called) configured with a cut-off
-     * at least ``r_cut()``.
+     * @param nl Neighbour list (in ready state i.e. neigh::List::update() or neigh::List::rebuild() called)
+     * configured with a cut-off at least ``r_cut()``.
      * @param pot The potential energy function.
      * @param threads Number of openMP threads to use.
      * @return The approximate curvature of the wrapped potential along the output Axis.
@@ -108,10 +111,12 @@ namespace fly::saddle {
     /**
      * @brief Compute the cut-off radius.
      *
-     * This is the cut-off that ``nl`` in call to ``eff_grad()`` with potential ``pot`` must be configured with.
+     * This is the cut-off that ``nl`` in call to ``eff_grad()`` with potential ``pot`` must be configured
+     * with.
      *
      * @param pot Potential that ``eff_grad()`` will be called with.
-     * @return auto A slightly larger cut-off that enables ``eff_grad`` to displace atoms a little without rebuilding the nl.
+     * @return auto A slightly larger cut-off that enables ``eff_grad`` to displace atoms a little without
+     * rebuilding the nl.
      */
     auto r_cut(potential::Generic const &pot) const noexcept { return pot.r_cut() + m_opt.delta_r * 2; }
 

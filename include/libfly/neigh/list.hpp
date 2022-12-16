@@ -58,7 +58,7 @@ namespace fly::neigh {
    *    4. Iterating over all adjacent grid-cells the neighbour-lists or real atoms are built.
    *
    *    The neighbour-lists contain the indexes of the real or ghost atoms. Alongside each atom we store the
-   * index of the real atom it may be an image of, this allows us to map ghost atoms to real atoms.
+   *    index of the real atom it may be an image of, this allows us to map ghost atoms to real atoms.
    *
    * \endrst
    *

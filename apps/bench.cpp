@@ -57,7 +57,7 @@ auto perturb(system::SoA<Position &, Axis &> out,
              neigh::List const &nl,
              Xoshiro &prng,
              double ostddev = 0.6,
-             double r_pert = 4.0) -> void {
+             double r_pert = 4.0) -> double {
   //
   std::normal_distribution normal(0., 1.);
 
@@ -89,6 +89,8 @@ auto perturb(system::SoA<Position &, Axis &> out,
   out(ax_, centre) += Vec::NullaryExpr([&] { return normal(prng); });
 
   out[ax_] /= gnorm(out[ax_]);  // normalize
+
+  return stddev;
 }
 
 template <typename... T>
@@ -135,14 +137,13 @@ Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> fd_hess(system::Box const 
 int main() {
   /////////////////   Initialise cell   /////////////////
 
-  int N = 2;
+  int N = 5;
 
-  std::cin >> N;
+  system::Supercell cell = remove_atoms(motif_to_lattice(bcc_iron_motif(), {N, N, N}), {1});
 
-  system::Supercell cell = remove_atoms(motif_to_lattice(bcc_iron_motif(), {N, N, N}), {});
+  Vec r_H = {2.857 / 2 + 3.14, 2.857 / 2 + 3.14, 2.857 / 4 + 3.14};
 
-  cell(fzn_, 1) = true;
-  cell(fzn_, 2) = true;
+  cell = add_atoms(cell, {system::Atom<TypeID, Position, Frozen>(1, r_H, false)});
 
   //
 
@@ -154,7 +155,17 @@ int main() {
 
   /////////////////////   Relax   /////////////////////
 
-  minimise::LBFGS minimiser({.f2norm = 1e-12}, cell.box());
+  io::BinaryFile fout("build/gsd/bench.gsd", io::create);
+
+  fout.commit([&fout, &cell] {
+    fout.write(cell.box());
+    fout.write(cell.map());
+    fout.write("particles/N", safe_cast<std::uint32_t>(cell.size()));
+    fout.write(id_, cell);
+    fout.write(r_, cell);
+  });
+
+  minimise::LBFGS minimiser({.f2norm = 1e-7}, cell.box());
 
   potential::Generic pot{
       potential::EAM{
@@ -170,124 +181,58 @@ int main() {
   fmt::print("FoundMin?={}\n",
              !timeit("Min", [&] { return minimiser.minimise(mirror, cell, pot, omp_get_max_threads()); }));
 
-  io::BinaryFile fout("build/gsd/bench.gsd", io::create);
-
-  fout.commit([&fout, &cell] {
-    fout.write(cell.box());
-    fout.write(cell.map());
-    fout.write("particles/N", safe_cast<std::uint32_t>(cell.size()));
-    fout.write(id_, cell);
-    fout.write(r_, cell);
-  });
-
   ///////////////////  Set up finder  ///////////////////
-
-  //   ///////////////////////////////
 
   neigh::List nl(cell.box(), pot.r_cut());
 
   nl.rebuild(cell, omp_get_max_threads());
 
-  timeit("Bench gradient single threaded", [&] { pot.gradient(mirror, cell, nl, 1); });
-
-  system::Hessian H;
-
-  timeit("hess comp", [&] { pot.hessian(H, cell, nl, omp_get_max_threads()); });
-
-  auto H2 = fd_hess(cell.box(), pot, cell);
-
-  Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> dH = (H2 - H.get()).triangularView<Eigen::Lower>();
-
-  fmt::print("hess ERROR = {}\n", gnorm(dH));
-
-  Eigen::Index active = 0;
-
-  for (auto const &elem : cell[fzn_]) {
-    if (!elem) {
-      ++active;
-    }
-  }
-
-  using M = Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>;
-
-  M r2a = M::Zero(active * Position::size(), cell.size() * Position::size());
-
-  Eigen::Index j = 0;
-
-  for (Eigen::Index i = 0; i < cell.size(); i++) {
-    if (!cell(fzn_, i)) {
-      r2a.block<3, 3>(j, i * 3) = Mat::Identity();
-      j += 3;
-    }
-  }
-
-  //   std::cout << "r2a\n" << r2a << std::endl;
-
-  Position::array_t act;
-
-  timeit("bench  mat * vec", [&] { act = r2a * cell[r_].matrix(); });
-
-  M reduced = r2a * H.get() * r2a.transpose();
-
-  Eigen::SelfAdjointEigenSolver<M> quick{reduced};
-
-  fmt::print("quick eigen values:\n");
-
-  for (auto &&v : quick.eigenvalues().head(10)) {
-    fmt::print("{}\n", v);
-  }
-
-  auto [val, vec] = timeit("eigen", [&] { return H.eigen(); });
-
-  Eigen::Index count = 0;
-
-  while (count < val.size() && std::abs(val[count]) < 1e-5) {
-    count++;
-  }
-
-  fmt::print("count={}\n", count);
-
-  fmt::print("analytic eigen values:\n");
-
-  for (auto &&v : val.head(13)) {
-    fmt::print("{}\n", v);
-  }
-
-  //   ////
-
-  system::Hessian::Matrix R = vec.rightCols(val.size() - count);
-
-  for (Eigen::Index i = 0; i < R.cols(); i++) {
-    R.col(i) *= 1 / std::sqrt(val[i + count]);
-  }
-
-  system::Hessian::Matrix Rt = R.transpose();
-
-  exit(0);
-
-  env::Catalogue cat({});
-
-  cat.rebuild(cell, omp_get_max_threads());
-
   saddle::Dimer dimer{
-      {.convex_max = 25, .use_history = false, .debug = true, .fout = &fout},
-      {.relax_in_convex = false},
+      {.convex_max = 5, .debug = false, .fout = nullptr},
+      {.iter_max_rot = 50, .theta_tol = 1 * M_PI / 360.},
       cell.box(),
   };
 
   //   //////////////////  Do benchmarking  //////////////////
 
-  for (size_t i = 0; i < 1; i++) {
+  saddle::Master mast{
+      {.num_threads = omp_get_max_threads(), .debug = true, .fout = &fout},
+      cell.box(),
+      pot,
+      minimiser,
+      dimer,
+  };
+
+  env::Catalogue cat({});
+
+  cat.rebuild(cell, omp_get_max_threads());
+
+  mast.find_mechs(mast.package({cell.size() - 1}, cat), cell);
+
+  exit(0);
+
+  // /////////////////////////
+
+  double stddev = 0.4;
+
+  for (size_t i = 0; i < 200; i++) {
+    //
     system::SoA<Position, Axis, TypeID const &, Frozen const &> dim(cell.size());
 
     dim.rebind(id_, cell);
     dim.rebind(fzn_, cell);
 
-    perturb(dim, cell, 61, nl, prng);
+    auto used = perturb(dim, cell, cell.size() - 1, nl, prng, stddev);
 
-    dimer.find_sp(dim, dim, cell, pot, {}, 0, omp_get_max_threads());
+    fmt::print("Stddev = {}, used = {}\n", stddev, used);
 
-    fout.commit([&fout, &dim] { fout.write(r_, dim); });
+    auto res = dimer.find_sp(dim, dim, cell, pot, {}, 0, omp_get_max_threads());
+
+    if (res == saddle::Dimer::Exit::success) {
+      stddev = std::min(1.0, used);
+
+      fout.commit([&fout, &dim] { fout.write(r_, dim); });
+    }
   }
 
   return 0;

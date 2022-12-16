@@ -26,6 +26,7 @@
 #include <cstddef>
 #include <cstdio>
 #include <cstdlib>
+#include <exception>
 #include <limits>
 #include <optional>
 #include <random>
@@ -270,8 +271,7 @@ namespace fly::saddle {
     }
 
     if (m_opt.fout || m_opt.debug) {
-      //
-      int c = 1;
+      auto c = m_opt.fout->n_frames();
 
       for (std::size_t i = 0; i < out.size(); ++i) {
         if (out[i]) {
@@ -279,12 +279,16 @@ namespace fly::saddle {
             if (m_opt.fout) {
               m_opt.fout->commit(
                   [&] { m_opt.fout->write(r_, reconstruct(geo_data[i].geo, mech.delta_sp, in)); });
+              m_opt.fout->commit(
+                  [&] { m_opt.fout->write(r_, reconstruct(geo_data[i].geo, mech.delta_fwd, in)); });
             }
             fmt::print("FINDER: @{} frame={}, Delta={}eV, A={:e}Hz\n",
                        geo_data[i].centre,
-                       c++,
+                       c,
                        mech.barrier,
                        mech.kinetic_pre);
+
+            c += 2;
           }
         }
       }
@@ -479,6 +483,7 @@ namespace fly::saddle {
     } else if (frac_sp > m_opt.recon_norm_frac_tol && d_sp > m_opt.recon_norm_abs_tol) {
       set_fail_flag();
     } else {
+      centroid_align(*recon.rel_sp, in);
       cache_slot = std::move(*recon.rel_sp);
     }
   }
@@ -500,13 +505,15 @@ namespace fly::saddle {
 #pragma omp task untied default(none) firstprivate(theta_tol) \
     shared(elem, in, nl_pert, batch, cache, geo_data)
       {
-        perturb(elem.dimer, in, geo_data.centre, nl_pert);
+        elem.stddev = perturb(elem.dimer, in, geo_data.centre, nl_pert);
         elem.mech = find_one(in, elem.dimer, elem.exit, geo_data.geo, cache, theta_tol);
       }
     }
 #pragma omp taskwait
 
     bool found_one_or_more = false;
+
+    std::vector<double> stddevs;
 
     // Process batch
     for (auto&& elem : batch) {
@@ -562,6 +569,7 @@ namespace fly::saddle {
             file.write(r_, in);
           });
           file.commit([&] { file.write(r_, reconstruct(geo_data.geo, elem.mech->delta_sp, in)); });
+          file.commit([&] { file.write(r_, elem.dimer); });
           file.commit([&] { file.write(r_, reconstruct(geo_data.geo, elem.mech->delta_fwd, in)); });
         }
         throw;
@@ -580,8 +588,26 @@ namespace fly::saddle {
       }
 #pragma omp taskwait
 
+      stddevs.push_back(elem.stddev);
+
       found_one_or_more = true;
     }
+
+    fmt::print(stderr, "Successful stddevs @{} are:{}\n", geo_data.centre, stddevs);
+
+    // double mean = 0;
+
+    // for (auto&& elem : stddevs) {
+    //   mean += elem;
+    // }
+
+    // mean /= static_cast<double>(stddevs.size());
+
+    // if (!stddevs.empty()) {
+    //   m_opt.stddev = mean;
+    // } else {
+
+    // }
 
     return found_one_or_more;
   }
@@ -731,6 +757,33 @@ namespace fly::saddle {
 
     thr.pot.hessian(thr.hess, in, thr.pot_nl, 1);
 
+    auto E = thr.hess.eigen();
+
+    system::Hessian::Vector min = E.vectors.col(0);
+
+    min /= gnorm(min);
+    dimer[ax_] /= gnorm(dimer[ax_]);
+
+    fmt::print("\n\nTheta={}, E={}, l={}\n\n", std::acos(gdot(min, dimer[ax_])), mech.barrier, E.values[0]);
+
+    {
+      m_opt.fout->commit([&] {
+        system::SoA<Position> tmp{dimer};
+        tmp[r_].matrix() += min * 20;
+        m_opt.fout->write(r_, tmp);
+      });
+
+      m_opt.fout->commit([&] { m_opt.fout->write(r_, dimer); });
+
+      m_opt.fout->commit([&] {
+        system::SoA<Position> tmp{dimer};
+        tmp[r_].matrix() -= min * 20;
+        m_opt.fout->write(r_, tmp);
+      });
+    }
+
+    // system::Hessian::Vector fr1 = thr.hess.eigenvalues();
+
     thr.pot.mw_hessian(thr.hess, in, 1);
 
     system::Hessian::Vector const& freq = thr.hess.eigenvalues();
@@ -767,6 +820,10 @@ namespace fly::saddle {
       for (int i = 0; i < m_num_zero_modes + 3; i++) {
         fmt::print("FINDER: sp mode {} = {}\n", i, freq[i]);
       }
+    }
+
+    if (std::abs(mech.barrier - 0.57) < 0.01) {
+      std::terminate();
     }
 
     return mech;
@@ -824,6 +881,22 @@ namespace fly::saddle {
     relax[r_] = dimer[r_] + dimer[ax_] * disp * m_opt.nudge_frac;
     relax[fzn_] = dimer[fzn_];
     relax.rebind(id_, dimer);
+
+    {
+      m_opt.fout->commit([&] {
+        system::SoA<Position> tmp{dimer};
+        tmp[r_] += dimer[ax_] * 0.5;
+        m_opt.fout->write(r_, tmp);
+      });
+
+      m_opt.fout->commit([&] { m_opt.fout->write(r_, dimer); });
+
+      m_opt.fout->commit([&] {
+        system::SoA<Position> tmp{dimer};
+        tmp[r_] -= dimer[ax_] * 0.5;
+        m_opt.fout->write(r_, tmp);
+      });
+    }
 
     if (m_count_frozen == 0) {
       // Freeze furthest atom to remove translational degrees of freedom.
@@ -941,7 +1014,7 @@ namespace fly::saddle {
   auto Master::perturb(system::SoA<Position&, Axis&> out,
                        system::SoA<Position const&, Frozen const&> in,
                        Index::scalar_t centre,
-                       neigh::List const& nl) -> void {
+                       neigh::List const& nl) -> double {
     //
     Xoshiro& prng = thread().prng;
 
@@ -1006,6 +1079,8 @@ namespace fly::saddle {
     out(ax_, centre) += Vec::NullaryExpr([&] { return normal(prng); });
 
     out[ax_] /= gnorm(out[ax_]);  // normalize
+
+    return stddev;
   }
 
   bool Master::is_new_mech(env::Mechanism const& maybe, std::vector<env::Mechanism> const& hist) const {
@@ -1024,6 +1099,11 @@ namespace fly::saddle {
 
       double d_sp = env::rmsd<Delta>(maybe.delta_sp, m.delta_sp);
       double d_fwd = env::rmsd<Delta>(maybe.delta_fwd, m.delta_fwd);
+
+      //   if (d_sp < m_opt.mech_tol) {
+      //     ASSERT(d_fwd < m_opt.mech_tol, "One SP different basins: old-sp={:.5f} old-min={:.5f}", d_sp,
+      //     d_fwd);
+      //   }
 
       if (d_sp < m_opt.mech_tol && d_fwd < m_opt.mech_tol) {
         dprint(m_opt.debug, "FINDER: Mech is NOT new, distance: old-sp={:.5f} old-min={:.5f}\n", d_sp, d_fwd);

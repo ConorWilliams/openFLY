@@ -4,13 +4,16 @@
 
 // This file is part of openFLY.
 
-// OpenFLY is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License
-// as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+// OpenFLY is free software: you can redistribute it and/or modify it under the terms of the GNU General
+// Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
+// option) any later version.
 
-// OpenFLY is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
-// warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+// OpenFLY is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the
+// implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+// for more details.
 
-// You should have received a copy of the GNU General Public License along with openFLY. If not, see <https://www.gnu.org/licenses/>.
+// You should have received a copy of the GNU General Public License along with openFLY. If not, see
+// <https://www.gnu.org/licenses/>.
 
 #include "libfly/saddle/dimer.hpp"
 
@@ -31,7 +34,8 @@ namespace fly::saddle {
                       int num_threads) -> Exit {
     // Check inputs
 
-    verify(in.size() == out.size(), "Dimer stepper inputs size mismatch, in={} out={}", in.size(), out.size());
+    verify(
+        in.size() == out.size(), "Dimer stepper inputs size mismatch, in={} out={}", in.size(), out.size());
 
     m_eff_grad.destructive_resize(in.size());
 
@@ -71,12 +75,13 @@ namespace fly::saddle {
       double mag_g = gnorm_sq(m_eff_grad[g_]);
 
       if (m_opt.debug) {
-        fmt::print("Dimer: i={:<4} trust={:f} acc={:f} norm(g)={:e} curv={:f} rebuild={}\n",
+        fmt::print("Dimer: i={:<4} trust={:f} acc={:f} norm(g)={:e} curv={:f} E={:f} rebuild={}\n",
                    i,
                    trust,
                    acc,
                    std::sqrt(mag_g),
                    curv,
+                   pot.energy(in, *m_nl),
                    eq(acc, 0.0));
       }
 
@@ -116,7 +121,11 @@ namespace fly::saddle {
         }
 
         if (m_opt.debug && !hist_sp.empty()) {
-          fmt::print("Dimer: i = {}, norm={}, cos(θ)={}, θ={}\n", i, l2, ctheta, std::acos(ctheta) / (2 * M_PI) * 360);
+          fmt::print("Dimer: i = {}, norm={}, cos(θ)={}, θ={}\n",
+                     i,
+                     l2,
+                     ctheta,
+                     std::acos(ctheta) / (2 * M_PI) * 360);
         }
       }
 

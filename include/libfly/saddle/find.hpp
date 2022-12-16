@@ -167,11 +167,11 @@ namespace fly::saddle {
       /**
        * @brief Maximum number of searches per environment.
        */
-      int max_searches = 1000;
+      int max_searches = 250;
       /**
        * @brief Maximum number of consecutive failed searches per environment.
        */
-      int max_failed_searches = 250;
+      int max_failed_searches = 100;
       /**
        * @brief Number of simultaneous SP searches per new environment.
        */
@@ -180,7 +180,7 @@ namespace fly::saddle {
        * @brief Fraction of distance between initial position and SP that dimer is displaced along its axis
        * before minimisation.
        */
-      double nudge_frac = 0.02;
+      double nudge_frac = 0.01;
       /**
        * @brief Print out debugging info.
        */
@@ -312,6 +312,7 @@ namespace fly::saddle {
 
     struct Batch {
       Dimer::Exit exit = Dimer::Exit::uninit;
+      double stddev = 0;
       std::optional<env::Mechanism> mech = {};
       system::SoA<Position, Axis> dimer;
 
@@ -390,11 +391,11 @@ namespace fly::saddle {
     // Compute m_deg_free and m_log_prod_eigen.
     void calc_minima_hess(SoA in);
 
-    // Perturb in-place positions around centre and write axis,
+    // Perturb in-place positions around centre and write axis, returns the stddev used
     auto perturb(system::SoA<Position&, Axis&> out,
                  system::SoA<Position const&, Frozen const&> in,
                  Index::scalar_t centre,
-                 neigh::List const& nl) -> void;
+                 neigh::List const& nl) -> double;
 
     /**
      * @brief True if mech has been seen before.

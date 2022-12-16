@@ -34,7 +34,7 @@ Meta
 Version 0.8.0
 -------------------------------
 
-First release to actually do any KMC! This release introduces the ``Basin`` class for performing N-fold way KMC as well as: serialisation support for the catalogue; an adaptive catalogue and a ``Master``s API changed (again!).
+First release to actually do any KMC! This release introduces the ``Basin`` class for performing N-fold way KMC as well as: serialisation support for the catalogue; an adaptive catalogue and a ``Master`` s API changed (again!).
 
 Added
 ~~~~~

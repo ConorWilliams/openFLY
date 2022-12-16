@@ -120,7 +120,7 @@ namespace fly::kinetic {
 
       ix = std::move(tmp);
     }
-  };
+  }
 
   /**
    * @brief Coordinate the running of a OLKMC simulation.

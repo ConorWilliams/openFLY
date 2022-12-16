@@ -121,6 +121,9 @@ namespace fly::saddle {
           }
         }
 
+        fmt::print(
+            "Dimer: i = {}, norm={}, cos(θ)={}, θ={}\n", i, l2, ctheta, std::acos(ctheta) / (2 * M_PI) * 360);
+
         if (m_opt.debug && !hist_sp.empty()) {
           fmt::print("Dimer: i = {}, norm={}, cos(θ)={}, θ={}\n",
                      i,

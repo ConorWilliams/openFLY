@@ -51,6 +51,7 @@ namespace fly::saddle {
                            system::SoA<TypeID const &, Frozen const &> in,
                            potential::Generic &pot,
                            neigh::List &nl,
+                           int count_frozen,
                            int num_threads) -> double {
     //
     verify(in.size() == out.size(), "Effective gradient size mismatch in={} out={}", in.size(), out.size());
@@ -88,7 +89,9 @@ namespace fly::saddle {
         m_delta_g[del_] = m_g1[g_] - m_g0[g_];
         m_delta_g[del_] -= gdot(m_delta_g[del_], inout[ax_]) * inout[ax_];  // Torque
 
-        trans_proj<Delta>(m_delta_g);
+        if (count_frozen == 0) {
+          trans_proj<Delta>(m_delta_g);
+        }
 
         // Use lbfgs to find rotation plane
         auto &theta = m_core.newton_step<Axis, Delta>(inout, m_delta_g);
@@ -153,7 +156,9 @@ namespace fly::saddle {
       out[g_] = m_g0[g_] - 2 * gdot(m_g0[g_], inout[ax_]) * inout[ax_];
     }
 
-    trans_proj<PotentialGradient>(out);
+    if (count_frozen == 0) {
+      trans_proj<PotentialGradient>(out);
+    }
 
     return m_curv;
   }

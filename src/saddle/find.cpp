@@ -113,7 +113,7 @@ namespace fly::saddle {
       // ... and randomise.
       dim[ax_] /= gnorm(dim[ax_]);
 
-      if (!thr.dimer.find_sp(dim, dim, in, thr.pot, {}, 1)) {
+      if (!thr.dimer.find_sp(dim, dim, in, thr.pot, {}, m_count_frozen, 1)) {
         res.rel_sp = std::move(dim);
       }
     }
@@ -784,7 +784,7 @@ namespace fly::saddle {
     //
     ThreadData& thr = thread();
 
-    auto err = thr.dimer.find_sp(dimer, dimer, in, thr.pot, hist_sp, theta_tol, 1);
+    auto err = thr.dimer.find_sp(dimer, dimer, in, thr.pot, hist_sp, theta_tol, m_count_frozen, 1);
 
     if (err && m_opt.debug) {
       switch (err) {

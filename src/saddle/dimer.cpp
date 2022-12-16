@@ -31,6 +31,7 @@ namespace fly::saddle {
                       potential::Generic &pot,
                       std::vector<system::SoA<Position>> const &hist_sp,
                       double theta_tol,
+                      int count_frozen,
                       int num_threads) -> Exit {
     // Check inputs
 
@@ -63,7 +64,7 @@ namespace fly::saddle {
 
     m_nl->rebuild(out, num_threads);
 
-    double curv = m_rotor.eff_gradient(m_eff_grad, out, in, pot, *m_nl, num_threads);
+    double curv = m_rotor.eff_gradient(m_eff_grad, out, in, pot, *m_nl, count_frozen, num_threads);
 
     double trust = m_opt.min_trust;
 
@@ -149,7 +150,7 @@ namespace fly::saddle {
         m_nl->update(Hg);
       }
 
-      curv = m_rotor.eff_gradient(m_eff_grad, out, in, pot, *m_nl, num_threads);
+      curv = m_rotor.eff_gradient(m_eff_grad, out, in, pot, *m_nl, count_frozen, num_threads);
 
       if (curv > 0) {
         convex_count += 1;

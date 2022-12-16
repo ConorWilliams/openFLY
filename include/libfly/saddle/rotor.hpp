@@ -98,6 +98,7 @@ namespace fly::saddle {
      * @param nl Neighbour list (in ready state i.e. neigh::List::update() or neigh::List::rebuild() called)
      * configured with a cut-off at least ``r_cut()``.
      * @param pot The potential energy function.
+     * @param count_frozen The number of frozen atoms in ``in``.
      * @param threads Number of openMP threads to use.
      * @return The approximate curvature of the wrapped potential along the output Axis.
      */
@@ -106,6 +107,7 @@ namespace fly::saddle {
                       system::SoA<TypeID const &, Frozen const &> in,
                       potential::Generic &pot,
                       neigh::List &nl,
+                      int count_frozen,
                       int threads = 1) -> double;
 
     /**

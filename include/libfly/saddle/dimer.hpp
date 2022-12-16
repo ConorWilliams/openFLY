@@ -6,13 +6,16 @@
 
 // This file is part of openFLY.
 
-// OpenFLY is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License
-// as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+// OpenFLY is free software: you can redistribute it and/or modify it under the terms of the GNU General
+// Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
+// option) any later version.
 
-// OpenFLY is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
-// warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+// OpenFLY is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the
+// implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+// for more details.
 
-// You should have received a copy of the GNU General Public License along with openFLY. If not, see <https://www.gnu.org/licenses/>.
+// You should have received a copy of the GNU General Public License along with openFLY. If not, see
+// <https://www.gnu.org/licenses/>.
 
 #include <cmath>
 #include <cstddef>
@@ -37,11 +40,13 @@ namespace fly::saddle {
   /**
    * @brief Saddle point locator.
    *
-   * A dimer is two images of a system. These images have a centre point and a unit axis. The images are (conceptually) located
+   * A dimer is two images of a system. These images have a centre point and a unit axis. The images are
+   * (conceptually) located
    * ``delta_r`` in the plus/minus directions along the axis.
    *
-   * This implementation uses the superlinear dimer method to find saddle-points. This alternates optimizing the orientation of the
-   * dimer along the minimum eigen-mode then translating the dimer along an effective potential to find the SP.
+   * This implementation uses the superlinear dimer method to find saddle-points. This alternates optimizing
+   * the orientation of the dimer along the minimum eigen-mode then translating the dimer along an effective
+   * potential to find the SP.
    */
   class Dimer {
   public:
@@ -85,8 +90,9 @@ namespace fly::saddle {
       /**
        * @brief If provided at each frame of the translation ``out`` will be written to this file.
        *
-       * It is the users responsibility to ensure the lifetime of ``fout`` is at least as long as the lifetime of the ``LBFGS`` object
-       * and ensure only a single ``LBFGS`` object writes to ``fout`` at any one time. This really only exist for debugging purposes...
+       * It is the users responsibility to ensure the lifetime of ``fout`` is at least as long as the lifetime
+       * of the ``LBFGS`` object and ensure only a single ``LBFGS`` object writes to ``fout`` at any one time.
+       * This really only exist for debugging purposes...
        */
       io::BinaryFile *fout = nullptr;
     };
@@ -125,15 +131,17 @@ namespace fly::saddle {
     /**
      * @brief Advance the dimer towards a saddle-point.
      *
-     * Performs at most ``max_find_sp`` translation steps. The translation uses the LBFGS algorithm with a trust-radius limited step
-     * size and an early-exit condition if the curvature is positive for too long.
+     * Performs at most ``max_find_sp`` translation steps. The translation uses the LBFGS algorithm with a
+     * trust-radius limited step size and an early-exit condition if the curvature is positive for too long.
      *
      * @param out Final position and axis orientation written here.
      * @param in Initial position, axis and per-particle data forwarded to potential.
      * @param pot Potential energy function.
      * @param in_min initial minima that dimer is climbing FROM.
      * @param hist_sp Previously discovered saddle points.
-     * @param theta_tol If the angle (Radians) between this SPS and a previous SP is less than theta_tol then abort.
+     * @param theta_tol If the angle (Radians) between this SPS and a previous SP is less than theta_tol then
+     * abort.
+     * @param count_frozen The number of frozen atoms in ``in``.
      * @param num_threads Number of openMP threads to use.
      * @return Exit-code.
      */
@@ -143,6 +151,7 @@ namespace fly::saddle {
                  potential::Generic &pot,
                  std::vector<system::SoA<Position>> const &hist_sp,
                  double theta_tol,
+                 int count_frozen,
                  int num_threads = 1) -> Exit;
 
   private:

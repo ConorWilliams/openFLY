@@ -525,6 +525,7 @@ namespace fly::saddle {
       // Found a mechanism.
 
       if (!is_new_mech(*elem.mech, out.m_mechs)) {
+        throw error("the theta tol is off?");
         dprint(m_opt.debug, "FINDER: Duplicate mech, caching\n");
         cache.emplace_back(elem.dimer);
         continue;

@@ -47,7 +47,7 @@ namespace fly {
    * @param extents Number of primitive-cells along each axis of the supercell.
    */
   template <typename Map, typename... T>
-  auto motif_to_lattice(system::Supercell<Map, T...> motif, Arr<int> const& extents)
+  auto motif_to_lattice(system::Supercell<Map, T...> motif, Arr<int> const &extents)
       -> system::Supercell<Map, T...> {
     //
     verify((extents > 0).all(), "Invalid extents={}", extents);
@@ -88,7 +88,7 @@ namespace fly {
 
     int i = 0;
 
-    template_for<int>(Arr<int>::Zero(), extents, [&](Arr<int> const& off) {
+    template_for<int>(Arr<int>::Zero(), extents, [&](Arr<int> const &off) {
       //
       Vec super_off = cell * off.matrix().cast<double>();
 
@@ -114,7 +114,7 @@ namespace fly {
    * @param bad Indexes of atoms to remove.
    */
   template <typename Map, typename... T>
-  auto remove_atoms(system::Supercell<Map, T...> const& cell, std::vector<Eigen::Index> const& bad)
+  auto remove_atoms(system::Supercell<Map, T...> const &cell, std::vector<Eigen::Index> const &bad)
       -> system::Supercell<Map, T...> {
     //
 
@@ -141,8 +141,8 @@ namespace fly {
    * @param atoms Atoms to add to ``cell``.
    */
   template <typename Map, typename... T>
-  auto add_atoms(system::Supercell<Map, T...> const& cell,
-                 std::vector<system::Atom<TypeID, T...>> const& atoms) {
+  auto add_atoms(system::Supercell<Map, T...> const &cell,
+                 std::vector<system::Atom<TypeID, T...>> const &atoms) {
     //
     auto out_cell = system::make_supercell<T...>(
         cell.box(), cell.map(), cell.size() + safe_cast<Eigen::Index>(atoms.size()));
@@ -173,7 +173,7 @@ namespace fly {
    * @param r Distance from ``centre`` to qualify for removal.
    */
   template <typename Map, typename... T>
-  auto remove_sphere(system::Supercell<Map, T...> const& cell, Eigen::Index centre, double r)
+  auto remove_sphere(system::Supercell<Map, T...> const &cell, Eigen::Index centre, double r)
       -> system::Supercell<Map, T...> {
     //
     neigh::List nl(cell.box(), r);
@@ -182,7 +182,7 @@ namespace fly {
 
     std::vector<Eigen::Index> bad = {centre};
 
-    nl.for_neighbours(centre, r, [&bad](auto n, auto const&...) { bad.push_back(n); });
+    nl.for_neighbours(centre, r, [&bad](auto n, auto const &...) { bad.push_back(n); });
 
     return remove_atoms(cell, bad);
   }
@@ -199,7 +199,7 @@ namespace fly {
    *
    * \endrst
    */
-  inline Vec centroid(system::SoA<Position const&> x) {
+  inline Vec centroid(system::SoA<Position const &> x) {
     Vec vsum = Vec::Zero();
     for (int i = 0; i < x.size(); i++) {
       vsum += x(r_, i);
@@ -210,7 +210,7 @@ namespace fly {
   /**
    * @brief Translate the atoms in ``x`` such that the centroid of ``x`` is the centroid of ``with``.
    */
-  inline void centroid_align(system::SoA<Position&> x, system::SoA<Position const&> with) {
+  inline void centroid_align(system::SoA<Position &> x, system::SoA<Position const &> with) {
     //
     ASSERT(x.size() == with.size(), "Different number of atoms {}!={}", x.size(), with.size());
 
@@ -225,5 +225,48 @@ namespace fly {
            centroid(with),
            centroid(x));
   }
+
+  /**
+   * @brief A class that can compare a defective lattice to a perfect lattice and detect the missing atoms.
+   */
+  class DetectVacancies {
+  public:
+    /**
+     * @brief Construct a new Detect Vacancies object.
+     *
+     * @param box A description of the simulation space.
+     * @param r_max At least the maximum distance an atom can be from a lattice site.
+     * @param perfect_lat The perfect lattice, must consist only of atom of a single type.
+     */
+    DetectVacancies(double r_max, system::Box const &box, system::viewSoA<TypeID, Position> perfect_lat);
+
+    /**
+     * @brief Find the canonicl coordinate of the vacanices.
+     *
+     * @param lat The defective lattice.
+     */
+    std::vector<Vec> detect_vacancies(system::viewSoA<TypeID, Position> lat);
+
+  private:
+    TypeID::scalar_t m_tp = 0;
+
+    neigh::List m_list;
+
+    system::SoA<Position> m_perfect;
+
+    system::SoA<Position, Index> m_combo;
+
+    Eigen::Index count_type(system::viewSoA<TypeID, Position> lat) const noexcept {
+      int tmp = 0;
+
+      for (Eigen::Index i = 0; i < lat.size(); i++) {
+        if (lat(id_, i) == m_tp) {
+          ++tmp;
+        }
+      }
+
+      return tmp;
+    }
+  };
 
 }  // namespace fly

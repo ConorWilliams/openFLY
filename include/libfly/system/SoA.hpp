@@ -6,13 +6,16 @@
 
 // This file is part of openFLY.
 
-// OpenFLY is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License
-// as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+// OpenFLY is free software: you can redistribute it and/or modify it under the terms of the GNU General
+// Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
+// option) any later version.
 
-// OpenFLY is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
-// warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+// OpenFLY is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the
+// implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+// for more details.
 
-// You should have received a copy of the GNU General Public License along with openFLY. If not, see <https://www.gnu.org/licenses/>.
+// You should have received a copy of the GNU General Public License along with openFLY. If not, see
+// <https://www.gnu.org/licenses/>.
 
 #include <Eigen/Core>
 #include <cstddef>
@@ -49,12 +52,13 @@ namespace fly::system {
    *
    * The default container type used in the libfly; an ``SoA`` models an array of ``Atom`` types
    * but decomposes the atom type and stores each property in a separate array. This enables efficient
-   * cache use. Like ``Atom``, the properties  of the "atom" are described through a series of template parameters
-   * which should inherit from ``Property``. The properties  of each atom can be accessed by the index of the
-   * atom or as an ``Eigen::Array`` to enable collective operations.
+   * cache use. Like ``Atom``, the properties  of the "atom" are described through a series of template
+   * parameters which should inherit from ``Property``. The properties  of each atom can be accessed by the
+   * index of the atom or as an ``Eigen::Array`` to enable collective operations.
    *
-   * SoA also supports slicing and reference properties  which transform that property into a view, this enables SoA to act as a
-   * concrete type in interfaces whilst allowing implicit conversions from any compatible SoA.
+   * SoA also supports slicing and reference properties  which transform that property into a view, this
+   * enables SoA to act as a concrete type in interfaces whilst allowing implicit conversions from any
+   * compatible SoA.
    *
    * \rst
    *
@@ -113,17 +117,19 @@ namespace fly::system {
 
   private:
     /**
-     * @brief Check Other is a specialization of a SoA but different from this SoA and that this SoA's Adaptors are (move)
-     * constructable from Other's adaptors.
+     * @brief Check Other is a specialization of a SoA but different from this SoA and that this SoA's
+     * Adaptors are (move) constructable from Other's adaptors.
      */
     template <typename Other>
-    static constexpr bool constructible = different_SoA_v<Other> && (std::is_constructible_v<detail::Adaptor<Pr>, Other> && ...);
+    static constexpr bool constructible
+        = different_SoA_v<Other> && (std::is_constructible_v<detail::Adaptor<Pr>, Other> && ...);
 
   public:
     /**
      * @brief Implicitly construct a new SoA object from SoA 'other' with different properties .
      *
-     * Only SFINE enabled if this SoA owns non of its arrays and this SoA is actually constructable from other.
+     * Only SFINE enabled if this SoA owns non of its arrays and this SoA is actually constructable from
+     * other.
      *
      */
     template <typename... T, typename = std::enable_if_t<owns_none && constructible<SoA<T...> const&>>>
@@ -132,7 +138,8 @@ namespace fly::system {
     /**
      * @brief Implicitly construct a new SoA object from SoA 'other' with different properties .
      *
-     * Only SFINE enabled if this SoA owns non of its arrays and this SoA is actually constructable from other.
+     * Only SFINE enabled if this SoA owns non of its arrays and this SoA is actually constructable from
+     * other.
      *
      */
     template <typename... T, typename = std::enable_if_t<owns_none && constructible<SoA<T...>&>>>
@@ -141,7 +148,8 @@ namespace fly::system {
     /**
      * @brief Implicitly construct a new SoA object from SoA 'other' with different properties .
      *
-     * Only SFINE enabled if this SoA owns non of its arrays and this SoA is actually constructable from other.
+     * Only SFINE enabled if this SoA owns non of its arrays and this SoA is actually constructable from
+     * other.
      *
      */
     template <typename... T, typename = std::enable_if_t<owns_none && constructible<SoA<T...>&&>>>
@@ -156,7 +164,9 @@ namespace fly::system {
      * SFINE enabled if this SoA owns some of its arrays and this SoA is actually constructable from other.
      *
      */
-    template <typename... T, typename = std::enable_if_t<!owns_none && constructible<SoA<T...> const&>>, typename = void>
+    template <typename... T,
+              typename = std::enable_if_t<!owns_none && constructible<SoA<T...> const&>>,
+              typename = void>
     explicit SoA(SoA<T...> const& other) : detail::Adaptor<Pr>(other)..., m_size(other.size()) {
       // The unnamed template parameter is a dummy to distinguish this from the implicit version.
     }
@@ -167,7 +177,9 @@ namespace fly::system {
      * SFINE enabled if this SoA owns some of its arrays and this SoA is actually constructable from other.
      *
      */
-    template <typename... T, typename = std::enable_if_t<!owns_none && constructible<SoA<T...>&>>, typename = void>
+    template <typename... T,
+              typename = std::enable_if_t<!owns_none && constructible<SoA<T...>&>>,
+              typename = void>
     explicit SoA(SoA<T...>& other) : detail::Adaptor<Pr>(other)..., m_size(other.size()) {
       // The unnamed template parameter is a dummy to distinguish this from the implicit version.
     }
@@ -178,10 +190,13 @@ namespace fly::system {
      * SFINE enabled if this SoA owns some of its arrays and this SoA is actually constructable from other.
      *
      */
-    template <typename... T, typename = std::enable_if_t<!owns_none && constructible<SoA<T...>&&>>, typename = void>
+    template <typename... T,
+              typename = std::enable_if_t<!owns_none && constructible<SoA<T...>&&>>,
+              typename = void>
     explicit SoA(SoA<T...>&& other) : detail::Adaptor<Pr>(std::move(other))..., m_size(other.size()) {
       // OK to ``std::move`` ``other`` multiple times as the detail::Adaptor constructor will only move its
-      // corresponding base slice. The unnamed template parameter is a dummy to distinguish this from the implicit version.
+      // corresponding base slice. The unnamed template parameter is a dummy to distinguish this from the
+      // implicit version.
     }
 
     //   private:
@@ -200,7 +215,8 @@ namespace fly::system {
     //      * @param args The ith source initializes the ith property.
     //      */
     //     template <bool Cond = (sizeof...(Pr) > 0), typename = std::enable_if_t<Cond>>
-    //     explicit SoA(SoA<add_ref<Pr>>... args) : detail::Adaptor<Pr>(args)..., m_size(first(args...).size()) {
+    //     explicit SoA(SoA<add_ref<Pr>>... args) : detail::Adaptor<Pr>(args)...,
+    //     m_size(first(args...).size()) {
     //       // T -> SoA<T const&>
     //       // T& -> SoA<T&>
     //       // T const & -> SoA<T const &>
@@ -212,8 +228,9 @@ namespace fly::system {
     //      *
     //      * @param args The ith source initializes the ith property.
     //      */
-    //     template <typename... T, typename = std::enable_if_t<(sizeof...(T) > 1 && sizeof...(T) == sizeof...(Pr))>>
-    //     explicit SoA(T&&... args) : detail::Adaptor<Pr>(std::forward<T>(args))..., m_size(first(args...).size()) {
+    //     template <typename... T, typename = std::enable_if_t<(sizeof...(T) > 1 && sizeof...(T) ==
+    //     sizeof...(Pr))>> explicit SoA(T&&... args) : detail::Adaptor<Pr>(std::forward<T>(args))...,
+    //     m_size(first(args...).size()) {
     //       // T -> SoA<T const&>
     //       // T& -> SoA<T&>
     //       // T const & -> SoA<T const &>
@@ -283,7 +300,8 @@ namespace fly::system {
      * @return void
      */
     template <typename T, typename U>
-    auto rebind(T, U& other) -> std::enable_if_t<(std::is_same_v<T&, Pr> || ...) || (std::is_same_v<T const&, Pr> || ...)> {
+    auto rebind(T, U& other)
+        -> std::enable_if_t<(std::is_same_v<T&, Pr> || ...) || (std::is_same_v<T const&, Pr> || ...)> {
       ASSERT(size() == other.size(), "rebinding to a differently sized SoA: {} != {}", size(), other.size());
       if constexpr ((std::is_same_v<T&, Pr> || ...)) {
         static_cast<detail::Adaptor<T&>&>(*this) = other;
@@ -327,5 +345,11 @@ namespace fly::system {
 
     /* clang-format off */ template <typename...>  friend class SoA; /* clang-format on */
   };
+
+  /**
+   * @brief An aliase to a ``SoA`` with each element a non-owning constant reference.
+   */
+  template <typename... Pr>
+  using viewSoA = SoA<Pr const&...>;
 
 }  // namespace fly::system

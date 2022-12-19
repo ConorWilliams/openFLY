@@ -212,11 +212,9 @@ namespace fly {
    */
   inline void centroid_align(system::SoA<Position &> x, system::SoA<Position const &> with) {
     //
-    ASSERT(x.size() == with.size(), "Different number of atoms {}!={}", x.size(), with.size());
-
     Vec delta = centroid(with) - centroid(x);
 
-    for (int i = 0; i < with.size(); i++) {
+    for (int i = 0; i < x.size(); i++) {
       x(r_, i) += delta;
     }
 
@@ -244,11 +242,14 @@ namespace fly {
      * @brief Find the canonicl coordinate of the vacanices.
      *
      * @param lat The defective lattice.
+     * @param num_threads The number of (openMP) threads to use.
      */
-    std::vector<Vec> detect_vacancies(system::viewSoA<TypeID, Position> lat);
+    std::vector<Vec> detect_vacancies(system::viewSoA<TypeID, Position> lat, int num_threads = 1);
 
   private:
     TypeID::scalar_t m_tp = 0;
+
+    double m_r_max;
 
     neigh::List m_list;
 

@@ -83,6 +83,10 @@ namespace fly::saddle {
       reconstruct(geo, m.delta_fwd, in), reconstruct(geo, m.delta_sp, in), {}, {},
     };
 
+    if (m_count_frozen == 0) {
+      centroid_align(res.sp, in);
+    }
+
     auto& thr = thread();
 
     {  // Minima
@@ -270,24 +274,26 @@ namespace fly::saddle {
     }
 
     if (m_opt.fout || m_opt.debug) {
-      auto c = m_opt.fout->n_frames();
+      auto c = m_opt.fout ? m_opt.fout->n_frames() : 0;
 
       for (std::size_t i = 0; i < out.size(); ++i) {
         if (out[i]) {
           for (auto& mech : out[i].m_mechs) {
+            fmt::print(stderr,
+                       "FINDER: @{} frame={}, Delta={}eV, A={:e}Hz\n",
+                       geo_data[i].centre,
+                       c,
+                       mech.barrier,
+                       mech.kinetic_pre);
+
             if (m_opt.fout) {
               m_opt.fout->commit(
                   [&] { m_opt.fout->write(r_, reconstruct(geo_data[i].geo, mech.delta_sp, in)); });
               m_opt.fout->commit(
                   [&] { m_opt.fout->write(r_, reconstruct(geo_data[i].geo, mech.delta_fwd, in)); });
             }
-            fmt::print("FINDER: @{} frame={}, Delta={}eV, A={:e}Hz\n",
-                       geo_data[i].centre,
-                       c,
-                       mech.barrier,
-                       mech.kinetic_pre);
 
-            c += 2;
+            c += m_opt.fout ? 2 : 1;
           }
         }
       }
@@ -482,7 +488,9 @@ namespace fly::saddle {
     } else if (frac_sp > m_opt.recon_norm_frac_tol && d_sp > m_opt.recon_norm_abs_tol) {
       set_fail_flag();
     } else {
-      centroid_align(*recon.rel_sp, in);
+      if (m_count_frozen == 0) {
+        centroid_align(*recon.rel_sp, in);
+      }
       cache_slot = std::move(*recon.rel_sp);
     }
   }
@@ -505,6 +513,11 @@ namespace fly::saddle {
     shared(elem, in, nl_pert, batch, cache, geo_data)
       {
         perturb(elem.dimer, in, geo_data.centre, nl_pert);
+
+        if (m_count_frozen == 0) {
+          centroid_align(elem.dimer, in);
+        }
+
         elem.mech = find_one(in, elem.dimer, elem.exit, geo_data.geo, cache, theta_tol);
       }
     }
@@ -529,7 +542,6 @@ namespace fly::saddle {
       // Found a mechanism.
 
       if (!is_new_mech(*elem.mech, out.m_mechs)) {
-        throw error("the theta tol is off?");
         dprint(m_opt.debug, "FINDER: Duplicate mech, caching\n");
         cache.emplace_back(elem.dimer);
         continue;

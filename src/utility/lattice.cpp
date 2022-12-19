@@ -25,7 +25,7 @@ namespace fly {
   DetectVacancies::DetectVacancies(double r_max,
                                    system::Box const &box,
                                    system::viewSoA<TypeID, Position> perfect_lat)
-      : m_list(box, r_max), m_perfect(perfect_lat) {
+      : m_r_max(r_max), m_list(box, r_max), m_perfect(perfect_lat) {
     verify(perfect_lat.size() > 0, "Perfect lattice must have some atoms!");
     m_tp = perfect_lat(id_, 0);
     verify((perfect_lat[id_] == m_tp).all(), "Perfect lattice must only contain atoms of typeID={}", m_tp);
@@ -33,9 +33,9 @@ namespace fly {
     for (Eigen::Index i = 0; i < m_perfect.size(); i++) {
       m_perfect(r_, i) = box.canon_image(m_perfect(r_, i));
     }
-  };
+  }
 
-  std::vector<Vec> DetectVacancies::detect_vacancies(system::viewSoA<TypeID, Position> lat) {
+  std::vector<Vec> DetectVacancies::detect_vacancies(system::viewSoA<TypeID, Position> lat, int num_threads) {
     //
     Eigen::Index count = count_type(lat);
 
@@ -46,11 +46,9 @@ namespace fly {
 
     centroid_align(m_perfect, lat);
 
-    if (auto n = m_perfect.size() + count; n != m_combo.size()) {
-      m_combo.destructive_resize(n);
-    }
+    m_combo.destructive_resize(m_perfect.size() + count);
 
-    m_combo[r_].head(m_perfect.size() * Position::size()) = m_perfect[r_];
+    m_combo[r_].head(m_perfect[r_].size()) = m_perfect[r_];
 
     {  // Copy defective into combo
 
@@ -66,14 +64,14 @@ namespace fly {
 
     m_combo[i_] = -1;
 
-    m_list.rebuild(m_combo, 1);
+    m_list.rebuild(m_combo, num_threads);
 
     for (Eigen::Index i = m_perfect.size(); i < m_combo.size(); i++) {
       //
       double r_min = std::numeric_limits<double>::max();
       Eigen::Index i_min = -1;
 
-      m_list.for_neighbours(i, rcut, [&](auto n, auto r, auto const &) {
+      m_list.for_neighbours(i, m_r_max, [&](auto n, auto r, auto const &) {
         if (n < m_perfect.size() && r < r_min) {
           // If lattice site and closer
           r_min = r;
@@ -85,7 +83,7 @@ namespace fly {
 
       verify(m_combo(i_, i_min) == -1, "Many-2-one assignment!");
 
-      m_combo(i_, i_min) = i;  // Assignment
+      m_combo(i_, i_min) = i;
     }
 
     std::vector<Vec> out;

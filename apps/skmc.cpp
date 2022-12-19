@@ -73,14 +73,68 @@ system::Supercell<system::TypeMap<>, Position, Frozen, T...> bcc_iron_motif() {
 template <typename... Ts>
 void ignore(Ts const &...) {}
 
+fly::system::SoA<TypeID, Position> explicit_V(std::vector<Vec> const &vac,
+                                              system::viewSoA<TypeID, Position> cell) {
+  //
+  fly::system::SoA<TypeID, Position> special(cell.size() + fly::ssize(vac));
+
+  special[id_].head(cell.size()) = cell[id_];  // Copy cells types
+  special[id_].tail(fly::ssize(vac)) = 2;      // TypeID for vacacies == 2
+
+  special[r_].head(cell[r_].size()) = cell[r_];
+
+  Eigen::Index x = cell.size();
+
+  for (auto const &v : vac) {
+    special(r_, x++) = v;
+  }
+
+  return special;
+}
+
+struct Result {
+  double v_v;  ///< The maximum of the V-V neighrest-neighbour distances. E.G for each vacancy compute the
+               ///< distance to its closest neighbour then v_v is the maximum of these.
+  double v_h;  ///< The minimum V-H distance.
+};
+
+/**
+ * @brief
+ */
+Result distances(system::Box const &box, std::vector<Vec> const &vac, Vec hy) {
+  //
+  auto mi = box.slow_min_image_computer();
+
+  Result r{
+      0,
+      std::numeric_limits<double>::max(),
+  };
+
+  for (auto const &v : vac) {
+    r.v_h = std::min(r.v_h, mi(hy, v));
+
+    double nn = std::numeric_limits<double>::max();
+
+    for (auto const &n : vac) {
+      if (&v != &n) {
+        nn = std::min(nn, mi(n, v));
+      }
+    }
+
+    r.v_v = std::max(r.v_v, nn);
+  }
+
+  return r;
+}
+
 int main() {
   //
 
   system::Supercell perfect = motif_to_lattice(bcc_iron_motif(), {6, 6, 6});
 
-  DetectVacancies detect(perfect.box(), perfect);
+  DetectVacancies detect(4, perfect.box(), perfect);
 
-  system::Supercell cell = remove_atoms(perfect, {1, 3});
+  system::Supercell cell = remove_atoms(perfect, {1});
 
   Vec r_H = {2.857 / 2 + 3.14, 2.857 / 2 + 3.14, 2.857 / 4 + 3.14};
 
@@ -102,26 +156,14 @@ int main() {
 
   fmt::print("Found {} vacancies @{}\n", vac.size(), vac);
 
-  fly::system::SoA<TypeID, Position> special(cell.size() + fly::ssize(vac));
-
-  special[id_].head(cell.size()) = cell[id_];
-  special[id_].tail(fly::ssize(vac)) = 2;
-
   auto const N = vac.size();
-
-  {
-    special[r_].head(cell.size() * Position::size()) = cell[r_];
-
-    Eigen::Index x = cell.size();
-
-    for (auto const &v : vac) {
-      special(r_, x++) = v;
-    }
-  }
 
   file.commit([&] {
     file.write(cell.box());
     file.write(cell.map());
+
+    auto special = explicit_V(vac, cell);
+
     file.write("particles/N", fly::safe_cast<std::uint32_t>(special.size()));
 
     file.write(id_, special);
@@ -144,9 +186,9 @@ int main() {
           },
           .opt_master = {
               .num_threads = omp_get_max_threads(),
-              .max_searches = 100,
+              .max_searches = 150,
               .max_failed_searches = 50,
-              .debug = true,
+              .debug = false,
           }
       },
       cell.box(),
@@ -186,21 +228,26 @@ int main() {
 
                 verify(v2.size() == N, "Num v changed");
 
-                {
-                  special[r_].head(post.size() * Position::size()) = post[r_];
+                fmt::print("Found {} vacancies @{}\n", v2.size(), v2);
 
-                  Eigen::Index x = post.size();
+                auto dist = distances(cell.box(), v2, post(r_, post.size() - 1));
 
-                  for (auto const &v : v2) {
-                    special(r_, x++) = v;
-                  }
-                }
-
-                fmt::print("Found {} vacancies @{}\n", vac.size(), vac);
+                fmt::print("Max V-V = {}, min V-H = {}\n", dist.v_v, dist.v_h);
 
                 // file.commit([&] { file.write(r_, pre); });
                 // file.commit([&] { file.write(r_, post); });
-                file.commit([&] { file.write(r_, special); });
+
+                auto vpost = explicit_V(v2, tmp);
+
+                file.commit([&] {
+                  auto copy = vpost;
+                  copy[r_].head(pre[r_].size()) = pre[r_];
+                  file.write(r_, copy);
+                });
+
+                file.commit([&] { file.write(r_, vpost); });
+
+                fmt::print("Just wrote frame index No. {}\n", file.n_frames() - 1);
               });
 
   return 0;

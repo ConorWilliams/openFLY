@@ -4,13 +4,16 @@
 
 // This file is part of openFLY.
 
-// OpenFLY is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License
-// as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+// OpenFLY is free software: you can redistribute it and/or modify it under the terms of the GNU General
+// Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
+// option) any later version.
 
-// OpenFLY is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
-// warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+// OpenFLY is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the
+// implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+// for more details.
 
-// You should have received a copy of the GNU General Public License along with openFLY. If not, see <https://www.gnu.org/licenses/>.
+// You should have received a copy of the GNU General Public License along with openFLY. If not, see
+// <https://www.gnu.org/licenses/>.
 
 #include "libfly/kinetic/basin.hpp"
 
@@ -44,7 +47,8 @@ namespace fly::kinetic {
     return XXH64(buff.data(), buff.size() * sizeof(int), 0);
   }
 
-  Basin::Basin(Options const &opt, system::SoA<Position const &> state, fly::env::Catalogue const &cat) : m_opt(opt), m_state(state) {
+  Basin::Basin(Options const &opt, system::SoA<Position const &> state, fly::env::Catalogue const &cat)
+      : m_opt(opt), m_state(state) {
     //
     for (int i = 0; i < state.size(); ++i) {
       for (env::Mechanism const &mech : cat.get_ref(i).get_mechs()) {
@@ -64,6 +68,8 @@ namespace fly::kinetic {
     if (m_opt.debug) {
       fmt::print("Basin: built a basin with {} mechanisms, rate_sum={}\n", m_mechs.size(), m_rate_sum);
     }
+
+    verify(m_rate_sum > 1e7, "Check");
 
     m_state_hash = hash(state.size(), cat);
   }

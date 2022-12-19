@@ -241,92 +241,94 @@ namespace fly::kinetic {
     SuperCache super(m_opt.opt_cache, {m_opt.opt_cache.opt_sb, {m_opt.opt_cache.opt_basin, cell, m_cat}});
 
     for (int i = 0;; ++i) {
-      ///////////// Select mechanism /////////////
-      auto const& [m, atom, dt, basin, changed] = super.kmc_choice(rng);
+      timeit("SKMC-loop\n", [&] {
+        ///////////// Select mechanism /////////////
+        auto const& [m, atom, dt, basin, changed] = super.kmc_choice(rng);
 
-      cell[r_] = super.state(basin)[r_];
+        cell[r_] = super.state(basin)[r_];
 
-      ///////////// Reconstruct mech /////////////
+        ///////////// Reconstruct mech /////////////
 
-      verify(!m.poison, "KMC chose a poisoned mechanisms with dE={}", m.barrier);
+        verify(!m.poison, "KMC chose a poisoned mechanisms with dE={}", m.barrier);
 
-      double E0 = energy(cell);  // Energy before mechanism
+        double E0 = energy(cell);  // Energy before mechanism
 
-      m_cat.reconstruct(raw_recon, m, atom, cell, !changed, num_threads);
+        m_cat.reconstruct(raw_recon, m, atom, cell, !changed, num_threads);
 
-      auto err = m_minimiser.minimise(rel_recon, raw_recon, m_pot, num_threads);
+        auto err = m_minimiser.minimise(rel_recon, raw_recon, m_pot, num_threads);
 
-      centroid_align(rel_recon, raw_recon);
+        centroid_align(rel_recon, raw_recon);
 
-      double Ef = energy(rel_recon);  // Energy after relax
+        double Ef = energy(rel_recon);  // Energy after relax
 
-      double dR_err = std::abs(gnorm(rel_recon[r_] - raw_recon[r_]) - m.err_fwd);
-      double dE_err = std::abs(Ef - E0 - m.delta);
+        double dR_err = std::abs(gnorm(rel_recon[r_] - raw_recon[r_]) - m.err_fwd);
+        double dE_err = std::abs(Ef - E0 - m.delta);
 
-      double dR_err_frac = dR_err / m.err_fwd;
-      double dE_err_frac = dE_err / std::abs(m.delta);
+        double dR_err_frac = dR_err / m.err_fwd;
+        double dE_err_frac = dE_err / std::abs(m.delta);
 
-      dprint(m_opt.debug,
-             "SKMC: dE_err={:.3f}[{:.3f}], dR_err={:.3f}[{:.3f}]\n",
-             dE_err,
-             dE_err_frac,
-             dR_err,
-             dR_err_frac);
+        dprint(m_opt.debug,
+               "SKMC: dE_err={:.3f}[{:.3f}], dR_err={:.3f}[{:.3f}]\n",
+               dE_err,
+               dE_err_frac,
+               dR_err,
+               dR_err_frac);
 
-      {
-        bool fail = false;
+        {
+          bool fail = false;
 
-        auto const& opt = m_mast.get_options();
+          auto const& opt = m_mast.get_options();
 
-        if (err) {
-          fail = true;
-        } else if (dE_err > opt.recon_e_tol_abs && dE_err_frac > opt.recon_e_tol_frac) {
-          fail = true;
-        } else if (dR_err > opt.recon_norm_frac_tol && dR_err_frac > opt.recon_norm_abs_tol) {
-          fail = true;
-        }
-
-        if (fail) {
-          dprint(m_opt.debug, "SKMC: Reconstruction failed @{}\n", atom);
-
-          auto initial_assign = m_cat.get_ref(atom).cat_index();
-          bool new_envs = false;
-
-          do {
-            double new_tol = m_cat.refine_tol(atom);
-            dprint(m_opt.debug, "SKMC: Refined tolerance to {}\n", new_tol);
-            new_envs = new_envs || kinetic::update_cat(m_mast, m_cat, cell, num_threads);
-          } while (initial_assign == m_cat.get_ref(atom).cat_index());
-
-          if (new_envs) {
-            dump_cat();
+          if (err) {
+            fail = true;
+          } else if (dE_err > opt.recon_e_tol_abs && dE_err_frac > opt.recon_e_tol_frac) {
+            fail = true;
+          } else if (dR_err > opt.recon_norm_frac_tol && dR_err_frac > opt.recon_norm_abs_tol) {
+            fail = true;
           }
 
-          super.reset({m_opt.opt_cache.opt_sb, {m_opt.opt_cache.opt_basin, cell, m_cat}});
+          if (fail) {
+            dprint(m_opt.debug, "SKMC: Reconstruction failed @{}\n", atom);
 
-          continue;
+            auto initial_assign = m_cat.get_ref(atom).cat_index();
+            bool new_envs = false;
+
+            do {
+              double new_tol = m_cat.refine_tol(atom);
+              dprint(m_opt.debug, "SKMC: Refined tolerance to {}\n", new_tol);
+              new_envs = new_envs || kinetic::update_cat(m_mast, m_cat, cell, num_threads);
+            } while (initial_assign == m_cat.get_ref(atom).cat_index());
+
+            if (new_envs) {
+              dump_cat();
+            }
+
+            super.reset({m_opt.opt_cache.opt_sb, {m_opt.opt_cache.opt_basin, cell, m_cat}});
+
+            return;
+          }
         }
-      }
 
-      ///////////// Time /////////////
+        ///////////// Time /////////////
 
-      time += dt;
+        time += dt;
 
-      std::invoke(f, time, std::as_const(cell), atom, m, system::SoA<Position const&>{rel_recon});
+        std::invoke(f, time, std::as_const(cell), atom, m, system::SoA<Position const&>{rel_recon});
 
-      cell[r_] = rel_recon[r_];
+        cell[r_] = rel_recon[r_];
 
-      ///////////// Update catalogue /////////////
+        ///////////// Update catalogue /////////////
 
-      if (kinetic::update_cat(m_mast, m_cat, cell, num_threads)) {
-        dump_cat();
-      }
+        if (kinetic::update_cat(m_mast, m_cat, cell, num_threads)) {
+          dump_cat();
+        }
 
-      ///////////// Update SuperBasin /////////////
+        ///////////// Update SuperBasin /////////////
 
-      super.connect_from(basin, atom, m, cell, m_cat);
+        super.connect_from(basin, atom, m, cell, m_cat);
 
-      dprint(m_opt.debug, "SKMC: Iteration #{} time = {:.3e}\n\n", i, time);
+        dprint(m_opt.debug, "SKMC: Iteration #{} time = {:.3e}\n", i, time);
+      });
     }
   }
 

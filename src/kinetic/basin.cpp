@@ -69,7 +69,7 @@ namespace fly::kinetic {
       fmt::print("Basin: built a basin with {} mechanisms, rate_sum={}\n", m_mechs.size(), m_rate_sum);
     }
 
-    verify(m_rate_sum > 1e7, "Check");
+    verify(m_rate_sum > 1e7, "Check sanity");
 
     m_state_hash = hash(state.size(), cat);
   }

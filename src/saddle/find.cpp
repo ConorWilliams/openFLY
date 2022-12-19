@@ -101,6 +101,16 @@ namespace fly::saddle {
     }
 
     {  // SP
+
+      // Need consistant random here.
+
+      Xoshiro tprng({
+          0b0100010000111101110011010101110011001100111111101010011101100100,
+          0b0101001110100101100101101101110010101101000111001011100010011010,
+          0b0001011011000111110001100100001011000100101011111011110110001000,
+          0b1000111010010011111010001001100001111100111001100000110100110001,
+      });
+
       system::SoA<Position, Axis, TypeID const&, Frozen const&> dim(in.size());
       dim.rebind(id_, in);
       dim.rebind(fzn_, in);
@@ -110,11 +120,10 @@ namespace fly::saddle {
       // Axis random and prop_to displacement.
       for (int j = 0; j < in.size(); ++j) {
         if (!in(fzn_, j)) {
-          dim(ax_, j)
-              = Vec::NullaryExpr([&] { return dist(thr.prng); }) * gnorm_sq(res.sp(r_, j) - in(r_, j));
+          dim(ax_, j) = Vec::NullaryExpr([&] { return dist(tprng); }) * gnorm_sq(res.sp(r_, j) - in(r_, j));
         }
       }
-      // ... and randomise.
+      // ... and normalise.
       dim[ax_] /= gnorm(dim[ax_]);
 
       if (!thr.dimer.find_sp(dim, dim, in, thr.pot, {}, m_count_frozen, 1)) {
@@ -316,7 +325,7 @@ namespace fly::saddle {
     int tot = 0;
     int fail = 0;
 
-    int mod = in(id_, geo_data.centre) == 1 ? 2 : 1;
+    int mod = in(id_, geo_data.centre) == 1 ? 4 : 1;
 
     while (tot < m_opt.max_searches * mod && fail < m_opt.max_failed_searches * mod) {
       //

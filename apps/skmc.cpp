@@ -154,7 +154,7 @@ int main() {
 
   auto vac = detect.detect_vacancies(cell);
 
-  fmt::print("Found {} vacancies @{}\n", vac.size(), vac);
+  fmt::print("Found {} vacancies @{:::.2f}\n", vac.size(), vac);
 
   auto const N = vac.size();
 
@@ -228,11 +228,11 @@ int main() {
 
                 verify(v2.size() == N, "Num v changed");
 
-                fmt::print("Found {} vacancies @{}\n", v2.size(), v2);
+                fmt::print("Found {} vacancies @{:::.2f}\n", v2.size(), v2);
 
                 auto dist = distances(cell.box(), v2, post(r_, post.size() - 1));
 
-                fmt::print("Max V-V = {}, min V-H = {}\n", dist.v_v, dist.v_h);
+                fmt::print("Max V-V = {:.3e}, min V-H = {:.3e}\n", dist.v_v, dist.v_h);
 
                 // file.commit([&] { file.write(r_, pre); });
                 // file.commit([&] { file.write(r_, post); });

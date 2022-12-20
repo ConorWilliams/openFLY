@@ -416,7 +416,7 @@ namespace fly::saddle {
       std::optional<system::SoA<Position>> rel_sp;   ///< Relaxed reconstructed sp
     };
 
-    void dump_recon(system::SoA<Position const&> in,
+    void dump_recon(system::SoA<Position const&, TypeID const&> in,
                     Index::scalar_t centre,
                     Recon const& recon,
                     system::SoA<Position const&> dimer) const;
@@ -427,17 +427,6 @@ namespace fly::saddle {
     Recon recon_relax(env::Geometry<Index> const& geo,
                       env::Mechanism const& m,
                       system::SoA<Position const&, TypeID const&, Frozen const&> in);
-
-    // // Reconstruct saddle point according to geo and relax system to saddle,
-    // // check we have not constructed a false SP, if we have mark mechanism as poisoned
-    // std::optional<system::SoA<Position>> recon_sp_relax(env::Geometry<Index> const& geo,
-    //                                                     env::Mechanism& m,
-    //                                                     system::SoA<Position const&, TypeID const&, Frozen
-    //                                                     const&> in);
-    // // Check a relaxed minima is close to a true minima.
-    // bool recon_min_relax(env::Geometry<Index> const& geo,
-    //                      env::Mechanism const& m,
-    //                      system::SoA<Position const&, TypeID const&, Frozen const&> in);
 
     ThreadData& thread() { return m_data[safe_cast<std::size_t>(omp_get_thread_num())]; }
 

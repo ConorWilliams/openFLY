@@ -364,7 +364,7 @@ namespace fly::saddle {
     }
   }
 
-  void Master::dump_recon(system::SoA<Position const&> in,
+  void Master::dump_recon(system::SoA<Position const&, TypeID const&> in,
                           Index::scalar_t centre,
                           Recon const& recon,
                           system::SoA<Position const&> dimer) const {
@@ -382,6 +382,8 @@ namespace fly::saddle {
 
     file.commit([&] {
       file.write("particles/N", fly::safe_cast<std::uint32_t>(in.size()));
+      file.write(m_box);
+      file.write(id_, in);
       file.write(r_, in);
     });
 
@@ -586,6 +588,8 @@ namespace fly::saddle {
           file.commit([&] {
             file.write("particles/N", fly::safe_cast<std::uint32_t>(in.size()));
             file.write(r_, in);
+            file.write(m_box);
+            file.write(id_, in);
           });
           file.commit([&] { file.write(r_, reconstruct(geo_data.geo, elem.mech->delta_sp, in)); });
           file.commit([&] { file.write(r_, elem.dimer); });
@@ -747,9 +751,45 @@ namespace fly::saddle {
       }
     }
 
-    if (mech.poison) {
-      //   verify(mech.barrier > 2., "Mechanism @{} with energy barrier = {}eV is poisoned!", geo[0][i_],
-      //   mech.barrier);
+    if (mech.poison && mech.barrier < 1.) {
+#pragma omp critical
+      {
+        fly::io::BinaryFile file("poison.gsd", fly::io::create);
+
+        file.commit([&] {
+          file.write("particles/N", fly::safe_cast<std::uint32_t>(in.size()));
+          file.write(m_box);
+          file.write(r_, in);
+          file.write(id_, in);
+        });
+
+        file.commit([&, rev = rev] { file.write(r_, rev); });
+        file.commit([&, sp = sp] { file.write(r_, sp); });
+        file.commit([&, fwd = fwd] { file.write(r_, fwd); });
+
+        file.commit([&] { file.write(id_, in); });
+        file.commit([&, re_sp = re_sp] { file.write(r_, re_sp); });
+        file.commit([&, re_min = re_min] { file.write(r_, re_min); });
+
+        file.commit([&] { file.write(id_, in); });
+
+        if (rel_sp) {
+          file.commit([&, rel_sp = rel_sp] { file.write(r_, *rel_sp); });
+        }
+
+        if (rel_min) {
+          file.commit([&, rel_min = rel_min] { file.write(r_, *rel_min); });
+        }
+      }
+
+      throw error("Mechanism @{} with energy barrier = {}eV is poisoned! err_sp={}, err_min={}",
+                  geo[0][i_],
+                  mech.barrier,
+                  mech.err_sp,
+                  mech.err_fwd);
+
+      //   mech.barrier)
+      //   verify(mech.barrier > 2., );
     }
 
     //////////////// Partial hessian compute. ////////////////
@@ -797,7 +837,7 @@ namespace fly::saddle {
     }
 
     return mech;
-  }
+  }  // namespace fly::saddle
 
   Dimer::Exit Master::find_sp(system::SoA<Position&, Axis&, Frozen const&, TypeID const&> dimer,
                               system::SoA<Position const&> in,

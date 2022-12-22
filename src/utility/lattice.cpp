@@ -25,7 +25,7 @@ namespace fly {
   DetectVacancies::DetectVacancies(double r_max,
                                    system::Box const &box,
                                    system::viewSoA<TypeID, Position> perfect_lat)
-      : m_r_max(r_max), m_list(box, r_max), m_perfect(perfect_lat) {
+      : m_r_max(r_max), m_box(box), m_list(box, r_max), m_perfect(perfect_lat) {
     verify(perfect_lat.size() > 0, "Perfect lattice must have some atoms!");
     m_tp = perfect_lat(id_, 0);
     verify((perfect_lat[id_] == m_tp).all(), "Perfect lattice must only contain atoms of typeID={}", m_tp);
@@ -44,23 +44,25 @@ namespace fly {
            count,
            m_perfect.size());
 
-    centroid_align(m_perfect, lat);
+    system::SoA<TypeID, Position> defective(count);
 
-    m_combo.destructive_resize(m_perfect.size() + count);
-
-    m_combo[r_].head(m_perfect[r_].size()) = m_perfect[r_];
-
-    {  // Copy defective into combo
-
-      Eigen::Index x = m_perfect.size();
+    {
+      Eigen::Index x = 0;
 
       for (Eigen::Index i = 0; i < lat.size(); i++) {
         if (lat(id_, i) == m_tp) {
-          m_combo(r_, x) = lat(r_, i);
+          defective(r_, x) = m_box.canon_image(lat(r_, i));
           x += 1;
         }
       }
     }
+
+    centroid_align(m_perfect, defective);
+
+    m_combo.destructive_resize(m_perfect.size() + count);
+
+    m_combo[r_].head(m_perfect[r_].size()) = m_perfect[r_];
+    m_combo[r_].tail(defective[r_].size()) = defective[r_];
 
     m_combo[i_] = -1;
 

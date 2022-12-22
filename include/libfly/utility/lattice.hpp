@@ -251,6 +251,8 @@ namespace fly {
 
     double m_r_max;
 
+    system::Box m_box;
+
     neigh::List m_list;
 
     system::SoA<Position> m_perfect;

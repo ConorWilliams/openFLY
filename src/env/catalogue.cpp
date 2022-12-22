@@ -278,7 +278,7 @@ namespace fly::env {
       if (v.size() > 1) {
         std::sort(v.begin(), v.end(), [](Env const &e1, Env const &e2) {
           // Biggest first
-          return e1.m_freq / (e1.m_false_pos + 1) > e2.m_freq / (e2.m_false_pos + 1);
+          return e1.m_freq / (e1.m_false_pos + 1.) > e2.m_freq / (e2.m_false_pos + 1.);
         });
 
         fmt::print("Key {} has {} envs\n", k, v.size());

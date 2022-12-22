@@ -128,11 +128,11 @@ int main() {
 
   DetectVacancies detect(4, perfect.box(), perfect);
 
-  system::Supercell cell = remove_atoms(perfect, {1});
+  system::Supercell cell = remove_atoms(perfect, {1, 2, 3, 4});
 
   Vec r_H = {2.857 / 2 + 3.14, 2.857 / 2 + 3.14, 2.857 / 4 + 3.14};
 
-  cell = add_atoms(cell, {system::Atom<TypeID, Position, Frozen>(1, r_H, false)});
+  // cell = add_atoms(cell, {system::Atom<TypeID, Position, Frozen>(1, r_H, false)});
 
   //   cell = add_atoms(
   //       cell, {system::Atom<TypeID, Position, Frozen, Hash>(1, {2.857 / 2 + 3.14, 2.857 / 2 + 3.14, 2.857
@@ -167,12 +167,12 @@ int main() {
   kinetic::SKMC runner = {
       {
           .debug = true,
-          .fread = "build/gsd/cat.VnH.bin",
+          .fread = "build/gsd/cat.bin",
           .opt_cache = {
               .debug = true,
               .opt_basin = {
                   .debug = true,
-                  .temp = 300,
+                  .temp = 600,
               },
               .opt_sb = {
                   .debug = true,
@@ -204,6 +204,7 @@ int main() {
   };
 
   double d_time = 0;
+  int count = 0;
 
   runner.skmc(cell,
               omp_get_max_threads(),
@@ -243,11 +244,13 @@ int main() {
 
                 fmt::print("Just wrote frame index No. {}\n", file.n_frames() - 1);
 
-                if (dist.v_h > 6) {
-                  return true;
+                if (dist.v_v > 6) {
+                  ++count;
                 } else {
-                  return false;
+                  count = 0;
                 }
+
+                return count >= 2;
               });
 
   fmt::print("It took {:.3e}s for H do detrap\n", d_time);

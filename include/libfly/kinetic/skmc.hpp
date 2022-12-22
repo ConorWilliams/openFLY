@@ -179,7 +179,9 @@ namespace fly::kinetic {
               dprint(m_opt.debug, "SKMC: Could not open catalogue: \"{}\"\n", m_opt.fread);
               return env::Catalogue{{}};
             }
-          }()) {}
+          }()) {
+      m_cat.optimize();
+    }
 
     /**
      * @brief
@@ -189,7 +191,7 @@ namespace fly::kinetic {
      * @param f
      */
     template <typename Map, typename... T, typename F>
-    auto skmc(system::Supercell<Map, T...>& cell, int num_threads, F const& f) -> void;
+    auto skmc(system::Supercell<Map, T...> const& cell, int num_threads, F const& f) -> void;
 
   private:
     Options m_opt;
@@ -205,8 +207,10 @@ namespace fly::kinetic {
   };
 
   template <typename Map, typename... T, typename F>
-  auto SKMC::skmc(system::Supercell<Map, T...>& cell, int num_threads, F const& f) -> void {
+  auto SKMC::skmc(system::Supercell<Map, T...> const& in_cell, int num_threads, F const& f) -> void {
     //
+    system::Supercell<Map, T...> cell = in_cell;
+
     neigh::List neigh_list(cell.box(), m_pot.r_cut());
 
     {  // Initial minimisation
@@ -241,6 +245,9 @@ namespace fly::kinetic {
     SuperCache super(m_opt.opt_cache, {m_opt.opt_cache.opt_sb, {m_opt.opt_cache.opt_basin, cell, m_cat}});
 
     for (int i = 0;; ++i) {
+      //
+      bool stop = false;
+
       timeit("SKMC-loop\n", [&] {
         ///////////// Select mechanism /////////////
         auto const& [m, atom, dt, basin, changed] = super.kmc_choice(rng);
@@ -313,7 +320,7 @@ namespace fly::kinetic {
 
         time += dt;
 
-        std::invoke(f, time, std::as_const(cell), atom, m, system::SoA<Position const&>{rel_recon});
+        stop = std::invoke(f, time, std::as_const(cell), atom, m, system::SoA<Position const&>{rel_recon});
 
         cell[r_] = rel_recon[r_];
 
@@ -329,6 +336,10 @@ namespace fly::kinetic {
 
         dprint(m_opt.debug, "SKMC: Iteration #{} time = {:.3e}\n", i, time);
       });
+
+      if (stop) {
+        break;
+      }
     }
   }
 

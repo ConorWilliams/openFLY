@@ -342,6 +342,11 @@ namespace fly::env {
       iarchive(*this);
     }
 
+    /**
+     * @brief Re-order the catalogue into frequency order.
+     */
+    void optimize();
+
   private:
     /**
      * @brief  A non-null pointer-like type to an ``Catalogue::Env``.
@@ -389,15 +394,6 @@ namespace fly::env {
     std::optional<neigh::List> m_nl;
     std::vector<RelEnv> m_real;
     std::map<std::size_t, std::vector<Env>, std::less<>> m_cat;
-
-    void optimize() {
-      for (auto&& [k, v] : m_cat) {
-        std::sort(v.begin(), v.end(), [](Env const& e1, Env const& e2) {
-          // Biggest first
-          return e1.m_freq > e2.m_freq;
-        });
-      }
-    }
 
     auto rebuild_impl(system::SoA<Position const&, TypeID const&, Frozen const&> const& info,
                       Eigen::Index num_types,

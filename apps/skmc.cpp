@@ -113,15 +113,9 @@ Result distances(system::Box const &box, std::vector<Vec> const &vac, Vec hy) {
   for (auto const &v : vac) {
     r.v_h = std::min(r.v_h, mi(hy, v));
 
-    double nn = std::numeric_limits<double>::max();
-
     for (auto const &n : vac) {
-      if (&v != &n) {
-        nn = std::min(nn, mi(n, v));
-      }
+      r.v_v = std::max(r.v_v, mi(n, v));
     }
-
-    r.v_v = std::max(r.v_v, nn);
   }
 
   return r;
@@ -173,7 +167,7 @@ int main() {
   kinetic::SKMC runner = {
       {
           .debug = true,
-          .fread = "build/gsd/cat.bin",
+          .fread = "build/gsd/cat.VnH.bin",
           .opt_cache = {
               .debug = true,
               .opt_basin = {
@@ -186,8 +180,8 @@ int main() {
           },
           .opt_master = {
               .num_threads = omp_get_max_threads(),
-              .max_searches = 150,
-              .max_failed_searches = 50,
+              .max_searches = 200,
+              .max_failed_searches = 75,
               .debug = false,
           }
       },
@@ -209,15 +203,18 @@ int main() {
       },
   };
 
+  double d_time = 0;
+
   runner.skmc(cell,
               omp_get_max_threads(),
-              [&](double time,
-                  system::SoA<Position const &> pre,
-                  int atom,
-                  env::Mechanism const &mech,
-                  system::SoA<Position const &> post) {
+              [&](double time,                        ///< Total time just after system at post
+                  system::SoA<Position const &> pre,  ///< State just before mech applied
+                  int atom,                           ///< Index of central atom of mechanism
+                  env::Mechanism const &mech,         ///< Chosen mechanism
+                  system::SoA<Position const &> post  ///< Final state of system after this iteration / mech
+              ) {
                 //
-                ignore(time, pre, atom, mech, pre, post);
+                d_time = time;
 
                 fly::system::SoA<TypeID const &, Position const &> tmp(cell.size());
 
@@ -234,9 +231,6 @@ int main() {
 
                 fmt::print("Max V-V = {:.3e}, min V-H = {:.3e}\n", dist.v_v, dist.v_h);
 
-                // file.commit([&] { file.write(r_, pre); });
-                // file.commit([&] { file.write(r_, post); });
-
                 auto vpost = explicit_V(v2, tmp);
 
                 file.commit([&] {
@@ -248,7 +242,15 @@ int main() {
                 file.commit([&] { file.write(r_, vpost); });
 
                 fmt::print("Just wrote frame index No. {}\n", file.n_frames() - 1);
+
+                if (dist.v_h > 6) {
+                  return true;
+                } else {
+                  return false;
+                }
               });
+
+  fmt::print("It took {:.3e}s for H do detrap\n", d_time);
 
   return 0;
 }

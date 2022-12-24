@@ -6,13 +6,16 @@
 
 // This file is part of openFLY.
 
-// OpenFLY is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License
-// as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+// OpenFLY is free software: you can redistribute it and/or modify it under the terms of the GNU General
+// Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
+// option) any later version.
 
-// OpenFLY is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
-// warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+// OpenFLY is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the
+// implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+// for more details.
 
-// You should have received a copy of the GNU General Public License along with openFLY. If not, see <https://www.gnu.org/licenses/>.
+// You should have received a copy of the GNU General Public License along with openFLY. If not, see
+// <https://www.gnu.org/licenses/>.
 
 #include <array>
 #include <cstddef>
@@ -36,11 +39,19 @@ namespace fly::potential {
   class DataEAM {
   public:
     /**
+     * @brief Options for parsing the EAM file.
+     */
+    struct Options {
+      bool debug = false;      ///< Controls debug printing.
+      bool symmetric = false;  ///< Assume symmetric phi.
+    };
+
+    /**
      * @brief Parse the LAMMPS-style eam/fs  stream and construct an DataEAM object.
      *
      * For detail on file specification see: https://docs.lammps.org/pair_eam.html
      */
-    explicit DataEAM(std::ifstream in);
+    DataEAM(Options const& opt, std::ifstream in);
 
     /**
      * @brief Fetch the cut-off radius.
@@ -100,7 +111,9 @@ namespace fly::potential {
       return i + m_n * j;
     }
 
-    std::size_t sym_index(std::size_t i, std::size_t j) const { return index(std::max(i, j), std::min(i, j)); }
+    std::size_t sym_index(std::size_t i, std::size_t j) const {
+      return index(std::max(i, j), std::min(i, j));
+    }
   };
 
 }  // namespace fly::potential

@@ -170,7 +170,8 @@ int main() {
   potential::Generic pot{
       potential::EAM{
           cell.map(),
-          std::make_shared<potential::DataEAM>(std::ifstream{"data/wen.eam.fs"}),
+          std::make_shared<potential::DataEAM>(potential::DataEAM::Options{},
+                                               std::ifstream{"data/wen.eam.fs"}),
       },
   };
 

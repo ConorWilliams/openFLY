@@ -49,7 +49,7 @@ system::Supercell<system::TypeMap<>, Position, Frozen, T...> bcc_iron_motif(doub
   system::TypeMap<> FeH(3);
 
   FeH.set(0, tp_, "Fe");
-  FeH.set(1, tp_, "H");
+  FeH.set(1, tp_, "C");
   FeH.set(2, tp_, "V");
 
   Mat basis{
@@ -69,6 +69,9 @@ system::Supercell<system::TypeMap<>, Position, Frozen, T...> bcc_iron_motif(doub
 
   return motif;
 }
+
+template <typename... Ts>
+void ignore(Ts const &...) {}
 
 fly::system::SoA<TypeID, Position> explicit_V(std::vector<Vec> const &vac,
                                               system::viewSoA<TypeID, Position> cell) {
@@ -131,11 +134,15 @@ int main() {
 
   DetectVacancies detect(4, perfect.box(), perfect);
 
-  system::Supercell cell = remove_atoms(perfect, {1});
+  // system::Supercell cell = remove_atoms(perfect, {1});
+
+  auto cell = perfect;
 
   Vec r_H = {2.857 / 2 + 3.14, 2.857 / 2 + 3.14, 2.857 / 4 + 3.14};
 
-  cell = add_atoms(cell, {system::Atom<TypeID, Position, Frozen>(1, r_H, false)});
+  Vec r_C = {8.85219 + 2.857 / 2, 11.7075, 8.85219};
+
+  cell = add_atoms(cell, {system::Atom<TypeID, Position, Frozen>(1, r_C, false)});
 
   //   cell = add_atoms(
   //       cell, {system::Atom<TypeID, Position, Frozen, Hash>(1, {2.857 / 2 + 3.14, 2.857 / 2 + 3.14, 2.857
@@ -170,7 +177,7 @@ int main() {
   kinetic::SKMC runner = {
       {
           .debug = true,
-          .fread = "build/gsd/cat.VnH.bin",
+          .fread = "build/gsd/cat.FeC.bin",
           .opt_cache = {
               .barrier_tol = 0.45,
               .debug = true,
@@ -186,7 +193,7 @@ int main() {
               .num_threads = omp_get_max_threads(),
               .max_searches = 200,
               .max_failed_searches = 75,
-              .debug = false,
+              .debug = true,
           }
       },
       cell.box(),
@@ -199,11 +206,8 @@ int main() {
               cell.map(),
               std::make_shared<potential::DataEAM>(
                 potential::DataEAM{
-                  {
-                    .debug = false, 
-                    .symmetric = false,
-                  }, 
-                  std::ifstream{"data/wen.eam.fs"}
+                  {}, 
+                  std::ifstream{"data/hepburn.eam.fs"}
                 }
               ),
           },
@@ -214,6 +218,54 @@ int main() {
           cell.box(),
       },
   };
+
+  // minimise::LBFGS minimiser({}, cell.box());
+
+  // potential::Generic pot{
+  //     potential::EAM{
+  //         cell.map(),
+  //         std::make_shared<potential::DataEAM>(potential::DataEAM{
+  //             {
+  //                 .debug = false,
+  //                 .symmetric = false,
+  //             },
+  //             std::ifstream{"data/hepburn.eam.fs"},
+  //         }),
+  //     },
+  // };
+
+  // system::SoA<Position &, PotentialGradient> mirror(cell.size());
+
+  // mirror.rebind(r_, cell);
+
+  // fmt::print("FoundMin?={}\n",
+  //            !timeit("Min", [&] { return minimiser.minimise(mirror, cell, pot, omp_get_max_threads()); }));
+
+  // saddle::Master mast{
+  //     {
+  //         .num_threads = omp_get_max_threads(),
+  //         .max_searches = 200,
+  //         .max_failed_searches = 75,
+  //         .debug = true,
+  //         .fout = &file,
+  //     },
+  //     cell.box(),
+  //     pot,
+  //     minimiser,
+  //     {
+  //         {.debug = true},
+  //         {.debug = true},
+  //         cell.box(),
+  //     },
+  // };
+
+  // env::Catalogue cat({});
+
+  // cat.rebuild(cell, omp_get_max_threads());
+
+  // mast.find_mechs(mast.package({432}, cat), cell);
+
+  // exit(0);
 
   double d_time = 0;
   int count = 0;

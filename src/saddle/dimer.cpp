@@ -91,6 +91,7 @@ namespace fly::saddle {
       }
 
       if (mag_g < m_opt.f2norm * m_opt.f2norm) {
+        dprint(m_opt.debug, "Dimer: Success\n");
         return success;
       } else if (convex_count >= m_opt.convex_max) {
         if (m_opt.debug) {

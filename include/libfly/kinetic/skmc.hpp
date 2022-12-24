@@ -68,6 +68,8 @@ namespace fly::kinetic {
       return false;
     }
 
+    std::reverse(ix.begin(), ix.end());
+
     int refines = 0;
 
     while (true) {
@@ -213,17 +215,19 @@ namespace fly::kinetic {
 
     neigh::List neigh_list(cell.box(), m_pot.r_cut());
 
+    auto energy = [&](system::SoA<Position const&> x) {
+      neigh_list.rebuild(x, num_threads);
+      return m_pot.energy(cell, neigh_list, num_threads);
+    };
+
     {  // Initial minimisation
       system::SoA<Position, PotentialGradient> out(cell.size());
       bool err = timeit("Minimise", [&] { return m_minimiser.minimise(out, cell, m_pot, num_threads); });
       cell[r_] = out[r_];
       verify(!err, "Minimiser failed");
-    }
 
-    auto energy = [&](system::SoA<Position const&> x) {
-      neigh_list.rebuild(x, num_threads);
-      return m_pot.energy(cell, neigh_list, num_threads);
-    };
+      dprint(m_opt.debug, "Minimised energy = {}eV\n", energy(cell));
+    }
 
     if (kinetic::update_cat(m_mast, m_cat, cell, num_threads)) {
       dump_cat();
@@ -256,7 +260,7 @@ namespace fly::kinetic {
 
         ///////////// Reconstruct mech /////////////
 
-        verify(!m.poison, "KMC chose a poisoned mechanisms with dE={}", m.barrier);
+        verify(!m.poison_fwd, "KMC chose a poisoned mechanisms with dE={}", m.barrier);
 
         double E0 = energy(cell);  // Energy before mechanism
 

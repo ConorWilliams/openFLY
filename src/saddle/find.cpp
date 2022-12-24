@@ -29,6 +29,7 @@
 #include <limits>
 #include <optional>
 #include <random>
+#include <thread>
 #include <utility>
 #include <vector>
 
@@ -104,25 +105,12 @@ namespace fly::saddle {
 
       // Need consistant random here.
 
-      Xoshiro tprng({
-          0b0100010000111101110011010101110011001100111111101010011101100100,
-          0b0101001110100101100101101101110010101101000111001011100010011010,
-          0b0001011011000111110001100100001011000100101011111011110110001000,
-          0b1000111010010011111010001001100001111100111001100000110100110001,
-      });
-
       system::SoA<Position, Axis, TypeID const&, Frozen const&> dim(in.size());
       dim.rebind(id_, in);
       dim.rebind(fzn_, in);
       dim[r_] = res.sp[r_];
-
-      std::normal_distribution<double> dist;
-      // Axis random and prop_to displacement.
-      for (int j = 0; j < in.size(); ++j) {
-        if (!in(fzn_, j)) {
-          dim(ax_, j) = Vec::NullaryExpr([&] { return dist(tprng); }) * gnorm_sq(res.sp(r_, j) - in(r_, j));
-        }
-      }
+      // Ensures Axis transforms with the symmetry
+      dim[ax_] = dim[r_] - in[r_];
       // ... and normalise.
       dim[ax_] /= gnorm(dim[ax_]);
 
@@ -264,6 +252,7 @@ namespace fly::saddle {
       for (std::size_t j = 0; j < geo_data.size(); ++j) {
 #pragma omp task untied default(none) firstprivate(j) shared(out, in, nl_pert, geo_data)
         {
+          fmt::print("FINDER: Searching @{:<4}\n", geo_data[j].centre);
           find_n(out[j], geo_data[j], in, nl_pert);
           fmt::print("FINDER: Done @{:<4} found {} mechs\n",
                      geo_data[j].centre,
@@ -325,7 +314,7 @@ namespace fly::saddle {
     int tot = 0;
     int fail = 0;
 
-    int mod = in(id_, geo_data.centre) == 1 ? 4 : 1;
+    int mod = in(id_, geo_data.centre) == 0 ? 1 : 4;
 
     while (tot < m_opt.max_searches * mod && fail < m_opt.max_failed_searches * mod) {
       //
@@ -404,20 +393,19 @@ namespace fly::saddle {
     }
   }
 
-  void Master::check_mech(Found& out,
-                          system::SoA<Position>& cache_slot,
-                          system::SoA<Position const&> dimer,
-                          env::Mechanism const& mech,
-                          std::size_t sym_indx,
-                          LocalisedGeo const& geo_data,
-                          SoA in) {
+  std::optional<system::SoA<Position>> Master::check_mech(Found& out,
+                                                          system::SoA<Position const&> dimer,
+                                                          env::Mechanism const& mech,
+                                                          std::size_t sym_indx,
+                                                          LocalisedGeo const& geo_data,
+                                                          SoA in) {
     bool fail;
 
 #pragma omp atomic read
     fail = out.m_fail;
 
     if (fail) {
-      return;
+      return {};
     }
 
     //
@@ -427,6 +415,7 @@ namespace fly::saddle {
       if (sym_indx == 0) {
 #pragma omp critical
         dump_recon(in, geo_data.centre, recon, dimer);
+
         throw error("First symmetry (identity) should be guaranteed to reconstruct");
       }
 
@@ -434,75 +423,101 @@ namespace fly::saddle {
       out.m_fail = true;
     };
 
-    if (!recon.rel_min || !recon.rel_sp) {
-      dprint(m_opt.debug,
-             "FINDER: @ symmetry #{} recon_relax()->[{},{}]\n",
-             sym_indx,
-             bool(recon.rel_min),
-             bool(recon.rel_sp));
-
-      set_fail_flag();
-      return;
-    }
-
-    centroid_align(*recon.rel_min, recon.min);
-    centroid_align(*recon.rel_sp, recon.sp);
+    // Common
 
     ThreadData& thr = thread();
 
     thr.pot_nl.rebuild(in);
     double E0 = thr.pot.energy(in, thr.pot_nl, 1);
 
+    // Check minima reconstructs.
+
+    if (!recon.rel_min) {
+      dprint(m_opt.debug, "FINDER: @ symmetry #{} recon_relax-min failied\n", sym_indx);
+      set_fail_flag();
+      return {};
+    }
+
+    centroid_align(*recon.rel_min, recon.min);
+
     thr.pot_nl.rebuild(*recon.rel_min);
     double Ef = thr.pot.energy(in, thr.pot_nl, 1);
+
+    double re_delta = Ef - E0;
+
+    double d_delta = std::abs(re_delta - mech.delta);
+
+    double frac_delta = d_delta / std::abs(mech.delta);
+
+    double err_fwd = gnorm((*recon.rel_min)[r_] - recon.min[r_]);
+
+    double d_fwd = std::abs(mech.err_fwd - err_fwd);
+
+    double frac_fwd = d_fwd / mech.err_fwd;
+
+    dprint(m_opt.debug,
+           "FINDER: Recon @{:>4} sym={:<2} Δ(ΔE)={:.3f} [{:.4f}], ΔR_min={:.3f} [{:.4f}]\n",
+           geo_data.centre,
+           sym_indx,
+           d_delta,
+           frac_delta,
+           d_fwd,
+           frac_fwd);
+
+    if ((d_delta > m_opt.recon_e_tol_abs && frac_delta > m_opt.recon_e_tol_frac)
+        || (frac_fwd > m_opt.recon_norm_frac_tol && d_fwd > m_opt.recon_norm_abs_tol)) {
+      set_fail_flag();
+      return {};
+    }
+
+    // Check SP reconstructs if expecting it to.
+
+    if (mech.poison_sp) {
+      dprint(m_opt.debug, "FINDER: @ symmetry #{} exiting from poison-sp\n", sym_indx);
+      return {};
+    }
+
+    if (!recon.rel_sp) {
+      dprint(m_opt.debug, "FINDER: @ symmetry #{} recon_relax-sp\n", sym_indx);
+      set_fail_flag();
+      return {};
+    }
+
+    centroid_align(*recon.rel_sp, recon.sp);
 
     thr.pot_nl.rebuild(*recon.rel_sp);
     double Esp = thr.pot.energy(in, thr.pot_nl, 1);
 
     double re_barrier = Esp - E0;
-    double re_delta = Ef - E0;
 
     double d_barrier = std::abs(re_barrier - mech.barrier);
-    double d_delta = std::abs(re_delta - mech.delta);
 
     double frac_barrier = d_barrier / std::abs(mech.barrier);
-    double frac_delta = d_delta / std::abs(mech.delta);
 
-    double err_fwd = gnorm((*recon.rel_min)[r_] - recon.min[r_]);
     double err_sp = gnorm((*recon.rel_sp)[r_] - recon.sp[r_]);
 
-    double d_fwd = std::abs(mech.err_fwd - err_fwd);
     double d_sp = std::abs(mech.err_sp - err_sp);
 
-    double frac_fwd = d_fwd / mech.err_fwd;
     double frac_sp = d_sp / mech.err_sp + err_sp;
 
     dprint(m_opt.debug,
-           "FINDER: Recon @{:>4} Δ(ΔE#)={:.3f} [{:.4f}] Δ(ΔE)={:.3f} [{:.4f}], ΔR_min={:.3f} [{:.4f}], "
-           "ΔR_sp={:.3f} [{:.4f}]\n",
+           "FINDER: Recon @{:>4} sym={:<2} Δ(ΔE#)={:.3f} [{:.4f}] ΔR_sp={:.3f} [{:.4f}]\n",
            geo_data.centre,
+           sym_indx,
            d_barrier,
            frac_barrier,
-           d_delta,
-           frac_delta,
-           d_fwd,
-           frac_fwd,
            d_sp,
            frac_sp);
 
-    if (d_barrier > m_opt.recon_e_tol_abs && frac_barrier > m_opt.recon_e_tol_frac) {
+    if ((d_barrier > m_opt.recon_e_tol_abs && frac_barrier > m_opt.recon_e_tol_frac)
+        || (frac_sp > m_opt.recon_norm_frac_tol && d_sp > m_opt.recon_norm_abs_tol)) {
       set_fail_flag();
-    } else if (d_delta > m_opt.recon_e_tol_abs && frac_delta > m_opt.recon_e_tol_frac) {
-      set_fail_flag();
-    } else if (frac_fwd > m_opt.recon_norm_frac_tol && d_fwd > m_opt.recon_norm_abs_tol) {
-      set_fail_flag();
-    } else if (frac_sp > m_opt.recon_norm_frac_tol && d_sp > m_opt.recon_norm_abs_tol) {
-      set_fail_flag();
+      return {};
     } else {
       if (m_count_frozen == 0) {
         centroid_align(*recon.rel_sp, in);
       }
-      cache_slot = std::move(*recon.rel_sp);
+      return std::move(recon.rel_sp);
     }
   }
 
@@ -514,7 +529,7 @@ namespace fly::saddle {
                           neigh::List const& nl_pert,
                           std::vector<system::SoA<Position>>& cache) {
     // Abort SPS if the cosine of the angle between the dimer and a known SP is greater than this.
-    double theta_tol = ((30 - 5) * std::exp(-0.02 * tot) + 5) / 360. * 2. * M_PI;
+    double theta_tol = ((30 - 2.5) * std::exp(-0.02 * tot) + 2.5) / 360. * 2. * M_PI;
 
     dprint(m_opt.debug, "FINDER: Theta tolerance = {}\n", theta_tol / 2. / M_PI * 360.);
 
@@ -560,14 +575,14 @@ namespace fly::saddle {
 
       // Found a new mechanism.
 
-      if (elem.mech->poison) {
+      if (elem.mech->poison_fwd) {
         dprint(m_opt.debug, "FINDER: caching poisoned\n");
         out.m_mechs.push_back(std::move(*elem.mech));
         cache.emplace_back(elem.dimer);
         continue;
       }
 
-      // Found a new non-poisoned mechanism.
+      // Found a new non-poisoned fowrard mechanism (sp may be poisoned).
 
       std::size_t num_new;
 
@@ -602,12 +617,32 @@ namespace fly::saddle {
 
       std::size_t n = cache.size();
 
-      cache.resize(n + num_new);
+      if (elem.mech->poison_sp) {
+        cache.emplace_back(elem.dimer);
+      } else {
+        cache.resize(n + num_new);
+      }
 
       for (std::size_t k = 0; k < num_new; k++) {
 #pragma omp task untied default(none) firstprivate(n, k, num_new) shared(out, in, cache, geo_data, elem)
-        check_mech(
-            out, cache[n + k], elem.dimer, out.m_mechs[out.m_mechs.size() - num_new + k], k, geo_data, in);
+        {
+          std::optional recon_sp
+              = check_mech(out, elem.dimer, out.m_mechs[out.m_mechs.size() - num_new + k], k, geo_data, in);
+
+          if (elem.mech->poison_sp) {
+            ASSERT(!recon_sp, "Logic error, check should have returned false", 0);
+          } else {
+            if (recon_sp) {
+              cache[n + k] = std::move(*recon_sp);
+            } else {
+              bool fail;
+#pragma omp atomic read
+              fail = out.m_fail;
+
+              ASSERT(fail, "Logic error if no recon_sp then fail should be set", 0);
+            }
+          }
+        }
       }
 #pragma omp taskwait
 
@@ -706,52 +741,64 @@ namespace fly::saddle {
 
     auto [re_min, re_sp, rel_min, rel_sp] = recon_relax(geo, mech, ref);
 
-    if (!rel_min || !rel_sp) {
-      dprint(m_opt.debug, "FINDER: Mech poisoned!\n");
-      mech.poison = true;
+    double const r_tol = m_opt.capture_r_tol;
+    double const e_tol = m_opt.capture_E_tol;
+
+    if (!rel_min) {
+      dprint(m_opt.debug, "FINDER: Mech min-poisoned, could not relax!\n");
+      mech.poison_fwd = true;
     } else {
       mech.err_fwd = gnorm((*rel_min)[r_] - re_min[r_]);
-      mech.err_sp = gnorm((*rel_sp)[r_] - re_sp[r_]);
 
-      dprint(m_opt.debug,
-             "FINDER: In-place reconstruct, unaligned: err_fwd={}, err_sp={}\n",
-             mech.err_fwd,
-             mech.err_sp);
+      dprint(m_opt.debug, "FINDER: In-place reconstruct, unaligned: err_fwd={}\n", mech.err_fwd);
 
       centroid_align(*rel_min, fwd);
-      centroid_align(*rel_sp, sp);
 
       thr.pot_nl.rebuild(*rel_min);
       double re_Ef = thr.pot.energy(in, thr.pot_nl, 1);
 
-      thr.pot_nl.rebuild(*rel_sp);
-      double re_Esp = thr.pot.energy(in, thr.pot_nl, 1);
-
       double err_fwd = gnorm((*rel_min)[r_] - fwd[r_]);
-      double err_sp = gnorm((*rel_sp)[r_] - sp[r_]);
 
-      double r_tol = m_opt.capture_r_tol;
-      double e_tol = m_opt.capture_E_tol;
-
-      double del_Esp = std::abs(re_Esp - Esp);
       double del_Efwd = std::abs(re_Ef - Ef);
 
-      dprint(m_opt.debug,
-             "FINDER: In-place reconstruct: err_fwd={} err_sp={} dEsp={} dEfwd={}\n",
-             err_fwd,
-             err_sp,
-             del_Esp,
-             del_Efwd);
+      dprint(m_opt.debug, "FINDER: In-place reconstruct, aligned: err_fwd={} dEfwd={}\n", err_fwd, del_Efwd);
 
-      if (err_fwd > r_tol || err_sp > r_tol || del_Efwd > e_tol || del_Esp > e_tol) {
-        dprint(m_opt.debug, "FINDER: Mech poisoned!\n");
-        mech.poison = true;
+      if (err_fwd > r_tol || del_Efwd > e_tol) {
+        dprint(m_opt.debug, "FINDER: Mech min-poisoned!\n");
+        mech.poison_fwd = true;
       } else {
-        mech.poison = false;
+        mech.poison_fwd = false;
       }
     }
 
-    if (mech.poison && mech.barrier < 1.) {
+    if (!rel_sp) {
+      dprint(m_opt.debug, "FINDER: Mech sp-poisoned, could not relax!\n");
+      mech.poison_sp = true;
+    } else {
+      mech.err_sp = gnorm((*rel_sp)[r_] - re_sp[r_]);
+
+      dprint(m_opt.debug, "FINDER: In-place reconstruct, unaligned: err_sp={}\n", mech.err_sp);
+
+      centroid_align(*rel_sp, sp);
+
+      thr.pot_nl.rebuild(*rel_sp);
+      double re_Esp = thr.pot.energy(in, thr.pot_nl, 1);
+
+      double err_sp = gnorm((*rel_sp)[r_] - sp[r_]);
+
+      double del_Esp = std::abs(re_Esp - Esp);
+
+      dprint(m_opt.debug, "FINDER: In-place reconstruct, aligned: err_sp={} dEsp={}\n", err_sp, del_Esp);
+
+      if (err_sp > r_tol || del_Esp > e_tol) {
+        dprint(m_opt.debug, "FINDER: Mech sp-poisoned!\n");
+        mech.poison_sp = true;
+      } else {
+        mech.poison_sp = false;
+      }
+    }
+
+    if (mech.poison_fwd && mech.barrier < 1.) {
 #pragma omp critical
       {
         fly::io::BinaryFile file("poison.gsd", fly::io::create);
@@ -787,9 +834,6 @@ namespace fly::saddle {
                   mech.barrier,
                   mech.err_sp,
                   mech.err_fwd);
-
-      //   mech.barrier)
-      //   verify(mech.barrier > 2., );
     }
 
     //////////////// Partial hessian compute. ////////////////
@@ -1087,26 +1131,53 @@ namespace fly::saddle {
 
     double min_d_sp = std::numeric_limits<double>::max();
     double min_d_fwd = std::numeric_limits<double>::max();
+    double min_d_theta = std::numeric_limits<double>::max();
 
     for (env::Mechanism const& m : hist) {
-      //
+      if (double dE = std::abs((m.barrier - maybe.barrier) / m.barrier); dE < 0.01) {
+        //
+        double d_sp = env::rmsd<Delta>(maybe.delta_sp, m.delta_sp);
+        double d_fwd = env::rmsd<Delta>(maybe.delta_fwd, m.delta_fwd);
 
-      double d_sp = env::rmsd<Delta>(maybe.delta_sp, m.delta_sp);
-      double d_fwd = env::rmsd<Delta>(maybe.delta_fwd, m.delta_fwd);
+        double dot = 0;
+        double n1 = 0;
+        double n2 = 0;
 
-      if (d_sp < m_opt.mech_tol && d_fwd < m_opt.mech_tol) {
-        dprint(m_opt.debug, "FINDER: Mech is NOT new, distance: old-sp={:.5f} old-min={:.5f}\n", d_sp, d_fwd);
-        return false;
+        for (Eigen::Index i = 0; i < m.delta_sp.size(); ++i) {
+          n1 += gnorm_sq(maybe.delta_sp[i][del_]);
+          n2 += gnorm_sq(m.delta_sp[i][del_]);
+          dot += gdot(maybe.delta_sp[i][del_], m.delta_sp[i][del_]);
+        }
+
+        n1 = std::sqrt(n1);
+        n2 = std::sqrt(n2);
+
+        double theta = std::acos(dot / (n1 * n2)) / (2 * M_PI) * 360;
+
+        if (d_sp < m_opt.mech_tol && d_fwd < m_opt.mech_tol && theta < 10) {
+          dprint(m_opt.debug,
+                 "FINDER: Mech is NOT new, distance: old-sp={:.3f} old-min={:.3f}, theta={:.1f}, n1={:.3f}, "
+                 "n2={:.3f}, f_ddEsp={}\n",
+                 d_sp,
+                 d_fwd,
+                 theta,
+                 n1,
+                 n2,
+                 dE);
+          return false;
+        }
+
+        min_d_sp = std::min(min_d_sp, d_sp);
+        min_d_fwd = std::min(min_d_fwd, d_fwd);
+        min_d_theta = std::min(min_d_theta, theta);
       }
-
-      min_d_sp = std::min(min_d_sp, d_sp);
-      min_d_fwd = std::min(min_d_fwd, d_fwd);
     }
 
     dprint(m_opt.debug,
-           "FINDER: Mech is new, min distance: old-sp={:.5f} old-min={:.5f}\n",
+           "FINDER: Mech is new, min distance: old-sp={:.3e} old-min={:.3e}, theta-min={:.1e}\n",
            min_d_sp,
-           min_d_fwd);
+           min_d_fwd,
+           min_d_theta);
     return true;
   }
 

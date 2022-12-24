@@ -48,7 +48,9 @@ namespace fly::env {
 
     double err_fwd = std::numeric_limits<double>::max();  ///< Forward reconstruction error.
     double err_sp = std::numeric_limits<double>::max();   ///< Saddle point reconstruction error.
-    bool poison = false;                                  ///< If true this mechanism cannot be reconstructed.
+
+    bool poison_sp = false;   ///< If true this mechanism's SP cannot be reconstructed.
+    bool poison_fwd = false;  ///< If true this mechanism's final state cannot be reconstructed.
 
     system::VoS<Delta> delta_sp;   ///< Displacement vectors from initial to saddle-point.
     system::VoS<Delta> delta_fwd;  ///< Displacement vectors from initial to final.
@@ -58,7 +60,7 @@ namespace fly::env {
      */
     template <class Archive>
     void serialize(Archive& archive) {
-      archive(barrier, delta, kinetic_pre, err_fwd, err_sp, poison, delta_sp, delta_fwd);
+      archive(barrier, delta, kinetic_pre, err_fwd, err_sp, poison_sp, poison_fwd, delta_sp, delta_fwd);
     }
   };
 

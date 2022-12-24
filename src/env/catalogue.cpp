@@ -284,7 +284,8 @@ namespace fly::env {
         fmt::print("Key {} has {} envs\n", k, v.size());
 
         for (auto const &e : v) {
-          fmt::print("\t Env #{} with freq={} false_pos={}\n", e.cat_index(), e.m_freq, e.m_false_pos);
+          fmt::print(
+              "\t Env #{:<4} with freq={:<9} false_pos={:<9}\n", e.cat_index(), e.m_freq, e.m_false_pos);
         }
       }
     }

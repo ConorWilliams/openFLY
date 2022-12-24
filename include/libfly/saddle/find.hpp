@@ -112,7 +112,7 @@ namespace fly::saddle {
       /**
        * @brief Tolerance for mechanisms to be considered distinct.
        */
-      double mech_tol = 0.25;
+      double mech_tol = 0.1;
       /**
        * @brief Tolerance for stationary points to be considered distinct.
        */
@@ -376,16 +376,13 @@ namespace fly::saddle {
     //////////////////////////////////////////////
 
     /**
-     * @brief Check a reconstructed mechanism is within tolerances, if it is cache the SP if not set out's
-     * fail flag and do not cache.
      */
-    void check_mech(Found& out,
-                    system::SoA<Position>& cache_slot,
-                    system::SoA<Position const&> dimer,
-                    env::Mechanism const& mech,
-                    std::size_t sym_num,
-                    LocalisedGeo const& geo_data,
-                    SoA in);
+    std::optional<system::SoA<Position>> check_mech(Found& out,
+                                                    system::SoA<Position const&> dimer,
+                                                    env::Mechanism const& mech,
+                                                    std::size_t sym_num,
+                                                    LocalisedGeo const& geo_data,
+                                                    SoA in);
 
     // Compute m_deg_free and m_log_prod_eigen.
     void calc_minima_hess(SoA in);

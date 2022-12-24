@@ -102,7 +102,7 @@ TEST_CASE("EAM compute", "[potential]") {
 
   if (eam_tab.good()) {
     //
-    auto data = std::make_shared<potential::DataEAM>(std::move(eam_tab));
+    auto data = std::make_shared<potential::DataEAM>(potential::DataEAM{{}, std::move(eam_tab)});
 
     system::Supercell cell = make_super();
 
@@ -152,7 +152,7 @@ TEST_CASE("EAM hess", "[potential]") {
 
   if (eam_tab.good()) {
     //
-    auto data = std::make_shared<potential::DataEAM>(std::move(eam_tab));
+    auto data = std::make_shared<potential::DataEAM>(potential::DataEAM::Options{}, std::move(eam_tab));
 
     system::Supercell cell = make_super(false);
 

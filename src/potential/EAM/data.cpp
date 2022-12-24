@@ -4,13 +4,16 @@
 
 // This file is part of openFLY.
 
-// OpenFLY is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License
-// as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+// OpenFLY is free software: you can redistribute it and/or modify it under the terms of the GNU General
+// Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
+// option) any later version.
 
-// OpenFLY is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
-// warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+// OpenFLY is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the
+// implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+// for more details.
 
-// You should have received a copy of the GNU General Public License along with openFLY. If not, see <https://www.gnu.org/licenses/>.
+// You should have received a copy of the GNU General Public License along with openFLY. If not, see
+// <https://www.gnu.org/licenses/>.
 
 #include "libfly/potential/EAM/data.hpp"
 
@@ -61,7 +64,7 @@ namespace fly::potential {
     return raw;
   }
 
-  DataEAM::DataEAM(std::ifstream in) {
+  DataEAM::DataEAM(Options const& opt, std::ifstream in) {
     //
     verify(in.good(), "Could not open eam in");
 
@@ -102,22 +105,27 @@ namespace fly::potential {
     // // Parse tabulation info
     getline(in) >> numP >> delP >> numR >> delR >> m_rcut;
 
+    dprint(opt.debug, "EAM: NumP={}, NumR={}\n", numP, numR);
+
     for (std::size_t i = 0; i < m_n; ++i) {
       {  // Read species info
         std::size_t atomic;
         double mass;
         getline(in) >> atomic >> mass;
 
-        // fmt::print("set mass of id={} to {}", i, )
+        dprint(opt.debug, "Set mass of id={} to {}\n", i, mass);
 
         tmap.set(std::uint32_t(i), m_, mass);
       }
+
+      dprint(opt.debug, "Read f_{}\n", i);
 
       // Read F
       m_f[i] = Spline{read_chunked(in, numP, 5), delP};
 
       // Read phi
       for (std::size_t j = 0; j < m_n; ++j) {
+        dprint(opt.debug, "Read phi_{},{}\n", i, j);
         m_phi[index(i, j)] = Spline{read_chunked(in, numR, 5), delR};
       }
     }
@@ -127,7 +135,9 @@ namespace fly::potential {
     for (std::size_t i = 0; i < m_n; ++i) {
       for (std::size_t j = 0; j <= i; ++j) {
         //
-        std::vector raw = read_chunked(in, numP, 5);
+        dprint(opt.debug, "Read V_{},{}\n", i, j);
+
+        std::vector raw = read_chunked(in, numR, 5);
 
         for (std::size_t k = 0; k < raw.size(); k++) {
           raw[k] /= delR * static_cast<double>(k);

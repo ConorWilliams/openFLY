@@ -101,13 +101,13 @@ add_executable(skmcFLY apps/skmc.cpp)
 target_compile_features(skmcFLY PRIVATE cxx_std_17)
 target_link_libraries(skmcFLY PRIVATE libFLY)
 
-add_executable(geoFLY apps/geo.cpp)
-target_compile_features(geoFLY PRIVATE cxx_std_17)
-target_link_libraries(geoFLY PRIVATE libFLY Nauty)
+add_executable(skmcFLY2 apps/skmcC.cpp)
+target_compile_features(skmcFLY2 PRIVATE cxx_std_17)
+target_link_libraries(skmcFLY2 PRIVATE libFLY Nauty)
 
-add_executable(benchFLY apps/bench.cpp)
-target_compile_features(benchFLY PRIVATE cxx_std_17)
-target_link_libraries(benchFLY PRIVATE libFLY)
+# add_executable(benchFLY apps/bench.cpp)
+# target_compile_features(benchFLY PRIVATE cxx_std_17)
+# target_link_libraries(benchFLY PRIVATE libFLY)
 
 # Dev mode
 if(FLY_DEVELOPER_MODE)

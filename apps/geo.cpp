@@ -51,8 +51,8 @@ system::Supercell<system::TypeMap<>, PotentialGradient, Position, Frozen, Hash> 
       {0.000000, 0.000000, 2.855300},
   };
 
-  system::Supercell motif
-      = system::make_supercell<PotentialGradient, Position, Frozen, Hash>({basis, Arr<bool>::Constant(true)}, FeH, 2);
+  system::Supercell motif = system::make_supercell<PotentialGradient, Position, Frozen, Hash>(
+      {basis, Arr<bool>::Constant(true)}, FeH, 2);
 
   motif[fzn_] = false;
   motif[id_] = 0;
@@ -92,11 +92,13 @@ int main() {
   potential::Generic pot{
       potential::EAM{
           cell.map(),
-          std::make_shared<potential::DataEAM>(std::ifstream{"data/wen.eam.fs"}),
+          std::make_shared<potential::DataEAM>(potential::DataEAM::Options{},
+                                               std::ifstream{"data/wen.eam.fs"}),
       },
   };
 
-  fmt::print("FoundMin?={}\n", !timeit("Minimise", [&] { return minimiser.minimise(cell, cell, pot, omp_get_max_threads()); }));
+  fmt::print("FoundMin?={}\n",
+             !timeit("Minimise", [&] { return minimiser.minimise(cell, cell, pot, omp_get_max_threads()); }));
 
   env::Catalogue cat({.delta_max = 100000, .debug = false});
 
@@ -111,21 +113,23 @@ int main() {
   fly::io::BinaryFile fout("build/gsd/geo.gsd", fly::io::create);
 
   fout.commit([&] {
-    fout.write(cell.box());                                                 //< Write the box to frame 0.
-    fout.write(cell.map());                                                 //< Write the map to frame 0.
-    fout.write("particles/N", fly::safe_cast<std::uint32_t>(cell.size()));  //< Write the number of atoms to frame 0.
-    fout.write(fly::id_, cell);                                             //< Write the TypeID's of the atoms to frame 0.
-    fout.write(fly::r_, cell);                                              //< Write the TypeID's of the atoms to frame 0.
-    fout.write(fly::hash_, cell);                                           //< Write the TypeID's of the atoms to frame 0.
+    fout.write(cell.box());  //< Write the box to frame 0.
+    fout.write(cell.map());  //< Write the map to frame 0.
+    fout.write("particles/N",
+               fly::safe_cast<std::uint32_t>(cell.size()));  //< Write the number of atoms to frame 0.
+    fout.write(fly::id_, cell);                              //< Write the TypeID's of the atoms to frame 0.
+    fout.write(fly::r_, cell);                               //< Write the TypeID's of the atoms to frame 0.
+    fout.write(fly::hash_, cell);                            //< Write the TypeID's of the atoms to frame 0.
   });
 
   // ////////////////////// find 2 ////////////////////////
 
   fly::io::BinaryFile dout("build/gsd/finder.gsd", fly::io::create);
 
-  dout.write(cell.box());                                                 //< Write the box to frame 0.
-  dout.write(cell.map());                                                 //< Write the map to frame 0.
-  dout.write("particles/N", fly::safe_cast<std::uint32_t>(cell.size()));  //< Write the number of atoms to frame 0.
+  dout.write(cell.box());  //< Write the box to frame 0.
+  dout.write(cell.map());  //< Write the map to frame 0.
+  dout.write("particles/N",
+             fly::safe_cast<std::uint32_t>(cell.size()));  //< Write the number of atoms to frame 0.
   dout.write(fly::id_, cell);
   dout.write(fly::r_, cell);
   dout.commit();

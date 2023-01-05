@@ -10,7 +10,7 @@ on:
       - main
 
 jobs:
-  test_big_3:
+  test_linux:
     strategy:
       fail-fast: false
       matrix:
@@ -95,7 +95,7 @@ jobs:
 
   docs:
     # Deploy docs only when builds succeed
-    needs: [test_big_3, test_intel]
+    needs: [test_linux, test_intel]
 
     runs-on: ubuntu-latest
 

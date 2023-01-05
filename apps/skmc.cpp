@@ -76,7 +76,7 @@ fly::system::SoA<TypeID, Position> explicit_V(std::vector<Vec> const &vac,
   fly::system::SoA<TypeID, Position> special(cell.size() + fly::ssize(vac));
 
   special[id_].head(cell.size()) = cell[id_];  // Copy cells types
-  special[id_].tail(fly::ssize(vac)) = 2;      // TypeID for vacacies == 2
+  special[id_].tail(fly::ssize(vac)) = 2;      // TypeID for vacancies == 2
 
   special[r_].head(cell[r_].size()) = cell[r_];
 
@@ -90,8 +90,7 @@ fly::system::SoA<TypeID, Position> explicit_V(std::vector<Vec> const &vac,
 }
 
 struct Result {
-  double v_v;  ///< The maximum of the V-V neighrest-neighbour distances. E.G for each vacancy compute the
-               ///< distance to its closest neighbour then v_v is the maximum of these.
+  double v_v;  ///< The maximum of the V-V nearest-neighbour distances.
   double v_h;  ///< The minimum V-H distance.
 };
 
@@ -131,7 +130,7 @@ int main() {
 
   DetectVacancies detect(4, perfect.box(), perfect);
 
-  system::Supercell cell = remove_atoms(perfect, {1});
+  system::Supercell cell = remove_atoms(perfect, {1, 2, 3});
 
   Vec r_H = {2.857 / 2 + 3.14, 2.857 / 2 + 3.14, 2.857 / 4 + 3.14};
 
@@ -170,13 +169,13 @@ int main() {
   kinetic::SKMC runner = {
       {
           .debug = true,
-          .fread = "build/gsd/tmp.bin",
+          .fread = "build/gsd/cat.v3.bin",
           .opt_cache = {
               .barrier_tol = 0.45,
               .debug = true,
               .opt_basin = {
                   .debug = true,
-                  .temp = 300,
+                  .temp = 500,
               },
               .opt_sb = {
                   .debug = true,
@@ -220,11 +219,13 @@ int main() {
 
   runner.skmc(cell,
               omp_get_max_threads(),
-              [&](double time,                        ///< Total time just after system at post
-                  system::SoA<Position const &> pre,  ///< State just before mech applied
-                  int atom,                           ///< Index of central atom of mechanism
-                  env::Mechanism const &mech,         ///< Chosen mechanism
-                  system::SoA<Position const &> post  ///< Final state of system after this iteration / mech
+              [&](double time,                         ///< Total time just after system at post
+                  system::SoA<Position const &> pre,   ///< State just before mech applied
+                  double E0,                           ///< Energy of the system in state pre.
+                  int atom,                            ///< Index of central atom of mechanism
+                  env::Mechanism const &mech,          ///< Chosen mechanism
+                  system::SoA<Position const &> post,  ///< Final state of system after this iteration / mech
+                  double Ef                            ///< Energy of system in state post.
               ) {
                 //
                 d_time = time;

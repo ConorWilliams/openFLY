@@ -125,7 +125,7 @@ namespace fly::kinetic {
   }
 
   /**
-   * @brief Coordinate the running of a OLKMC simulation.
+   * @brief Coordinate the running of an OLKMC simulation.
    */
   class SKMC {
   public:
@@ -156,7 +156,13 @@ namespace fly::kinetic {
     };
 
     /**
-     * @brief Construct a new SKMC object.
+     * @brief Construct a new SKMC object
+     *
+     * @param opt The configuration options.
+     * @param box The simulation box that the simulation is contained within.
+     * @param min The minimiser, used for minimisation during saddle-point searches and for relaxing the cell.
+     * @param pot Potential energy function.
+     * @param dimer For saddle-point searches.
      */
     SKMC(Options const& opt,
          system::Box const& box,
@@ -186,11 +192,20 @@ namespace fly::kinetic {
     }
 
     /**
-     * @brief
+     * @brief Run an OLKMC simulation starting with ''cell''.
      *
-     * @param cell
-     * @param num_threads
-     * @param f
+     * \rst
+     *
+     * Example:
+     *
+     * .. include:: ../../examples/kinetic/skmc.cpp
+     *    :code:
+     *
+     * \endrst
+     *
+     * @param cell The initial state of the simulation.
+     * @param num_threads The number of (openMP) threads to use.
+     * @param f The callback which determines the stopping criterion, see example above/below.
      */
     template <typename Map, typename... T, typename F>
     auto skmc(system::Supercell<Map, T...> const& cell, int num_threads, F const& f) -> void;
@@ -324,7 +339,8 @@ namespace fly::kinetic {
 
         time += dt;
 
-        stop = std::invoke(f, time, std::as_const(cell), atom, m, system::SoA<Position const&>{rel_recon});
+        stop = std::invoke(
+            f, time, std::as_const(cell), E0, atom, m, system::SoA<Position const&>{rel_recon}, Ef);
 
         cell[r_] = rel_recon[r_];
 

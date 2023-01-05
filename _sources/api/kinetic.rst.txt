@@ -3,7 +3,7 @@ Kinetics
 
 Directory: ``libfly/kinetic``
 
-The ``kinetic`` folder contains a data-structures and algorithms for choosing mechanisms according to the KMC and Super-KMC algorithms. Everything is contained within the namespace ``fly::kinetic``
+The ``kinetic`` folder contains a data-structures and algorithms for choosing mechanisms according to the KMC and Super-KMC algorithms. Everything is contained within the namespace ``fly::kinetic``.
 
 Basins
 ---------------------------------------
@@ -46,5 +46,18 @@ File: ``libfly/kinetic/cache.hpp``
     :sections: briefdescription detaileddescription
 
 .. doxygenclass:: fly::kinetic::SuperCache
+    :members:
+    :undoc-members:
+
+
+Super kinetic Monte Carlo
+--------------------------------
+
+File: ``libfly/kinetic/skmc.hpp``
+
+.. doxygenfile:: libfly/kinetic/skmc.hpp
+    :sections: briefdescription detaileddescription
+
+.. doxygenclass:: fly::kinetic::SKMC
     :members:
     :undoc-members:

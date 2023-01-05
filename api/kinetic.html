@@ -5,10 +5,10 @@
     <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 <link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="Changelog" href="../ChangeLog-stub.html" /><link rel="prev" title="Saddle-points" href="saddle.html" />
 
-    <link rel="shortcut icon" href="../_static/favicon.ico"/><meta name="generator" content="sphinx-5.3.0, furo 2022.09.29"/>
+    <link rel="shortcut icon" href="../_static/favicon.ico"/><!-- Generated with Sphinx 5.3.0 and Furo 2022.12.07 -->
         <title>Kinetics - OpenFLY documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?digest=d81277517bee4d6b0349d71bb2661d4890b5617c" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?digest=91d0f0d1c444bdcb17a68e833c7a53903343c195" />
     <link rel="stylesheet" type="text/css" href="../_static/tabs.css" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?digest=30d1aed668e5c3a91c3e3bf6a60b675221979f0e" />
@@ -155,7 +155,7 @@
   
   
 </a><form class="sidebar-search-container" method="get" action="../search.html" role="search">
-  <input class="sidebar-search" placeholder=Search name="q" aria-label="Search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
   <input type="hidden" name="check_keywords" value="yes">
   <input type="hidden" name="area" value="default">
 </form>
@@ -237,7 +237,7 @@
           <section id="kinetics">
 <h1>Kinetics<a class="headerlink" href="#kinetics" title="Permalink to this heading">#</a></h1>
 <p>Directory: <code class="docutils literal notranslate"><span class="pre">libfly/kinetic</span></code></p>
-<p>The <code class="docutils literal notranslate"><span class="pre">kinetic</span></code> folder contains a data-structures and algorithms for choosing mechanisms according to the KMC and Super-KMC algorithms. Everything is contained within the namespace <code class="docutils literal notranslate"><span class="pre">fly::kinetic</span></code></p>
+<p>The <code class="docutils literal notranslate"><span class="pre">kinetic</span></code> folder contains a data-structures and algorithms for choosing mechanisms according to the KMC and Super-KMC algorithms. Everything is contained within the namespace <code class="docutils literal notranslate"><span class="pre">fly::kinetic</span></code>.</p>
 <section id="basins">
 <h2>Basins<a class="headerlink" href="#basins" title="Permalink to this heading">#</a></h2>
 <p>File: <code class="docutils literal notranslate"><span class="pre">libfly/kinetic/basin.hpp</span></code></p>
@@ -660,6 +660,139 @@
 </dd></dl>
 
 </section>
+<section id="super-kinetic-monte-carlo">
+<h2>Super kinetic Monte Carlo<a class="headerlink" href="#super-kinetic-monte-carlo" title="Permalink to this heading">#</a></h2>
+<p>File: <code class="docutils literal notranslate"><span class="pre">libfly/kinetic/skmc.hpp</span></code></p>
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv4N3fly7kinetic4SKMCE">
+<span id="_CPPv3N3fly7kinetic4SKMCE"></span><span id="_CPPv2N3fly7kinetic4SKMCE"></span><span id="fly::kinetic::SKMC"></span><span class="target" id="classfly_1_1kinetic_1_1SKMC"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SKMC</span></span></span><a class="headerlink" href="#_CPPv4N3fly7kinetic4SKMCE" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Coordinate the running of an OLKMC simulation. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3fly7kinetic4SKMC4SKMCERK7OptionsRKN6system3BoxERKN8minimise5LBFGSERKN9potential7GenericERKN6saddle5DimerE">
+<span id="_CPPv3N3fly7kinetic4SKMC4SKMCERK7OptionsRKN6system3BoxERKN8minimise5LBFGSERKN9potential7GenericERKN6saddle5DimerE"></span><span id="_CPPv2N3fly7kinetic4SKMC4SKMCERK7OptionsRKN6system3BoxERKN8minimise5LBFGSERKN9potential7GenericERKN6saddle5DimerE"></span><span id="fly::kinetic::SKMC::SKMC__OptionsCR.system::BoxCR.minimise::LBFGSCR.potential::GenericCR.saddle::DimerCR"></span><span class="target" id="classfly_1_1kinetic_1_1SKMC_1a796eaaf100b03455c0b319a63a8a6257"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SKMC</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N3fly7kinetic4SKMC7OptionsE" title="fly::kinetic::SKMC::Options"><span class="n"><span class="pre">Options</span></span></a><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">opt</span></span>, <span class="n"><span class="pre">system</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="system.html#_CPPv4N3fly6system3BoxE" title="fly::system::Box"><span class="n"><span class="pre">Box</span></span></a><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">box</span></span>, <span class="n"><span class="pre">minimise</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="minimise.html#_CPPv4N3fly8minimise5LBFGSE" title="fly::minimise::LBFGS"><span class="n"><span class="pre">LBFGS</span></span></a><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">min</span></span>, <span class="n"><span class="pre">potential</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="potential.html#_CPPv4N3fly9potential7GenericE" title="fly::potential::Generic"><span class="n"><span class="pre">Generic</span></span></a><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">pot</span></span>, <span class="n"><span class="pre">saddle</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="saddle.html#_CPPv4N3fly6saddle5DimerE" title="fly::saddle::Dimer"><span class="n"><span class="pre">Dimer</span></span></a><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">dimer</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3fly7kinetic4SKMC4SKMCERK7OptionsRKN6system3BoxERKN8minimise5LBFGSERKN9potential7GenericERKN6saddle5DimerE" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Construct a new <a class="reference internal" href="#classfly_1_1kinetic_1_1SKMC"><span class="std std-ref">SKMC</span></a> object. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>opt</strong> – The configuration options. </p></li>
+<li><p><strong>box</strong> – The simulation box that the simulation is contained within. </p></li>
+<li><p><strong>min</strong> – The minimiser, used for minimisation during saddle-point searches and for relaxing the cell. </p></li>
+<li><p><strong>pot</strong> – Potential energy function. </p></li>
+<li><p><strong>dimer</strong> – For saddle-point searches. </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0Dp0EN3fly7kinetic4SKMC4skmcEvRKN6system9SupercellI3MapDp1TEEiRK1F">
+<span id="_CPPv3I0Dp0EN3fly7kinetic4SKMC4skmcERKN6system9SupercellI3MapDp1TEEiRK1F"></span><span id="_CPPv2I0Dp0EN3fly7kinetic4SKMC4skmcERKN6system9SupercellI3MapDp1TEEiRK1F"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Map</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">F</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classfly_1_1kinetic_1_1SKMC_1a43f74ce567d3110eedef520f787025d2"></span><span class="kt"><span class="pre">auto</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">skmc</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">system</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="system.html#_CPPv4I0DpEN3fly6system9SupercellE" title="fly::system::Supercell"><span class="n"><span class="pre">Supercell</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0Dp0EN3fly7kinetic4SKMC4skmcEvRKN6system9SupercellI3MapDp1TEEiRK1F" title="fly::kinetic::SKMC::skmc::Map"><span class="n"><span class="pre">Map</span></span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0Dp0EN3fly7kinetic4SKMC4skmcEvRKN6system9SupercellI3MapDp1TEEiRK1F" title="fly::kinetic::SKMC::skmc::T"><span class="n"><span class="pre">T</span></span></a><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">cell</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">num_threads</span></span>, <a class="reference internal" href="#_CPPv4I0Dp0EN3fly7kinetic4SKMC4skmcEvRKN6system9SupercellI3MapDp1TEEiRK1F" title="fly::kinetic::SKMC::skmc::F"><span class="n"><span class="pre">F</span></span></a><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">f</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="o"><span class="pre">-&gt;</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><a class="headerlink" href="#_CPPv4I0Dp0EN3fly7kinetic4SKMC4skmcEvRKN6system9SupercellI3MapDp1TEEiRK1F" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Run an OLKMC simulation starting with ‘’cell’’. </p>
+<p><p>Example:</p>
+<div class="code highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;libfly/kinetic/skmc.hpp&quot;</span>
+
+<span class="k">using</span><span class="w"> </span><span class="k">namespace</span><span class="w"> </span><span class="nn">fly</span><span class="p">;</span>
+
+<span class="kt">void</span><span class="w"> </span><span class="nf">example_skmc</span><span class="p">(</span><span class="n">system</span><span class="o">::</span><span class="n">Supercell</span><span class="o">&lt;</span><span class="n">system</span><span class="o">::</span><span class="n">TypeMap</span><span class="o">&lt;&gt;</span><span class="p">,</span><span class="w"> </span><span class="n">Position</span><span class="p">,</span><span class="w"> </span><span class="n">Frozen</span><span class="o">&gt;</span><span class="w"> </span><span class="n">cell</span><span class="p">,</span>
+<span class="w">                  </span><span class="n">potential</span><span class="o">::</span><span class="n">Generic</span><span class="w"> </span><span class="n">potential_func</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="c1">// Construct am SKMC object with some non-default options.</span>
+<span class="w">  </span><span class="n">kinetic</span><span class="o">::</span><span class="n">SKMC</span><span class="w"> </span><span class="n">runner</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="p">{</span>
+<span class="w">          </span><span class="p">.</span><span class="n">debug</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">true</span><span class="p">,</span>
+<span class="w">          </span><span class="p">.</span><span class="n">opt_cache</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
+<span class="w">              </span><span class="p">.</span><span class="n">debug</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">true</span><span class="p">,</span>
+<span class="w">              </span><span class="p">.</span><span class="n">opt_basin</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                  </span><span class="p">.</span><span class="n">debug</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">true</span><span class="p">,</span>
+<span class="w">                  </span><span class="p">.</span><span class="n">temp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">500</span><span class="p">,</span><span class="w"> </span><span class="c1">///&lt; Set the temperature of the simulation</span>
+<span class="w">              </span><span class="p">},</span>
+<span class="w">              </span><span class="p">.</span><span class="n">opt_sb</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                  </span><span class="p">.</span><span class="n">debug</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">true</span><span class="p">,</span>
+<span class="w">              </span><span class="p">},</span>
+<span class="w">          </span><span class="p">},</span>
+<span class="w">          </span><span class="p">.</span><span class="n">opt_master</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{},</span>
+<span class="w">      </span><span class="p">},</span>
+<span class="w">      </span><span class="n">cell</span><span class="p">.</span><span class="n">box</span><span class="p">(),</span>
+<span class="w">      </span><span class="p">{</span><span class="w"> </span><span class="p">{},</span><span class="w"> </span><span class="n">cell</span><span class="p">.</span><span class="n">box</span><span class="p">()</span><span class="w"> </span><span class="p">},</span>
+<span class="w">      </span><span class="n">potential_func</span><span class="p">,</span>
+<span class="w">      </span><span class="p">{</span><span class="w"> </span><span class="p">{},</span><span class="w"> </span><span class="p">{},</span><span class="w"> </span><span class="n">cell</span><span class="p">.</span><span class="n">box</span><span class="p">()</span><span class="w"> </span><span class="p">},</span>
+<span class="w">  </span><span class="p">};</span>
+
+<span class="w">  </span><span class="c1">// Run an OLKMC simulation using the runner object.</span>
+<span class="w">  </span><span class="n">runner</span><span class="p">.</span><span class="n">skmc</span><span class="p">(</span><span class="n">cell</span><span class="p">,</span>
+<span class="w">              </span><span class="n">omp_get_max_threads</span><span class="p">(),</span>
+<span class="w">              </span><span class="p">[</span><span class="o">&amp;</span><span class="p">](</span><span class="kt">double</span><span class="w"> </span><span class="n">time</span><span class="p">,</span><span class="w">                         </span><span class="c1">///&lt; Total time just after system at post.</span>
+<span class="w">                  </span><span class="n">system</span><span class="o">::</span><span class="n">SoA</span><span class="o">&lt;</span><span class="n">Position</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="o">&amp;&gt;</span><span class="w"> </span><span class="n">pre</span><span class="p">,</span><span class="w">   </span><span class="c1">///&lt; State just before mech applied.</span>
+<span class="w">                  </span><span class="kt">double</span><span class="w"> </span><span class="n">E0</span><span class="p">,</span><span class="w">                           </span><span class="c1">///&lt; Energy of the system in state pre.</span>
+<span class="w">                  </span><span class="kt">int</span><span class="w"> </span><span class="n">atom</span><span class="p">,</span><span class="w">                            </span><span class="c1">///&lt; Index of central atom of mechanism.</span>
+<span class="w">                  </span><span class="n">env</span><span class="o">::</span><span class="n">Mechanism</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="o">&amp;</span><span class="n">mech</span><span class="p">,</span><span class="w">          </span><span class="c1">///&lt; Chosen mechanism.</span>
+<span class="w">                  </span><span class="n">system</span><span class="o">::</span><span class="n">SoA</span><span class="o">&lt;</span><span class="n">Position</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="o">&amp;&gt;</span><span class="w"> </span><span class="n">post</span><span class="p">,</span><span class="w">  </span><span class="c1">///&lt; Final state of system after this iteration/mech.</span>
+<span class="w">                  </span><span class="kt">double</span><span class="w"> </span><span class="n">Ef</span><span class="w">                            </span><span class="c1">///&lt; Energy of system in state post.</span>
+<span class="w">              </span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                </span><span class="c1">// Called every step of the simulation.</span>
+<span class="w">                </span><span class="c1">// Can output pre/post do processing etc.</span>
+<span class="w">                </span><span class="c1">// Return true to stop and false to continue simulation.</span>
+<span class="w">                </span><span class="k">return</span><span class="w"> </span><span class="nb">false</span><span class="p">;</span>
+<span class="w">              </span><span class="p">});</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>cell</strong> – The initial state of the simulation. </p></li>
+<li><p><strong>num_threads</strong> – The number of (openMP) threads to use. </p></li>
+<li><p><strong>f</strong> – The callback which determines the stopping criterion, see example above/below. </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv4N3fly7kinetic4SKMC7OptionsE">
+<span id="_CPPv3N3fly7kinetic4SKMC7OptionsE"></span><span id="_CPPv2N3fly7kinetic4SKMC7OptionsE"></span><span id="fly::kinetic::SKMC::Options"></span><span class="target" id="structfly_1_1kinetic_1_1SKMC_1_1Options"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Options</span></span></span><a class="headerlink" href="#_CPPv4N3fly7kinetic4SKMC7OptionsE" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Configure the <code class="docutils literal notranslate"><a class="reference internal" href="#classfly_1_1kinetic_1_1SKMC"><span class="std std-ref"><span class="pre">SKMC</span></span></a></code> class. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N3fly7kinetic4SKMC7Options5debugE">
+<span id="_CPPv3N3fly7kinetic4SKMC7Options5debugE"></span><span id="_CPPv2N3fly7kinetic4SKMC7Options5debugE"></span><span id="fly::kinetic::SKMC::Options::debug__b"></span><span class="target" id="structfly_1_1kinetic_1_1SKMC_1_1Options_1a7087922e727caf6fd22f3c4b2fb45524"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">debug</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">false</span></span><a class="headerlink" href="#_CPPv4N3fly7kinetic4SKMC7Options5debugE" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Configure debug printing. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N3fly7kinetic4SKMC7Options5freadE">
+<span id="_CPPv3N3fly7kinetic4SKMC7Options5freadE"></span><span id="_CPPv2N3fly7kinetic4SKMC7Options5freadE"></span><span id="fly::kinetic::SKMC::Options::fread__ss"></span><span class="target" id="structfly_1_1kinetic_1_1SKMC_1_1Options_1ad023ac118a40cc805ad00e28a2329f95"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">fread</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="s"><span class="pre">&quot;cat.bin&quot;</span></span><a class="headerlink" href="#_CPPv4N3fly7kinetic4SKMC7Options5freadE" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>The name of the file to read the catalogue from. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N3fly7kinetic4SKMC7Options6fwriteE">
+<span id="_CPPv3N3fly7kinetic4SKMC7Options6fwriteE"></span><span id="_CPPv2N3fly7kinetic4SKMC7Options6fwriteE"></span><span id="fly::kinetic::SKMC::Options::fwrite__ss"></span><span class="target" id="structfly_1_1kinetic_1_1SKMC_1_1Options_1a06c6519a039a078884d4f187d95e801b"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">fwrite</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N3fly7kinetic4SKMC7Options5freadE" title="fly::kinetic::SKMC::Options::fread"><span class="n"><span class="pre">fread</span></span></a><a class="headerlink" href="#_CPPv4N3fly7kinetic4SKMC7Options6fwriteE" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>The name of the file to write the catalogue to. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N3fly7kinetic4SKMC7Options9opt_cacheE">
+<span id="_CPPv3N3fly7kinetic4SKMC7Options9opt_cacheE"></span><span id="_CPPv2N3fly7kinetic4SKMC7Options9opt_cacheE"></span><span id="fly::kinetic::SKMC::Options::opt_cache__SuperCache::Options"></span><span class="target" id="structfly_1_1kinetic_1_1SKMC_1_1Options_1a70a675f09c425644dbabb4830e305b2e"></span><a class="reference internal" href="#_CPPv4N3fly7kinetic10SuperCacheE" title="fly::kinetic::SuperCache"><span class="n"><span class="pre">SuperCache</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N3fly7kinetic10SuperCache7OptionsE" title="fly::kinetic::SuperCache::Options"><span class="n"><span class="pre">Options</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">opt_cache</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="p"><span class="pre">{</span></span><span class="p"><span class="pre">}</span></span><a class="headerlink" href="#_CPPv4N3fly7kinetic4SKMC7Options9opt_cacheE" title="Permalink to this definition">#</a><br /></dt>
+<dd><p><a class="reference internal" href="#structfly_1_1kinetic_1_1SKMC_1_1Options"><span class="std std-ref">Options</span></a> for the superbasin. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N3fly7kinetic4SKMC7Options10opt_masterE">
+<span id="_CPPv3N3fly7kinetic4SKMC7Options10opt_masterE"></span><span id="_CPPv2N3fly7kinetic4SKMC7Options10opt_masterE"></span><span id="fly::kinetic::SKMC::Options::opt_master__saddle::Master::Options"></span><span class="target" id="structfly_1_1kinetic_1_1SKMC_1_1Options_1aeca98d0ed41c79a9557d6a94623891f3"></span><span class="n"><span class="pre">saddle</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="saddle.html#_CPPv4N3fly6saddle6MasterE" title="fly::saddle::Master"><span class="n"><span class="pre">Master</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="saddle.html#_CPPv4N3fly6saddle6Master7OptionsE" title="fly::saddle::Master::Options"><span class="n"><span class="pre">Options</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">opt_master</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="p"><span class="pre">{</span></span><span class="p"><span class="pre">}</span></span><a class="headerlink" href="#_CPPv4N3fly7kinetic4SKMC7Options10opt_masterE" title="Permalink to this definition">#</a><br /></dt>
+<dd><p><a class="reference internal" href="#structfly_1_1kinetic_1_1SKMC_1_1Options"><span class="std std-ref">Options</span></a> for the saddle-point finder. </p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</section>
 </section>
 
         </article>
@@ -728,6 +861,7 @@
 <li><a class="reference internal" href="#basins">Basins</a></li>
 <li><a class="reference internal" href="#superbasins">Superbasins</a></li>
 <li><a class="reference internal" href="#super-super-basins">Super(super)basins</a></li>
+<li><a class="reference internal" href="#super-kinetic-monte-carlo">Super kinetic Monte Carlo</a></li>
 </ul>
 </li>
 </ul>

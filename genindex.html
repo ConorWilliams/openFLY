@@ -360,6 +360,8 @@
 </li>
         <li><a href="api/env.html#_CPPv4NK3fly3env9Catalogue8num_keysEv">fly::env::Catalogue::num_keys (C++ function)</a>
 </li>
+        <li><a href="api/env.html#_CPPv4N3fly3env9Catalogue8optimizeEv">fly::env::Catalogue::optimize (C++ function)</a>
+</li>
         <li><a href="api/env.html#_CPPv4N3fly3env9Catalogue7OptionsE">fly::env::Catalogue::Options (C++ struct)</a>
 </li>
         <li><a href="api/env.html#_CPPv4N3fly3env9Catalogue7Options5debugE">fly::env::Catalogue::Options::debug (C++ member)</a>
@@ -442,7 +444,9 @@
 </li>
         <li><a href="api/env.html#_CPPv4N3fly3env9Mechanism11kinetic_preE">fly::env::Mechanism::kinetic_pre (C++ member)</a>
 </li>
-        <li><a href="api/env.html#_CPPv4N3fly3env9Mechanism6poisonE">fly::env::Mechanism::poison (C++ member)</a>
+        <li><a href="api/env.html#_CPPv4N3fly3env9Mechanism10poison_fwdE">fly::env::Mechanism::poison_fwd (C++ member)</a>
+</li>
+        <li><a href="api/env.html#_CPPv4N3fly3env9Mechanism9poison_spE">fly::env::Mechanism::poison_sp (C++ member)</a>
 </li>
         <li><a href="api/env.html#_CPPv4I0EN3fly3env9Mechanism9serializeEvR7Archive">fly::env::Mechanism::serialize (C++ function)</a>
 </li>
@@ -648,8 +652,6 @@
 </li>
         <li><a href="api/neighbour.html#_CPPv4N3fly5neigh4List4ListERKN6system3BoxEd">fly::neigh::List::List (C++ function)</a>
 </li>
-    </ul></td>
-    <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="api/neighbour.html#_CPPv4N3fly5neigh4List15MAX_GHOST_RATIOE">fly::neigh::List::MAX_GHOST_RATIO (C++ member)</a>
 </li>
         <li><a href="api/neighbour.html#_CPPv4N3fly5neigh4List7rebuildEN6system3SoAIRK8PositionEEi">fly::neigh::List::rebuild (C++ function)</a>
@@ -662,9 +664,17 @@
 </li>
         <li><a href="api/potential.html#_CPPv4N3fly9potential7DataEAME">fly::potential::DataEAM (C++ class)</a>
 </li>
-        <li><a href="api/potential.html#_CPPv4N3fly9potential7DataEAM7DataEAMENSt8ifstreamE">fly::potential::DataEAM::DataEAM (C++ function)</a>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/potential.html#_CPPv4N3fly9potential7DataEAM7DataEAMERK7OptionsNSt8ifstreamE">fly::potential::DataEAM::DataEAM (C++ function)</a>
 </li>
         <li><a href="api/potential.html#_CPPv4NK3fly9potential7DataEAM1fEN6TypeID8scalar_tE">fly::potential::DataEAM::f (C++ function)</a>
+</li>
+        <li><a href="api/potential.html#_CPPv4N3fly9potential7DataEAM7OptionsE">fly::potential::DataEAM::Options (C++ struct)</a>
+</li>
+        <li><a href="api/potential.html#_CPPv4N3fly9potential7DataEAM7Options5debugE">fly::potential::DataEAM::Options::debug (C++ member)</a>
+</li>
+        <li><a href="api/potential.html#_CPPv4N3fly9potential7DataEAM7Options9symmetricE">fly::potential::DataEAM::Options::symmetric (C++ member)</a>
 </li>
         <li><a href="api/potential.html#_CPPv4NK3fly9potential7DataEAM3phiEN6TypeID8scalar_tEN6TypeID8scalar_tE">fly::potential::DataEAM::phi (C++ function)</a>
 </li>
@@ -684,6 +694,8 @@
 </li>
         <li><a href="api/potential.html#_CPPv4N3fly9potential3EAM7hessianERN6system7HessianEN6system3SoAIRK6TypeIDRK6FrozenEERKN5neigh4ListEi">fly::potential::EAM::hessian (C++ function)</a>
 </li>
+        <li><a href="api/potential.html#_CPPv4N3fly9potential3EAM10mw_hessianERN6system7HessianEN6system3SoAIRK6TypeIDRK6FrozenEEi">fly::potential::EAM::mw_hessian (C++ function)</a>
+</li>
         <li><a href="api/potential.html#_CPPv4NK3fly9potential3EAM5r_cutEv">fly::potential::EAM::r_cut (C++ function)</a>
 </li>
         <li><a href="api/potential.html#_CPPv4N3fly9potential7GenericE">fly::potential::Generic (C++ class)</a>
@@ -695,6 +707,8 @@
         <li><a href="api/potential.html#_CPPv4N3fly9potential7Generic8gradientEN6system3SoAIR17PotentialGradientEEN6system3SoAIRK6TypeIDRK6FrozenEERKN5neigh4ListEi">fly::potential::Generic::gradient (C++ function)</a>
 </li>
         <li><a href="api/potential.html#_CPPv4N3fly9potential7Generic7hessianERN6system7HessianEN6system3SoAIRK6TypeIDRK6FrozenEERKN5neigh4ListEi">fly::potential::Generic::hessian (C++ function)</a>
+</li>
+        <li><a href="api/potential.html#_CPPv4N3fly9potential7Generic10mw_hessianERN6system7HessianEN6system3SoAIRK6TypeIDRK6FrozenEEi">fly::potential::Generic::mw_hessian (C++ function)</a>
 </li>
         <li><a href="api/potential.html#_CPPv4NK3fly9potential7Generic5r_cutEv">fly::potential::Generic::r_cut (C++ function)</a>
 </li>
@@ -724,7 +738,7 @@
 </li>
         <li><a href="api/saddle.html#_CPPv4N3fly6saddle5Dimer4Exit6uninitE">fly::saddle::Dimer::Exit::uninit (C++ enumerator)</a>
 </li>
-        <li><a href="api/saddle.html#_CPPv4N3fly6saddle5Dimer7find_spEN6system3SoAIR8PositionR4AxisEEN6system3SoAIRK8PositionRK4AxisRK6TypeIDRK6FrozenEEN6system3SoAIRK8PositionEERN9potential7GenericERKNSt6vectorIN6system3SoAI8PositionEEEEdi">fly::saddle::Dimer::find_sp (C++ function)</a>
+        <li><a href="api/saddle.html#_CPPv4N3fly6saddle5Dimer7find_spEN6system3SoAIR8PositionR4AxisEEN6system3SoAIRK8PositionRK4AxisRK6TypeIDRK6FrozenEEN6system3SoAIRK8PositionEERN9potential7GenericERKNSt6vectorIN6system3SoAI8PositionEEEEdii">fly::saddle::Dimer::find_sp (C++ function)</a>
 </li>
         <li><a href="api/saddle.html#_CPPv4N3fly6saddle5Dimer7OptionsE">fly::saddle::Dimer::Options (C++ struct)</a>
 </li>
@@ -753,6 +767,8 @@
         <li><a href="api/saddle.html#_CPPv4N3fly6saddle5Dimer7Options12shrink_trustE">fly::saddle::Dimer::Options::shrink_trust (C++ member)</a>
 </li>
         <li><a href="api/saddle.html#_CPPv4N3fly6saddle5Dimer7Options9skin_fracE">fly::saddle::Dimer::Options::skin_frac (C++ member)</a>
+</li>
+        <li><a href="api/saddle.html#_CPPv4N3fly6saddle5Dimer7Options11use_historyE">fly::saddle::Dimer::Options::use_history (C++ member)</a>
 </li>
         <li><a href="api/saddle.html#_CPPv4N3fly6saddle6MasterE">fly::saddle::Master (C++ class)</a>
 </li>
@@ -824,7 +840,7 @@
 </li>
         <li><a href="api/saddle.html#_CPPv4N3fly6saddle5RotorE">fly::saddle::Rotor (C++ class)</a>
 </li>
-        <li><a href="api/saddle.html#_CPPv4N3fly6saddle5Rotor12eff_gradientEN6system3SoAIR17PotentialGradientEEN6system3SoAIR4AxisEEN6system3SoAIRK6TypeIDRK6FrozenEERN9potential7GenericERN5neigh4ListEi">fly::saddle::Rotor::eff_gradient (C++ function)</a>
+        <li><a href="api/saddle.html#_CPPv4N3fly6saddle5Rotor12eff_gradientEN6system3SoAIR17PotentialGradientEEN6system3SoAIR4AxisEEN6system3SoAIRK6TypeIDRK6FrozenEERN9potential7GenericERN5neigh4ListEii">fly::saddle::Rotor::eff_gradient (C++ function)</a>
 </li>
         <li><a href="api/saddle.html#_CPPv4N3fly6saddle5Rotor7OptionsE">fly::saddle::Rotor::Options (C++ struct)</a>
 </li>
@@ -864,6 +880,8 @@
 </li>
         <li><a href="api/utility.html#_CPPv4N3fly6Spline6SplineENSt6vectorIdEEd">fly::Spline::Spline (C++ function)</a>, <a href="api/utility.html#_CPPv4N3fly6Spline6SplineEv">[1]</a>
 </li>
+        <li><a href="api/utility.html#_CPPv4I0EN3fly5ssizeENSt13common_type_tINSt9ptrdiff_tENSt13make_signed_tIDTcldt1c4sizeEEEEEERK1C">fly::ssize (C++ function)</a>
+</li>
         <li><a href="api/system.html#_CPPv4IDpEN3fly6system4AtomE">fly::system::Atom (C++ struct)</a>
 </li>
         <li><a href="api/system.html#_CPPv4N3fly6system4Atom4AtomEDpRKN1T8matrix_tE">fly::system::Atom::Atom (C++ function)</a>, <a href="api/system.html#_CPPv4N3fly6system4Atom4AtomEDpRRN1T8matrix_tE">[1]</a>, <a href="api/system.html#_CPPv4N3fly6system4Atom4AtomERK4Atom">[2]</a>, <a href="api/system.html#_CPPv4N3fly6system4Atom4AtomERR4Atom">[3]</a>, <a href="api/system.html#_CPPv4N3fly6system4Atom4AtomEv">[4]</a>
@@ -896,7 +914,19 @@
 </li>
         <li><a href="api/system.html#_CPPv4N3fly6system7HessianE">fly::system::Hessian (C++ class)</a>
 </li>
+        <li><a href="api/system.html#_CPPv4N3fly6system7Hessian5eigenEv">fly::system::Hessian::eigen (C++ function)</a>
+</li>
+        <li><a href="api/system.html#_CPPv4N3fly6system7Hessian7eigen_tE">fly::system::Hessian::eigen_t (C++ struct)</a>
+</li>
+        <li><a href="api/system.html#_CPPv4N3fly6system7Hessian7eigen_t6valuesE">fly::system::Hessian::eigen_t::values (C++ member)</a>
+</li>
+        <li><a href="api/system.html#_CPPv4N3fly6system7Hessian7eigen_t7vectorsE">fly::system::Hessian::eigen_t::vectors (C++ member)</a>
+</li>
         <li><a href="api/system.html#_CPPv4N3fly6system7Hessian11eigenvaluesEv">fly::system::Hessian::eigenvalues (C++ function)</a>
+</li>
+        <li><a href="api/system.html#_CPPv4NK3fly6system7Hessian3getEv">fly::system::Hessian::get (C++ function)</a>
+</li>
+        <li><a href="api/system.html#_CPPv4N3fly6system7Hessian6MatrixE">fly::system::Hessian::Matrix (C++ type)</a>
 </li>
         <li><a href="api/system.html#_CPPv4N3fly6system7HessianclEN5Eigen5IndexEN5Eigen5IndexE">fly::system::Hessian::operator() (C++ function)</a>
 </li>
@@ -979,6 +1009,8 @@
         <li><a href="api/system.html#_CPPv4N3fly6system9Supercell3boxEv">fly::system::Supercell::box (C++ function)</a>, <a href="api/system.html#_CPPv4NK3fly6system9Supercell3boxEv">[1]</a>
 </li>
         <li><a href="api/system.html#_CPPv4N3fly6system9Supercell3mapEv">fly::system::Supercell::map (C++ function)</a>, <a href="api/system.html#_CPPv4NK3fly6system9Supercell3mapEv">[1]</a>
+</li>
+        <li><a href="api/system.html#_CPPv4N3fly6system9Supercell7set_boxERK3Box">fly::system::Supercell::set_box (C++ function)</a>
 </li>
         <li><a href="api/system.html#_CPPv4N3fly6system9Supercell9SupercellERK3BoxRK3MapN5Eigen5IndexE">fly::system::Supercell::Supercell (C++ function)</a>
 </li>

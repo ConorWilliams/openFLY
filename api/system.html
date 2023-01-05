@@ -746,31 +746,31 @@ distance.</p>
 <dd><p>The libfly representation of an atom. </p>
 <p>Libfly uses this type to build atoms to allow integration with libFLY’s containers. An <a class="reference internal" href="#structfly_1_1system_1_1Atom"><span class="std std-ref">Atom</span></a> behaves as a structure of its properties , which are accessed through <code class="docutils literal notranslate"><span class="pre">operator[]</span></code>.</p>
 <p><p>Example:</p>
-<div class="code highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;libfly/system/atom.hpp&quot;</span><span class="cp"></span>
+<div class="code highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;libfly/system/atom.hpp&quot;</span>
 
-<span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;libfly/system/property.hpp&quot;</span><span class="cp"></span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;libfly/system/property.hpp&quot;</span>
 
-<span class="kt">void</span><span class="w"> </span><span class="nf">example_atom</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="kt">void</span><span class="w"> </span><span class="nf">example_atom</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
 <span class="w">  </span><span class="c1">// Define a property to represent spin that is a scalar of type bool.</span>
-<span class="w">  </span><span class="k">struct</span><span class="w"> </span><span class="nc">spin</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">fly</span><span class="o">::</span><span class="n">system</span><span class="o">::</span><span class="n">Property</span><span class="o">&lt;</span><span class="kt">bool</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{};</span><span class="w"></span>
+<span class="w">  </span><span class="k">struct</span><span class="w"> </span><span class="nc">spin</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">fly</span><span class="o">::</span><span class="n">system</span><span class="o">::</span><span class="n">Property</span><span class="o">&lt;</span><span class="kt">bool</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{};</span>
 
 <span class="w">  </span><span class="c1">// Define a property to represent position that is a vector of 3 doubles.</span>
 <span class="w">  </span><span class="c1">// Note there is a built-in property for this (Position).</span>
-<span class="w">  </span><span class="k">struct</span><span class="w"> </span><span class="nc">xyz</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">fly</span><span class="o">::</span><span class="n">system</span><span class="o">::</span><span class="n">Property</span><span class="o">&lt;</span><span class="kt">double</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{};</span><span class="w"></span>
+<span class="w">  </span><span class="k">struct</span><span class="w"> </span><span class="nc">xyz</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">fly</span><span class="o">::</span><span class="n">system</span><span class="o">::</span><span class="n">Property</span><span class="o">&lt;</span><span class="kt">double</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{};</span>
 
 <span class="w">  </span><span class="c1">// Define a property to represent the inertia tensor that is a 3x3 matrix of doubles.</span>
-<span class="w">  </span><span class="k">struct</span><span class="w"> </span><span class="nc">I</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">fly</span><span class="o">::</span><span class="n">system</span><span class="o">::</span><span class="n">Property</span><span class="o">&lt;</span><span class="kt">double</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{};</span><span class="w"></span>
+<span class="w">  </span><span class="k">struct</span><span class="w"> </span><span class="nc">I</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">fly</span><span class="o">::</span><span class="n">system</span><span class="o">::</span><span class="n">Property</span><span class="o">&lt;</span><span class="kt">double</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{};</span>
 
 <span class="w">  </span><span class="c1">// Create an atom</span>
-<span class="w">  </span><span class="n">fly</span><span class="o">::</span><span class="n">system</span><span class="o">::</span><span class="n">Atom</span><span class="o">&lt;</span><span class="n">spin</span><span class="p">,</span><span class="w"> </span><span class="n">xyz</span><span class="p">,</span><span class="w"> </span><span class="n">I</span><span class="o">&gt;</span><span class="w"> </span><span class="n">atom</span><span class="p">{</span><span class="w"></span>
-<span class="w">      </span><span class="nb">true</span><span class="p">,</span><span class="w"></span>
-<span class="w">      </span><span class="p">{</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">},</span><span class="w"></span>
+<span class="w">  </span><span class="n">fly</span><span class="o">::</span><span class="n">system</span><span class="o">::</span><span class="n">Atom</span><span class="o">&lt;</span><span class="n">spin</span><span class="p">,</span><span class="w"> </span><span class="n">xyz</span><span class="p">,</span><span class="w"> </span><span class="n">I</span><span class="o">&gt;</span><span class="w"> </span><span class="n">atom</span><span class="p">{</span>
+<span class="w">      </span><span class="nb">true</span><span class="p">,</span>
+<span class="w">      </span><span class="p">{</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">},</span>
 <span class="w">      </span><span class="n">I</span><span class="o">::</span><span class="n">matrix_t</span><span class="o">::</span><span class="n">Zero</span><span class="p">(),</span><span class="w">  </span><span class="c1">// I::matrix_t is Eigen::Matrix&lt;double, 3, 3&gt;</span>
-<span class="w">  </span><span class="p">};</span><span class="w"></span>
+<span class="w">  </span><span class="p">};</span>
 
 <span class="w">  </span><span class="c1">//   Access and set the spin property</span>
-<span class="w">  </span><span class="n">atom</span><span class="p">[</span><span class="n">spin</span><span class="p">{}]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">false</span><span class="p">;</span><span class="w"></span>
-<span class="p">}</span><span class="w"></span>
+<span class="w">  </span><span class="n">atom</span><span class="p">[</span><span class="n">spin</span><span class="p">{}]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">false</span><span class="p">;</span>
+<span class="p">}</span>
 </pre></div>
 </div>
 </p>
@@ -904,11 +904,11 @@ distance.</p>
 <p class="admonition-title">Tip</p>
 <p>With <code class="docutils literal notranslate"><span class="pre">truncate</span> <span class="pre">=</span> <span class="pre">true</span></code> this overload has some runtime-cost to count the char’s in the array.</p>
 <p>If you would like to call the template overload to get a mapped Eigen::Array use explicit template syntax:</p>
-<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">TypeMap</span><span class="w"> </span><span class="nf">map</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span><span class="w"></span>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">TypeMap</span><span class="w"> </span><span class="nf">map</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
 
 <span class="c1">// set the Type //</span>
 
-<span class="n">map</span><span class="p">.</span><span class="n">get</span><span class="o">&lt;</span><span class="n">Type</span><span class="o">&gt;</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="n">tp_</span><span class="p">)</span><span class="w"></span>
+<span class="n">map</span><span class="p">.</span><span class="n">get</span><span class="o">&lt;</span><span class="n">Type</span><span class="o">&gt;</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="n">tp_</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1008,36 +1008,36 @@ distance.</p>
 <p>The default container type used in the libfly; an <code class="docutils literal notranslate"><a class="reference internal" href="#classfly_1_1system_1_1SoA"><span class="std std-ref"><span class="pre">SoA</span></span></a></code> models an array of <code class="docutils literal notranslate"><a class="reference internal" href="#structfly_1_1system_1_1Atom"><span class="std std-ref"><span class="pre">Atom</span></span></a></code> types but decomposes the atom type and stores each property in a separate array. This enables efficient cache use. Like <code class="docutils literal notranslate"><a class="reference internal" href="#structfly_1_1system_1_1Atom"><span class="std std-ref"><span class="pre">Atom</span></span></a></code>, the properties of the “atom” are described through a series of template parameters which should inherit from <code class="docutils literal notranslate"><a class="reference internal" href="#structfly_1_1system_1_1Property"><span class="std std-ref"><span class="pre">Property</span></span></a></code>. The properties of each atom can be accessed by the index of the atom or as an <code class="docutils literal notranslate"><span class="pre">Eigen::Array</span></code> to enable collective operations.</p>
 <p><a class="reference internal" href="#classfly_1_1system_1_1SoA"><span class="std std-ref">SoA</span></a> also supports slicing and reference properties which transform that property into a view, this enables <a class="reference internal" href="#classfly_1_1system_1_1SoA"><span class="std std-ref">SoA</span></a> to act as a concrete type in interfaces whilst allowing implicit conversions from any compatible <a class="reference internal" href="#classfly_1_1system_1_1SoA"><span class="std std-ref">SoA</span></a>.</p>
 <p><p>Example:</p>
-<div class="code highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;libfly/system/SoA.hpp&quot;</span><span class="cp"></span>
+<div class="code highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;libfly/system/SoA.hpp&quot;</span>
 
-<span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;libfly/system/property.hpp&quot;</span><span class="cp"></span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;libfly/system/property.hpp&quot;</span>
 
 <span class="c1">// Define a property to represent spin that is a scalar of type bool.</span>
-<span class="k">struct</span><span class="w"> </span><span class="nc">spin</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">fly</span><span class="o">::</span><span class="n">system</span><span class="o">::</span><span class="n">Property</span><span class="o">&lt;</span><span class="kt">bool</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{};</span><span class="w"></span>
+<span class="k">struct</span><span class="w"> </span><span class="nc">spin</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">fly</span><span class="o">::</span><span class="n">system</span><span class="o">::</span><span class="n">Property</span><span class="o">&lt;</span><span class="kt">bool</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{};</span>
 
 <span class="c1">// Define a property to represent position that is a vector of 3 doubles.</span>
 <span class="c1">// Note there is a built-in property for this (Position).</span>
-<span class="k">struct</span><span class="w"> </span><span class="nc">xyz</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">fly</span><span class="o">::</span><span class="n">system</span><span class="o">::</span><span class="n">Property</span><span class="o">&lt;</span><span class="kt">double</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{};</span><span class="w"></span>
+<span class="k">struct</span><span class="w"> </span><span class="nc">xyz</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">fly</span><span class="o">::</span><span class="n">system</span><span class="o">::</span><span class="n">Property</span><span class="o">&lt;</span><span class="kt">double</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{};</span>
 
 <span class="c1">// Define a property to represent the inertia tensor that is a 3x3 matrix of doubles.</span>
-<span class="k">struct</span><span class="w"> </span><span class="nc">I</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">fly</span><span class="o">::</span><span class="n">system</span><span class="o">::</span><span class="n">Property</span><span class="o">&lt;</span><span class="kt">double</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{};</span><span class="w"></span>
+<span class="k">struct</span><span class="w"> </span><span class="nc">I</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">fly</span><span class="o">::</span><span class="n">system</span><span class="o">::</span><span class="n">Property</span><span class="o">&lt;</span><span class="kt">double</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{};</span>
 
 <span class="c1">// Use reference property -&gt; pass by value.</span>
-<span class="kt">void</span><span class="w"> </span><span class="nf">zero_xyz</span><span class="p">(</span><span class="n">fly</span><span class="o">::</span><span class="n">system</span><span class="o">::</span><span class="n">SoA</span><span class="o">&lt;</span><span class="n">xyz</span><span class="w"> </span><span class="o">&amp;&gt;</span><span class="w"> </span><span class="n">view_xyz</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="kt">void</span><span class="w"> </span><span class="nf">zero_xyz</span><span class="p">(</span><span class="n">fly</span><span class="o">::</span><span class="n">system</span><span class="o">::</span><span class="n">SoA</span><span class="o">&lt;</span><span class="n">xyz</span><span class="w"> </span><span class="o">&amp;&gt;</span><span class="w"> </span><span class="n">view_xyz</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <span class="w">  </span><span class="c1">// Zero the positions</span>
-<span class="w">  </span><span class="n">view_xyz</span><span class="p">[</span><span class="n">xyz</span><span class="p">{}]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"></span>
-<span class="p">}</span><span class="w"></span>
+<span class="w">  </span><span class="n">view_xyz</span><span class="p">[</span><span class="n">xyz</span><span class="p">{}]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
 
-<span class="kt">void</span><span class="w"> </span><span class="nf">example_SoA</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="kt">void</span><span class="w"> </span><span class="nf">example_SoA</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
 <span class="w">  </span><span class="c1">// SoA of 10 uninitialized atoms.</span>
-<span class="w">  </span><span class="n">fly</span><span class="o">::</span><span class="n">system</span><span class="o">::</span><span class="n">SoA</span><span class="o">&lt;</span><span class="n">spin</span><span class="p">,</span><span class="w"> </span><span class="n">xyz</span><span class="p">,</span><span class="w"> </span><span class="n">I</span><span class="o">&gt;</span><span class="w"> </span><span class="n">atoms</span><span class="p">(</span><span class="mi">10</span><span class="p">);</span><span class="w"></span>
+<span class="w">  </span><span class="n">fly</span><span class="o">::</span><span class="n">system</span><span class="o">::</span><span class="n">SoA</span><span class="o">&lt;</span><span class="n">spin</span><span class="p">,</span><span class="w"> </span><span class="n">xyz</span><span class="p">,</span><span class="w"> </span><span class="n">I</span><span class="o">&gt;</span><span class="w"> </span><span class="n">atoms</span><span class="p">(</span><span class="mi">10</span><span class="p">);</span>
 
 <span class="w">  </span><span class="c1">// Set the spin of the fist atom.</span>
-<span class="w">  </span><span class="n">atoms</span><span class="p">(</span><span class="n">spin</span><span class="p">{},</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">true</span><span class="p">;</span><span class="w"></span>
+<span class="w">  </span><span class="n">atoms</span><span class="p">(</span><span class="n">spin</span><span class="p">{},</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">true</span><span class="p">;</span>
 
 <span class="w">  </span><span class="c1">// Implicitly sliced at call.</span>
-<span class="w">  </span><span class="n">zero_xyz</span><span class="p">(</span><span class="n">atoms</span><span class="p">);</span><span class="w"></span>
-<span class="p">}</span><span class="w"></span>
+<span class="w">  </span><span class="n">zero_xyz</span><span class="p">(</span><span class="n">atoms</span><span class="p">);</span>
+<span class="p">}</span>
 </pre></div>
 </div>
 </p>
@@ -1160,28 +1160,28 @@ distance.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>Assignment to reference properties  follows pointer-semantics:</p>
-<div class="code highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;libfly/system/SoA.hpp&quot;</span><span class="cp"></span>
-<span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;libfly/system/property.hpp&quot;</span><span class="cp"></span>
+<div class="code highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;libfly/system/SoA.hpp&quot;</span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;libfly/system/property.hpp&quot;</span>
 
-<span class="kt">void</span><span class="w"> </span><span class="nf">SoA_assign</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="kt">void</span><span class="w"> </span><span class="nf">SoA_assign</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
 <span class="w">  </span><span class="c1">// Define a property to represent position that is a vector of 3 doubles.</span>
 <span class="w">  </span><span class="c1">// Note there is a built-in property for this (Position).</span>
-<span class="w">  </span><span class="k">struct</span><span class="w"> </span><span class="nc">xyz</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">fly</span><span class="o">::</span><span class="n">system</span><span class="o">::</span><span class="n">Property</span><span class="o">&lt;</span><span class="kt">double</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{};</span><span class="w"></span>
+<span class="w">  </span><span class="k">struct</span><span class="w"> </span><span class="nc">xyz</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">fly</span><span class="o">::</span><span class="n">system</span><span class="o">::</span><span class="n">Property</span><span class="o">&lt;</span><span class="kt">double</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{};</span>
 
-<span class="w">  </span><span class="n">fly</span><span class="o">::</span><span class="n">system</span><span class="o">::</span><span class="n">SoA</span><span class="o">&lt;</span><span class="n">xyz</span><span class="o">&gt;</span><span class="w"> </span><span class="n">a</span><span class="p">(</span><span class="mi">10</span><span class="p">);</span><span class="w"></span>
-<span class="w">  </span><span class="n">fly</span><span class="o">::</span><span class="n">system</span><span class="o">::</span><span class="n">SoA</span><span class="o">&lt;</span><span class="n">xyz</span><span class="o">&gt;</span><span class="w"> </span><span class="n">b</span><span class="p">(</span><span class="mi">10</span><span class="p">);</span><span class="w"></span>
+<span class="w">  </span><span class="n">fly</span><span class="o">::</span><span class="n">system</span><span class="o">::</span><span class="n">SoA</span><span class="o">&lt;</span><span class="n">xyz</span><span class="o">&gt;</span><span class="w"> </span><span class="n">a</span><span class="p">(</span><span class="mi">10</span><span class="p">);</span>
+<span class="w">  </span><span class="n">fly</span><span class="o">::</span><span class="n">system</span><span class="o">::</span><span class="n">SoA</span><span class="o">&lt;</span><span class="n">xyz</span><span class="o">&gt;</span><span class="w"> </span><span class="n">b</span><span class="p">(</span><span class="mi">10</span><span class="p">);</span>
 
-<span class="w">  </span><span class="n">a</span><span class="p">[</span><span class="n">xyz</span><span class="p">{}]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w"></span>
-<span class="w">  </span><span class="n">b</span><span class="p">[</span><span class="n">xyz</span><span class="p">{}]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">2</span><span class="p">;</span><span class="w"></span>
+<span class="w">  </span><span class="n">a</span><span class="p">[</span><span class="n">xyz</span><span class="p">{}]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span>
+<span class="w">  </span><span class="n">b</span><span class="p">[</span><span class="n">xyz</span><span class="p">{}]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">2</span><span class="p">;</span>
 
-<span class="w">  </span><span class="n">fly</span><span class="o">::</span><span class="n">system</span><span class="o">::</span><span class="n">SoA</span><span class="o">&lt;</span><span class="n">xyz</span><span class="w"> </span><span class="o">&amp;&gt;</span><span class="w"> </span><span class="n">view_a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">a</span><span class="p">;</span><span class="w"></span>
-<span class="w">  </span><span class="n">fly</span><span class="o">::</span><span class="n">system</span><span class="o">::</span><span class="n">SoA</span><span class="o">&lt;</span><span class="n">xyz</span><span class="w"> </span><span class="o">&amp;&gt;</span><span class="w"> </span><span class="n">view_b</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">b</span><span class="p">;</span><span class="w"></span>
-<span class="w">  </span><span class="n">fly</span><span class="o">::</span><span class="n">system</span><span class="o">::</span><span class="n">SoA</span><span class="o">&lt;</span><span class="n">xyz</span><span class="w"> </span><span class="o">&amp;&gt;</span><span class="w"> </span><span class="n">view_b2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">b</span><span class="p">;</span><span class="w"></span>
+<span class="w">  </span><span class="n">fly</span><span class="o">::</span><span class="n">system</span><span class="o">::</span><span class="n">SoA</span><span class="o">&lt;</span><span class="n">xyz</span><span class="w"> </span><span class="o">&amp;&gt;</span><span class="w"> </span><span class="n">view_a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">a</span><span class="p">;</span>
+<span class="w">  </span><span class="n">fly</span><span class="o">::</span><span class="n">system</span><span class="o">::</span><span class="n">SoA</span><span class="o">&lt;</span><span class="n">xyz</span><span class="w"> </span><span class="o">&amp;&gt;</span><span class="w"> </span><span class="n">view_b</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">b</span><span class="p">;</span>
+<span class="w">  </span><span class="n">fly</span><span class="o">::</span><span class="n">system</span><span class="o">::</span><span class="n">SoA</span><span class="o">&lt;</span><span class="n">xyz</span><span class="w"> </span><span class="o">&amp;&gt;</span><span class="w"> </span><span class="n">view_b2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">b</span><span class="p">;</span>
 
 <span class="w">  </span><span class="n">view_a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">view_b</span><span class="p">;</span><span class="w">                 </span><span class="c1">// This does NOT set a[xyz{}] to  b[xyz{}]</span>
 <span class="w">  </span><span class="n">view_a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">move</span><span class="p">(</span><span class="n">view_b</span><span class="p">);</span><span class="w">      </span><span class="c1">// Neither does this</span>
 <span class="w">  </span><span class="n">view_a</span><span class="p">[</span><span class="n">xyz</span><span class="p">{}]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">view_b2</span><span class="p">[</span><span class="n">xyz</span><span class="p">{}];</span><span class="w">  </span><span class="c1">// This does :)</span>
-<span class="p">}</span><span class="w"></span>
+<span class="p">}</span>
 </pre></div>
 </div>
 </div>
@@ -1255,15 +1255,15 @@ distance.</p>
 <dd><p>A container that models a std::vector of atoms. </p>
 <p>The properties of the “atom” are described through a series of template parameters which should inherit from <code class="docutils literal notranslate"><a class="reference internal" href="#structfly_1_1system_1_1Property"><span class="std std-ref"><span class="pre">Property</span></span></a></code></p>
 <p><p>Example:</p>
-<div class="code highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;libfly/system/VoS.hpp&quot;</span><span class="cp"></span>
+<div class="code highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;libfly/system/VoS.hpp&quot;</span>
 
-<span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;libfly/system/atom.hpp&quot;</span><span class="cp"></span>
-<span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;libfly/system/property.hpp&quot;</span><span class="cp"></span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;libfly/system/atom.hpp&quot;</span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;libfly/system/property.hpp&quot;</span>
 
-<span class="kt">void</span><span class="w"> </span><span class="nf">example_VoS</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="kt">void</span><span class="w"> </span><span class="nf">example_VoS</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
 <span class="w">  </span><span class="c1">// Define a property to represent position that is a vector of 3 doubles.</span>
 <span class="w">  </span><span class="c1">// Note there is a built-in property for this (Position).</span>
-<span class="w">  </span><span class="k">struct</span><span class="w"> </span><span class="nc">xyz</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">fly</span><span class="o">::</span><span class="n">system</span><span class="o">::</span><span class="n">Property</span><span class="o">&lt;</span><span class="kt">double</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{};</span><span class="w"></span>
+<span class="w">  </span><span class="k">struct</span><span class="w"> </span><span class="nc">xyz</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">fly</span><span class="o">::</span><span class="n">system</span><span class="o">::</span><span class="n">Property</span><span class="o">&lt;</span><span class="kt">double</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{};</span>
 
 <span class="w">  </span><span class="n">fly</span><span class="o">::</span><span class="n">system</span><span class="o">::</span><span class="n">VoS</span><span class="o">&lt;</span><span class="n">xyz</span><span class="o">&gt;</span><span class="w"> </span><span class="n">atoms</span><span class="p">;</span><span class="w">  </span><span class="c1">// Empty VoS</span>
 
@@ -1272,7 +1272,7 @@ distance.</p>
 <span class="w">  </span><span class="n">fly</span><span class="o">::</span><span class="n">system</span><span class="o">::</span><span class="n">Atom</span><span class="o">&lt;</span><span class="n">xyz</span><span class="o">&gt;&amp;</span><span class="w"> </span><span class="n">first_atom</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">atoms</span><span class="p">[</span><span class="mi">0</span><span class="p">];</span><span class="w">  </span><span class="c1">// Reference to first atom.</span>
 
 <span class="w">  </span><span class="n">atoms</span><span class="p">.</span><span class="n">push_back</span><span class="p">(</span><span class="n">first_atom</span><span class="p">);</span><span class="w">  </span><span class="c1">// Make a second atom a copy of the first.</span>
-<span class="p">}</span><span class="w"></span>
+<span class="p">}</span>
 </pre></div>
 </div>
 <div class="admonition-todo admonition" id="id1">
@@ -1367,6 +1367,17 @@ distance.</p>
 <dd><p><a class="reference internal" href="#classfly_1_1system_1_1TypeMap"><span class="std std-ref">TypeMap</span></a> getter. </p>
 </dd></dl>
 
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3fly6system9Supercell7set_boxERK3Box">
+<span id="_CPPv3N3fly6system9Supercell7set_boxERK3Box"></span><span id="_CPPv2N3fly6system9Supercell7set_boxERK3Box"></span><span id="fly::system::Supercell::set_box__BoxCR"></span><span class="target" id="classfly_1_1system_1_1Supercell_1acde02514a1d0c604f9b9f5edfb6b27c1"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">set_box</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N3fly6system3BoxE" title="fly::system::Box"><span class="n"><span class="pre">Box</span></span></a><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">box</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3fly6system9Supercell7set_boxERK3Box" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Set simulation box. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>box</strong> – The new simulation box. </p>
+</dd>
+</dl>
+</dd></dl>
+
 </div>
 </dd></dl>
 
@@ -1405,6 +1416,12 @@ distance.</p>
 <div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-types">Public Types</p>
 <dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N3fly6system7Hessian6MatrixE">
+<span id="_CPPv3N3fly6system7Hessian6MatrixE"></span><span id="_CPPv2N3fly6system7Hessian6MatrixE"></span><span class="target" id="classfly_1_1system_1_1Hessian_1a741996428226928635cf909f09cd526b"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Matrix</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="n"><span class="pre">Eigen</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">Matrix</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">double</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="n"><span class="pre">Eigen</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">Dynamic</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="n"><span class="pre">Eigen</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">Dynamic</span></span><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4N3fly6system7Hessian6MatrixE" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>The Matrix types used to store the eigen vectors of the hessian. </p>
+</dd></dl>
+
+<dl class="cpp type">
 <dt class="sig sig-object cpp" id="_CPPv4N3fly6system7Hessian6VectorE">
 <span id="_CPPv3N3fly6system7Hessian6VectorE"></span><span id="_CPPv2N3fly6system7Hessian6VectorE"></span><span class="target" id="classfly_1_1system_1_1Hessian_1a3987245125975ba6bf704a75bf02a219"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Vector</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="n"><span class="pre">Eigen</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">Vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">double</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="n"><span class="pre">Eigen</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">Dynamic</span></span><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4N3fly6system7Hessian6VectorE" title="Permalink to this definition">#</a><br /></dt>
 <dd><p>The vector types used to store the eigen values of the hessian. </p>
@@ -1414,10 +1431,24 @@ distance.</p>
 <div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
 <dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3fly6system7Hessian5eigenEv">
+<span id="_CPPv3N3fly6system7Hessian5eigenEv"></span><span id="_CPPv2N3fly6system7Hessian5eigenEv"></span><span id="fly::system::Hessian::eigen"></span><span class="target" id="classfly_1_1system_1_1Hessian_1ac9bf6b2569303af5ea545cc7cb020339"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N3fly6system7Hessian7eigen_tE" title="fly::system::Hessian::eigen_t"><span class="n"><span class="pre">eigen_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">eigen</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3fly6system7Hessian5eigenEv" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Computes the eigenvalues and eigenvectors. </p>
+<p>See: <a class="reference external" href="https://eigen.tuxfamily.org/dox/classEigen_1_1SelfAdjointEigenSolver.html">https://eigen.tuxfamily.org/dox/classEigen_1_1SelfAdjointEigenSolver.html</a> only reads the lower diagonal portion of the matrix. </p>
+</dd></dl>
+
+<dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4N3fly6system7Hessian11eigenvaluesEv">
 <span id="_CPPv3N3fly6system7Hessian11eigenvaluesEv"></span><span id="_CPPv2N3fly6system7Hessian11eigenvaluesEv"></span><span id="fly::system::Hessian::eigenvalues"></span><span class="target" id="classfly_1_1system_1_1Hessian_1a2d298def62af555775f99773cdabe85c"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N3fly6system7Hessian6VectorE" title="fly::system::Hessian::Vector"><span class="n"><span class="pre">Vector</span></span></a><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">eigenvalues</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3fly6system7Hessian11eigenvaluesEv" title="Permalink to this definition">#</a><br /></dt>
 <dd><p>Compute and return a reference to an ordered vector of Eigen Values. </p>
-<p>See: <a class="reference external" href="https://eigen.tuxfamily.org/dox/classEigen_1_1SelfAdjointEigenSolver.html">https://eigen.tuxfamily.org/dox/classEigen_1_1SelfAdjointEigenSolver.html</a> only reads the lower diagonal portion of the matrix. </p>
+<p>See: <a class="reference external" href="https://eigen.tuxfamily.org/dox/classEigen_1_1SelfAdjointEigenSolver.html">https://eigen.tuxfamily.org/dox/classEigen_1_1SelfAdjointEigenSolver.html</a> only reads the lower diagonal portion of the matrix.</p>
+<p>The eigenvalues are repeated according to their algebraic multiplicity, so there are as many eigenvalues as rows in the matrix. The eigenvalues are sorted in increasing order. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK3fly6system7Hessian3getEv">
+<span id="_CPPv3NK3fly6system7Hessian3getEv"></span><span id="_CPPv2NK3fly6system7Hessian3getEv"></span><span id="fly::system::Hessian::getC"></span><span class="target" id="classfly_1_1system_1_1Hessian_1a46a779624883ba97a42672e9b2950546"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N3fly6system7Hessian6MatrixE" title="fly::system::Hessian::Matrix"><span class="n"><span class="pre">Matrix</span></span></a><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">get</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="k"><span class="pre">noexcept</span></span><a class="headerlink" href="#_CPPv4NK3fly6system7Hessian3getEv" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Fetch a reference to the underlying matrix. </p>
 </dd></dl>
 
 <dl class="cpp function">
@@ -1446,6 +1477,27 @@ distance.</p>
 </dd></dl>
 
 </div>
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv4N3fly6system7Hessian7eigen_tE">
+<span id="_CPPv3N3fly6system7Hessian7eigen_tE"></span><span id="_CPPv2N3fly6system7Hessian7eigen_tE"></span><span id="fly::system::Hessian::eigen_t"></span><span class="target" id="structfly_1_1system_1_1Hessian_1_1eigen__t"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">eigen_t</span></span></span><a class="headerlink" href="#_CPPv4N3fly6system7Hessian7eigen_tE" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>A struct that contains references to the eigen values/vectors. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N3fly6system7Hessian7eigen_t6valuesE">
+<span id="_CPPv3N3fly6system7Hessian7eigen_t6valuesE"></span><span id="_CPPv2N3fly6system7Hessian7eigen_t6valuesE"></span><span id="fly::system::Hessian::eigen_t::values__VectorCR"></span><span class="target" id="structfly_1_1system_1_1Hessian_1_1eigen__t_1a6edaccb09e7212e129cecea71a911b04"></span><a class="reference internal" href="#_CPPv4N3fly6system7Hessian6VectorE" title="fly::system::Hessian::Vector"><span class="n"><span class="pre">Vector</span></span></a><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">values</span></span></span><a class="headerlink" href="#_CPPv4N3fly6system7Hessian7eigen_t6valuesE" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>The n (maybe repeated) eigen values of the (n x n) matrix. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N3fly6system7Hessian7eigen_t7vectorsE">
+<span id="_CPPv3N3fly6system7Hessian7eigen_t7vectorsE"></span><span id="_CPPv2N3fly6system7Hessian7eigen_t7vectorsE"></span><span id="fly::system::Hessian::eigen_t::vectors__MatrixCR"></span><span class="target" id="structfly_1_1system_1_1Hessian_1_1eigen__t_1ab9321b9e44dcc5203457f41e4bce5d4e"></span><a class="reference internal" href="#_CPPv4N3fly6system7Hessian6MatrixE" title="fly::system::Hessian::Matrix"><span class="n"><span class="pre">Matrix</span></span></a><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">vectors</span></span></span><a class="headerlink" href="#_CPPv4N3fly6system7Hessian7eigen_t7vectorsE" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>The <code class="docutils literal notranslate"><span class="pre">k</span></code>th column stores the <code class="docutils literal notranslate"><span class="pre">k</span></code> eigenvector corresponding to the <code class="docutils literal notranslate"><span class="pre">k</span></code>th eigenvalue. The eigenvectors are normalized to have (Euclidean) norm equal to one. </p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
 </dd></dl>
 
 </section>

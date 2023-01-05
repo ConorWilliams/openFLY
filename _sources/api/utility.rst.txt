@@ -112,7 +112,7 @@ Small functions
 
 -----------------------
 
-.. doxygenfunction:: fly::ssise
+.. doxygenfunction:: fly::ssize
 
 Mathematical functions
 ~~~~~~~~~~~~~~~~~~~~~~~~

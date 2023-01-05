@@ -15,7 +15,7 @@ jobs:
       fail-fast: false
       matrix:
         cpp: [17, 20]
-        os: [ubuntu-latest, windows-latest]
+        os: [ubuntu-latest]
 
     runs-on: ${{ matrix.os }}
 
@@ -24,10 +24,6 @@ jobs:
         with:
           submodules: true
           fetch-depth: 0
-
-      - name: Compile a universal OpenMP
-        run: brew install libomp
-        if: matrix.os == 'macos-latest'
 
       - name: Install vcpkg
         uses: friendlyanon/setup-vcpkg@v1

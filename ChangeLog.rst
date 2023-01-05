@@ -34,6 +34,9 @@ Meta
 
 Version 0.9.0
 -------------------------------
+
+The is the first semi-complete version of openFLY that adds support for superbasins and running OLKMC simulations.
+
 Added
 ~~~~~
 

@@ -6,13 +6,16 @@
 
 // This file is part of openFLY.
 
-// OpenFLY is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License
-// as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+// OpenFLY is free software: you can redistribute it and/or modify it under the terms of the GNU General
+// Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
+// option) any later version.
 
-// OpenFLY is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
-// warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+// OpenFLY is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the
+// implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+// for more details.
 
-// You should have received a copy of the GNU General Public License along with openFLY. If not, see <https://www.gnu.org/licenses/>.
+// You should have received a copy of the GNU General Public License along with openFLY. If not, see
+// <https://www.gnu.org/licenses/>.
 
 #include <cstddef>
 #include <type_traits>
@@ -31,9 +34,9 @@ namespace fly::system {
   /**
    * @brief LibFLY's representation of a system of atoms
    *
-   * The Supercell is libFLY's amalgamation of all the data required for a simulation. It **is a** SoA containing all the atoms in the
-   * system **has a** ``Box`` and a ``TypeMap``. A Supercell always has the ``TypeID`` property for each atom and accepts the rest as
-   * template arguments.
+   * The Supercell is libFLY's amalgamation of all the data required for a simulation. It **is a** SoA
+   * containing all the atoms in the system **has a** ``Box`` and a ``TypeMap``. A Supercell always has the
+   * ``TypeID`` property for each atom and accepts the rest as template arguments.
    *
    * @tparam Map A specialisation of fly::system::TypeMap.
    * @tparam T Property tags derived from ``Property``.
@@ -45,13 +48,15 @@ namespace fly::system {
 
     static_assert(SOA::owns_all, "Supercells must own all their data");
 
-    static_assert(detail::is_TypeMap<Map>::value, "The Map template param must be a specialisation of system::TypeMap");
+    static_assert(detail::is_TypeMap<Map>::value,
+                  "The Map template param must be a specialisation of system::TypeMap");
 
   public:
     /**
      * @brief Construct a new Supercell object to store ``num_atoms`` atoms.
      */
-    Supercell(Box const& box, Map const& map, Eigen::Index num_atoms) : SOA(num_atoms), m_box(box), m_map(map) {}
+    Supercell(Box const& box, Map const& map, Eigen::Index num_atoms)
+        : SOA(num_atoms), m_box(box), m_map(map) {}
 
     /**
      * @brief Simulation box const-getter.
@@ -62,6 +67,13 @@ namespace fly::system {
      * @brief Simulation box getter.
      */
     Box& box() noexcept { return m_box; }
+
+    /**
+     * @brief Set simulation box.
+     *
+     * @param box The new simulation box.
+     */
+    void set_box(Box const& box) { m_box = box; }
 
     /**
      * @brief TypeMap const-getter.
@@ -92,7 +104,8 @@ namespace fly::system {
    * @return A constructed supercell with the Map template-parameter deduced.
    */
   template <typename... T, typename... U>
-  auto make_supercell(Box const& box, TypeMap<U...> const& map, Eigen::Index num_atoms) -> Supercell<TypeMap<U...>, T...> {
+  auto make_supercell(Box const& box, TypeMap<U...> const& map, Eigen::Index num_atoms)
+      -> Supercell<TypeMap<U...>, T...> {
     return {box, map, num_atoms};
   }
 

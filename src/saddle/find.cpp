@@ -84,10 +84,6 @@ namespace fly::saddle {
       reconstruct(geo, m.delta_fwd, in), reconstruct(geo, m.delta_sp, in), {}, {},
     };
 
-    if (m_count_frozen == 0) {
-      centroid_align(res.sp, in);
-    }
-
     auto& thr = thread();
 
     {  // Minima
@@ -103,16 +99,20 @@ namespace fly::saddle {
 
     {  // SP
 
-      // Need consistant random here.
-
       system::SoA<Position, Axis, TypeID const&, Frozen const&> dim(in.size());
       dim.rebind(id_, in);
       dim.rebind(fzn_, in);
-      dim[r_] = res.sp[r_];
+
       // Ensures Axis transforms with the symmetry
-      dim[ax_] = dim[r_] - in[r_];
+      dim[ax_] = res.sp[r_] - in[r_];
       // ... and normalise.
       dim[ax_] /= gnorm(dim[ax_]);
+      // Align res.sp post-use for constructing axis!
+      if (m_count_frozen == 0) {
+        centroid_align(res.sp, in);
+      }
+
+      dim[r_] = res.sp[r_];
 
       if (!thr.dimer.find_sp(dim, dim, in, thr.pot, {}, m_count_frozen, 1)) {
         res.rel_sp = std::move(dim);
@@ -456,7 +456,7 @@ namespace fly::saddle {
     double frac_fwd = d_fwd / mech.err_fwd;
 
     dprint(m_opt.debug,
-           "FINDER: Recon @{:>4} sym={:<2} Δ(ΔE)={:.3f} [{:.4f}], ΔR_min={:.3f} [{:.4f}]\n",
+           "FINDER: Recon @{:>4} sym={:<2}  Δ(ΔE)={:.3f} [{:.4f}] ΔR_min={:.3f} [{:.4f}]\n",
            geo_data.centre,
            sym_indx,
            d_delta,

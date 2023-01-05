@@ -70,75 +70,18 @@ system::Supercell<system::TypeMap<>, Position, Frozen, T...> bcc_iron_motif(doub
   return motif;
 }
 
-template <typename... Ts>
-void ignore(Ts const &...) {}
-
-fly::system::SoA<TypeID, Position> explicit_V(std::vector<Vec> const &vac,
-                                              system::viewSoA<TypeID, Position> cell) {
-  //
-  fly::system::SoA<TypeID, Position> special(cell.size() + fly::ssize(vac));
-
-  special[id_].head(cell.size()) = cell[id_];  // Copy cells types
-  special[id_].tail(fly::ssize(vac)) = 2;      // TypeID for vacacies == 2
-
-  special[r_].head(cell[r_].size()) = cell[r_];
-
-  Eigen::Index x = cell.size();
-
-  for (auto const &v : vac) {
-    special(r_, x++) = v;
-  }
-
-  return special;
-}
-
-struct Result {
-  double v_v;  ///< The maximum of the V-V neighrest-neighbour distances. E.G for each vacancy compute the
-               ///< distance to its closest neighbour then v_v is the maximum of these.
-  double v_h;  ///< The minimum V-H distance.
-};
-
-/**
- * @brief
- */
-Result distances(system::Box const &box, std::vector<Vec> const &vac, Vec hy) {
-  //
-  auto mi = box.slow_min_image_computer();
-
-  Result r{
-      0,
-      std::numeric_limits<double>::max(),
-  };
-
-  for (auto const &v : vac) {
-    r.v_h = std::min(r.v_h, mi(hy, v));
-
-    for (auto const &n : vac) {
-      r.v_v = std::max(r.v_v, mi(n, v));
-    }
-  }
-
-  return r;
-}
-
 int main() {
   //
 
-  // double a;
+  system::Supercell cell = motif_to_lattice(bcc_iron_motif(), {6, 6, 6});
 
-  // fmt::print("a = ");
+  // Mat basis = cell.box().basis();
 
-  // std::cin >> a;
+  // basis(2, 2) = 2 * basis(1, 1);
 
-  system::Supercell perfect = motif_to_lattice(bcc_iron_motif(), {6, 6, 6});
+  // cell.set_box({basis, Arr<bool>{true, true, true}});
 
-  DetectVacancies detect(4, perfect.box(), perfect);
-
-  // system::Supercell cell = remove_atoms(perfect, {1});
-
-  auto cell = perfect;
-
-  Vec r_H = {2.857 / 2 + 3.14, 2.857 / 2 + 3.14, 2.857 / 4 + 3.14};
+  // Vec r_C = {5.99564 + 2.86 / 4, 5.99576, 13.6908};
 
   Vec r_C = {8.85219 + 2.857 / 2, 11.7075, 8.85219};
 
@@ -156,22 +99,14 @@ int main() {
 
   fly::io::BinaryFile file("build/gsd/sim.gsd", fly::io::create);
 
-  auto vac = detect.detect_vacancies(cell);
-
-  fmt::print("Found {} vacancies @{:::.2f}\n", vac.size(), vac);
-
-  auto const N = vac.size();
-
   file.commit([&] {
     file.write(cell.box());
     file.write(cell.map());
 
-    auto special = explicit_V(vac, cell);
-
-    file.write("particles/N", fly::safe_cast<std::uint32_t>(special.size()));
-
-    file.write(id_, special);
-    file.write(r_, special);
+    file.write("particles/N", fly::safe_cast<std::uint32_t>(cell.size()));
+    file.write("log/time", -1);
+    file.write(id_, cell);
+    file.write(r_, cell);
   });
 
   kinetic::SKMC runner = {
@@ -193,7 +128,7 @@ int main() {
               .num_threads = omp_get_max_threads(),
               .max_searches = 200,
               .max_failed_searches = 75,
-              .debug = true,
+              .debug = false,
           }
       },
       cell.box(),
@@ -286,35 +221,19 @@ int main() {
                 tmp.rebind(r_, post);
                 tmp.rebind(id_, cell);
 
-                auto v2 = detect.detect_vacancies(tmp);
-
-                verify(v2.size() == N, "Num v changed");
-
-                fmt::print("Found {} vacancies @{:::.2f}\n", v2.size(), v2);
-
-                auto dist = distances(cell.box(), v2, post(r_, post.size() - 1));
-
-                fmt::print("Max V-V = {:.3e}, min V-H = {:.3e}\n", dist.v_v, dist.v_h);
-
-                auto vpost = explicit_V(v2, tmp);
-
                 file.commit([&] {
-                  auto copy = vpost;
-                  copy[r_].head(pre[r_].size()) = pre[r_];
-                  file.write(r_, copy);
+                  file.write("log/time", -1);
+                  file.write(r_, pre);
                 });
 
-                file.commit([&] { file.write(r_, vpost); });
+                file.commit([&] {
+                  file.write("log/time", d_time);
+                  file.write(r_, post);
+                });
 
                 fmt::print("Just wrote frame index No. {}\n", file.n_frames() - 1);
 
-                if (dist.v_v > 6) {
-                  ++count;
-                } else {
-                  count = 0;
-                }
-
-                return count >= 2;
+                return false;
               });
 
   fmt::print("It took {:.3e}s for H do detrap\n", d_time);

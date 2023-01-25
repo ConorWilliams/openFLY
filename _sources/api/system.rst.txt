@@ -90,6 +90,13 @@ File: ``libfly/system/SoA.hpp``
     :members:
     :undoc-members:
 
+
+Aliases
+..............
+
+.. doxygentypedef:: viewSoA
+
+
 Array of structures
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

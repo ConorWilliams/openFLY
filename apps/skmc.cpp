@@ -132,7 +132,7 @@ int main() {
   kinetic::SKMC runner = {
       {
           .debug = true,
-          .fread = "build/gsd/cat.v3.bin",
+          .fread = "build/gsd/cat.v1.bin",
           .opt_cache = {
               .barrier_tol = 0.45,
               .debug = true,

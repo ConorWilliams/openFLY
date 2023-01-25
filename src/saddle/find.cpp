@@ -208,7 +208,9 @@ namespace fly::saddle {
     return out_data;
   }
 
-  std::vector<Master::Found> Master::find_mechs(std::vector<LocalisedGeo> const& geo_data, SoA in) {
+  std::vector<Master::Found> Master::find_mechs(std::vector<LocalisedGeo> const& geo_data,
+                                                SoA in,
+                                                std::optional<Hint> const& hint) {
     // Early exit!
     if (geo_data.empty()) {
       return {};
@@ -250,10 +252,9 @@ namespace fly::saddle {
 #pragma omp single nowait
     {
       for (std::size_t j = 0; j < geo_data.size(); ++j) {
-#pragma omp task untied default(none) firstprivate(j) shared(out, in, nl_pert, geo_data)
+#pragma omp task untied default(none) firstprivate(j) shared(out, in, nl_pert, geo_data, hint)
         {
-          //   fmt::print("FINDER: Searching @{:<4}\n", geo_data[j].centre);
-          find_n(out[j], geo_data[j], in, nl_pert);
+          find_n(out[j], geo_data[j], in, nl_pert, hint);
 
           if (out[j]) {
             fmt::print("FINDER: Done @{:<4} found {} mechs\n", geo_data[j].centre, out[j].mechs().size());
@@ -305,12 +306,18 @@ namespace fly::saddle {
 
   ///////////////////////////////////////////////////////
 
-  void Master::find_n(Found& out, LocalisedGeo const& geo_data, SoA in, neigh::List const& nl_pert) {
+  void Master::find_n(Found& out,
+                      LocalisedGeo const& geo_data,
+                      SoA in,
+                      neigh::List const& nl_pert,
+                      std::optional<Hint> const& hint) {
     //
 
-    auto N = safe_cast<std::size_t>(m_opt.batch_size);
+    if (hint->centre == geo_data.centre) {
+      fmt::print("Got a hint for a mech centred on atom #{}\n", hint->centre);
+    }
 
-    std::vector<Batch> batch(N, Batch{in.size()});
+    std::vector<Batch> batch(safe_cast<std::size_t>(m_opt.batch_size), Batch{in.size()});
 
     std::vector<system::SoA<Position>> cache;  // Cache saddle-points
 
@@ -585,7 +592,7 @@ namespace fly::saddle {
         continue;
       }
 
-      // Found a new non-poisoned fowrard mechanism (sp may be poisoned).
+      // Found a new non-poisoned forward mechanism (sp may be poisoned).
 
       std::size_t num_new;
 
@@ -921,15 +928,6 @@ namespace fly::saddle {
       system::SoA<Position const&, Axis const&, Frozen const&, TypeID const&> dimer,
       system::SoA<Position const&> in,
       Index::scalar_t centre) {
-    // Check sp centred on centre and freeze an atom.
-
-    auto [_, max] = min_max(dimer, in);
-
-    if (max != centre) {
-      dprint(m_opt.debug, "FINDER: found mech at {} but wanted {}\n", max, centre);
-      return {};
-    }
-
     //   Minimisations
 
     double disp = gnorm(dimer[r_] - in[r_]);
@@ -942,7 +940,7 @@ namespace fly::saddle {
     if (m_count_frozen == 0) {
       // Freeze furthest atom to remove translational degrees of freedom.
 
-      auto min = m_sep_list[safe_cast<size_t>(max)];
+      auto min = m_sep_list[safe_cast<size_t>(centre)];
 
       dprint(m_opt.debug, "FINDER: Freezing atom #{}\n", min);
 
@@ -992,6 +990,15 @@ namespace fly::saddle {
     }
 
     ASSERT(gnorm(centroid(rev) - centroid(in)) < 1e-8, "Drift correction failed", 0);
+
+    // Check mech centred on centre.
+
+    auto [_, max] = min_max(rev, fwd);
+
+    if (max != centre) {
+      dprint(m_opt.debug, "FINDER: found mech at {} but wanted {}\n", max, centre);
+      return {};
+    }
 
     return Pathway{std::move(rev), std::move(sp_), std::move(fwd)};
   }

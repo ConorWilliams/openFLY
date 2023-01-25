@@ -282,6 +282,16 @@ namespace fly::saddle {
         -> std::vector<LocalisedGeo>;
 
     /**
+     * @brief A hint for ensuring ergodic pathways.
+     */
+    struct Hint {
+      system::viewSoA<Position> prev_state;  ///< A reference to the previous state of the system
+      Index::scalar_t centre;                ///< Central atom of mech that brought us to current state.
+      env::Mechanism mech;                   ///< Mechanism that brought us to current state.
+      env::Geometry<Index> geo;              ///< Geometry around central atom in previous state.
+    };
+
+    /**
      * @brief Find all the mechanisms centred on the ``unknown`` geometries.
      *
      * This will recursively schedule SP searches on the slave threads.
@@ -289,8 +299,10 @@ namespace fly::saddle {
      * @param geos A list of localised geometries encoding the atoms to centre the SP searches on and their
      * local environments.
      * @param in Description of system to search in.
+     * @param hint A hint to aid in
      */
-    auto find_mechs(std::vector<LocalisedGeo> const& geos, SoA in) -> std::vector<Found>;
+    auto find_mechs(std::vector<LocalisedGeo> const& geos, SoA in, std::optional<Hint> const& hint = {})
+        -> std::vector<Found>;
 
   private:
     // Per thread variables
@@ -332,7 +344,11 @@ namespace fly::saddle {
     ///////////////////////////////////////////////////////////////////////////////////
 
     // Find all mechs and write to geo_data
-    void find_n(Found& out, LocalisedGeo const& geo_data, SoA in, neigh::List const& nl_pert);
+    void find_n(Found& out,
+                LocalisedGeo const& geo_data,
+                SoA in,
+                neigh::List const& nl_pert,
+                std::optional<Hint> const& hint);
 
     bool find_batch(int tot,
                     Found& out,

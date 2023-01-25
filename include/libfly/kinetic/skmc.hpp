@@ -18,6 +18,7 @@
 // <https://www.gnu.org/licenses/>.
 
 #include <fstream>
+#include <optional>
 #include <utility>
 
 #include "libfly/env/catalogue.hpp"
@@ -29,6 +30,7 @@
 #include "libfly/potential/generic.hpp"
 #include "libfly/saddle/dimer.hpp"
 #include "libfly/saddle/find.hpp"
+#include "libfly/system/SoA.hpp"
 #include "libfly/system/box.hpp"
 #include "libfly/system/supercell.hpp"
 #include "libfly/utility/core.hpp"
@@ -38,7 +40,7 @@
 /**
  * \file skmc.hpp
  *
- * @brief
+ * @brief Objects that coordinate and run an OLKMC simulation.
  */
 
 namespace fly::kinetic {
@@ -46,13 +48,14 @@ namespace fly::kinetic {
   /**
    * @brief Updates/rebuilds a catalogue from a ``cell``.
    *
-   * This function repeatedly calls ``.rebuild()`` on ``cat`` and coordinates saddle-point searches using
-   * ``mast`` to find the mechanisms for the newly encountered environments.
+   * This function repeatedly calls ``.rebuild()`` on ``cat`` and coordinates saddle-point
+   * searches using ``mast`` to find the mechanisms for the newly encountered environments.
    *
    * @param mast The saddle-point/mechanism finder.
    * @param cat The catalogue to update
    * @param cell The cell to rebuild the catalogue from.
    * @param num_threads The number of openMP threads to use.
+   * @param hint An optional hint for the SP searches.
    * @return true If new environments encountered.
    * @return false If no new environments encountered.
    */
@@ -60,7 +63,8 @@ namespace fly::kinetic {
   bool update_cat(saddle::Master& mast,
                   env::Catalogue& cat,
                   system::Supercell<Map, T...> const& cell,
-                  int num_threads) {
+                  int num_threads,
+                  std::optional<saddle::Master::Hint> const& hint = {}) {
     //
     std::vector<int> ix = cat.rebuild(cell, num_threads);
 
@@ -68,6 +72,7 @@ namespace fly::kinetic {
       return false;
     }
 
+    // This is simply because H is normally at the back but takes the longest to search.
     std::reverse(ix.begin(), ix.end());
 
     int refines = 0;
@@ -78,7 +83,7 @@ namespace fly::kinetic {
 
       fmt::print("Update: New envs @{} with {} refines\n", ix, refines);
 
-      std::vector found = mast.find_mechs(saddle::Master::package({ix}, cat), cell);
+      std::vector found = mast.find_mechs(saddle::Master::package({ix}, cat), cell, hint);
 
       /*
        * If find_mechs has failed, the failed environments must be too symmetric, we must refine them until
@@ -322,6 +327,8 @@ namespace fly::kinetic {
             do {
               double new_tol = m_cat.refine_tol(atom);
               dprint(m_opt.debug, "SKMC: Refined tolerance to {}\n", new_tol);
+              // Here we could provide a hint from the failed mechanism but it is not guaranteed that the new
+              // unknown environments have anything to do with the mech that brought us here
               new_envs = new_envs || kinetic::update_cat(m_mast, m_cat, cell, num_threads);
             } while (initial_assign == m_cat.get_ref(atom).cat_index());
 
@@ -349,11 +356,24 @@ namespace fly::kinetic {
                       system::SoA<Position const&>{rel_recon},
                       Ef);
 
-        cell[r_] = rel_recon[r_];
+        if (stop) {
+          return;  // Early exit
+        }
 
         ///////////// Update catalogue /////////////
 
-        if (kinetic::update_cat(m_mast, m_cat, cell, num_threads)) {
+        // Here we are updating the catalogue after a successful mechanism, can provide a hint.
+
+        saddle::Master::Hint hint = {
+            cell,
+            atom,
+            m,
+            m_cat.get_geo(atom),
+        };
+
+        cell[r_] = rel_recon[r_];  // Update cell after constructing the hint.
+
+        if (kinetic::update_cat(m_mast, m_cat, cell, num_threads, hint)) {
           dump_cat();
         }
 

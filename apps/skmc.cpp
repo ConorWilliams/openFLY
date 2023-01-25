@@ -96,11 +96,11 @@ int main() {
 
   DetectVacancies detect(0.75, perfect.box(), perfect);
 
-  system::Supercell cell = remove_atoms(perfect, {1, 2, 3});
+  system::Supercell cell = remove_atoms(perfect, {1});
 
-  //   Vec r_H = {2.857 / 2 + 3.14, 2.857 / 2 + 3.14, 2.857 / 4 + 3.14};
+  Vec r_H = {2.857 / 2 + 3.14, 2.857 / 2 + 3.14, 2.857 / 4 + 3.14};
 
-  //   cell = add_atoms(cell, {system::Atom<TypeID, Position, Frozen>(1, r_H, false)});
+  cell = add_atoms(cell, {system::Atom<TypeID, Position, Frozen>(1, r_H, false)});
 
   //   cell = add_atoms(
   //       cell, {system::Atom<TypeID, Position, Frozen, Hash>(1, {2.857 / 2 + 3.14, 2.857 / 2 + 3.14, 2.857
@@ -114,20 +114,14 @@ int main() {
 
   fly::io::BinaryFile file("build/gsd/sim.gsd", fly::io::create);
 
-  auto vac = detect.detect_vacancies(cell);
-
-  fmt::print("Found {} vacancies @{:::.2f}\n", vac.size(), vac);
-
   file.commit([&] {
     file.write(cell.box());
     file.write(cell.map());
 
-    auto special = explicit_V(vac, cell);
+    file.write("particles/N", fly::safe_cast<std::uint32_t>(cell.size()));
 
-    file.write("particles/N", fly::safe_cast<std::uint32_t>(special.size()));
-
-    file.write(id_, special);
-    file.write(r_, special);
+    file.write(id_, cell);
+    file.write(r_, cell);
 
     file.write("log/time", -1.);
     file.write("log/energy", -1.);
@@ -138,13 +132,13 @@ int main() {
   kinetic::SKMC runner = {
       {
           .debug = true,
-          .fread = "build/gsd/cat.Vn.bin",
+          .fread = "build/gsd/cat.v3.bin",
           .opt_cache = {
               .barrier_tol = 0.45,
               .debug = true,
               .opt_basin = {
                   .debug = true,
-                  .temp = 500,
+                  .temp = 300,
               },
               .opt_sb = {
                   .debug = true,
@@ -183,9 +177,11 @@ int main() {
       },
   };
 
-  double prev_time = 0;
-
   auto const min_image = cell.box().slow_min_image_computer();
+
+  double run_time = 0;
+  bool v_diss = false;
+  bool h_escaped = false;
 
   runner.skmc(cell,
               omp_get_max_threads(),
@@ -198,47 +194,52 @@ int main() {
                   double Ef                            ///< Energy of system in state post.
               ) {
                 //
+                run_time = time;
 
                 fly::system::SoA<TypeID const &, Position const &> tmp(cell.size());
 
                 tmp.rebind(r_, post);
                 tmp.rebind(id_, cell);
 
-                auto v2 = detect.detect_vacancies(tmp);
+                std::vector vac = detect.detect_vacancies(tmp);
 
-                fmt::print("Found {} vacancies @{:::.2f}\n", v2.size(), v2);
+                fmt::print("Found {} vacancies @{:::.2f}\n", vac.size(), vac);
 
-                double const VH = [&]() {
-                  double x = std::numeric_limits<double>::max();
+                // V-dis testing
+
+                double const VV = kruskal_max(vac, min_image);
+
+                fmt::print("MST max V-V = {:.3e}\n", VV);
+
+                v_diss = VV > 5;  // Vacancy-cluster dissociation criterion
+
+                // H-escape testing
+                if (auto last = post.size() - 1; cell(id_, last) == 1) {
+                  double vh = std::numeric_limits<double>::max();
 
                   for (auto const &v : vac) {
-                    x = std::min(x, min_image(post(r_, post.size() - 1), v));
+                    vh = std::min(vh, min_image(post(r_, last), v));
                   }
 
-                  return x;
-                }();
+                  fmt::print("Min V-H = {:.3e}\n", vh);
 
-                double const VV = kruskal_max(v2, min_image);
+                  h_escaped = vh > 6;  // H-escape criterion set here.
+                }
 
-                fmt::print("MST max VV = {:.3e}, min VH = {:.3e}\n", VV, VH);
-
-                auto vpost = explicit_V(v2, tmp);
+                // Write to GSD
 
                 file.commit([&] {
                   file.write("particles/N", fly::safe_cast<std::uint32_t>(cell.size()));
 
-                  file.write(id_, cell);
                   file.write(r_, pre);
 
-                  file.write("log/time", -1);
                   file.write("log/energy", E0);
-                  file.write("log/barrier", -1.);
-                  file.write("log/kinetic", -1.);
                 });
 
-                prev_time = time;
-
                 file.commit([&] {
+                  //
+                  auto vpost = explicit_V(vac, tmp);
+
                   file.write("particles/N", fly::safe_cast<std::uint32_t>(vpost.size()));
 
                   file.write(id_, vpost);
@@ -252,10 +253,11 @@ int main() {
 
                 fmt::print("Just wrote frame index No. {}\n", file.n_frames() - 1);
 
-                return VV > 5;
+                return v_diss || h_escaped;
               });
 
-  fmt::print("It took {:.3e}s to terminate\n", prev_time);
+  fmt::print("It took {:.3e}s to terminate\n", run_time);
+  fmt::print("H escaped = {}, cluster dissociated = {}\n", h_escaped, v_diss);
 
   return 0;
 }

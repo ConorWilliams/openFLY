@@ -191,6 +191,9 @@ File ``libfly/lattice.hpp``
 .. doxygenfile:: lattice.hpp
     :sections: briefdescription detaileddescription
 
+Building/manipulating
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 .. doxygenfunction:: motif_to_lattice
 
 .. doxygenfunction:: add_atoms
@@ -198,3 +201,16 @@ File ``libfly/lattice.hpp``
 .. doxygenfunction:: remove_atoms
     
 .. doxygenfunction:: remove_sphere
+
+.. doxygenfunction:: fly::centroid
+
+.. doxygenfunction:: centroid_align
+
+Vacancies
+~~~~~~~~~~
+
+.. doxygenclass:: fly::DetectVacancies
+    :members:
+    :undoc-members:
+
+.. doxygenfunction:: kruskal_max

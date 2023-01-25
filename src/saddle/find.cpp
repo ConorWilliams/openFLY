@@ -252,11 +252,14 @@ namespace fly::saddle {
       for (std::size_t j = 0; j < geo_data.size(); ++j) {
 #pragma omp task untied default(none) firstprivate(j) shared(out, in, nl_pert, geo_data)
         {
-          fmt::print("FINDER: Searching @{:<4}\n", geo_data[j].centre);
+          //   fmt::print("FINDER: Searching @{:<4}\n", geo_data[j].centre);
           find_n(out[j], geo_data[j], in, nl_pert);
-          fmt::print("FINDER: Done @{:<4} found {} mechs\n",
-                     geo_data[j].centre,
-                     out[j] ? int(out[j].mechs().size()) : -1);
+
+          if (out[j]) {
+            fmt::print("FINDER: Done @{:<4} found {} mechs\n", geo_data[j].centre, out[j].mechs().size());
+          } else {
+            fmt::print("FINDER: Failed @{:<4}\n", geo_data[j].centre);
+          }
         }
       }
     }

@@ -89,52 +89,18 @@ fly::system::SoA<TypeID, Position> explicit_V(std::vector<Vec> const &vac,
   return special;
 }
 
-struct Result {
-  double v_v;  ///< The maximum of the V-V nearest-neighbour distances.
-  double v_h;  ///< The minimum V-H distance.
-};
-
-/**
- * @brief
- */
-Result distances(system::Box const &box, std::vector<Vec> const &vac, Vec hy) {
-  //
-  auto mi = box.slow_min_image_computer();
-
-  Result r{
-      0,
-      std::numeric_limits<double>::max(),
-  };
-
-  for (auto const &v : vac) {
-    r.v_h = std::min(r.v_h, mi(hy, v));
-
-    for (auto const &n : vac) {
-      r.v_v = std::max(r.v_v, mi(n, v));
-    }
-  }
-
-  return r;
-}
-
 int main() {
   //
 
-  // double a;
-
-  // fmt::print("a = ");
-
-  // std::cin >> a;
-
   system::Supercell perfect = motif_to_lattice(bcc_iron_motif(), {6, 6, 6});
 
-  DetectVacancies detect(4, perfect.box(), perfect);
+  DetectVacancies detect(0.75, perfect.box(), perfect);
 
   system::Supercell cell = remove_atoms(perfect, {1, 2, 3});
 
-  Vec r_H = {2.857 / 2 + 3.14, 2.857 / 2 + 3.14, 2.857 / 4 + 3.14};
+  //   Vec r_H = {2.857 / 2 + 3.14, 2.857 / 2 + 3.14, 2.857 / 4 + 3.14};
 
-  cell = add_atoms(cell, {system::Atom<TypeID, Position, Frozen>(1, r_H, false)});
+  //   cell = add_atoms(cell, {system::Atom<TypeID, Position, Frozen>(1, r_H, false)});
 
   //   cell = add_atoms(
   //       cell, {system::Atom<TypeID, Position, Frozen, Hash>(1, {2.857 / 2 + 3.14, 2.857 / 2 + 3.14, 2.857
@@ -152,8 +118,6 @@ int main() {
 
   fmt::print("Found {} vacancies @{:::.2f}\n", vac.size(), vac);
 
-  auto const N = vac.size();
-
   file.commit([&] {
     file.write(cell.box());
     file.write(cell.map());
@@ -164,12 +128,17 @@ int main() {
 
     file.write(id_, special);
     file.write(r_, special);
+
+    file.write("log/time", -1.);
+    file.write("log/energy", -1.);
+    file.write("log/barrier", -1.);
+    file.write("log/kinetic", -1.);
   });
 
   kinetic::SKMC runner = {
       {
           .debug = true,
-          .fread = "build/gsd/cat.v3.bin",
+          .fread = "build/gsd/cat.Vn.bin",
           .opt_cache = {
               .barrier_tol = 0.45,
               .debug = true,
@@ -214,8 +183,9 @@ int main() {
       },
   };
 
-  double d_time = 0;
-  int count = 0;
+  double prev_time = 0;
+
+  auto const min_image = cell.box().slow_min_image_computer();
 
   runner.skmc(cell,
               omp_get_max_threads(),
@@ -228,7 +198,6 @@ int main() {
                   double Ef                            ///< Energy of system in state post.
               ) {
                 //
-                d_time = time;
 
                 fly::system::SoA<TypeID const &, Position const &> tmp(cell.size());
 
@@ -237,36 +206,56 @@ int main() {
 
                 auto v2 = detect.detect_vacancies(tmp);
 
-                verify(v2.size() == N, "Num v changed");
-
                 fmt::print("Found {} vacancies @{:::.2f}\n", v2.size(), v2);
 
-                auto dist = distances(cell.box(), v2, post(r_, post.size() - 1));
+                double const VH = [&]() {
+                  double x = std::numeric_limits<double>::max();
 
-                fmt::print("Max V-V = {:.3e}, min V-H = {:.3e}\n", dist.v_v, dist.v_h);
+                  for (auto const &v : vac) {
+                    x = std::min(x, min_image(post(r_, post.size() - 1), v));
+                  }
+
+                  return x;
+                }();
+
+                double const VV = kruskal_max(v2, min_image);
+
+                fmt::print("MST max VV = {:.3e}, min VH = {:.3e}\n", VV, VH);
 
                 auto vpost = explicit_V(v2, tmp);
 
                 file.commit([&] {
-                  auto copy = vpost;
-                  copy[r_].head(pre[r_].size()) = pre[r_];
-                  file.write(r_, copy);
+                  file.write("particles/N", fly::safe_cast<std::uint32_t>(cell.size()));
+
+                  file.write(id_, cell);
+                  file.write(r_, pre);
+
+                  file.write("log/time", -1);
+                  file.write("log/energy", E0);
+                  file.write("log/barrier", -1.);
+                  file.write("log/kinetic", -1.);
                 });
 
-                file.commit([&] { file.write(r_, vpost); });
+                prev_time = time;
+
+                file.commit([&] {
+                  file.write("particles/N", fly::safe_cast<std::uint32_t>(vpost.size()));
+
+                  file.write(id_, vpost);
+                  file.write(r_, vpost);
+
+                  file.write("log/time", time);
+                  file.write("log/energy", Ef);
+                  file.write("log/barrier", mech.barrier);
+                  file.write("log/kinetic", mech.kinetic_pre);
+                });
 
                 fmt::print("Just wrote frame index No. {}\n", file.n_frames() - 1);
 
-                if (dist.v_v > 6) {
-                  ++count;
-                } else {
-                  count = 0;
-                }
-
-                return count >= 2;
+                return VV > 5;
               });
 
-  fmt::print("It took {:.3e}s for H do detrap\n", d_time);
+  fmt::print("It took {:.3e}s to terminate\n", prev_time);
 
   return 0;
 }

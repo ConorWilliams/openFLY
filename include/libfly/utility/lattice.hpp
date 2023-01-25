@@ -23,6 +23,7 @@
 #include <algorithm>
 #include <cmath>
 #include <cstddef>
+#include <type_traits>
 
 #include "libfly/neigh/list.hpp"
 #include "libfly/system/atom.hpp"
@@ -233,13 +234,13 @@ namespace fly {
      * @brief Construct a new Detect Vacancies object.
      *
      * @param box A description of the simulation space.
-     * @param r_max At least the maximum distance an atom can be from a lattice site.
+     * @param r_lat The "radius" of a lattice point i.e. the minimum distance to be considered at that point.
      * @param perfect_lat The perfect lattice, must consist only of atom of a single type.
      */
-    DetectVacancies(double r_max, system::Box const &box, system::viewSoA<TypeID, Position> perfect_lat);
+    DetectVacancies(double r_lat, system::Box const &box, system::viewSoA<TypeID, Position> perfect_lat);
 
     /**
-     * @brief Find the canonicl coordinate of the vacanices.
+     * @brief Find the canonical coordinate of the vacancies.
      *
      * @param lat The defective lattice.
      * @param num_threads The number of (openMP) threads to use.
@@ -249,7 +250,7 @@ namespace fly {
   private:
     TypeID::scalar_t m_tp = 0;
 
-    double m_r_max;
+    double m_r_lat;
 
     system::Box m_box;
 
@@ -271,5 +272,121 @@ namespace fly {
       return tmp;
     }
   };
+
+  /**
+   * @brief Stores the integers 0... N as a collection of disjoint (non-overlapping) sets..
+   */
+  class DisjointSetForest {
+  public:
+    /**
+     * @brief Initialise a forest of N sets each containing a single integer 0...N.
+     */
+    explicit DisjointSetForest(std::size_t N) : m_part(N) {
+      for (std::size_t i = 0; i < N; i++) {
+        m_part[i].parent = i;
+      }
+    }
+
+    /**
+     * @brief Return an index of the set that the integer ``x``, in 0... N, belongs to.
+     *
+     * This remains constant until merge() is called.
+     */
+    std::size_t find(std::size_t x) {
+      //
+      ASSERT(x < m_part.size(), "{} is not in the forest", x);
+
+      if (m_part[x].parent != x) {
+        return (m_part[x].parent = find(m_part[x].parent));  // Path compression
+      } else {
+        return x;
+      }
+    }
+
+    /**
+     * @brief Replace the set at index ``x`` and the set at index ``y`` with their union.
+     */
+    void merge(std::size_t x, std::size_t y) {
+      //
+      ASSERT(x < m_part.size(), "x={} is not in the forest", x);
+      ASSERT(y < m_part.size(), "y={} is not in the forest", y);
+
+      if (x == y) {
+        return;
+      }
+
+      if (m_part[x].size < m_part[y].size) {
+        std::swap(x, y);
+      }
+
+      m_part[y].parent = x;
+      m_part[x].size = m_part[x].size + m_part[y].size;
+    }
+
+  private:
+    struct Node {
+      std::size_t parent;
+      std::size_t size = 1;
+    };
+
+    std::vector<Node> m_part;
+  };
+
+  /**
+   * @brief Get the longest edge in a minimum spanning tree of the nodes in ``v``.
+   *
+   * If there is less than two nodes then this function will return -1.
+   *
+   * @param v A vector of nodes.
+   * @param norm A function which computes the distance between two of the nodes in ``v``.
+   */
+  template <typename T, typename F>
+  auto kruskal_max(std::vector<T> const &v, F const &norm)
+      -> std::enable_if_t<std::is_invocable_r_v<double, F const &, T const &, T const &>, double> {
+    //
+
+    struct Edge {
+      std::size_t A;
+      std::size_t B;
+
+      double len;
+    };
+
+    std::vector<Edge> adj;
+
+    // Initialise and sort edges
+
+    for (std::size_t i = 0; i < v.size(); i++) {
+      for (std::size_t j = 0; j < i; j++) {
+        adj.push_back({i, j, std::invoke(norm, v[i], v[j])});
+      }
+    }
+
+    std::sort(adj.begin(), adj.end(), [](Edge const &x, Edge const &y) { return x.len < y.len; });
+
+    DisjointSetForest forest(v.size());
+
+    double max = 0;
+    std::size_t count = 0;
+
+    for (auto const &edge : adj) {
+      //
+      auto set_A = forest.find(edge.A);
+      auto set_B = forest.find(edge.B);
+
+      if (set_A != set_B) {
+        //
+        forest.merge(set_A, set_B);
+
+        max = std::max(max, edge.len);
+
+        if (++count == v.size() - 1) {
+          return max;
+        }
+      }
+    }
+
+    return -1;
+  }
 
 }  // namespace fly

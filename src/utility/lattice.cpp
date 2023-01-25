@@ -18,14 +18,17 @@
 
 #include "libfly/utility/lattice.hpp"
 
+#include <fmt/core.h>
+
 #include <cstddef>
+#include <limits>
 
 namespace fly {
 
-  DetectVacancies::DetectVacancies(double r_max,
+  DetectVacancies::DetectVacancies(double r_lat,
                                    system::Box const &box,
                                    system::viewSoA<TypeID, Position> perfect_lat)
-      : m_r_max(r_max), m_box(box), m_list(box, r_max), m_perfect(perfect_lat) {
+      : m_r_lat(r_lat), m_box(box), m_list(box, r_lat), m_perfect(perfect_lat) {
     verify(perfect_lat.size() > 0, "Perfect lattice must have some atoms!");
     m_tp = perfect_lat(id_, 0);
     verify((perfect_lat[id_] == m_tp).all(), "Perfect lattice must only contain atoms of typeID={}", m_tp);
@@ -68,12 +71,14 @@ namespace fly {
 
     m_list.rebuild(m_combo, num_threads);
 
+    int off_lattice = 0;
+
     for (Eigen::Index i = m_perfect.size(); i < m_combo.size(); i++) {
       //
       double r_min = std::numeric_limits<double>::max();
       Eigen::Index i_min = -1;
 
-      m_list.for_neighbours(i, m_r_max, [&](auto n, auto r, auto const &) {
+      m_list.for_neighbours(i, m_r_lat, [&](auto n, auto r, auto const &) {
         if (n < m_perfect.size() && r < r_min) {
           // If lattice site and closer
           r_min = r;
@@ -81,11 +86,12 @@ namespace fly {
         }
       });
 
-      verify(i_min != -1, "Could not assign atom to perfect lattice site!");
-
-      verify(m_combo(i_, i_min) == -1, "Many-2-one assignment!");
-
-      m_combo(i_, i_min) = i;
+      if (i_min == -1) {
+        ++off_lattice;
+      } else {
+        verify(m_combo(i_, i_min) == -1, "Many-to-1 assignment!");
+        m_combo(i_, i_min) = i;
+      }
     }
 
     std::vector<Vec> out;

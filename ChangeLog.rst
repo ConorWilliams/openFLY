@@ -22,8 +22,14 @@ Unreleased
 -------------------------------
 Added
 ~~~~~
+
+- New ``kruskal_max`` algorithm for computing the size of vacancy clusters.
+
 Changed
 ~~~~~~~
+
+- ``DetectVacacies`` class interface changed and minimum distance introduced.
+
 Removed
 ~~~~~~~
 Bugfixes
@@ -97,10 +103,10 @@ Added
 - Catalogue has serialisation support (hence all serialised members of the catalogue do to).
 - Catalogue environments expose their delta_max.
 - Catalogue has a method to calculate the (approximate) symmetries a geometry has.
-- Dimer::Exit has a new return code.
-- Many new options in Master::Options.
-- New Xoshiro constructor to properly seed from ``std::random_device``.
-- Box has a new min_image calculator method.
+- ``Dimer::Exit`` has a new return code.
+- Many new options in ``Master::Options``.
+- New ``Xoshiro`` constructor to properly seed from ``std::random_device``.
+- ``Box`` has a new min_image calculator method.
 
 Changed
 ~~~~~~~

@@ -81,7 +81,7 @@ namespace fly::kinetic {
       //
       std::vector<int> fails;
 
-      fmt::print("Update: New envs @{} with {} refines\n", ix, refines);
+      fmt::print("Update: {} new environments with {} refines\n", ix.size(), refines);
 
       std::vector found = mast.find_mechs(saddle::Master::package({ix}, cat), cell, hint);
 

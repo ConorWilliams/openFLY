@@ -362,18 +362,12 @@ namespace fly::saddle {
      * @brief Find a single mechanism
      *
      * @param in Initial basin
-     * @param dimer_in_out Perturbed dimer as input and output.
-     * @param hist_sp Previous saddle points.
-     * @param exit Stores the return code of the SP search.
-     * @param theta_tol forwarded to Dimer::find_sp()
+     * @param dimer Dimer at the saddle-point output.
      * @param geo Centred of perturbation.
      */
-    std::optional<env::Mechanism> find_one(SoA in,
-                                           system::SoA<Position&, Axis&> dimer_in_out,
-                                           Dimer::Exit& exit,
-                                           env::Geometry<Index> const& geo,
-                                           std::vector<system::SoA<Position>> const& hist_sp,
-                                           double theta_tol);
+    std::optional<env::Mechanism> saddle_2_mech(system::viewSoA<Position, Frozen, TypeID> in,
+                                                system::viewSoA<Position, Axis, Frozen, TypeID> dimer,
+                                                env::Geometry<Index> const& geo);
 
     // Do a saddle point search
     Dimer::Exit find_sp(system::SoA<Position&, Axis&, Frozen const&, TypeID const&> dimer,

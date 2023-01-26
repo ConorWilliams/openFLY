@@ -257,9 +257,25 @@ namespace fly::saddle {
           find_n(out[j], geo_data[j], in, nl_pert, hint);
 
           if (out[j]) {
-            fmt::print("FINDER: Done @{:<4} found {} mechs\n", geo_data[j].centre, out[j].mechs().size());
+            std::vector<double> barriers;
+
+            for (auto const& m : out[j].mechs()) {
+              barriers.push_back(m.barrier);
+            }
+
+            std::sort(barriers.begin(), barriers.end());
+
+            auto last = std::unique(barriers.begin(), barriers.end());
+
+            barriers.erase(last, barriers.end());
+
+            fmt::print("FINDER: @{:<4} found {:>3} mechs {::.2f}\n",
+                       geo_data[j].centre,
+                       out[j].mechs().size(),
+                       barriers);
+
           } else {
-            fmt::print("FINDER: Failed @{:<4}\n", geo_data[j].centre);
+            fmt::print("FINDER: @{:<4} symmetry-break!\n", geo_data[j].centre);
           }
         }
       }
@@ -315,9 +331,19 @@ namespace fly::saddle {
 
     if (hint->centre == geo_data.centre) {
       fmt::print("Got a hint for a mech centred on atom #{}\n", hint->centre);
+
+      //   system::viewSoA<Position, TypeID, Frozen> tmp(in.size());
+
+      //   tmp.rebind(r_, hint->prev_state);
+      //   tmp.rebind(fzn_, in);
+      //   tmp.rebind(id_, in);
+
+      //   Recon re = recon_relax(hint->geo, hint->mech, tmp);
+
+      //   std::optional mech = saddle_2_mech(in, *re.rel_sp, geo_data.geo);
     }
 
-    std::vector<Batch> batch(safe_cast<std::size_t>(m_opt.batch_size), Batch{in.size()});
+    std::vector<Batch> batch(safe_cast<std::size_t>(m_opt.batch_size), Batch(in.size()));
 
     std::vector<system::SoA<Position>> cache;  // Cache saddle-points
 
@@ -554,7 +580,20 @@ namespace fly::saddle {
           centroid_align(elem.dimer, in);
         }
 
-        elem.mech = find_one(in, elem.dimer, elem.exit, geo_data.geo, cache, theta_tol);
+        system::SoA<Position&, Axis&, Frozen const&, TypeID const&> dimer(in.size());
+
+        dimer.rebind(r_, elem.dimer);
+        dimer.rebind(ax_, elem.dimer);
+        dimer.rebind(fzn_, in);
+        dimer.rebind(id_, in);
+
+        elem.exit = find_sp(dimer, in, cache, theta_tol);
+
+        if (elem.exit == Dimer::success) {
+          elem.mech = saddle_2_mech(in, dimer, geo_data.geo);
+        } else {
+          elem.mech = std::nullopt;
+        }
       }
     }
 #pragma omp taskwait
@@ -623,7 +662,7 @@ namespace fly::saddle {
         throw;
       }
 
-      verify(num_new > 0, "Only found {} but should have had at least 1", num_new);
+      verify(num_new > 0, "Found none @{} but should have had at least 1", geo_data.centre);
 
       std::size_t n = cache.size();
 
@@ -662,25 +701,10 @@ namespace fly::saddle {
     return found_one_or_more;
   }
 
-  std::optional<env::Mechanism> Master::find_one(
-      system::SoA<Position const&, Frozen const&, TypeID const&> in,
-      system::SoA<Position&, Axis&> dimer_in_out,
-      Dimer::Exit& exit,
-      env::Geometry<Index> const& geo,
-      std::vector<system::SoA<Position>> const& hist_sp,
-      double theta_tol) {
+  std::optional<env::Mechanism> Master::saddle_2_mech(system::viewSoA<Position, Frozen, TypeID> in,
+                                                      system::viewSoA<Position, Axis, Frozen, TypeID> dimer,
+                                                      env::Geometry<Index> const& geo) {
     // Saddle search
-
-    system::SoA<Position&, Axis&, Frozen const&, TypeID const&> dimer(in.size());
-
-    dimer.rebind(r_, dimer_in_out);
-    dimer.rebind(ax_, dimer_in_out);
-    dimer.rebind(fzn_, in);
-    dimer.rebind(id_, in);
-
-    if ((exit = find_sp(dimer, in, hist_sp, theta_tol))) {
-      return {};
-    }
 
     std::optional path = do_adj_min(dimer, in, geo[0][i_]);
 
@@ -742,7 +766,42 @@ namespace fly::saddle {
       mech.delta_fwd.emplace_back(fwd(r_, i) - rev(r_, i));
     }
 
-    // Test reconstruction
+    //////////////// Partial hessian compute. ////////////////
+
+    thr.pot_nl.rebuild(sp, 1);
+
+    thr.pot.hessian(thr.hess, in, thr.pot_nl, 1);
+
+    thr.pot.mw_hessian(thr.hess, in, 1);
+
+    system::Hessian::Vector const& freq = thr.hess.eigenvalues();
+
+    // Must have at least one neg
+    verify(freq[0] < -m_opt.hessian_eigen_zero_tol, "Saddle-point with minimum mode={}", freq[0]);
+
+    int count_zeros = 0;
+    mech.kinetic_pre = 0;
+
+    for (int i = 1; i < freq.size(); i++) {
+      //
+      if (freq[i] < -m_opt.hessian_eigen_zero_tol) {
+        dprint(m_opt.debug, "FINDER: Second order SP or higher, modes {} = {}\n", i, freq.head(i));
+        return {};
+      } else if (freq[i] > m_opt.hessian_eigen_zero_tol) {
+        mech.kinetic_pre += std::log(freq[i]);
+      } else {
+        ++count_zeros;
+      }
+    }
+
+    if (count_zeros != m_num_zero_modes) {
+      for (int j = 0; j < std::max(m_num_zero_modes, count_zeros) + 3; j++) {
+        fmt::print(stderr, "FINDER: [ERR] min mode {} = {}\n", j, freq[j]);
+      }
+      throw error("Expecting {} zero modes but hessian has {}", m_num_zero_modes, count_zeros);
+    }
+
+    // Test reconstruction of the mechanism, mark poisoning and calc recon errors
 
     system::SoA<Position const&, TypeID const&, Frozen const&> ref(rev.size());
     ref.rebind(r_, rev);
@@ -808,6 +867,8 @@ namespace fly::saddle {
       }
     }
 
+    // Debugging extreme poisoning
+
     if (mech.poison_fwd && mech.barrier < 1.) {
 #pragma omp critical
       {
@@ -844,41 +905,6 @@ namespace fly::saddle {
                   mech.barrier,
                   mech.err_sp,
                   mech.err_fwd);
-    }
-
-    //////////////// Partial hessian compute. ////////////////
-
-    thr.pot_nl.rebuild(sp, 1);
-
-    thr.pot.hessian(thr.hess, in, thr.pot_nl, 1);
-
-    thr.pot.mw_hessian(thr.hess, in, 1);
-
-    system::Hessian::Vector const& freq = thr.hess.eigenvalues();
-
-    // Must have at least one neg
-    verify(freq[0] < -m_opt.hessian_eigen_zero_tol, "Saddle-point with minimum mode={}", freq[0]);
-
-    int count_zeros = 0;
-    mech.kinetic_pre = 0;
-
-    for (int i = 1; i < freq.size(); i++) {
-      //
-      if (freq[i] < -m_opt.hessian_eigen_zero_tol) {
-        dprint(m_opt.debug, "FINDER: Second order SP or higher, modes {} = {}\n", i, freq.head(i));
-        return {};
-      } else if (freq[i] > m_opt.hessian_eigen_zero_tol) {
-        mech.kinetic_pre += std::log(freq[i]);
-      } else {
-        ++count_zeros;
-      }
-    }
-
-    if (count_zeros != m_num_zero_modes) {
-      for (int j = 0; j < std::max(m_num_zero_modes, count_zeros) + 3; j++) {
-        fmt::print(stderr, "FINDER: [ERR] min mode {} = {}\n", j, freq[j]);
-      }
-      throw error("Expecting {} zero modes but hessian has {}", m_num_zero_modes, count_zeros);
     }
 
     if (m_opt.debug) {

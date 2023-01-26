@@ -385,7 +385,7 @@ namespace fly::saddle {
     // Cache saddle-points.
     std::vector<system::SoA<Position>> cache;
 
-    if (hint->centre == geo_data.centre) {
+    if (hint && hint->centre == geo_data.centre) {
       process_hint(out, geo_data, in, *hint, cache);
     }
 

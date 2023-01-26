@@ -268,7 +268,7 @@ namespace fly::saddle {
 
             barriers.erase(last, barriers.end());
 
-            fmt::print("FINDER: @{:<4} found {:>3} mechs {::.3f}\n",
+            fmt::print("FINDER: @{:<4} found {:>3} mech(s) {::.3f}\n",
                        geo_data[j].centre,
                        out[j].mechs().size(),
                        barriers);
@@ -349,8 +349,11 @@ namespace fly::saddle {
     }
 
     if (std::optional mech = saddle_2_mech(in, dimer, geo_data.geo)) {
-      fmt::print("FINDER: @{:<4} hints  {:.2f}eV \n", geo_data.centre, mech->barrier);
+      double b = mech->barrier;
+
       verify(add_mech(out, in, std::move(*mech), dimer, cache, geo_data), "Hinted mech was not added");
+
+      fmt::print("FINDER: @{:<4} hints {:>3} mech(s) [{:.3f}]\n", geo_data.centre, out.mechs().size(), b);
       return;
     }
 
@@ -358,7 +361,9 @@ namespace fly::saddle {
 
     // Debugging output
 
-    fly::io::BinaryFile file("build/gsd/hint.gsd", fly::io::create);
+    static int count = 0;
+
+    fly::io::BinaryFile file(fmt::format("build/gsd/hint.{}.gsd", count++), fly::io::create);
 
     file.commit([&] {
       file.write("particles/N", fly::safe_cast<std::uint32_t>(in.size()));
@@ -580,7 +585,7 @@ namespace fly::saddle {
     double frac_sp = d_sp / mech.err_sp + err_sp;
 
     dprint(m_opt.debug,
-           "FINDER: Recon @{:>4} sym={:<2} Δ(ΔE#)={:.3f} [{:.4f}] ΔR_sp={:.3f} [{:.4f}]\n",
+           "FINDER: Recon @{:>4} sym={:<2} Δ(ΔE#)={:.3f} [{:.4f}]  ΔR_sp={:.3f} [{:.4f}]\n",
            geo_data.centre,
            sym_indx,
            d_barrier,
@@ -1224,22 +1229,22 @@ namespace fly::saddle {
     double min_d_theta = std::numeric_limits<double>::max();
 
     for (env::Mechanism const& m : hist) {
-        //
-        double d_sp = env::rmsd<Delta>(maybe.delta_sp, m.delta_sp);
-        double d_fwd = env::rmsd<Delta>(maybe.delta_fwd, m.delta_fwd);
+      //
+      double d_sp = env::rmsd<Delta>(maybe.delta_sp, m.delta_sp);
+      double d_fwd = env::rmsd<Delta>(maybe.delta_fwd, m.delta_fwd);
 
-        double dot = 0;
-        double n1 = 0;
-        double n2 = 0;
+      double dot = 0;
+      double n1 = 0;
+      double n2 = 0;
 
-        for (Eigen::Index i = 0; i < m.delta_sp.size(); ++i) {
-          n1 += gnorm_sq(maybe.delta_sp[i][del_]);
-          n2 += gnorm_sq(m.delta_sp[i][del_]);
-          dot += gdot(maybe.delta_sp[i][del_], m.delta_sp[i][del_]);
-        }
+      for (Eigen::Index i = 0; i < m.delta_sp.size(); ++i) {
+        n1 += gnorm_sq(maybe.delta_sp[i][del_]);
+        n2 += gnorm_sq(m.delta_sp[i][del_]);
+        dot += gdot(maybe.delta_sp[i][del_], m.delta_sp[i][del_]);
+      }
 
-        n1 = std::sqrt(n1);
-        n2 = std::sqrt(n2);
+      n1 = std::sqrt(n1);
+      n2 = std::sqrt(n2);
 
       double theta = std::acos(std::clamp(dot / (n1 * n2), -1., 1.)) / (2 * M_PI) * 360;
 
@@ -1247,16 +1252,16 @@ namespace fly::saddle {
       min_d_fwd = std::min(min_d_fwd, d_fwd);
       min_d_theta = std::min(min_d_theta, theta);
 
-        if (d_sp < m_opt.mech_tol && d_fwd < m_opt.mech_tol && theta < 10) {
-          dprint(m_opt.debug,
-                 "FINDER: Mech is NOT new, distance: old-sp={:.3f} old-min={:.3f}, theta={:.1f}, n1={:.3f}, "
+      if (d_sp < m_opt.mech_tol && d_fwd < m_opt.mech_tol && theta < 10) {
+        dprint(m_opt.debug,
+               "FINDER: Mech is NOT new, distance: old-sp={:.3f} old-min={:.3f}, theta={:.1f}, n1={:.3f}, "
                "n2={:.3f}\n",
-                 d_sp,
-                 d_fwd,
-                 theta,
-                 n1,
+               d_sp,
+               d_fwd,
+               theta,
+               n1,
                n2);
-          return false;
+        return false;
       }
     }
 

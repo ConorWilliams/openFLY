@@ -305,7 +305,8 @@ namespace fly::kinetic {
                dR_err,
                dR_err_frac);
 
-        {
+        {  // Test for reconstruction failures.
+
           bool fail = false;
 
           auto const& opt = m_mast.get_options();
@@ -362,7 +363,7 @@ namespace fly::kinetic {
 
         ///////////// Update catalogue /////////////
 
-        // Here we are updating the catalogue after a successful mechanism, can provide a hint.
+        // Updating the catalogue after a successful mechanism, can provide a hint.
 
         saddle::Master::Hint hint = {
             system::SoA<Position>{cell},

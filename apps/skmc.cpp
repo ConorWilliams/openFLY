@@ -96,7 +96,7 @@ int main() {
 
   DetectVacancies detect(0.75, perfect.box(), perfect);
 
-  system::Supercell cell = remove_atoms(perfect, {1});
+  system::Supercell cell = remove_atoms(perfect, {1, 3});
 
   Vec r_H = {2.857 / 2 + 3.14, 2.857 / 2 + 3.14, 2.857 / 4 + 3.14};
 
@@ -132,7 +132,7 @@ int main() {
   kinetic::SKMC runner = {
       {
           .debug = true,
-          .fread = "build/gsd/cat.v1.bin",
+          .fread = "build/gsd/cat.v2.2.bin",
           .opt_cache = {
               .barrier_tol = 0.45,
               .debug = true,
@@ -188,7 +188,7 @@ int main() {
               [&](double time,                         ///< Total time just after system at post
                   system::SoA<Position const &> pre,   ///< State just before mech applied
                   double E0,                           ///< Energy of the system in state pre.
-                  int atom,                            ///< Index of central atom of mechanism
+                  int,                                 ///< Index of central atom of mechanism
                   env::Mechanism const &mech,          ///< Chosen mechanism
                   system::SoA<Position const &> post,  ///< Final state of system after this iteration / mech
                   double Ef                            ///< Energy of system in state post.

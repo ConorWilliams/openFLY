@@ -135,12 +135,11 @@ namespace fly::saddle {
 
     for (int i = 0; i < n; i++) {
       ct += gdot(a[i][del_], b[i][del_]);
-
       sa += gnorm_sq(a[i][del_]);
       sb += gnorm_sq(b[i][del_]);
     }
 
-    return std::acos(ct / std::sqrt(sa * sb)) / 2 / M_PI * 360.;
+    return std::acos(std::clamp(ct / std::sqrt(sa * sb), -1., 1.)) / 2 / M_PI * 360.;
   }
 
   // Find the indices of minimally and maximally separated atoms.
@@ -1225,7 +1224,6 @@ namespace fly::saddle {
     double min_d_theta = std::numeric_limits<double>::max();
 
     for (env::Mechanism const& m : hist) {
-      if (double dE = std::abs((m.barrier - maybe.barrier) / m.barrier); dE < 0.01) {
         //
         double d_sp = env::rmsd<Delta>(maybe.delta_sp, m.delta_sp);
         double d_fwd = env::rmsd<Delta>(maybe.delta_fwd, m.delta_fwd);
@@ -1243,32 +1241,31 @@ namespace fly::saddle {
         n1 = std::sqrt(n1);
         n2 = std::sqrt(n2);
 
-        double theta = std::acos(dot / (n1 * n2)) / (2 * M_PI) * 360;
+      double theta = std::acos(std::clamp(dot / (n1 * n2), -1., 1.)) / (2 * M_PI) * 360;
+
+      min_d_sp = std::min(min_d_sp, d_sp);
+      min_d_fwd = std::min(min_d_fwd, d_fwd);
+      min_d_theta = std::min(min_d_theta, theta);
 
         if (d_sp < m_opt.mech_tol && d_fwd < m_opt.mech_tol && theta < 10) {
           dprint(m_opt.debug,
                  "FINDER: Mech is NOT new, distance: old-sp={:.3f} old-min={:.3f}, theta={:.1f}, n1={:.3f}, "
-                 "n2={:.3f}, f_ddEsp={}\n",
+               "n2={:.3f}\n",
                  d_sp,
                  d_fwd,
                  theta,
                  n1,
-                 n2,
-                 dE);
+               n2);
           return false;
-        }
-
-        min_d_sp = std::min(min_d_sp, d_sp);
-        min_d_fwd = std::min(min_d_fwd, d_fwd);
-        min_d_theta = std::min(min_d_theta, theta);
       }
     }
 
     dprint(m_opt.debug,
-           "FINDER: Mech is new, min distance: old-sp={:.3e} old-min={:.3e}, theta-min={:.1e}\n",
+           "FINDER: Mech is new, min distance: old-sp={:.3e} old-min={:.3e}, theta-min={:.1f}\n",
            min_d_sp,
            min_d_fwd,
            min_d_theta);
+
     return true;
   }
 

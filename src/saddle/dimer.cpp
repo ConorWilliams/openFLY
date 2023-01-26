@@ -35,8 +35,7 @@ namespace fly::saddle {
                       int num_threads) -> Exit {
     // Check inputs
 
-    verify(
-        in.size() == out.size(), "Dimer stepper inputs size mismatch, in={} out={}", in.size(), out.size());
+    verify(in.size() == out.size(), "Dimer stepper size mismatch, in={} out={}", in.size(), out.size());
 
     m_eff_grad.destructive_resize(in.size());
 

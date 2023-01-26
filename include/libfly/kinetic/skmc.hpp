@@ -284,7 +284,7 @@ namespace fly::kinetic {
 
         double E0 = energy(cell);  // Energy before mechanism
 
-        m_cat.reconstruct(raw_recon, m, atom, cell, !changed, num_threads);
+        Mat O = m_cat.reconstruct(raw_recon, m, atom, cell, !changed, num_threads);
 
         auto err = m_minimiser.minimise(rel_recon, raw_recon, m_pot, num_threads);
 
@@ -365,11 +365,16 @@ namespace fly::kinetic {
         // Here we are updating the catalogue after a successful mechanism, can provide a hint.
 
         saddle::Master::Hint hint = {
-            cell,
+            system::SoA<Position>{cell},
             atom,
-            m,
+            m.delta_sp,
             m_cat.get_geo(atom),
         };
+
+        // Transform SP deltas as appropriate
+        for (Eigen::Index j = 0; j < m.delta_sp.size(); j++) {
+          hint.delta_sp[j][del_].noalias() = O * m.delta_sp[j][del_];
+        }
 
         cell[r_] = rel_recon[r_];  // Update cell after constructing the hint.
 

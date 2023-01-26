@@ -267,13 +267,13 @@ namespace fly::env {
     auto refine_tol(int i, double min_delta = 0) -> double;
 
   private:
-    void reconstruct_impl(Mechanism const& mech,
-                          int i,
-                          system::SoA<Position const&, TypeID const&, Frozen const&> in,
-                          system::SoA<Position&> out,
-                          bool in_ready_state,
-                          Eigen::Index num_types,
-                          int num_threads);
+    Mat reconstruct_impl(Mechanism const& mech,
+                         int i,
+                         system::SoA<Position const&, TypeID const&, Frozen const&> in,
+                         system::SoA<Position&> out,
+                         bool in_ready_state,
+                         Eigen::Index num_types,
+                         int num_threads);
 
   public:
     /**
@@ -291,6 +291,7 @@ namespace fly::env {
      * atom match the input
      * ``in`` otherwise, the geometry will be rebuilt.
      * @param num_threads Number of openMP threads to use.
+     * @return Mat The matrix that transforms ``mech`` before reconstruction onto out.
      */
     template <typename Map, typename... T>
     auto reconstruct(system::SoA<Position&> out,
@@ -298,8 +299,8 @@ namespace fly::env {
                      int i,
                      system::Supercell<Map, T...> const& in,
                      bool in_ready_state,
-                     int num_threads) -> void {
-      reconstruct_impl(mech, i, in, out, in_ready_state, in.map().num_types(), num_threads);
+                     int num_threads) -> Mat {
+      return reconstruct_impl(mech, i, in, out, in_ready_state, in.map().num_types(), num_threads);
     }
 
     /**

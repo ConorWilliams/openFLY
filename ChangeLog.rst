@@ -28,7 +28,9 @@ Added
 Changed
 ~~~~~~~
 
+- The catalogues' ``reconstruct_impl`` now returns the transformation matrix.
 - ``DetectVacacies`` class interface changed and minimum distance introduced.
+- New hinting process for saddle point searches
 
 Removed
 ~~~~~~~

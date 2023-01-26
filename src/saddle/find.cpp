@@ -269,7 +269,7 @@ namespace fly::saddle {
 
             barriers.erase(last, barriers.end());
 
-            fmt::print("FINDER: @{:<4} found {:>3} mechs {::.2f}\n",
+            fmt::print("FINDER: @{:<4} found {:>3} mechs {::.3f}\n",
                        geo_data[j].centre,
                        out[j].mechs().size(),
                        barriers);
@@ -320,6 +320,61 @@ namespace fly::saddle {
     return out;
   }
 
+  void Master::process_hint(Found& out,
+                            LocalisedGeo const& geo_data,
+                            SoA in,
+                            Hint const& hint,
+                            std::vector<system::SoA<Position>>& cache) {
+    // This is copypasta from recon_relax as we need the axis.
+
+    system::SoA<Position> re_sp = reconstruct(hint.geo, hint.delta_sp, hint.prev_state);
+
+    system::SoA<Position, Axis, TypeID const&, Frozen const&> dimer(in.size());
+
+    dimer.rebind(id_, in);
+    dimer.rebind(fzn_, in);
+
+    // Ensures Axis transforms with the symmetry
+    dimer[ax_] = re_sp[r_] - hint.prev_state[r_];
+    // ... and normalise.
+    dimer[ax_] /= gnorm(dimer[ax_]);
+    // Align post-use for constructing axis!
+    if (m_count_frozen == 0) {
+      centroid_align(re_sp, hint.prev_state);
+    }
+    dimer[r_] = re_sp[r_];
+
+    if (thread().dimer.find_sp(dimer, dimer, hint.prev_state, thread().pot, {}, m_count_frozen, 1)) {
+      fmt::print("FINDER: Hint's find_sp failed!\n");
+      return;
+    }
+
+    if (std::optional mech = saddle_2_mech(in, dimer, geo_data.geo)) {
+      fmt::print("FINDER: @{:<4} hints  {:.2f}eV \n", geo_data.centre, mech->barrier);
+      verify(add_mech(out, in, std::move(*mech), dimer, cache, geo_data), "Hinted mech was not added");
+      return;
+    }
+
+    fmt::print("FINDER: Hint was useless!\n");
+
+    // Debugging output
+
+    fly::io::BinaryFile file("build/gsd/hint.gsd", fly::io::create);
+
+    file.commit([&] {
+      file.write("particles/N", fly::safe_cast<std::uint32_t>(in.size()));
+      file.write(m_box);
+      file.write(id_, in);
+      file.write(r_, hint.prev_state);
+    });
+
+    file.commit([&] { file.write(r_, re_sp); });
+
+    file.commit([&] { file.write(r_, dimer); });
+
+    file.commit([&] { file.write(r_, in); });
+  }
+
   ///////////////////////////////////////////////////////
 
   void Master::find_n(Found& out,
@@ -327,25 +382,14 @@ namespace fly::saddle {
                       SoA in,
                       neigh::List const& nl_pert,
                       std::optional<Hint> const& hint) {
-    //
+    // Cache saddle-points.
+    std::vector<system::SoA<Position>> cache;
 
     if (hint->centre == geo_data.centre) {
-      fmt::print("Got a hint for a mech centred on atom #{}\n", hint->centre);
-
-      //   system::viewSoA<Position, TypeID, Frozen> tmp(in.size());
-
-      //   tmp.rebind(r_, hint->prev_state);
-      //   tmp.rebind(fzn_, in);
-      //   tmp.rebind(id_, in);
-
-      //   Recon re = recon_relax(hint->geo, hint->mech, tmp);
-
-      //   std::optional mech = saddle_2_mech(in, *re.rel_sp, geo_data.geo);
+      process_hint(out, geo_data, in, *hint, cache);
     }
 
     std::vector<Batch> batch(safe_cast<std::size_t>(m_opt.batch_size), Batch(in.size()));
-
-    std::vector<system::SoA<Position>> cache;  // Cache saddle-points
 
     int tot = 0;
     int fail = 0;
@@ -557,6 +601,97 @@ namespace fly::saddle {
     }
   }
 
+  bool Master::add_mech(Found& out,
+                        SoA in,
+                        env::Mechanism&& mech,
+                        system::viewSoA<Position, Axis> dimer,
+                        std::vector<system::SoA<Position>>& cache,
+                        LocalisedGeo const& geo_data) {
+    // Found a mechanism.
+
+    if (!is_new_mech(mech, out.m_mechs)) {
+      dprint(m_opt.debug, "FINDER: Duplicate mech, caching\n");
+      cache.emplace_back(dimer);
+      return false;
+    }
+
+    // Found a new mechanism.
+
+    if (mech.poison_fwd) {
+      dprint(m_opt.debug, "FINDER: caching poisoned\n");
+      out.m_mechs.push_back(std::move(mech));
+      cache.emplace_back(dimer);
+      return false;
+    }
+
+    // Found a new non-poisoned forward mechanism (sp may be poisoned).
+
+    std::size_t num_new;
+
+    try {
+      num_new = append_syms(geo_data.syms, mech, out.m_mechs);
+    } catch (...) {
+#pragma omp critical
+      {
+        fly::io::BinaryFile file("crash.gsd", fly::io::create);
+
+        fmt::print(
+            stderr,
+            "Append symmetries threw @{}, this implies a symmetrical saddle-point but sym-breaking minima, "
+            "perhaps the minimiser reached the wrong minima i.e. failed to follow the minimum mode or the "
+            "sp was higher order. Failure was written to \"crash.gsd\" in the current working directory\n",
+            geo_data.centre);
+
+        file.commit([&] {
+          file.write("particles/N", fly::safe_cast<std::uint32_t>(in.size()));
+          file.write(r_, in);
+          file.write(m_box);
+          file.write(id_, in);
+        });
+        file.commit([&] { file.write(r_, reconstruct(geo_data.geo, mech.delta_sp, in)); });
+        file.commit([&] { file.write(r_, dimer); });
+        file.commit([&] { file.write(r_, reconstruct(geo_data.geo, mech.delta_fwd, in)); });
+      }
+      throw;
+    }
+
+    verify(num_new > 0, "Found none @{} but should have had at least 1", geo_data.centre);
+
+    std::size_t n = cache.size();
+
+    if (mech.poison_sp) {
+      cache.emplace_back(dimer);
+    } else {
+      cache.resize(n + num_new);
+    }
+
+    for (std::size_t k = 0; k < num_new; k++) {
+#pragma omp task untied default(none) firstprivate(n, k, num_new) \
+    shared(out, in, cache, geo_data, dimer, mech)
+      {
+        std::optional recon_sp
+            = check_mech(out, dimer, out.m_mechs[out.m_mechs.size() - num_new + k], k, geo_data, in);
+
+        if (mech.poison_sp) {
+          ASSERT(!recon_sp, "Logic error, check should have returned false", 0);
+        } else {
+          if (recon_sp) {
+            cache[n + k] = std::move(*recon_sp);
+          } else {
+            bool fail;
+#pragma omp atomic read
+            fail = out.m_fail;
+
+            ASSERT(fail, "Logic error if no recon_sp then fail should be set", 0);
+          }
+        }
+      }
+    }
+#pragma omp taskwait
+
+    return true;
+  }
+
   bool Master::find_batch(int tot,
                           Found& out,
                           std::vector<Batch>& batch,
@@ -603,6 +738,7 @@ namespace fly::saddle {
     // Process batch
     for (auto&& elem : batch) {
       if (!elem.mech) {
+        //
         ASSERT(elem.exit != Dimer::Exit::uninit, "Uninitialised exit/return code exit={}!", elem.exit);
 
         if (elem.exit == Dimer::Exit::success) {
@@ -611,91 +747,10 @@ namespace fly::saddle {
         } else {
           dprint(m_opt.debug, "FINDER: Not caching SPS collision/fail\n");
         }
-        continue;
+
+      } else if (add_mech(out, in, std::move(*elem.mech), elem.dimer, cache, geo_data)) {
+        found_one_or_more = true;
       }
-
-      // Found a mechanism.
-
-      if (!is_new_mech(*elem.mech, out.m_mechs)) {
-        dprint(m_opt.debug, "FINDER: Duplicate mech, caching\n");
-        cache.emplace_back(elem.dimer);
-        continue;
-      }
-
-      // Found a new mechanism.
-
-      if (elem.mech->poison_fwd) {
-        dprint(m_opt.debug, "FINDER: caching poisoned\n");
-        out.m_mechs.push_back(std::move(*elem.mech));
-        cache.emplace_back(elem.dimer);
-        continue;
-      }
-
-      // Found a new non-poisoned forward mechanism (sp may be poisoned).
-
-      std::size_t num_new;
-
-      try {
-        num_new = append_syms(geo_data.syms, *elem.mech, out.m_mechs);
-      } catch (...) {
-#pragma omp critical
-        {
-          fly::io::BinaryFile file("crash.gsd", fly::io::create);
-
-          fmt::print(
-              stderr,
-              "Append symmetries threw @{}, this implies a symmetrical saddle-point but sym-breaking minima, "
-              "perhaps the minimiser reached the wrong minima i.e. failed to follow the minimum mode or the "
-              "sp was higher order. Failure was written to \"crash.gsd\" in the current working directory\n",
-              geo_data.centre);
-
-          file.commit([&] {
-            file.write("particles/N", fly::safe_cast<std::uint32_t>(in.size()));
-            file.write(r_, in);
-            file.write(m_box);
-            file.write(id_, in);
-          });
-          file.commit([&] { file.write(r_, reconstruct(geo_data.geo, elem.mech->delta_sp, in)); });
-          file.commit([&] { file.write(r_, elem.dimer); });
-          file.commit([&] { file.write(r_, reconstruct(geo_data.geo, elem.mech->delta_fwd, in)); });
-        }
-        throw;
-      }
-
-      verify(num_new > 0, "Found none @{} but should have had at least 1", geo_data.centre);
-
-      std::size_t n = cache.size();
-
-      if (elem.mech->poison_sp) {
-        cache.emplace_back(elem.dimer);
-      } else {
-        cache.resize(n + num_new);
-      }
-
-      for (std::size_t k = 0; k < num_new; k++) {
-#pragma omp task untied default(none) firstprivate(n, k, num_new) shared(out, in, cache, geo_data, elem)
-        {
-          std::optional recon_sp
-              = check_mech(out, elem.dimer, out.m_mechs[out.m_mechs.size() - num_new + k], k, geo_data, in);
-
-          if (elem.mech->poison_sp) {
-            ASSERT(!recon_sp, "Logic error, check should have returned false", 0);
-          } else {
-            if (recon_sp) {
-              cache[n + k] = std::move(*recon_sp);
-            } else {
-              bool fail;
-#pragma omp atomic read
-              fail = out.m_fail;
-
-              ASSERT(fail, "Logic error if no recon_sp then fail should be set", 0);
-            }
-          }
-        }
-      }
-#pragma omp taskwait
-
-      found_one_or_more = true;
     }
 
     return found_one_or_more;

@@ -291,13 +291,13 @@ namespace fly::env {
     }
   }
 
-  void Catalogue::reconstruct_impl(Mechanism const &mech,
-                                   int i,
-                                   system::SoA<Position const &, TypeID const &, Frozen const &> in,
-                                   system::SoA<Position &> out,
-                                   bool in_ready_state,
-                                   Eigen::Index num_types,
-                                   int num_threads) {
+  Mat Catalogue::reconstruct_impl(Mechanism const &mech,
+                                  int i,
+                                  system::SoA<Position const &, TypeID const &, Frozen const &> in,
+                                  system::SoA<Position &> out,
+                                  bool in_ready_state,
+                                  Eigen::Index num_types,
+                                  int num_threads) {
     //
 
     verify(out.size() == in.size(),
@@ -340,6 +340,9 @@ namespace fly::env {
       for (int j = 0; j < geo.size(); ++j) {
         out(r_, geo[j][i_]).noalias() += O * mech.delta_fwd[j][del_];
       }
+
+      return O;
+
     } else {
       throw error("Unable to align cell perm geo {} onto reference, ready={}", i, in_ready_state);
     }

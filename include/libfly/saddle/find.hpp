@@ -285,10 +285,10 @@ namespace fly::saddle {
      * @brief A hint for ensuring ergodic pathways.
      */
     struct Hint {
-      system::viewSoA<Position> prev_state;  ///< A reference to the previous state of the system
-      Index::scalar_t centre;                ///< Central atom of mech that brought us to current state.
-      env::Mechanism mech;                   ///< Mechanism that brought us to current state.
-      env::Geometry<Index> geo;              ///< Geometry around central atom in previous state.
+      system::SoA<Position> prev_state;  ///< A reference to the previous state of the system
+      Index::scalar_t centre;            ///< Central atom of mech that brought us to current state.
+      system::VoS<Delta> delta_sp;       ///< To SP of mechanism that brought us to current state.
+      env::Geometry<Index> geo;          ///< Geometry around central atom in previous state.
     };
 
     /**
@@ -343,6 +343,19 @@ namespace fly::saddle {
 
     ///////////////////////////////////////////////////////////////////////////////////
 
+    bool add_mech(Found& out,
+                  SoA in,
+                  env::Mechanism&& mech,
+                  system::viewSoA<Position, Axis> dimer,
+                  std::vector<system::SoA<Position>>& cache,
+                  LocalisedGeo const& geo_data);
+
+    void process_hint(Found& out,
+                      LocalisedGeo const& geo_data,
+                      SoA in,
+                      Hint const& hint,
+                      std::vector<system::SoA<Position>>& cache);
+
     // Find all mechs and write to geo_data
     void find_n(Found& out,
                 LocalisedGeo const& geo_data,
@@ -361,6 +374,15 @@ namespace fly::saddle {
     /**
      * @brief Find a single mechanism
      *
+     * This assumes some COM drift between dimer and in
+     *
+     * Stages:
+     *  Find min->sp->min path from dimer with no COM drift
+     *  Check valid pathway
+     *  build mechanism from pathway
+     *  TEST mechanism reconstructs onto sp+min
+     *
+     *
      * @param in Initial basin
      * @param dimer Dimer at the saddle-point output.
      * @param geo Centred of perturbation.
@@ -369,7 +391,12 @@ namespace fly::saddle {
                                                 system::viewSoA<Position, Axis, Frozen, TypeID> dimer,
                                                 env::Geometry<Index> const& geo);
 
-    // Do a saddle point search
+    /**
+     * @brief Do a SP search
+     *
+     * Move dimer (pos+ax) to the saddle point.
+     *
+     */
     Dimer::Exit find_sp(system::SoA<Position&, Axis&, Frozen const&, TypeID const&> dimer,
                         system::SoA<Position const&> in,
                         std::vector<system::SoA<Position>> const& hist_sp,

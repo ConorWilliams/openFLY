@@ -138,7 +138,7 @@ int main() {
               .debug = true,
               .opt_basin = {
                   .debug = true,
-                  .temp = 300,
+                  .temp = 500,
               },
               .opt_sb = {
                   .debug = true,
@@ -253,7 +253,7 @@ int main() {
 
                 fmt::print("Just wrote frame index No. {}\n", file.n_frames() - 1);
 
-                return v_diss || h_escaped;
+                return v_diss;
               });
 
   fmt::print("It took {:.3e}s to terminate\n", run_time);

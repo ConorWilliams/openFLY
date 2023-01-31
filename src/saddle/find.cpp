@@ -353,6 +353,11 @@ namespace fly::saddle {
 
       verify(add_mech(out, in, std::move(*mech), dimer, cache, geo_data), "Hinted mech was not added");
 
+      if (out.m_fail) {
+        fmt::print("FINDER: Hint reveals asym!\n");
+        return;
+      }
+
       fmt::print("FINDER: @{:<4} hints {:>3} mech(s) [{:.3f}]\n", geo_data.centre, out.mechs().size(), b);
       return;
     }
@@ -391,6 +396,10 @@ namespace fly::saddle {
 
     if (hint && hint->centre == geo_data.centre) {
       process_hint(out, geo_data, in, *hint, cache);
+
+      if (out.m_fail) {
+        return;
+      }
     }
 
     std::vector<Batch> batch(safe_cast<std::size_t>(m_opt.batch_size), Batch(in.size()));
@@ -605,6 +614,8 @@ namespace fly::saddle {
     }
   }
 
+  // Add mech should: add one or more mechs and return true or return false if no mech was added due to a mech
+  // collision
   bool Master::add_mech(Found& out,
                         SoA in,
                         env::Mechanism&& mech,
@@ -625,7 +636,7 @@ namespace fly::saddle {
       dprint(m_opt.debug, "FINDER: caching poisoned\n");
       out.m_mechs.push_back(std::move(mech));
       cache.emplace_back(dimer);
-      return false;
+      return true;
     }
 
     // Found a new non-poisoned forward mechanism (sp may be poisoned).
@@ -633,6 +644,7 @@ namespace fly::saddle {
     std::size_t num_new;
 
     try {
+      // Adds mechanism + all symmetries
       num_new = append_syms(geo_data.syms, mech, out.m_mechs);
     } catch (...) {
 #pragma omp critical
@@ -677,7 +689,9 @@ namespace fly::saddle {
             = check_mech(out, dimer, out.m_mechs[out.m_mechs.size() - num_new + k], k, geo_data, in);
 
         if (mech.poison_sp) {
+          // This check may be too strong
           ASSERT(!recon_sp, "Logic error, check should have returned false", 0);
+
         } else {
           if (recon_sp) {
             cache[n + k] = std::move(*recon_sp);
@@ -685,7 +699,7 @@ namespace fly::saddle {
             bool fail;
 #pragma omp atomic read
             fail = out.m_fail;
-
+            // double check that check_mech has set fail flag
             ASSERT(fail, "Logic error if no recon_sp then fail should be set", 0);
           }
         }
@@ -746,7 +760,7 @@ namespace fly::saddle {
         ASSERT(elem.exit != Dimer::Exit::uninit, "Uninitialised exit/return code exit={}!", elem.exit);
 
         if (elem.exit == Dimer::Exit::success) {
-          dprint(m_opt.debug, "FINDER: Caching failure\n");
+          dprint(m_opt.debug, "FINDER: Caching failure not at this atom\n");
           cache.emplace_back(elem.dimer);
         } else {
           dprint(m_opt.debug, "FINDER: Not caching SPS collision/fail\n");

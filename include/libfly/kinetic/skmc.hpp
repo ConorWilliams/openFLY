@@ -365,16 +365,21 @@ namespace fly::kinetic {
 
         // Updating the catalogue after a successful mechanism, can provide a hint.
 
-        saddle::Master::Hint hint = {
-            system::SoA<Position>{cell},
-            atom,
-            m.delta_sp,
-            m_cat.get_geo(atom),
-        };
+        std::optional<saddle::Master::Hint> hint = std::nullopt;
 
-        // Transform SP deltas as appropriate
-        for (Eigen::Index j = 0; j < m.delta_sp.size(); j++) {
-          hint.delta_sp[j][del_].noalias() = O * m.delta_sp[j][del_];
+        if (!m.poison_sp) {
+          // Only if SP is reconstructable
+          hint = saddle::Master::Hint{
+              system::SoA<Position>{cell},
+              atom,
+              m.delta_sp,
+              m_cat.get_geo(atom),
+          };
+
+          // Transform SP deltas as appropriate
+          for (Eigen::Index j = 0; j < m.delta_sp.size(); j++) {
+            hint->delta_sp[j][del_].noalias() = O * m.delta_sp[j][del_];
+          }
         }
 
         cell[r_] = rel_recon[r_];  // Update cell after constructing the hint.

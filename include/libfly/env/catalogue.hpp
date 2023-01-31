@@ -320,7 +320,11 @@ namespace fly::env {
 
       Catalogue loaded(opt);
 
-      iarchive(loaded);
+      try {
+        iarchive(loaded);
+      } catch (std::exception const& e) {
+        throw error("Catalogue is a bad binary: {}", e.what());
+      }
 
       std::equal_to<> eq;
 

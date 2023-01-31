@@ -36,8 +36,7 @@
  *
  * @brief Generic potential energy class.
  *
- * Potentials get info about atoms via a ``SoA``. This allows potentials to slice generic supercells while
- * remaining concrete.
+ * The potential completely describes the interatomic interactions present in a system.
  */
 
 namespace fly::potential {
@@ -49,15 +48,6 @@ namespace fly::potential {
    */
   class Generic {
   private:
-    template <typename Potential, typename... Args>
-    using Energy = decltype(std::declval<Potential>().energy(std::declval<Args>()...));
-
-    template <typename Potential, typename... Args>
-    using Gradient = decltype(std::declval<Potential>().gradient(std::declval<Args>()...));
-
-    template <typename Potential, typename... Args>
-    using Hessian = decltype(std::declval<Potential>().hessian(std::declval<Args>()...));
-
     using variant = std::variant<EAM>;
 
   public:
@@ -102,13 +92,7 @@ namespace fly::potential {
      */
     auto energy(system::SoA<TypeID const&, Frozen const&> in, neigh::List const& nl, int threads = 1)
         -> double {
-      return ::fly::visit(m_pot, [&, threads](auto& pot) -> double {
-        if constexpr (is_detected_v<Energy, decltype(pot), decltype(in), decltype(nl), decltype(threads)>) {
-          return pot.energy(in, nl, threads);
-        } else {
-          throw error("Generic potential {}, does not support .energy(...) of this system.", m_pot.index());
-        }
-      });
+      return ::fly::visit(m_pot, [&, threads](auto& pot) -> double { return pot.energy(in, nl, threads); });
     }
 
     /**
@@ -127,18 +111,7 @@ namespace fly::potential {
                   system::SoA<TypeID const&, Frozen const&> in,
                   neigh::List const& nl,
                   int threads = 1) -> void {
-      return ::fly::visit(m_pot, [&, threads](auto& pot) {
-        if constexpr (is_detected_v<Gradient,
-                                    decltype(pot),
-                                    decltype(out),
-                                    decltype(in),
-                                    decltype(nl),
-                                    decltype(threads)>) {
-          pot.gradient(out, in, nl, threads);
-        } else {
-          throw error("Generic potential {}, does not support .gradient(...) of this system.", m_pot.index());
-        }
-      });
+      return ::fly::visit(m_pot, [&, threads](auto& pot) { pot.gradient(out, in, nl, threads); });
     }
 
     /**
@@ -158,18 +131,7 @@ namespace fly::potential {
                  system::SoA<TypeID const&, Frozen const&> in,
                  neigh::List const& nl,
                  int threads = 1) -> void {
-      return ::fly::visit(m_pot, [&](auto& pot) {
-        if constexpr (is_detected_v<Hessian,
-                                    decltype(pot),
-                                    decltype(out),
-                                    decltype(in),
-                                    decltype(nl),
-                                    decltype(threads)>) {
-          pot.hessian(out, in, nl, threads);
-        } else {
-          throw error("Generic potential {}, does not support .hessian(...) of this system.", m_pot.index());
-        }
-      });
+      return ::fly::visit(m_pot, [&](auto& pot) { pot.hessian(out, in, nl, threads); });
     }
 
     /**

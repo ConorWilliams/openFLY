@@ -1,6 +1,7 @@
 /.clangd
 /.cache
 /.vscode
+/KIM
 
 data/xyz
 data/*.fs

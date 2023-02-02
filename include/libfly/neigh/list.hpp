@@ -26,6 +26,11 @@
 #include "libfly/system/property.hpp"
 #include "libfly/utility/core.hpp"
 
+// Forward decl for friendship
+namespace fly::potential {
+  class KIM_API;
+}
+
 /**
  * \file list.hpp
  *
@@ -156,14 +161,18 @@ namespace fly::neigh {
     auto size() const noexcept -> Eigen::Index { return m_neigh_lists.size(); }
 
   private:
-    struct Next : system::Property<Eigen::Index> {};  ///< Index of the next atom in the linked cell list.
+    friend class ::fly::potential::KIM_API;
 
-    system::Box m_box;                  ///< Store the box.
-    typename system::Box::Grid m_grid;  ///< Store the grid (made by the box).
-    detail::AdjacentCells m_cells;      ///< Store the neighbour cell lists.
-    double m_r_cut;                     ///< Store the cut of radius.
-    system::SoA<Index, Next, Position>
-        m_atoms;  ///< Store the canonical positions, Index = index-in-input for real+ghosts.
+    struct Next : system::Property<Eigen::Index> {};  ///< Index of the next atom in the linked cell list.
+    struct Contrib : system::Property<int> {};        /// To support the KIM-API
+
+    using soa_type = system::SoA<Index, Next, Position, Contrib>;
+
+    system::Box m_box;                           ///< Store the box.
+    typename system::Box::Grid m_grid;           ///< Store the grid (made by the box).
+    detail::AdjacentCells m_cells;               ///< Store the neighbour cell lists.
+    double m_r_cut;                              ///< Store the cut of radius.
+    soa_type m_atoms;                            ///< Canonical pos, Index = index-in-input for real+ghosts.
     Eigen::Index m_num_plus_ghosts = 0;          ///< Number of real atoms + number of ghost atoms.
     Vector<Eigen::Index> m_head;                 ///< Index of the start of each bucket.
     Vector<Vector<Eigen::Index>> m_neigh_lists;  ///< Neighbour list for each non-ghost atom.
@@ -191,6 +200,14 @@ namespace fly::neigh {
     Eigen::Index image_to_real(Eigen::Index i) const noexcept {
       return *(m_atoms[Index{}].data() + Index::size() * i);
     }
+
+    static int get_cluster_neigh(void* const dataObject,
+                                 int const numberOfNeighborLists,
+                                 double const* const cutoffs,
+                                 int const neighborListIndex,
+                                 int const particleNumber,
+                                 int* const numberOfNeighbors,
+                                 int const** const neighborsOfParticle);
   };
 
 }  // namespace fly::neigh

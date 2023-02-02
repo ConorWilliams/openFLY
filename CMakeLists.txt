@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.16)
+cmake_minimum_required(VERSION 3.19)
 
 # In-source guard
 if(CMAKE_SOURCE_DIR STREQUAL CMAKE_BINARY_DIR)
@@ -65,7 +65,9 @@ find_package(span-lite CONFIG REQUIRED)
 find_package(xxHash CONFIG REQUIRED)
 find_package(cereal CONFIG REQUIRED)
 
-# Ancient voodoo
+# find_package(kim-api CONFIG REQUIRED)
+
+# Ancient voodoo that is autoconf
 ExternalProject_Add(
     nauty
     URL "https://pallini.di.uniroma1.it/nauty27r4.tar.gz"
@@ -106,9 +108,17 @@ add_executable(skmcFLY apps/skmc.cpp)
 target_compile_features(skmcFLY PRIVATE cxx_std_17)
 target_link_libraries(skmcFLY PRIVATE libFLY)
 
-# add_executable(skmcFLY2 apps/skmcC.cpp)
-# target_compile_features(skmcFLY2 PRIVATE cxx_std_17)
-# target_link_libraries(skmcFLY2 PRIVATE libFLY Nauty)
+# ////////////////////////////
+find_package(KIM-API 2.3.0 CONFIG PATHS ${CMAKE_SOURCE_DIR}/build/kim-api/kim-api/install/share/cmake/kim-api)
+
+if(NOT KIM-API_FOUND)
+    message(FATAL_ERROR "The KIM-API could not be found, install a local copy with:\n\"./scripts/kim-api/install.sh\"")
+endif()
+
+# ////////////////////////////
+add_executable(skmcKIM apps/kim.cpp)
+target_compile_features(skmcKIM PRIVATE cxx_std_17)
+target_link_libraries(skmcKIM PRIVATE libFLY Nauty KIM-API::kim-api)
 
 # add_executable(benchFLY apps/bench.cpp)
 # target_compile_features(benchFLY PRIVATE cxx_std_17)

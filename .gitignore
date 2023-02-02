@@ -1,7 +1,9 @@
 /.clangd
 /.cache
 /.vscode
-/KIM
+
+/build
+/external
 
 data/xyz
 data/*.fs
@@ -10,12 +12,11 @@ data/*.fs
 gmon.out
 out.png
 
+*.log
 *.gsd
 
 CMakeUserPresets.json
-BinaryFile_test.gsd
 compile_commands.json
-Testing
 
-/build
-log.log
+
+

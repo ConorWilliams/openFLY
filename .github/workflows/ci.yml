@@ -29,6 +29,12 @@ jobs:
         uses: friendlyanon/setup-vcpkg@v1
         with: { path: "external/vcpkg", cache-version: "${{ matrix.cpp }}" }
 
+      - name: Configure KIM-API
+        run: cmake -S scripts/kim-api -B build/kim-api
+
+      - name: Build KIM-API
+        run: cmake --build build/kim-api -j4
+
       - name: Configure
         shell: pwsh
         run: cmake "-DCMAKE_CXX_STANDARD=${{ matrix.cpp }}" "--preset=ci-$("${{ matrix.os }}".split("-")[0])"

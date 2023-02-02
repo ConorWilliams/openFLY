@@ -86,9 +86,15 @@ jobs:
           source /opt/intel/oneapi/setvars.sh
           printenv >> $GITHUB_ENV
 
+      - name: Configure KIM-API
+        run: cmake -S scripts/kim-api -B build/kim-api
+
+      - name: Build KIM-API
+        run: cmake --build build/kim-api -j4
+
       - name: Configure
         shell: pwsh
-        run: cmake "-DCMAKE_CXX_STANDARD=${{ matrix.cpp }}" --preset=ci-ubuntu -DCMAKE_CXX_COMPILER=icpx
+        run: cmake "-DCMAKE_CXX_STANDARD=${{ matrix.cpp }}" --preset=ci-ubuntu -DCMAKE_C_COMPILER=icx -DCMAKE_CXX_COMPILER=icpx -DCMAKE_FORTRAN_COMPILER=ifx
 
       - name: Build
         run: cmake --build build --config Release -j 2

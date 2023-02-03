@@ -166,4 +166,35 @@ namespace fly::neigh {
     }
   }
 
+  int List::get_cluster_neigh(void* const obj,
+                              int const numberOfNeighborLists,
+                              double const* const cutoffs,
+                              int const neighborListIndex,
+                              int const particleNumber,
+                              int* const numberOfNeighbors,
+                              int const** const neighborsOfParticle) {
+    //
+    List const* nl = (List const*)obj;
+    //
+    if ((numberOfNeighborLists != 1) || (cutoffs[0] > nl->m_r_cut) || neighborListIndex != 0) {
+      return true;
+    }
+
+    *numberOfNeighbors = 0;
+
+    if (particleNumber >= nl->size() || nl->m_num_plus_ghosts < 0) /* invalid id */
+    {
+      fmt::print(stderr, "WARNING: KIM-API requesting ghosts neighbours");
+      return true;
+    }
+
+    *numberOfNeighbors = 0;  // nl->m_neigh_lists[particleNumber].size();
+
+    fmt::print(stderr, "@{} fetch {} neigh\n", particleNumber, nl->m_neigh_lists[particleNumber].size());
+
+    *neighborsOfParticle = nl->m_neigh_lists[particleNumber].data();
+    //
+    return false;
+  }
+
 }  // namespace fly::neigh

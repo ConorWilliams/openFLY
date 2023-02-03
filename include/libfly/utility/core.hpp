@@ -150,11 +150,12 @@ namespace fly {
 /**
  * @brief Use like fly::verify() but disabled if ``NDEBUG`` defined.
  */
-#  define ASSERT(expr, string_literal, ...)                                                                          \
-    do {                                                                                                             \
-      if (constexpr std::string_view fname = fly::detail::file_name(__FILE__); !(expr)) {                            \
-        throw fly::error("ASSERT \"{}\" failed in ...{}:{} | " string_literal, #expr, fname, __LINE__, __VA_ARGS__); \
-      }                                                                                                              \
+#  define ASSERT(expr, string_literal, ...)                                                             \
+    do {                                                                                                \
+      if (constexpr std::string_view fname = fly::detail::file_name(__FILE__); !(expr)) {               \
+        throw fly::error(                                                                               \
+            "ASSERT \"{}\" failed in ...{}:{} | " string_literal, #expr, fname, __LINE__, __VA_ARGS__); \
+      }                                                                                                 \
     } while (false)
 
 #else
@@ -175,7 +176,8 @@ namespace fly {
    *
    * \rst
    *
-   * Must be greater than or equal to 2. Configurable using the :ref:`FLY_SPATIAL_DIMS <configure FLY_SPATIAL_DIMS>` macro.
+   * Must be greater than or equal to 2. Configurable using the :ref:`FLY_SPATIAL_DIMS <configure
+   * FLY_SPATIAL_DIMS>` macro.
    *
    * \endrst
    */
@@ -217,7 +219,8 @@ namespace fly {
     struct is_narrowing_conversion_impl : std::true_type {};
 
     template <typename From, typename To>
-    struct is_narrowing_conversion_impl<From, To, std::void_t<decltype(To{std::declval<From>()})>> : std::false_type {};
+    struct is_narrowing_conversion_impl<From, To, std::void_t<decltype(To{std::declval<From>()})>>
+        : std::false_type {};
 
   }  // namespace detail
 
@@ -354,7 +357,8 @@ namespace fly {
   /**
    * @brief Conditional printing utility.
    *
-   * If ``cond`` is true forwards ``fmt`` and ``args...`` to ``fmt::print``. Useful for printing debug messages.
+   * If ``cond`` is true forwards ``fmt`` and ``args...`` to ``fmt::print``. Useful for printing debug
+   * messages.
    */
   template <typename... Args>
   auto dprint(bool cond, fmt::format_string<Args...> fmt, Args &&...args) -> void {
@@ -451,7 +455,8 @@ namespace fly {
         } else if constexpr (std::is_invocable_v<F const &, Arr<T>>) {
           std::invoke(f, Arr<T>{args...});
         } else {
-          static_assert(always_false<F>, "template_for()'s function argument 'f' not invokable with indices or Arr<...>");
+          static_assert(always_false<F>,
+                        "template_for()'s function argument 'f' not invokable with indices or Arr<...>");
         }
       } else {
         for (T i = beg[spatial_dims - 1 - N]; i < end[spatial_dims - 1 - N]; i++) {
@@ -479,7 +484,8 @@ namespace fly {
    *        }
    *    }
    *
-   * Additionally, this will detect if ``f`` is callable with an array of indexes, e.g. (in the notation from above):
+   * Additionally, this will detect if ``f`` is callable with an array of indexes, e.g. (in the notation from
+   * above):
    *
    * .. code::
    *
@@ -507,7 +513,8 @@ namespace fly {
    * @return The result of ``c.size()`` cast to an appropriate signed type.
    */
   template <typename C>
-  constexpr auto ssize(C const &c) -> std::common_type_t<std::ptrdiff_t, std::make_signed_t<decltype(c.size())>> {
+  constexpr auto ssize(C const &c)
+      -> std::common_type_t<std::ptrdiff_t, std::make_signed_t<decltype(c.size())>> {
     using R = std::common_type_t<std::ptrdiff_t, std::make_signed_t<decltype(c.size())>>;
     return static_cast<R>(c.size());
   }
@@ -528,7 +535,8 @@ namespace fly {
    * @return ``true`` if ``a`` and  ``b`` are within ``atol`` or fractionally within ``ftol`` of each other.
    */
   template <typename T>
-  constexpr auto near(T a, T b, T atol = 1e-10, T ftol = 0.0001) -> std::enable_if_t<std::is_floating_point_v<T>, bool> {
+  constexpr auto near(T a, T b, T atol = 1e-10, T ftol = 0.0001)
+      -> std::enable_if_t<std::is_floating_point_v<T>, bool> {
     return std::abs(a - b) < atol || std::abs(a - b) <= ftol * std::max(std::abs(a), std::abs(b));
   }
 
@@ -559,7 +567,8 @@ namespace fly {
    * @return The shifted prefix product (see above) of ``x``.
    */
   template <typename T, int N>
-  auto product_scan(Eigen::Array<T, N, 1> x) -> std::enable_if_t<std::is_arithmetic_v<T>, Eigen::Array<T, N, 1>> {
+  auto product_scan(Eigen::Array<T, N, 1> x)
+      -> std::enable_if_t<std::is_arithmetic_v<T>, Eigen::Array<T, N, 1>> {
     T prod = 1;
     for (Eigen::Index i = 0; i < x.size(); i++) {
       prod *= std::exchange(x[i], prod);
@@ -687,7 +696,8 @@ namespace fly {
    * @return The unit normal of a hyperplane passing through the columns of ``P``.
    */
   template <typename Scalar, int N>
-  auto hyperplane_normal(Eigen::Matrix<Scalar, N, N> const &P) -> std::enable_if_t<N != Eigen::Dynamic, Eigen::Vector<Scalar, N>> {
+  auto hyperplane_normal(Eigen::Matrix<Scalar, N, N> const &P)
+      -> std::enable_if_t<N != Eigen::Dynamic, Eigen::Vector<Scalar, N>> {
     //
     Eigen::Matrix<Scalar, N, N + 1> H = Eigen::Matrix<Scalar, N, N + 1>::Ones();
 
@@ -782,6 +792,7 @@ namespace fly {
     }
 
     using Base::begin;
+    using Base::data;
     using Base::end;
 
     /**
@@ -799,8 +810,8 @@ namespace fly {
     /**
      * @brief Resizes the container to contain count elements.
      *
-     * If the current size is greater than count, the container is reduced to its first count elements. If the current size is less
-     * than count, additional default-inserted elements are appended.
+     * If the current size is greater than count, the container is reduced to its first count elements. If the
+     * current size is less than count, additional default-inserted elements are appended.
      *
      * @param count New size of the container
      */
@@ -817,8 +828,8 @@ namespace fly {
    * @brief Basic implementation of a Golang like defer.
    *
    *
-   * \tparam F The nullary invocable's type, this **MUST** be deducted through CTAD by the deduction guide and it must be ``noexcept``
-   * callable.
+   * \tparam F The nullary invocable's type, this **MUST** be deducted through CTAD by the deduction guide and
+   * it must be ``noexcept`` callable.
    *
    * \rst
    *

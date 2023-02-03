@@ -3,6 +3,7 @@
 
 #include <KIM_ChargeUnit.hpp>
 #include <KIM_FunctionTypes.hpp>
+#include <KIM_LogVerbosity.hpp>
 #include <KIM_ModelRoutineName.hpp>
 #include <KIM_SpeciesName.hpp>
 #include <KIM_TemperatureUnit.hpp>
@@ -92,7 +93,7 @@ namespace fly::potential {
           using namespace KIM::MODEL_ROUTINE_NAME;
           if (!((name == Create) || (name == ComputeArgumentsCreate) || (name == Compute) || (name == Refresh)
                 || (name == ComputeArgumentsDestroy) || (name == Destroy))) {
-            throw fly::error("Unknown Routine \"" + name.ToString() + "\" is required by model.");
+            throw fly::error("Unknown Routine \"{}\" is required by model.", name.ToString());
           }
         }
       }
@@ -282,73 +283,60 @@ namespace fly::potential {
                   int) -> void {
       //
 
+      verify(out.size() == in.size(), "size mismatch! {} != {}", out.size(), in.size());
+
       struct Code : system::Property<int> {};
-
-      system::SoA<Code> codes(in.size());
-
-      for (Eigen::Index i = 0; i < in.size(); i++) {
-        codes(Code{}, i) = safe_cast<int>(in(id_, i));
-      }
+      struct Contrib : system::Property<int> {};
 
       int num_plus_ghosts = nl.m_num_plus_ghosts;
 
-      {
-        namespace KAN = KIM::COMPUTE_ARGUMENT_NAME;
+      system::SoA<Code, Contrib, Position, PotentialGradient> arg_data(num_plus_ghosts);
 
-        if (m_args->SetArgumentPointer(KAN::numberOfParticles, &num_plus_ghosts)
-            || m_args->SetArgumentPointer(KAN::particleSpeciesCodes, codes[Code{}].data())
-            || m_args->SetArgumentPointer(KAN::particleContributing,
-                                          nl.m_atoms[neigh::List::Contrib{}].data())
-            || m_args->SetArgumentPointer(KAN::coordinates, nl.m_atoms[r_].data())
-            || m_args->SetArgumentPointer(KAN::partialEnergy, static_cast<double*>(nullptr))
-            || m_args->SetArgumentPointer(KAN::partialForces, out[g_].data())) {
-          throw("KIM_API_set_data");
-        }
+      system::SoA<Code> codes(num_plus_ghosts);
+
+      for (Eigen::Index i = 0; i < num_plus_ghosts; i++) {
+        codes(Code{}, i) = safe_cast<int>(in(id_, nl.image_to_real(i)));
       }
 
-      //   if (m_args->SetCallbackPointer(KIM::COMPUTE_CALLBACK_NAME::GetNeighborList,
-      //                                  KIM::LANGUAGE_NAME::cpp,
-      //                                  (KIM::Function*)&neigh::List::get_cluster_neigh,
-      //                                  (void*)&nl)) {
-      //     throw error("KIM_API_set_call_back");
-      //   }
+      namespace KAN = KIM::COMPUTE_ARGUMENT_NAME;
 
-      //   kim_cluster_model->GetInfluenceDistance(&influence_distance_cluster_model);
-      //   int const* modelWillNotRequestNeighborsOfNoncontributingParticles;
-      //   kim_cluster_model->GetNeighborListPointers(&number_of_neighbor_lists,
-      //                                              &cutoff_cluster_model,
-      //                                              &modelWillNotRequestNeighborsOfNoncontributingParticles);
-      //   std::cout << "Model has influence distance of : " << influence_distance_cluster_model << std::endl;
-      //   std::cout << "Model has numberOfNeighborLists : " << number_of_neighbor_lists << std::endl;
-      //   for (int i = 0; i < number_of_neighbor_lists; ++i) {
-      //     std::cout << "\t"
-      //               << "Neighbor list " << i << " has cutoff " << cutoff_cluster_model[i]
-      //               << " with "
-      //                  "modelWillNotRequestNeighborsOfNoncontributingParticles "
-      //               << modelWillNotRequestNeighborsOfNoncontributingParticles[i] << std::endl;
-      //   }
-      //   // ignoring hints from here on...
-      //   if (number_of_neighbor_lists != 1) MY_ERROR("too many neighbor lists");
+      fmt::print("num_plus_ghosts={}\n", num_plus_ghosts);
 
-      // /* setup particleSpecies */
-      // int isSpeciesSupported;
-      // error = kim_cluster_model->GetSpeciesSupportAndCode(
-      //     KIM::SPECIES_NAME::Ar, &isSpeciesSupported, &(particleSpecies_cluster_model[0]));
-      // if (error) MY_ERROR("get_species_code");
-      // for (i = 1; i < NCLUSTERPARTS; ++i) particleSpecies_cluster_model[i] =
-      // particleSpecies_cluster_model[0];
-      // /* setup particleContributing */
-      // for (i = 0; i < NCLUSTERPARTS; ++i)
-      //   particleContributing_cluster_model[i] = 1; /* every particle contributes */
+      for (int i = 0; i < num_plus_ghosts; i++) {
+        fmt::print(
+            "atom {}, code={}, contrib={}\n", i, codes(Code{}, i), nl.m_atoms[neigh::List::Contrib{}][i]);
+      }
 
-      // /* setup neighbor lists */
-      // /* allocate memory for list */
-      // nl_cluster_model.numberOfParticles = NCLUSTERPARTS;
-      // nl_cluster_model.NNeighbors = new int[NCLUSTERPARTS];
-      // if (NULL == nl_cluster_model.NNeighbors) MY_ERROR("new unsuccessful");
+      std::vector<double> tnp(10000);
 
-      // nl_cluster_model.neighborList = new int[NCLUSTERPARTS * NCLUSTERPARTS];
-      // if (NULL == nl_cluster_model.neighborList) MY_ERROR("new unsuccessful");
+      if (m_args->SetArgumentPointer(KAN::numberOfParticles, &num_plus_ghosts)
+          || m_args->SetArgumentPointer(KAN::particleSpeciesCodes, codes[Code{}].data())
+          || m_args->SetArgumentPointer(KAN::particleContributing, nl.m_atoms[neigh::List::Contrib{}].data())
+          || m_args->SetArgumentPointer(KAN::coordinates, nl.m_atoms[r_].data())
+          || m_args->SetArgumentPointer(KAN::partialEnergy, static_cast<double*>(nullptr))
+          || m_args->SetArgumentPointer(KAN::partialForces, out[g_].data())) {
+        throw("KIM_API_set_data");
+      }
+
+      if (m_args->SetCallbackPointer(KIM::COMPUTE_CALLBACK_NAME::GetNeighborList,
+                                     KIM::LANGUAGE_NAME::cpp,
+                                     reinterpret_cast<void (*)()>(&neigh::List::get_cluster_neigh),
+                                     const_cast<neigh::List*>(&nl)  // C api has no
+                                     )) {
+        throw error("KIM_API_set_call_back");
+      }
+
+      m_args->PushLogVerbosity(KIM::LOG_VERBOSITY::debug);
+
+      int res = 0;
+
+      m_args->AreAllRequiredArgumentsAndCallbacksPresent(&res);
+
+      verify(res, "Poop!");
+
+      if (m_model->Compute(m_args)) {
+        throw error("Kim_Compute");
+      }
     }
 
     /**
@@ -362,7 +350,7 @@ namespace fly::potential {
      * @return double The potential energy of the system of atoms.
      */
     auto energy(system::SoA<TypeID const&, Frozen const&> in, neigh::List const& nl, int threads = 1)
-        -> double {}
+        -> double;
 
   private:
     Options m_opt;
@@ -375,64 +363,66 @@ namespace fly::potential {
 
 }  // namespace fly::potential
 
-using namespace fly;
+// Sum up the results
+int sum(std::vector<int> const&) {
+  using namespace fly;
 
-template <typename... T>
-system::Supercell<system::TypeMap<>, Position, Frozen, T...> bcc_iron_motif(double a = 2.855300) {
-  //
-  system::TypeMap<> FeH(2);
+  template <typename... T>
+  system::Supercell<system::TypeMap<>, Position, Frozen, T...> bcc_iron_motif(double a = 2.855300) {
+    //
+    system::TypeMap<> FeH(2);
 
-  FeH.set(0, tp_, "Fe");
-  FeH.set(1, tp_, "H");
+    FeH.set(0, tp_, "Fe");
+    FeH.set(1, tp_, "H");
 
-  Mat basis{
-      {a, 0, 0},
-      {0, a, 0},
-      {0, 0, a},
-  };
+    Mat basis{
+        {a, 0, 0},
+        {0, a, 0},
+        {0, 0, a},
+    };
 
-  system::Supercell motif
-      = system::make_supercell<Position, Frozen, T...>({basis, Arr<bool>::Constant(true)}, FeH, 2);
+    system::Supercell motif
+        = system::make_supercell<Position, Frozen, T...>({basis, Arr<bool>::Constant(true)}, FeH, 2);
 
-  motif[fzn_] = false;
-  motif[id_] = 0;
+    motif[fzn_] = false;
+    motif[id_] = 0;
 
-  motif(r_, 0) = Vec::Zero();
-  motif(r_, 1) = Vec::Constant(0.5);
+    motif(r_, 0) = Vec::Zero();
+    motif(r_, 1) = Vec::Constant(0.5);
 
-  return motif;
-}
+    return motif;
+  }
 
-int main(int, const char**) {
-  //
+  int main(int, const char**) {
+    //
 
-  system::Supercell perfect = motif_to_lattice(bcc_iron_motif(), {6, 6, 6});
+    system::Supercell perfect = motif_to_lattice(bcc_iron_motif(), {6, 6, 6});
 
-  system::Supercell cell = remove_atoms(perfect, {1, 3});
+    system::Supercell cell = remove_atoms(perfect, {1, 3});
 
-  Vec r_H = {2.857 / 2 + 3.14, 2.857 / 2 + 3.14, 2.857 / 4 + 3.14};
+    Vec r_H = {2.857 / 2 + 3.14, 2.857 / 2 + 3.14, 2.857 / 4 + 3.14};
 
-  cell = add_atoms(cell, {system::Atom<TypeID, Position, Frozen>(1, r_H, false)});
+    cell = add_atoms(cell, {system::Atom<TypeID, Position, Frozen>(1, r_H, false)});
 
-  ///
+    ///
 
-  potential::KIM_API::Options opt{
-      .model_name = "EAM_Dynamo_Wen_2021_FeH__MO_634187028437_000",
-  };
+    potential::KIM_API::Options opt{
+        .model_name = "EAM_Dynamo_Wen_2021_FeH__MO_634187028437_000",
+    };
 
-  potential::KIM_API model(opt, cell.map());
+    potential::KIM_API model(opt, cell.map());
 
-  neigh::List nl(cell.box(), model.r_cut());
+    neigh::List nl(cell.box(), model.r_cut());
 
-  nl.rebuild(cell, omp_get_max_threads());
+    nl.rebuild(cell, omp_get_max_threads());
 
-  system::SoA<PotentialGradient> grad(cell.size());
+    system::SoA<PotentialGradient> grad(cell.size());
 
-  model.gradient(grad, cell, nl, 0);
+    model.gradient(grad, cell, nl, 0);
 
-  fmt::print("r_cut = {}\n", model.r_cut());
+    fmt::print(stderr, "r_cut = {}\n", model.r_cut());
 
-  fmt::print("Working\n");
+    fmt::print("Working\n");
 
-  return 0;
-}
+    return 0;
+  }

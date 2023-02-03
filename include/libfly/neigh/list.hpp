@@ -163,21 +163,21 @@ namespace fly::neigh {
   private:
     friend class ::fly::potential::KIM_API;
 
-    struct Next : system::Property<Eigen::Index> {};  ///< Index of the next atom in the linked cell list.
-    struct Contrib : system::Property<int> {};        /// To support the KIM-API
+    struct Next : system::Property<int> {};     ///< Index of the next atom in the linked cell list.
+    struct Contrib : system::Property<int> {};  /// To support the KIM-API
 
     using soa_type = system::SoA<Index, Next, Position, Contrib>;
 
-    system::Box m_box;                           ///< Store the box.
-    typename system::Box::Grid m_grid;           ///< Store the grid (made by the box).
-    detail::AdjacentCells m_cells;               ///< Store the neighbour cell lists.
-    double m_r_cut;                              ///< Store the cut of radius.
-    soa_type m_atoms;                            ///< Canonical pos, Index = index-in-input for real+ghosts.
-    Eigen::Index m_num_plus_ghosts = 0;          ///< Number of real atoms + number of ghost atoms.
-    Vector<Eigen::Index> m_head;                 ///< Index of the start of each bucket.
-    Vector<Vector<Eigen::Index>> m_neigh_lists;  ///< Neighbour list for each non-ghost atom.
+    system::Box m_box;                   ///< Store the box.
+    typename system::Box::Grid m_grid;   ///< Store the grid (made by the box).
+    detail::AdjacentCells m_cells;       ///< Store the neighbour cell lists.
+    double m_r_cut;                      ///< Store the cut of radius.
+    soa_type m_atoms;                    ///< Canonical pos, Index = index-in-input for real+ghosts.
+    Eigen::Index m_num_plus_ghosts = 0;  ///< Number of real atoms + number of ghost atoms.
+    Vector<int> m_head;                  ///< Index of the start of each bucket.
+    Vector<Vector<int>> m_neigh_lists;   ///< Neighbour list for each non-ghost atom.
 
-    static constexpr auto NONE = std::numeric_limits<Eigen::Index>::max();
+    static constexpr auto NONE = std::numeric_limits<int>::max();
 
     /**
      * @brief Set up all ghost indexes positions and offsets.
@@ -201,7 +201,7 @@ namespace fly::neigh {
       return *(m_atoms[Index{}].data() + Index::size() * i);
     }
 
-    static int get_cluster_neigh(void* const dataObject,
+    static int get_cluster_neigh(void* const obj,
                                  int const numberOfNeighborLists,
                                  double const* const cutoffs,
                                  int const neighborListIndex,

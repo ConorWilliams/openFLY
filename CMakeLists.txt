@@ -17,6 +17,9 @@ project(
     LANGUAGES CXX C
 )
 
+# Add the cmake folder so custom
+set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake" ${CMAKE_MODULE_PATH})
+
 # This variable is set by project() in CMake 3.21+
 if(NOT PROJECT_IS_TOP_LEVEL)
     string(COMPARE EQUAL "${CMAKE_SOURCE_DIR}" "${PROJECT_SOURCE_DIR}" PROJECT_IS_TOP_LEVEL)
@@ -116,9 +119,13 @@ if(NOT KIM-API_FOUND)
 endif()
 
 # ////////////////////////////
-add_executable(skmcKIM apps/kim.cpp)
+
+add_subdirectory(${CMAKE_SOURCE_DIR}/external/backward-cpp)
+
+add_executable(skmcKIM apps/kim.cpp ${BACKWARD_ENABLE})
 target_compile_features(skmcKIM PRIVATE cxx_std_17)
 target_link_libraries(skmcKIM PRIVATE libFLY Nauty KIM-API::kim-api)
+add_backward(skmcKIM)
 
 # add_executable(benchFLY apps/bench.cpp)
 # target_compile_features(benchFLY PRIVATE cxx_std_17)

@@ -10,6 +10,7 @@
 #include <KIM_TimeUnit.hpp>
 #include <cstddef>
 #include <exception>
+#include <nonstd/span.hpp>
 
 #include "KIM_SimulatorHeaders.hpp"
 #include "KIM_SupportedExtensions.hpp"
@@ -24,6 +25,7 @@
 #include "libfly/minimise/LBFGS/lbfgs.hpp"
 #include "libfly/neigh/list.hpp"
 #include "libfly/neigh/sort.hpp"
+#include "libfly/potential/EAM/data.hpp"
 #include "libfly/potential/generic.hpp"
 #include "libfly/saddle//find.hpp"
 #include "libfly/saddle/dimer.hpp"
@@ -47,7 +49,7 @@ namespace fly::potential {
       std::string model_name = "";  // The exact name of the KIM model
     };
 
-    explicit KIM_API(Options const& opt, system::TypeMap<> const& map) : m_opt(opt) {
+    explicit KIM_API(Options const& opt, system::TypeMap<> const& map) : m_opt(opt), m_map(map.num_types()) {
       int units_accepted = false;
       int err = KIM::Model::Create(KIM::NUMBERING::zeroBased,
                                    KIM::LENGTH_UNIT::A,
@@ -274,7 +276,8 @@ namespace fly::potential {
      *
      * @param in Per-atom TypeID's and Frozen properties
      * @param out Potential gradient written to this.
-     * @param nl Neighbour list (in ready state i.e. neigh::List::update() or neigh::List::rebuild() called).
+     * @param nl Neighbour list (in ready state i.e. neigh::List::update() or neigh::List::rebuild()
+     * called).
      * @param threads Number of openMP threads to use.
      */
     auto gradient(system::SoA<PotentialGradient&> out,
@@ -285,45 +288,34 @@ namespace fly::potential {
 
       verify(out.size() == in.size(), "size mismatch! {} != {}", out.size(), in.size());
 
-      struct Code : system::Property<int> {};
-      struct Contrib : system::Property<int> {};
-
       int num_plus_ghosts = nl.m_num_plus_ghosts;
 
-      system::SoA<Code, Contrib, Position, PotentialGradient> arg_data(num_plus_ghosts);
-
-      system::SoA<Code> codes(num_plus_ghosts);
+      if (m_kim_io.size() != num_plus_ghosts) {
+        m_kim_io.destructive_resize(num_plus_ghosts);
+      }
 
       for (Eigen::Index i = 0; i < num_plus_ghosts; i++) {
-        codes(Code{}, i) = safe_cast<int>(in(id_, nl.image_to_real(i)));
+        m_kim_io(KIM_code{}, i) = safe_cast<int>(in(id_, nl.image_to_real(i)));
+        m_kim_io(KIM_contrib{}, i) = i < nl.size();
       }
 
       namespace KAN = KIM::COMPUTE_ARGUMENT_NAME;
 
-      fmt::print("num_plus_ghosts={}\n", num_plus_ghosts);
-
-      for (int i = 0; i < num_plus_ghosts; i++) {
-        fmt::print(
-            "atom {}, code={}, contrib={}\n", i, codes(Code{}, i), nl.m_atoms[neigh::List::Contrib{}][i]);
-      }
-
-      std::vector<double> tnp(10000);
-
       if (m_args->SetArgumentPointer(KAN::numberOfParticles, &num_plus_ghosts)
-          || m_args->SetArgumentPointer(KAN::particleSpeciesCodes, codes[Code{}].data())
-          || m_args->SetArgumentPointer(KAN::particleContributing, nl.m_atoms[neigh::List::Contrib{}].data())
+          || m_args->SetArgumentPointer(KAN::particleSpeciesCodes, m_kim_io[KIM_code{}].data())
+          || m_args->SetArgumentPointer(KAN::particleContributing, m_kim_io[KIM_contrib{}].data())
           || m_args->SetArgumentPointer(KAN::coordinates, nl.m_atoms[r_].data())
           || m_args->SetArgumentPointer(KAN::partialEnergy, static_cast<double*>(nullptr))
-          || m_args->SetArgumentPointer(KAN::partialForces, out[g_].data())) {
-        throw("KIM_API_set_data");
+          || m_args->SetArgumentPointer(KAN::partialForces, m_kim_io[KIM_force{}].data())) {
+        throw("KIM_API_set_argument_pointer");
       }
 
       if (m_args->SetCallbackPointer(KIM::COMPUTE_CALLBACK_NAME::GetNeighborList,
                                      KIM::LANGUAGE_NAME::cpp,
-                                     reinterpret_cast<void (*)()>(&neigh::List::get_cluster_neigh),
+                                     reinterpret_cast<void (*)()>(&neigh::List::get_neigh),
                                      const_cast<neigh::List*>(&nl)  // C api has no
                                      )) {
-        throw error("KIM_API_set_call_back");
+        throw error("KIM_API_set_callback");
       }
 
       m_args->PushLogVerbosity(KIM::LOG_VERBOSITY::debug);
@@ -332,10 +324,18 @@ namespace fly::potential {
 
       m_args->AreAllRequiredArgumentsAndCallbacksPresent(&res);
 
-      verify(res, "Poop!");
+      verify(res, "Failed to set all required arguments and callbacks!");
 
       if (m_model->Compute(m_args)) {
-        throw error("Kim_Compute");
+        throw error("KIM_API_compute");
+      }
+
+      out[g_] = 0;
+
+      for (Eigen::Index i = 0; i < num_plus_ghosts; ++i) {
+        if (auto j = nl.image_to_real(i); !in(fzn_, j)) {
+          out(g_, j) -= m_kim_io(KIM_force{}, i);
+        }
       }
     }
 
@@ -355,7 +355,14 @@ namespace fly::potential {
   private:
     Options m_opt;
 
-    std::vector<int> m_contrib;
+    struct KIM_code : system::Property<int> {};
+    struct KIM_contrib : system::Property<int> {};
+    struct KIM_energy : system::Property<double> {};
+    struct KIM_force : system::Property<double, 3> {};
+
+    system::TypeMap<KIM_code> m_map;
+
+    system::SoA<KIM_code, KIM_contrib, KIM_energy, KIM_force> m_kim_io;
 
     KIM::Model* m_model = nullptr;
     KIM::ComputeArguments* m_args = nullptr;
@@ -363,66 +370,97 @@ namespace fly::potential {
 
 }  // namespace fly::potential
 
-// Sum up the results
-int sum(std::vector<int> const&) {
-  using namespace fly;
+using namespace fly;
 
-  template <typename... T>
-  system::Supercell<system::TypeMap<>, Position, Frozen, T...> bcc_iron_motif(double a = 2.855300) {
-    //
-    system::TypeMap<> FeH(2);
+template <typename... T>
+system::Supercell<system::TypeMap<>, Position, Frozen, T...> bcc_iron_motif(double a = 2.855300) {
+  //
+  system::TypeMap<> FeH(2);
 
-    FeH.set(0, tp_, "Fe");
-    FeH.set(1, tp_, "H");
+  FeH.set(0, tp_, "Fe");
+  FeH.set(1, tp_, "H");
 
-    Mat basis{
-        {a, 0, 0},
-        {0, a, 0},
-        {0, 0, a},
-    };
+  Mat basis{
+      {a, 0, 0},
+      {0, a, 0},
+      {0, 0, a},
+  };
 
-    system::Supercell motif
-        = system::make_supercell<Position, Frozen, T...>({basis, Arr<bool>::Constant(true)}, FeH, 2);
+  system::Supercell motif
+      = system::make_supercell<Position, Frozen, T...>({basis, Arr<bool>::Constant(true)}, FeH, 2);
 
-    motif[fzn_] = false;
-    motif[id_] = 0;
+  motif[fzn_] = false;
+  motif[id_] = 0;
 
-    motif(r_, 0) = Vec::Zero();
-    motif(r_, 1) = Vec::Constant(0.5);
+  motif(r_, 0) = Vec::Zero();
+  motif(r_, 1) = Vec::Constant(0.5);
 
-    return motif;
-  }
+  return motif;
+}
 
-  int main(int, const char**) {
-    //
+int main(int, const char**) {
+  //
 
-    system::Supercell perfect = motif_to_lattice(bcc_iron_motif(), {6, 6, 6});
+  system::Supercell perfect = motif_to_lattice(bcc_iron_motif(), {16, 16, 16});
 
-    system::Supercell cell = remove_atoms(perfect, {1, 3});
+  system::Supercell cell = remove_atoms(perfect, {1, 3});
 
-    Vec r_H = {2.857 / 2 + 3.14, 2.857 / 2 + 3.14, 2.857 / 4 + 3.14};
+  Vec r_H = {2.857 / 2 + 3.14, 2.857 / 2 + 3.14, 2.857 / 4 + 3.14};
 
-    cell = add_atoms(cell, {system::Atom<TypeID, Position, Frozen>(1, r_H, false)});
+  cell = add_atoms(cell, {system::Atom<TypeID, Position, Frozen>(1, r_H, false)});
 
-    ///
+  ///
+  // MEAM_LAMMPS_LeeJang_2007_FeH__MO_095610951957_001
+  // EAM_Dynamo_Wen_2021_FeH__MO_634187028437_000
+  potential::KIM_API::Options opt{
+      .model_name = "EAM_Dynamo_Wen_2021_FeH__MO_634187028437_000",
+  };
 
-    potential::KIM_API::Options opt{
-        .model_name = "EAM_Dynamo_Wen_2021_FeH__MO_634187028437_000",
-    };
+  potential::KIM_API model(opt, cell.map());
 
-    potential::KIM_API model(opt, cell.map());
+  system::SoA<PotentialGradient> grad_kim(cell.size());
+  system::SoA<PotentialGradient> grad_gen(cell.size());
 
+  {
     neigh::List nl(cell.box(), model.r_cut());
 
     nl.rebuild(cell, omp_get_max_threads());
 
-    system::SoA<PotentialGradient> grad(cell.size());
-
-    model.gradient(grad, cell, nl, 0);
-
-    fmt::print(stderr, "r_cut = {}\n", model.r_cut());
-
-    fmt::print("Working\n");
-
-    return 0;
+    for (int i = 0; i < 2; i++) {
+      timeit("KIM    ", [&] { model.gradient(grad_kim, cell, nl, 1); });
+    }
   }
+
+  potential::Generic pot{
+      potential::EAM{
+          cell.map(),
+          std::make_shared<potential::DataEAM>(potential::DataEAM::Options{},
+                                               std::ifstream{"data/wen.eam.fs"}),
+      },
+  };
+
+  {
+    neigh::List nl(cell.box(), pot.r_cut());
+
+    nl.rebuild(cell, omp_get_max_threads());
+
+    for (int i = 0; i < 2; i++) {
+      timeit("Generic", [&] { pot.gradient(grad_gen, cell, nl, 4); });
+    }
+  }
+
+  // print a comparison of the gradients
+
+  for (Eigen::Index i = 0; i < 10; i++) {
+    fmt::print("{}\n", grad_gen(g_, i) - grad_kim(g_, i));
+  }
+
+  // print the norm of the gradient differences
+  fmt::print("Norm of the gradient difference: {}\n", gnorm(grad_gen[g_] - grad_kim[g_]));
+
+  fmt::print(stderr, "r_cut = {}\n", model.r_cut());
+
+  fmt::print("Working\n");
+
+  return 0;
+}

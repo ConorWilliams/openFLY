@@ -3,7 +3,7 @@
 /.vscode
 
 /build
-/external
+
 
 data/xyz
 data/*.fs

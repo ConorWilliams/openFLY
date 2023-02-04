@@ -163,10 +163,9 @@ namespace fly::neigh {
   private:
     friend class ::fly::potential::KIM_API;
 
-    struct Next : system::Property<int> {};     ///< Index of the next atom in the linked cell list.
-    struct Contrib : system::Property<int> {};  /// To support the KIM-API
+    struct Next : system::Property<int> {};  ///< Index of the next atom in the linked cell list.
 
-    using soa_type = system::SoA<Index, Next, Position, Contrib>;
+    using soa_type = system::SoA<Index, Next, Position>;
 
     system::Box m_box;                   ///< Store the box.
     typename system::Box::Grid m_grid;   ///< Store the grid (made by the box).
@@ -201,13 +200,13 @@ namespace fly::neigh {
       return *(m_atoms[Index{}].data() + Index::size() * i);
     }
 
-    static int get_cluster_neigh(void* const obj,
-                                 int const numberOfNeighborLists,
-                                 double const* const cutoffs,
-                                 int const neighborListIndex,
-                                 int const particleNumber,
-                                 int* const numberOfNeighbors,
-                                 int const** const neighborsOfParticle);
+    static int get_neigh(List const* const obj,
+                         int const numberOfNeighborLists,
+                         double const* const cutoffs,
+                         int const neighborListIndex,
+                         int const particleNumber,
+                         int* const numberOfNeighbors,
+                         int const** const neighborsOfParticle);
   };
 
 }  // namespace fly::neigh

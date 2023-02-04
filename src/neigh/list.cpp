@@ -57,8 +57,6 @@ namespace fly::neigh {
     if (size() != positions.size()) {
       // Allocate space if needed
       m_atoms.destructive_resize(positions.size() * (1 + MAX_GHOST_RATIO));
-      m_atoms[Contrib{}] = 0;
-      m_atoms[Contrib{}].head(positions.size()) = 1;
       m_neigh_lists.resize(positions.size());
 
       // Need to re-index if size changed
@@ -166,15 +164,13 @@ namespace fly::neigh {
     }
   }
 
-  int List::get_cluster_neigh(void* const obj,
-                              int const numberOfNeighborLists,
-                              double const* const cutoffs,
-                              int const neighborListIndex,
-                              int const particleNumber,
-                              int* const numberOfNeighbors,
-                              int const** const neighborsOfParticle) {
-    //
-    List const* nl = (List const*)obj;
+  int List::get_neigh(List const* const nl,
+                      int const numberOfNeighborLists,
+                      double const* const cutoffs,
+                      int const neighborListIndex,
+                      int const particleNumber,
+                      int* const numberOfNeighbors,
+                      int const** const neighborsOfParticle) {
     //
     if ((numberOfNeighborLists != 1) || (cutoffs[0] > nl->m_r_cut) || neighborListIndex != 0) {
       return true;
@@ -188,12 +184,10 @@ namespace fly::neigh {
       return true;
     }
 
-    *numberOfNeighbors = 0;  // nl->m_neigh_lists[particleNumber].size();
-
-    fmt::print(stderr, "@{} fetch {} neigh\n", particleNumber, nl->m_neigh_lists[particleNumber].size());
+    *numberOfNeighbors = safe_cast<int>(nl->m_neigh_lists[particleNumber].size());
 
     *neighborsOfParticle = nl->m_neigh_lists[particleNumber].data();
-    //
+
     return false;
   }
 

@@ -21,7 +21,7 @@ ExternalProject_Add(
     URL "https://s3.openkim.org/kim-api/kim-api-2.3.0.txz"
     URL_HASH "SHA256=93673bb8fbc0625791f2ee67915d1672793366d10cabc63e373196862c14f991"
     PREFIX ${CMAKE_BINARY_DIR}/kim-api
-    CMAKE_ARGS ${CMAKE_BINARY_DIR}/kim-api/src/kim-api  -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=${CMAKE_BINARY_DIR}/kim-api/install
+    CMAKE_ARGS ${CMAKE_BINARY_DIR}/kim-api/src/kim-api  -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=${CMAKE_BINARY_DIR}/kim-api/install -DCMAKE_CXX_FLAGS="-march=native" -DCMAKE_EXPORT_COMPILE_COMMANDS=On
     TEST_COMMAND make test
     TEST_BEFORE_INSTALL TRUE
     STEP_TARGETS install

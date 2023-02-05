@@ -55,11 +55,20 @@ target_include_directories(libFLY PRIVATE "$<BUILD_INTERFACE:${PROJECT_SOURCE_DI
 
 target_compile_features(libFLY PUBLIC cxx_std_17)
 
-# Link libraries
+# Find dpenedancies
 include(ExternalProject)
 
 # System
 find_package(OpenMP REQUIRED)
+
+find_package(KIM-API 2.3.0 CONFIG PATHS ${CMAKE_SOURCE_DIR}/build/kim-api/kim-api/install/share/cmake/kim-api)
+
+if(NOT KIM-API_FOUND)
+    message(FATAL_ERROR "The KIM-API could not be found, install a local copy with:\n\"./scripts/kim-api/install.sh\"")
+endif()
+
+# Lib Backward is easiest as a submodule/subdirectory.
+add_subdirectory(${CMAKE_SOURCE_DIR}/external/backward-cpp)
 
 # All managed by vcpkg
 find_package(fmt CONFIG REQUIRED)
@@ -68,7 +77,7 @@ find_package(span-lite CONFIG REQUIRED)
 find_package(xxHash CONFIG REQUIRED)
 find_package(cereal CONFIG REQUIRED)
 
-# find_package(kim-api CONFIG REQUIRED)
+# Manually install lib Nauty. This is a bit of a pain, but it is the only way to get it to work.
 
 # Ancient voodoo that is autoconf
 ExternalProject_Add(
@@ -102,29 +111,31 @@ target_include_directories(Nauty INTERFACE
 
 add_dependencies(Nauty nauty)
 
-target_link_libraries(libFLY PRIVATE Nauty xxHash::xxhash)
+# Link libraries
 
-target_link_libraries(libFLY PUBLIC Eigen3::Eigen fmt::fmt nonstd::span-lite OpenMP::OpenMP_CXX cereal::cereal)
+target_link_libraries(libFLY PRIVATE 
+    Nauty 
+    xxHash::xxhash
+    KIM-API::kim-api
+)
+
+target_link_libraries(libFLY PUBLIC 
+    Eigen3::Eigen 
+    fmt::fmt 
+    nonstd::span-lite
+    OpenMP::OpenMP_CXX 
+    cereal::cereal
+)
 
 # Declare executable(s)
+
 add_executable(skmcFLY apps/skmc.cpp)
 target_compile_features(skmcFLY PRIVATE cxx_std_17)
 target_link_libraries(skmcFLY PRIVATE libFLY)
 
-# ////////////////////////////
-find_package(KIM-API 2.3.0 CONFIG PATHS ${CMAKE_SOURCE_DIR}/build/kim-api/kim-api/install/share/cmake/kim-api)
-
-if(NOT KIM-API_FOUND)
-    message(FATAL_ERROR "The KIM-API could not be found, install a local copy with:\n\"./scripts/kim-api/install.sh\"")
-endif()
-
-# ////////////////////////////
-
-add_subdirectory(${CMAKE_SOURCE_DIR}/external/backward-cpp)
-
 add_executable(skmcKIM apps/kim.cpp ${BACKWARD_ENABLE})
 target_compile_features(skmcKIM PRIVATE cxx_std_17)
-target_link_libraries(skmcKIM PRIVATE libFLY Nauty KIM-API::kim-api)
+target_link_libraries(skmcKIM PRIVATE libFLY)
 add_backward(skmcKIM)
 
 # add_executable(benchFLY apps/bench.cpp)

@@ -223,20 +223,4 @@ namespace fly::potential {
     }
   }
 
-  void EAM::mw_hessian(system::Hessian& out, system::SoA<TypeID const&, Frozen const&> in, int num_threads) {
-    // Transform into mass-weighted hessian
-#pragma omp parallel for num_threads(num_threads) schedule(dynamic)
-    for (Eigen::Index i = 0; i < in.size(); ++i) {
-      //
-      double mass_i = m_data->type_map().get(in(id_, i), m_);
-
-      for (Eigen::Index j = i; j < in.size(); ++j) {
-        //
-        double mass_j = m_data->type_map().get(in(id_, j), m_);
-
-        out(j, i) *= 1 / std::sqrt(mass_i * mass_j);
-      }
-    }
-  }
-
 }  // namespace fly::potential

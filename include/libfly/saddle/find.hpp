@@ -38,6 +38,7 @@
 #include "libfly/system/box.hpp"
 #include "libfly/system/hessian.hpp"
 #include "libfly/system/property.hpp"
+#include "libfly/system/typemap.hpp"
 #include "libfly/utility/core.hpp"
 #include "libfly/utility/random.hpp"
 
@@ -251,12 +252,14 @@ namespace fly::saddle {
      *
      * @param opt The configuration options.
      * @param box Description of the simulation space.
+     * @param map The mass map for mass-weighting the Hessians.
      * @param pot The potential to use for minimisations and SP searches.
      * @param min The minimiser to relax either side of a SP.
      * @param dimer Used to find SPs.
      */
     Master(Options const& opt,
            system::Box const& box,
+           system::TypeMap<Mass> map,
            potential::Generic const& pot,
            minimise::LBFGS const& min,
            saddle::Dimer const& dimer);
@@ -334,6 +337,7 @@ namespace fly::saddle {
 
     Options m_opt;
     system::Box m_box;
+    system::TypeMap<Mass> m_map;
 
     std::vector<Eigen::Index> m_sep_list;  // atom i is furthest from sep_list[i]
     int m_num_zero_modes;                  // Degree of freedom in each input

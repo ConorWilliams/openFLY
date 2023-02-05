@@ -116,18 +116,6 @@ namespace fly::potential {
                  neigh::List const& nl,
                  int threads = 1) -> void;
 
-    /**
-     * @brief Mass weight hessian matrix.
-     *
-     * As hessian matrices are always symmetric this function only acts on the lower diagonal portion.
-     *
-     * @param in Input data.
-     * @param out Hessian matrix (computed with .hessian()).
-     * @param threads Number of openMP threads to use.
-     */
-    auto mw_hessian(system::Hessian& out, system::SoA<TypeID const&, Frozen const&> in, int threads = 1)
-        -> void;
-
   private:
     std::shared_ptr<DataEAM const> m_data;
 

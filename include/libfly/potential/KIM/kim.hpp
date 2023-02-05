@@ -18,6 +18,7 @@
 // <https://www.gnu.org/licenses/>.
 
 #include <cstddef>
+#include <limits>
 #include <memory>
 
 #include "libfly/neigh/list.hpp"
@@ -50,9 +51,9 @@ namespace fly::potential {
   class KIM_API {
   public:
     struct Options {
-      std::string model_name = "No default";  ///< The exact name of the KIM model.
-      double epsilon = 1e-2;                  ///< Hessian finite-difference step size.
-      bool debug = false;                     ///< Print debug information.
+      std::string model_name = "No default";                               ///< The name of the KIM model.
+      double epsilon = std::sqrt(std::numeric_limits<double>::epsilon());  ///< Fnite-difference step size.
+      bool debug = false;                                                  ///< Print debug information.
     };
 
     explicit KIM_API(Options const& opt, system::TypeMap<> const& map);
@@ -97,6 +98,24 @@ namespace fly::potential {
                   neigh::List const& nl,
                   int threads = -1) -> void;
 
+    /**
+     * @brief Compute hessian matrix.
+     *
+     * Assumes the neighbour list are ready. The resulting hessian is n by n (n = number of atoms) and
+     * only include contributions from the m active atoms i.e. have zeros for frozen atoms. Uses symmetric
+     * finite difference.
+     *
+     * @param in Per-atom data used by hessian for computation.
+     * @param out Hessian matrix to write output to.
+     * @param nl Neighbour list (in ready state i.e. neigh::List::update() or neigh::List::rebuild() called)
+     * configured with a cut-off at least ``r_cut()``.
+     * @param threads The number of openMP threads to use.
+     */
+    auto hessian(system::Hessian& out,
+                 system::SoA<TypeID const&, Frozen const&> in,
+                 neigh::List const& nl,
+                 int threads = 1) -> void;
+
   private:
     Options m_opt;
 
@@ -111,6 +130,8 @@ namespace fly::potential {
 
     KIM::Model* m_model = nullptr;
     KIM::ComputeArguments* m_args = nullptr;
+
+    void force(system::SoA<TypeID const&, Frozen const&> in, neigh::List const& nl);
   };
 
 }  // namespace fly::potential

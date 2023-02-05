@@ -21,6 +21,8 @@
 #include <Eigen/Eigenvalues>
 #include <type_traits>
 
+#include "libfly/system/SoA.hpp"
+#include "libfly/system/typemap.hpp"
 #include "libfly/utility/core.hpp"
 
 /**
@@ -116,9 +118,29 @@ namespace fly::system {
       return {m_solver.eigenvalues(), m_solver.eigenvectors()};
     }
     /**
-     * @brief Fetch a reference to the underlying matrix.
+     * @brief Fetch a const-reference to the underlying matrix.
      */
     Matrix const& get() const noexcept { return m_hess; }
+
+    /**
+     * @brief Fetch a mutable reference to the underlying matrix.
+     */
+    Matrix& get() noexcept { return m_hess; }
+
+    /**
+     * @brief Transform to a mass-weighted hessian.
+     *
+     * @param map The type map containing the masses of the atoms as a function of their type ID.
+     * @param in The view containing the atom IDs.
+     */
+    auto mass_weight(TypeMap<Mass> const& map, system::viewSoA<TypeID> const& in) -> void {
+      for (auto i = 0; i < in.size(); ++i) {
+        auto const mi = map.get(in(id_, i), m_);
+        for (auto j = 0; j < in.size(); ++j) {
+          (*this)(j, i) *= 1 / std::sqrt(mi * map.get(in(id_, j), m_));
+        }
+      }
+    }
 
   private:
     Matrix m_hess;

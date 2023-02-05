@@ -100,7 +100,6 @@ namespace fly::potential {
      *
      * Can assume the neighbour list are ready, force on frozen atoms must be zero.
      *
-     *
      * @param out Result is written here.
      * @param in Per-atom data used by potential for computation.
      * @param nl Neighbour list (in ready state i.e. neigh::List::update() or neigh::List::rebuild() called)
@@ -117,9 +116,10 @@ namespace fly::potential {
     /**
      * @brief Compute hessian matrix.
      *
-     * Can assume the neighbour list are ready. The resulting hessian must be n by n (n = number of atoms) and
-     * only include contributions from the m active atoms i.e. have zeros for frozen atoms. As hessian
-     * matrices are always symmetric this function is only required to compute the lower diagonal portion.
+     * Can assume the neighbour list are ready. The resulting hessian must be n by n (n = number of atoms *
+     * spatial dims) and only include contributions from the m active atoms i.e. have zeros for frozen atoms.
+     * As hessian matrices are always symmetric this function is only required to compute the lower diagonal
+     * portion.
      *
      * @param in Per-atom data used by hessian for computation.
      * @param out Hessian matrix to write output to.
@@ -132,20 +132,6 @@ namespace fly::potential {
                  neigh::List const& nl,
                  int threads = 1) -> void {
       return ::fly::visit(m_pot, [&](auto& pot) { pot.hessian(out, in, nl, threads); });
-    }
-
-    /**
-     * @brief Mass weight a hessian matrix.
-     *
-     * As hessian matrices are always symmetric this function only acts on the lower diagonal portion.
-     *
-     * @param in Input data.
-     * @param out Hessian matrix (computed with .hessian()).
-     * @param threads Number of openMP threads to use.
-     */
-    auto mw_hessian(system::Hessian& out, system::SoA<TypeID const&, Frozen const&> in, int threads = 1)
-        -> void {
-      ::fly::visit(m_pot, [&](auto& pot) { pot.mw_hessian(out, in, threads); });
     }
 
   private:

@@ -20,6 +20,8 @@
 //
 #include "KIM_SimulatorHeaders.hpp"
 #include "KIM_SupportedExtensions.hpp"
+#include "libfly/system/SoA.hpp"
+#include "libfly/system/property.hpp"
 #include "libfly/utility/core.hpp"
 
 namespace fly::potential {
@@ -301,14 +303,7 @@ namespace fly::potential {
     return energy;
   }
 
-  auto KIM_API::gradient(system::SoA<PotentialGradient&> out,
-                         system::SoA<TypeID const&, Frozen const&> in,
-                         neigh::List const& nl,
-                         int) -> void {
-    //
-
-    verify(out.size() == in.size(), "size mismatch! {} != {}", out.size(), in.size());
-
+  void KIM_API::force(system::SoA<TypeID const&, Frozen const&> in, neigh::List const& nl) {
     int num_plus_ghosts = safe_cast<int>(nl.m_num_plus_ghosts);
 
     if (m_kim_io.size() != num_plus_ghosts) {
@@ -348,14 +343,68 @@ namespace fly::potential {
     if (m_model->Compute(m_args)) {
       throw error("KIM_API_compute");
     }
+  }
+
+  auto KIM_API::gradient(system::SoA<PotentialGradient&> out,
+                         system::SoA<TypeID const&, Frozen const&> in,
+                         neigh::List const& nl,
+                         int) -> void {
+    //
+
+    verify(out.size() == in.size(), "size mismatch! {} != {}", out.size(), in.size());
+
+    force(in, nl);
 
     out[g_] = 0;
 
-    for (Eigen::Index i = 0; i < num_plus_ghosts; ++i) {
+    for (Eigen::Index i = 0; i < nl.m_num_plus_ghosts; ++i) {
       if (auto j = nl.image_to_real(i); !in(fzn_, j)) {
         out(g_, j) -= m_kim_io(KIM_force{}, i);
       }
     }
+  }
+
+  auto KIM_API::hessian(system::Hessian& out,
+                        system::SoA<TypeID const&, Frozen const&> in,
+                        neigh::List const& nl_initial,
+                        int threads) -> void {
+    // Comput the hessian using the symmetric finite difference of the gradient.
+
+    out.zero_for(in.size());
+
+    system::SoA<Position, Delta> r(in.size());
+
+    Eigen::Index const N = in.size() * Position::size();
+
+    r[r_] = nl_initial.m_atoms[r_].head(N);
+    r[del_] = 0;
+
+    system::SoA<PotentialGradient> g_plus(in.size());
+    system::SoA<PotentialGradient> g_minus(in.size());
+
+    neigh::List nl(nl_initial.m_box, r_cut() + 2 * m_opt.epsilon);
+
+    nl.rebuild(r, threads);
+
+    for (Eigen::Index i = 0; i < N; ++i) {
+      r[del_][i] = -m_opt.epsilon;
+      nl.update(r);
+      gradient(g_plus, in, nl, threads);
+
+      r[del_][i] = 2 * m_opt.epsilon;
+      nl.update(r);
+      gradient(g_minus, in, nl, threads);
+
+      r[del_][i] = -m_opt.epsilon;
+      nl.update(r);
+      r[del_][i] = 0;
+
+      out.get().col(i) = (g_plus[g_] - g_minus[g_]) / (2 * m_opt.epsilon);
+    }
+
+    // Symmetrise hessian
+    // system::Hessian::Matrix H = out.get().transpose();
+    // out.get() = 0.5 * (H + out.get());
   }
 
 }  // namespace fly::potential

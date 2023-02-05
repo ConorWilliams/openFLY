@@ -1,4 +1,5 @@
 
+
 #include <fmt/core.h>
 
 #include <cstddef>
@@ -24,6 +25,7 @@
 #include "libfly/system/atom.hpp"
 #include "libfly/system/box.hpp"
 #include "libfly/system/boxes/orthorhombic.hpp"
+#include "libfly/system/hessian.hpp"
 #include "libfly/system/property.hpp"
 #include "libfly/system/supercell.hpp"
 #include "libfly/system/typemap.hpp"
@@ -59,10 +61,51 @@ system::Supercell<system::TypeMap<>, Position, Frozen, T...> bcc_iron_motif(doub
   return motif;
 }
 
-int main(int, const char**) {
+template <typename... T>
+using cview = fly::system::SoA<T const &...>;
+
+Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> fd_hess(system::Box const &box,
+                                                              potential::Generic &pot,
+                                                              cview<Position, TypeID, Frozen> data) {
+  system::SoA<PotentialGradient> glo(data.size());
+  system::SoA<PotentialGradient> ghi(data.size());
+  system::SoA<Position> xlo(data.size());
+  system::SoA<Position> xhi(data.size());
+
+  neigh::List nl(box, pot.r_cut());
+
+  Eigen::Index const n = data.size() * Position::size();
+
+  Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> H(n, n);
+
+  double const dx = 1e-4;
+
+  for (Eigen::Index i = 0; i < n; i++) {
+    //
+    xlo = data;
+    xhi = data;
+
+    if (!data(fzn_, i / 3)) {
+      xlo(r_, i / 3)[i % 3] -= dx / 2;
+      xhi(r_, i / 3)[i % 3] += dx / 2;
+    }
+
+    nl.rebuild(xlo);
+    pot.gradient(glo, data, nl);
+
+    nl.rebuild(xhi);
+    pot.gradient(ghi, data, nl);
+
+    H.col(i).array() = (ghi[g_] - glo[g_]) / dx;
+  }
+
+  return H;
+}
+
+int main(int, const char **) {
   //
 
-  system::Supercell perfect = motif_to_lattice(bcc_iron_motif(), {6, 6, 6});
+  system::Supercell perfect = motif_to_lattice(bcc_iron_motif(), {2, 2, 2});
 
   system::Supercell cell = remove_atoms(perfect, {1, 3});
 
@@ -82,6 +125,9 @@ int main(int, const char**) {
   system::SoA<PotentialGradient> grad_kim(cell.size());
   system::SoA<PotentialGradient> grad_gen(cell.size());
 
+  system::Hessian hess_kim;
+  system::Hessian hess_gen;
+
   {
     neigh::List nl(cell.box(), model.r_cut());
 
@@ -92,6 +138,8 @@ int main(int, const char**) {
     }
 
     fmt::print("energy={:.10f}\n", model.energy(cell, nl, 1));
+
+    timeit("Hessian", [&] { model.hessian(hess_kim, cell, nl, 1); });
   }
 
   potential::Generic pot{
@@ -112,18 +160,26 @@ int main(int, const char**) {
     }
 
     fmt::print("energy={:.10f}\n", pot.energy(cell, nl, 1));
-  }
 
-  // print a comparison of the gradients
-
-  for (Eigen::Index i = 0; i < 10; i++) {
-    fmt::print("{}\n", grad_gen(g_, i) - grad_kim(g_, i));
+    timeit("Hessian", [&] { pot.hessian(hess_gen, cell, nl, 1); });
   }
 
   // print the norm of the gradient differences
   fmt::print("Norm of the gradient difference: {}\n", gnorm(grad_gen[g_] - grad_kim[g_]));
 
-  fmt::print(stderr, "r_cut = {}\n", model.r_cut());
+  system::Hessian::Matrix tmp = hess_gen.get().triangularView<Eigen::Lower>();
+
+  tmp -= hess_kim.get().triangularView<Eigen::Lower>();
+
+  fmt::print("Norm of the hessian difference: {}\n", gnorm(tmp));
+
+  fmt::print("r_cut = {}\n", model.r_cut());
+
+  // std::cout << "hess1\n" << hess_gen.get() << std::endl;
+
+  // std::cout << "hess2\n" << hess_kim.get() << std::endl;
+
+  // std::cout << "hess1 - hess2\n" << tmp << std::endl;
 
   fmt::print("Working\n");
 

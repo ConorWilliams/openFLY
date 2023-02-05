@@ -175,10 +175,11 @@ namespace fly::saddle {
 
   Master::Master(Master::Options const& opt,
                  system::Box const& box,
+                 system::TypeMap<Mass> map,
                  potential::Generic const& pot,
                  minimise::LBFGS const& min,
                  saddle::Dimer const& dimer)
-      : m_opt{opt}, m_box{box} {
+      : m_opt{opt}, m_box{box}, m_map(map) {
     //
     std::random_device rd;
 
@@ -845,7 +846,7 @@ namespace fly::saddle {
 
     thr.pot.hessian(thr.hess, in, thr.pot_nl, 1);
 
-    thr.pot.mw_hessian(thr.hess, in, 1);
+    thr.hess.mass_weight(m_map, in);
 
     system::Hessian::Vector const& freq = thr.hess.eigenvalues();
 
@@ -1121,7 +1122,7 @@ namespace fly::saddle {
 
     m_data[0].pot.hessian(m_data[0].hess, in, m_data[0].pot_nl, m_opt.num_threads);
 
-    m_data[0].pot.mw_hessian(m_data[0].hess, in, m_opt.num_threads);
+    m_data[0].hess.mass_weight(m_map, in);
 
     system::Hessian::Vector const& freq = m_data[0].hess.eigenvalues();
 

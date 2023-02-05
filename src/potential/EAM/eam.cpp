@@ -36,18 +36,15 @@ namespace fly::potential {
 
 #pragma omp parallel for reduction(+ : v_sum, f_sum) num_threads(num_threads) schedule(static)
     for (Eigen::Index a = 0; a < in.size(); a++) {
-      // Skip contribution from frozen atoms.
-      if (!in(fzn_, a)) {
-        double rho = 0;
+      double rho = 0;
 
-        nl.for_neighbours(a, r_cut(), [&](auto b, double r, Vec const&) {
-          //
-          v_sum += m_data->v(in(id_, a), in(id_, b)).f(r);
-          rho += m_data->phi(in(id_, b), in(id_, a)).f(r);
-        });
+      nl.for_neighbours(a, r_cut(), [&](auto b, double r, Vec const&) {
+        //
+        v_sum += m_data->v(in(id_, a), in(id_, b)).f(r);
+        rho += m_data->phi(in(id_, b), in(id_, a)).f(r);
+      });
 
-        f_sum += m_data->f(in(id_, a)).f(rho);
-      }
+      f_sum += m_data->f(in(id_, a)).f(rho);
     }
 
     return (0.5 * v_sum) + f_sum;

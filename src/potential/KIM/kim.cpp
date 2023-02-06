@@ -263,6 +263,8 @@ namespace fly::potential {
       m_kim_io(KIM_contrib{}, i) = i < nl.size();
     }
 
+    double energy = 0;
+
     namespace KAN = KIM::COMPUTE_ARGUMENT_NAME;
 
     if (m_args->SetArgumentPointer(KAN::numberOfParticles, &num_plus_ghosts)
@@ -270,7 +272,7 @@ namespace fly::potential {
         || m_args->SetArgumentPointer(KAN::particleContributing, m_kim_io[KIM_contrib{}].data())
         || m_args->SetArgumentPointer(KAN::coordinates, nl.m_atoms[r_].data())
         || m_args->SetArgumentPointer(KAN::partialForces, static_cast<double*>(nullptr))
-        || m_args->SetArgumentPointer(KAN::partialEnergy, m_kim_io[KIM_energy{}].data())) {
+        || m_args->SetArgumentPointer(KAN::partialEnergy, &energy)) {
       throw("KIM_API_set_argument_pointer");
     }
 
@@ -290,14 +292,6 @@ namespace fly::potential {
 
     if (m_model->Compute(m_args)) {
       throw error("KIM_API_compute");
-    }
-
-    // Sum up the partial energies
-
-    double energy = 0;
-
-    for (int i = 0; i < num_plus_ghosts; i++) {
-      energy += m_kim_io(KIM_energy{}, i);
     }
 
     return energy;

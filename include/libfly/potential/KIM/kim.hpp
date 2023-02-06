@@ -20,6 +20,7 @@
 #include <cstddef>
 #include <limits>
 #include <memory>
+#include <utility>
 
 #include "libfly/neigh/list.hpp"
 #include "libfly/system/SoA.hpp"
@@ -52,11 +53,35 @@ namespace fly::potential {
   public:
     struct Options {
       std::string model_name = "No default";                               ///< The name of the KIM model.
-      double epsilon = std::sqrt(std::numeric_limits<double>::epsilon());  ///< Fnite-difference step size.
+      double epsilon = std::sqrt(std::numeric_limits<double>::epsilon());  ///< Finite-difference step size.
       bool debug = false;                                                  ///< Print debug information.
     };
 
-    explicit KIM_API(Options const& opt, system::TypeMap<> const& map);
+    KIM_API(Options const& opt, system::TypeMap<> const& map);
+
+    KIM_API(KIM_API const& other) : KIM_API(other.m_opt, system::TypeMap<>{other.m_map}) {}
+
+    KIM_API& operator=(KIM_API const& other) {
+      *this = KIM_API(other);
+      return *this;
+    }
+
+    KIM_API(KIM_API&& other)
+    noexcept
+        : m_opt(std::move(other.m_opt)),
+          m_map(std::move(other.m_map)),
+          m_kim_io(std::move(other.m_kim_io)),
+          m_model(std::exchange(other.m_model, nullptr)),
+          m_args(std::exchange(other.m_args, nullptr)) {}
+
+    KIM_API& operator=(KIM_API&& other) noexcept {
+      m_opt = std::move(other.m_opt);
+      m_map = std::move(other.m_map);
+      m_kim_io = std::move(other.m_kim_io);
+      m_model = std::exchange(other.m_model, nullptr);
+      m_args = std::exchange(other.m_args, nullptr);
+      return *this;
+    }
 
     ~KIM_API() noexcept;
 
@@ -121,12 +146,11 @@ namespace fly::potential {
 
     struct KIM_code : system::Property<int> {};
     struct KIM_contrib : system::Property<int> {};
-    struct KIM_energy : system::Property<double> {};
     struct KIM_force : system::Property<double, 3> {};
 
     system::TypeMap<KIM_code> m_map;  ///< Maps TypeID to KIM code.
 
-    system::SoA<KIM_code, KIM_contrib, KIM_energy, KIM_force> m_kim_io;
+    system::SoA<KIM_code, KIM_contrib, KIM_force> m_kim_io;
 
     KIM::Model* m_model = nullptr;
     KIM::ComputeArguments* m_args = nullptr;

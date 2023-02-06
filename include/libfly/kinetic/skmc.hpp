@@ -33,6 +33,7 @@
 #include "libfly/system/SoA.hpp"
 #include "libfly/system/box.hpp"
 #include "libfly/system/supercell.hpp"
+#include "libfly/system/typemap.hpp"
 #include "libfly/utility/core.hpp"
 #include "libfly/utility/lattice.hpp"
 #include "libfly/utility/random.hpp"
@@ -165,12 +166,14 @@ namespace fly::kinetic {
      *
      * @param opt The configuration options.
      * @param box The simulation box that the simulation is contained within.
+     * @param map The type map for the simulation.
      * @param min The minimiser, used for minimisation during saddle-point searches and for relaxing the cell.
      * @param pot Potential energy function.
      * @param dimer For saddle-point searches.
      */
     SKMC(Options const& opt,
          system::Box const& box,
+         system::TypeMap<Mass> const& map,
          minimise::LBFGS const& min,
          potential::Generic const& pot,
          saddle::Dimer const& dimer)
@@ -178,6 +181,7 @@ namespace fly::kinetic {
           m_mast{
               opt.opt_master,
               box,
+              map,
               pot,
               min,
               dimer,

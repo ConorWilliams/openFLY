@@ -112,27 +112,25 @@ target_include_directories(Nauty INTERFACE
 add_dependencies(Nauty nauty)
 
 # Link libraries
-
-target_link_libraries(libFLY PRIVATE 
-    Nauty 
+target_link_libraries(libFLY PRIVATE
+    Nauty
     xxHash::xxhash
     KIM-API::kim-api
 )
 
-target_link_libraries(libFLY PUBLIC 
-    Eigen3::Eigen 
-    fmt::fmt 
+target_link_libraries(libFLY PUBLIC
+    Eigen3::Eigen
+    fmt::fmt
     nonstd::span-lite
-    OpenMP::OpenMP_CXX 
+    OpenMP::OpenMP_CXX
     cereal::cereal
 )
 
 # Declare executable(s)
 
-add_executable(skmcFLY apps/skmc.cpp)
-target_compile_features(skmcFLY PRIVATE cxx_std_17)
-target_link_libraries(skmcFLY PRIVATE libFLY)
-
+# add_executable(skmcFLY apps/skmc.cpp)
+# target_compile_features(skmcFLY PRIVATE cxx_std_17)
+# target_link_libraries(skmcFLY PRIVATE libFLY)
 add_executable(skmcKIM apps/kim.cpp ${BACKWARD_ENABLE})
 target_compile_features(skmcKIM PRIVATE cxx_std_17)
 target_link_libraries(skmcKIM PRIVATE libFLY)

@@ -3,6 +3,7 @@
 #include <fmt/core.h>
 
 #include <cstddef>
+#include <cstdint>
 #include <exception>
 #include <nonstd/span.hpp>
 
@@ -30,18 +31,35 @@
 #include "libfly/system/supercell.hpp"
 #include "libfly/system/typemap.hpp"
 #include "libfly/utility/core.hpp"
+#include "libfly/utility/data.hpp"
 #include "libfly/utility/lattice.hpp"
 #include "libfly/utility/random.hpp"
 
 using namespace fly;
 
+double sym_2_mass(std::string_view symbol) {
+  using namespace fly::data;
+
+  auto it = std::find_if(atoms.begin(), atoms.end(), [&](auto const &sym) { return sym.symbol == symbol; });
+
+  if (it == atoms.end()) {
+    throw error("Symbol \"{}\" not found in the periodic table!", symbol);
+  }
+
+  return it->mass;
+}
+
 template <typename... T>
-system::Supercell<system::TypeMap<>, Position, Frozen, T...> bcc_iron_motif(double a = 2.855300) {
+system::Supercell<system::TypeMap<Mass>, Position, Frozen, T...> bcc_iron_motif(double a = 2.855300) {
   //
-  system::TypeMap<> FeH(2);
+  system::TypeMap<Mass> FeH(2);
 
   FeH.set(0, tp_, "Fe");
   FeH.set(1, tp_, "H");
+
+  for (std::uint32_t i = 0; i < FeH.num_types(); i++) {
+    FeH.set(i, m_, sym_2_mass(FeH.get(i, tp_)));
+  }
 
   Mat basis{
       {a, 0, 0},
@@ -105,7 +123,7 @@ Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> fd_hess(system::Box const 
 int main(int, const char **) {
   //
 
-  system::Supercell perfect = motif_to_lattice(bcc_iron_motif(), {2, 2, 2});
+  system::Supercell perfect = motif_to_lattice(bcc_iron_motif(), {6, 6, 6});
 
   system::Supercell cell = remove_atoms(perfect, {1, 3});
 
@@ -120,7 +138,7 @@ int main(int, const char **) {
       .model_name = "EAM_Dynamo_Wen_2021_FeH__MO_634187028437_000",
   };
 
-  potential::KIM_API model(opt, cell.map());
+  potential::KIM_API model(opt, system::TypeMap<>{cell.map()});
 
   system::SoA<PotentialGradient> grad_kim(cell.size());
   system::SoA<PotentialGradient> grad_gen(cell.size());
@@ -144,7 +162,7 @@ int main(int, const char **) {
 
   potential::Generic pot{
       potential::EAM{
-          cell.map(),
+          system::TypeMap<>{cell.map()},
           std::make_shared<potential::DataEAM>(potential::DataEAM::Options{},
                                                std::ifstream{"data/wen.eam.fs"}),
       },

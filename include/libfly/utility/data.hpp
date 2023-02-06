@@ -83,4 +83,5 @@ namespace fly::data {
       sym_mass_num{"Mc", 289.0, 115},        sym_mass_num{"Lv", 293.0, 116},
       sym_mass_num{"Ts", 294.0, 117},        sym_mass_num{"Og", 294.0, 118},
   };
+
 }  // namespace fly::data

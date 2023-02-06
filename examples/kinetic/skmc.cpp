@@ -2,7 +2,7 @@
 
 using namespace fly;
 
-void example_skmc(system::Supercell<system::TypeMap<>, Position, Frozen> cell,
+void example_skmc(system::Supercell<system::TypeMap<Mass>, Position, Frozen> cell,
                   potential::Generic potential_func) {
   // Construct am SKMC object with some non-default options.
   kinetic::SKMC runner = { 
@@ -21,6 +21,7 @@ void example_skmc(system::Supercell<system::TypeMap<>, Position, Frozen> cell,
           .opt_master = {},
       },
       cell.box(), 
+      cell.map(),
       { {}, cell.box() },
       potential_func,
       { {}, {}, cell.box() },

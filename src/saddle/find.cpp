@@ -827,6 +827,8 @@ namespace fly::saddle {
     thr.pot_nl.rebuild(fwd);
     double Ef = thr.pot.energy(in, thr.pot_nl, 1);
 
+    verify(Esp > E0, "Bad internal state Esp={} but E0={}!", Esp, E0);
+
     env::Mechanism mech;
 
     mech.barrier = Esp - E0;
@@ -943,7 +945,7 @@ namespace fly::saddle {
 
     // Debugging extreme poisoning
 
-    if (mech.poison_fwd && mech.barrier < 1.) {
+    if (false && mech.poison_fwd && mech.barrier < .5) {
 #pragma omp critical
       {
         fly::io::BinaryFile file("poison.gsd", fly::io::create);

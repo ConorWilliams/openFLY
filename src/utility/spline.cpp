@@ -4,24 +4,28 @@
 
 // This file is part of openFLY.
 
-// OpenFLY is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License
-// as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+// OpenFLY is free software: you can redistribute it and/or modify it under the terms of the GNU General
+// Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
+// option) any later version.
 
-// OpenFLY is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
-// warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+// OpenFLY is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the
+// implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+// for more details.
 
-// You should have received a copy of the GNU General Public License along with openFLY. If not, see <https://www.gnu.org/licenses/>.
+// You should have received a copy of the GNU General Public License along with openFLY. If not, see
+// <https://www.gnu.org/licenses/>.
 
 #include "libfly/utility/spline.hpp"
 
+#include <fmt/core.h>
+
+#include <algorithm>
 #include <cstddef>
 
 namespace fly {
 
   Spline::Spline(std::vector<double> y, double dx) : m_dx(dx), m_inv_dx(1 / dx) {
     //
-
-    y.push_back(y.back());  // Fix-up floating point rounding
 
     std::size_t n = y.size() - 1;
 
@@ -81,6 +85,16 @@ namespace fly {
     for (std::size_t i = 0; i <= n - 1; ++i) {
       m_spines.push_back({a[i], b[i], c[i], d[i]});
     }
+
+    // fmt::print("final spine: a={}, b={}, c={}, d={}\n",
+    //            m_spines.back().a,
+    //            m_spines.back().b,
+    //            m_spines.back().c,
+    //            m_spines.back().d);
+
+    // ASSERT(m_spines.back().b >= 0, "Spline must be monotonic increasing but b={}.", m_spines.back().b);
+    // m_spines.back().c = std::max(m_spines.back().b, 1.0);  //
+    // m_spines.back().d = 0;
   }
 
 }  // namespace fly

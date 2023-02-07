@@ -38,19 +38,35 @@
 #include "libfly/system/supercell.hpp"
 #include "libfly/system/typemap.hpp"
 #include "libfly/utility/core.hpp"
+#include "libfly/utility/data.hpp"
 #include "libfly/utility/lattice.hpp"
 #include "libfly/utility/random.hpp"
 
 using namespace fly;
 
+double sym_2_mass(std::string_view symbol) {
+  using namespace fly::data;
+
+  auto it = std::find_if(atoms.begin(), atoms.end(), [&](auto const &sym) { return sym.symbol == symbol; });
+
+  if (it == atoms.end()) {
+    throw error("Symbol \"{}\" not found in the periodic table!", symbol);
+  }
+
+  return it->mass;
+}
+
 template <typename... T>
-system::Supercell<system::TypeMap<>, Position, Frozen, T...> bcc_iron_motif(double a = 2.855300) {
+system::Supercell<system::TypeMap<Mass>, Position, Frozen, T...> bcc_iron_motif(double a) {
   //
-  system::TypeMap<> FeH(3);
+  system::TypeMap<Mass> FeH(2);
 
   FeH.set(0, tp_, "Fe");
-  FeH.set(1, tp_, "H");
-  FeH.set(2, tp_, "V");
+  FeH.set(1, tp_, "C");
+
+  for (std::uint32_t i = 0; i < FeH.num_types(); i++) {
+    FeH.set(i, m_, sym_2_mass(FeH.get(i, tp_)));
+  }
 
   Mat basis{
       {a, 0, 0},
@@ -92,25 +108,17 @@ fly::system::SoA<TypeID, Position> explicit_V(std::vector<Vec> const &vac,
 int main() {
   //
 
-  system::Supercell perfect = motif_to_lattice(bcc_iron_motif(), {6, 6, 6});
+  constexpr auto a = 2.855;  // eam 55 or meam 67
+
+  system::Supercell perfect = motif_to_lattice(bcc_iron_motif(a), {6, 6, 6});
 
   DetectVacancies detect(0.75, perfect.box(), perfect);
 
-  system::Supercell cell = remove_atoms(perfect, {1, 3});
+  system::Supercell cell = remove_atoms(perfect, {});  // 173
 
-  Vec r_H = {2.857 / 2 + 3.14, 2.857 / 2 + 3.14, 2.857 / 4 + 3.14};
+  Vec r_C = Vec::Constant(3.14) + a * Vec{0.5, 0.5, 0} + a * Vec{0, 0, 1};
 
-  //   cell = add_atoms(cell, {system::Atom<TypeID, Position, Frozen>(1, r_H, false)});
-
-  //   cell = add_atoms(
-  //       cell, {system::Atom<TypeID, Position, Frozen, Hash>(1, {2.857 / 2 + 3.14, 2.857 / 2 + 3.14, 2.857
-  //       / 4 * 2 + 3.14}, false, 0)});
-
-  //   cell = add_atoms(cell, {system::Atom<TypeID, Position, Frozen, Hash>(1, {0.992116, 6.01736, 4.56979},
-  //   false, 0)});
-
-  //   cell(r_, 431) = Vec{4.5896, 4.5892, 5.91909};
-  //   cell(r_, 0) = Vec{4.45211, 4.45172, 4.2526};
+  cell = add_atoms(cell, {system::Atom<TypeID, Position, Frozen>{1, r_C, false}});
 
   fly::io::BinaryFile file("build/gsd/sim.gsd", fly::io::create);
 
@@ -129,16 +137,28 @@ int main() {
     file.write("log/kinetic", -1.);
   });
 
+  // Low-alloy steels: An atomic level study using an Fe-Mn-Si-C modified embedded atom method.
+  // Model got to C diffusion in perfect Fe overnight.
+  //   std::string const model = "MEAM_LAMMPS_AslamBaskesDickel_2019_FeMnSiC__MO_427873955970_001";
+
+  // Paper 1 -Effect of interfacial bonding on dislocation strengthening in graphene nanosheet reinforced
+  // iron composite: A molecular dynamics study, https://doi.org/10.1016/j.commatsci.2021.110309
+  std::string const model = "EAM_Dynamo_HepburnAckland_2008_FeC__MO_143977152728_005";
+
+  // Structural, elastic, and thermal properties of cementite (Fe3C) were studied using a modified embedded
+  // atom method (MEAM) potential for iron-carbon (Fe-C) alloys
+  // std::string const model = "MEAM_LAMMPS_LiyanageKimHouze_2014_FeC__MO_075279800195_001";
+
   kinetic::SKMC runner = {
       {
           .debug = true,
-          .fread = "build/gsd/cat.v2.2.bin",
+          .fread = "build/gsd/cat." + model + ".bin",
           .opt_cache = {
               .barrier_tol = 0.45,
               .debug = true,
               .opt_basin = {
                   .debug = true,
-                  .temp = 500,
+                  .temp = 800,
               },
               .opt_sb = {
                   .debug = true,
@@ -152,20 +172,21 @@ int main() {
           }
       },
       cell.box(),
+      cell.map(),
       {
           {},
           cell.box(),
       },
       potential::Generic{
           potential::EAM{
-              cell.map(),
+              system::TypeMap<>{cell.map()},
               std::make_shared<potential::DataEAM>(
                 potential::DataEAM{
                   {
-                    .debug = false, 
+                    .debug = false,
                     .symmetric = false,
-                  }, 
-                  std::ifstream{"data/wen.eam.fs"}
+                  },
+                  std::ifstream{"data/hepburn.eam.fs"}
                 }
               ),
           },
@@ -176,6 +197,26 @@ int main() {
           cell.box(),
       },
   };
+
+  //   potential::EAM{
+  //               system::TypeMap<>{cell.map()},
+  //               std::make_shared<potential::DataEAM>(
+  //                 potential::DataEAM{
+  //                   {
+  //                     .debug = false,
+  //                     .symmetric = false,
+  //                   },
+  //                   std::ifstream{"data/wen.eam.fs"}
+  //                 }
+  //               ),
+  //           },
+
+  //   potential::KIM_API{
+  //     potential::KIM_API::Options{
+  //         .model_name = model,
+  //     },
+  //     system::TypeMap<>{cell.map()},
+  //   },
 
   auto const min_image = cell.box().slow_min_image_computer();
 

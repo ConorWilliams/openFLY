@@ -290,7 +290,9 @@ namespace fly::kinetic {
 
         Mat O = m_cat.reconstruct(raw_recon, m, atom, cell, !changed, num_threads);
 
-        auto err = m_minimiser.minimise(rel_recon, raw_recon, m_pot, num_threads);
+        auto err = timeit("SKMC: Minimise", [&] {
+          return m_minimiser.minimise(rel_recon, raw_recon, m_pot, num_threads);  //
+        });
 
         centroid_align(rel_recon, raw_recon);
 
@@ -388,7 +390,11 @@ namespace fly::kinetic {
 
         cell[r_] = rel_recon[r_];  // Update cell after constructing the hint.
 
-        if (kinetic::update_cat(m_mast, m_cat, cell, num_threads, hint)) {
+        auto new_envs = timeit("SKMC: Update", [&] {
+          return kinetic::update_cat(m_mast, m_cat, cell, num_threads, hint);  //
+        });
+
+        if (new_envs) {
           dump_cat();
         }
 

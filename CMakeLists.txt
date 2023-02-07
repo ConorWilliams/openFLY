@@ -63,6 +63,9 @@ find_package(OpenMP REQUIRED)
 
 find_package(KIM-API 2.3.0 CONFIG PATHS ${CMAKE_SOURCE_DIR}/build/kim-api/kim-api/install/share/cmake/kim-api)
 
+# ${KIM_API_}
+message(STATUS "Using KIM-API @\"${kim-api_BINARY_DIR}\"")
+
 if(NOT KIM-API_FOUND)
     message(FATAL_ERROR "The KIM-API could not be found, install a local copy with:\n\"./scripts/kim-api/install.sh\"")
 endif()
@@ -127,18 +130,14 @@ target_link_libraries(libFLY PUBLIC
 )
 
 # Declare executable(s)
-
-# add_executable(skmcFLY apps/skmc.cpp)
+# add_executable(skmcFLY apps/skmc.cpp ${BACKWARD_ENABLE})
 # target_compile_features(skmcFLY PRIVATE cxx_std_17)
 # target_link_libraries(skmcFLY PRIVATE libFLY)
-add_executable(skmcKIM apps/kim.cpp ${BACKWARD_ENABLE})
-target_compile_features(skmcKIM PRIVATE cxx_std_17)
-target_link_libraries(skmcKIM PRIVATE libFLY)
-add_backward(skmcKIM)
-
-# add_executable(benchFLY apps/bench.cpp)
-# target_compile_features(benchFLY PRIVATE cxx_std_17)
-# target_link_libraries(benchFLY PRIVATE libFLY)
+# add_backward(skmcFLY)
+add_executable(carbonFLY apps/carbon.cpp ${BACKWARD_ENABLE})
+target_compile_features(carbonFLY PRIVATE cxx_std_17)
+target_link_libraries(carbonFLY PRIVATE libFLY)
+add_backward(carbonFLY)
 
 # Dev mode
 if(FLY_DEVELOPER_MODE)

@@ -26,6 +26,7 @@
 
 #include "libfly/neigh/list.hpp"
 #include "libfly/potential/EAM/eam.hpp"
+#include "libfly/potential/KIM/kim.hpp"
 #include "libfly/system/SoA.hpp"
 #include "libfly/system/hessian.hpp"
 #include "libfly/system/property.hpp"
@@ -48,7 +49,7 @@ namespace fly::potential {
    */
   class Generic {
   private:
-    using variant = std::variant<EAM>;
+    using variant = std::variant<EAM, KIM_API>;
 
   public:
     /**

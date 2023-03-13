@@ -242,7 +242,7 @@
 <h2>Simulation space<a class="headerlink" href="#simulation-space" title="Permalink to this heading">#</a></h2>
 <p>File: <code class="docutils literal notranslate"><span class="pre">libfly/system/box.hpp</span></code></p>
 <p>Classes for describing the simulation space. </p>
-<p><p><p>Atoms in libFLY exist within a simulation space (or box) and this space is often periodic. Periodic boxes must tessellate in
+<p><p>Atoms in libFLY exist within a simulation space (or box) and this space is often periodic. Periodic boxes must tessellate in
 N-dimensional space hence, libFLY’s boxes are parallelotopes. The parallelotopes is described by a series of <em>basis</em> vectors. These
 are assembled into an upper-triangular matrix of the form:</p>
 <div class="math-wrapper docutils container">
@@ -263,7 +263,6 @@ however, along non-periodic axes atoms must be inside the canonical cell.</p>
 box is split into a <em>grid</em> of smaller parallelotopes. These <em>grid cells</em> are determined by the maximum interatomic interaction
 distance.</p>
 </p>
- </p>
 <section id="generalised-box">
 <h3>Generalised box<a class="headerlink" href="#generalised-box" title="Permalink to this heading">#</a></h3>
 <dl class="cpp class">
@@ -276,7 +275,7 @@ distance.</p>
 <dl class="cpp type">
 <dt class="sig sig-object cpp" id="_CPPv4N3fly6system3Box4GridE">
 <span id="_CPPv3N3fly6system3Box4GridE"></span><span id="_CPPv2N3fly6system3Box4GridE"></span><span class="target" id="classfly_1_1system_1_1Box_1a32190db4ef90d39ea2ccadf2b0f859af"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Grid</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">variant</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="crystal_systems.html#_CPPv4N3fly6system9OrthoGridE" title="fly::system::OrthoGrid"><span class="n"><span class="pre">OrthoGrid</span></span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="crystal_systems.html#_CPPv4N3fly6system7TriGridE" title="fly::system::TriGrid"><span class="n"><span class="pre">TriGrid</span></span></a><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4N3fly6system3Box4GridE" title="Permalink to this definition">#</a><br /></dt>
-<dd><p>The result of calling <a class="reference internal" href="#classfly_1_1system_1_1Box_1aba4825410e61f7f1ec545ff08a86935f"><span class="std std-ref">Box::make_grid()</span></a> </p>
+<dd><p>The result of calling <a class="reference internal" href="#classfly_1_1system_1_1Box_1aba4825410e61f7f1ec545ff08a86935f"><span class="std std-ref">Box::make_grid()</span></a></p>
 </dd></dl>
 
 </div>
@@ -312,8 +311,6 @@ distance.</p>
 <dt class="sig sig-object cpp" id="_CPPv4I0ENK3fly6system3Box11canon_imageE3VecRKN5Eigen10MatrixBaseI1EEE">
 <span id="_CPPv3I0ENK3fly6system3Box11canon_imageERKN5Eigen10MatrixBaseI1EEE"></span><span id="_CPPv2I0ENK3fly6system3Box11canon_imageERKN5Eigen10MatrixBaseI1EEE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">E</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classfly_1_1system_1_1Box_1a44d0f9cb43e76d83adce69e469e189ad"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="utility.html#_CPPv4N3fly3VecE" title="fly::Vec"><span class="n"><span class="pre">Vec</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">canon_image</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">Eigen</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">MatrixBase</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0ENK3fly6system3Box11canon_imageE3VecRKN5Eigen10MatrixBaseI1EEE" title="fly::system::Box::canon_image::E"><span class="n"><span class="pre">E</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">x</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4I0ENK3fly6system3Box11canon_imageE3VecRKN5Eigen10MatrixBaseI1EEE" title="Permalink to this definition">#</a><br /></dt>
 <dd><p>Maps an atom into the canonical cell. </p>
-<p><p></p>
- </p>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
 <p>Assumes atoms are within the extents of the non-periodic axes!</p>
@@ -856,8 +853,6 @@ distance.</p>
 <dt class="sig sig-object cpp" id="_CPPv4N3fly6system7TypeMap7TypeMapEN5Eigen5IndexE">
 <span id="_CPPv3N3fly6system7TypeMap7TypeMapEN5Eigen5IndexE"></span><span id="_CPPv2N3fly6system7TypeMap7TypeMapEN5Eigen5IndexE"></span><span id="fly::system::TypeMap::TypeMap__Eigen::Index"></span><span class="target" id="classfly_1_1system_1_1TypeMap_1af338c1d140e505f4f95f323e7b65bc4e"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">explicit</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">TypeMap</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">Eigen</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">Index</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">num_types</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3fly6system7TypeMap7TypeMapEN5Eigen5IndexE" title="Permalink to this definition">#</a><br /></dt>
 <dd><p>Construct a <a class="reference internal" href="#classfly_1_1system_1_1TypeMap"><span class="std std-ref">TypeMap</span></a> to hold <code class="docutils literal notranslate"><span class="pre">num_types</span></code> types. </p>
-<p><p></p>
- </p>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
 <p>All the new properties are uninitialised.</p>
@@ -1058,8 +1053,6 @@ distance.</p>
 <dt class="sig sig-object cpp" id="_CPPv4N3fly6system3SoA3SoAEN5Eigen5IndexE">
 <span id="_CPPv3N3fly6system3SoA3SoAEN5Eigen5IndexE"></span><span id="_CPPv2N3fly6system3SoA3SoAEN5Eigen5IndexE"></span><span id="fly::system::SoA::SoA__Eigen::Index"></span><span class="target" id="classfly_1_1system_1_1SoA_1ae95022b8536982187e6bb8ec85f7a6c1"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">explicit</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SoA</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">Eigen</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">Index</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">size</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3fly6system3SoA3SoAEN5Eigen5IndexE" title="Permalink to this definition">#</a><br /></dt>
 <dd><p>Construct a new <a class="reference internal" href="#classfly_1_1system_1_1SoA"><span class="std std-ref">SoA</span></a> containing ‘size’ atoms. </p>
-<p><p></p>
- </p>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
 <p>New atoms are uninitialized, non-owning SoA’s contain <code class="docutils literal notranslate"><span class="pre">nullptr</span></code>.</p>
@@ -1139,24 +1132,21 @@ distance.</p>
 <dt class="sig sig-object cpp" id="_CPPv4N3fly6system3SoAaSERR3SoA">
 <span id="_CPPv3N3fly6system3SoAaSERR3SoA"></span><span id="_CPPv2N3fly6system3SoAaSERR3SoA"></span><span id="fly::system::SoA::assign-operator__SoARR"></span><span class="target" id="classfly_1_1system_1_1SoA_1a7d20caf258c1df27cd643072b63fff14"></span><a class="reference internal" href="#_CPPv4IDpEN3fly6system3SoAE" title="fly::system::SoA"><span class="n"><span class="pre">SoA</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">=</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4IDpEN3fly6system3SoAE" title="fly::system::SoA"><span class="n"><span class="pre">SoA</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><a class="headerlink" href="#_CPPv4N3fly6system3SoAaSERR3SoA" title="Permalink to this definition">#</a><br /></dt>
 <dd><p>Defaulted move assignment operator. </p>
-<p><p>See the <a class="reference internal" href="#note-on-assignment-to-references">note on assignment to references</a>.</p>
- </p>
+<p>See the <a class="reference internal" href="#note-on-assignment-to-references">note on assignment to references</a>.</p>
 </dd></dl>
 
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4N3fly6system3SoAaSERK3SoA">
 <span id="_CPPv3N3fly6system3SoAaSERK3SoA"></span><span id="_CPPv2N3fly6system3SoAaSERK3SoA"></span><span id="fly::system::SoA::assign-operator__SoACR"></span><span class="target" id="classfly_1_1system_1_1SoA_1af775c71a2724e0f3ecb1e39000f14193"></span><a class="reference internal" href="#_CPPv4IDpEN3fly6system3SoAE" title="fly::system::SoA"><span class="n"><span class="pre">SoA</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">=</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4IDpEN3fly6system3SoAE" title="fly::system::SoA"><span class="n"><span class="pre">SoA</span></span></a><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><a class="headerlink" href="#_CPPv4N3fly6system3SoAaSERK3SoA" title="Permalink to this definition">#</a><br /></dt>
 <dd><p>Defaulted copy assignment operator. </p>
-<p><p>See the <a class="reference internal" href="#note-on-assignment-to-references">note on assignment to references</a>.</p>
- </p>
+<p>See the <a class="reference internal" href="#note-on-assignment-to-references">note on assignment to references</a>.</p>
 </dd></dl>
 
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4I00EN3fly6system3SoAaSER3SoARR1T">
 <span id="_CPPv3I00EN3fly6system3SoAaSERR1T"></span><span id="_CPPv2I00EN3fly6system3SoAaSERR1T"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">enable_if_t</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0EN3fly6system3SoA15different_SoA_vE" title="fly::system::SoA::different_SoA_v"><span class="n"><span class="pre">different_SoA_v</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I00EN3fly6system3SoAaSER3SoARR1T" title="fly::system::SoA::operator=::T"><span class="n"><span class="pre">T</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classfly_1_1system_1_1SoA_1a59786da6bb27b9d8b0db1da34b122e6b"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4IDpEN3fly6system3SoAE" title="fly::system::SoA"><span class="n"><span class="pre">SoA</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">=</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I00EN3fly6system3SoAaSER3SoARR1T" title="fly::system::SoA::operator=::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">other</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I00EN3fly6system3SoAaSER3SoARR1T" title="Permalink to this definition">#</a><br /></dt>
 <dd><p>Assign to a <a class="reference internal" href="#classfly_1_1system_1_1SoA"><span class="std std-ref">SoA</span></a> with with different properties . </p>
-<p><p><span class="target" id="note-on-assignment-to-references"></span></p>
- </p>
+<p><span class="target" id="note-on-assignment-to-references"></span></p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>Assignment to reference properties  follows pointer-semantics:</p>

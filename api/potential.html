@@ -5,7 +5,7 @@
     <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 <link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="Minimisers" href="minimise.html" /><link rel="prev" title="Input/Output (IO)" href="io.html" />
 
-    <link rel="shortcut icon" href="../_static/favicon.ico"/><!-- Generated with Sphinx 6.1.3 and Furo 2022.12.07 -->
+    <link rel="shortcut icon" href="../_static/favicon.ico"/><!-- Generated with Sphinx 5.3.0 and Furo 2022.12.07 -->
         <title>Potentials - OpenFLY documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?digest=91d0f0d1c444bdcb17a68e833c7a53903343c195" />
@@ -242,7 +242,7 @@
 <h2>Generic potential<a class="headerlink" href="#generic-potential" title="Permalink to this heading">#</a></h2>
 <p>File: <code class="docutils literal notranslate"><span class="pre">libfly/potential/generic.hpp</span></code></p>
 <p>Generic potential energy class. </p>
-<p>Potentials get info about atoms via a <code class="docutils literal notranslate"><span class="pre">SoA</span></code>. This allows potentials to slice generic supercells while remaining concrete. </p>
+<p>The potential completely describes the interatomic interactions present in a system. </p>
 <dl class="cpp class">
 <dt class="sig sig-object cpp" id="_CPPv4N3fly9potential7GenericE">
 <span id="_CPPv3N3fly9potential7GenericE"></span><span id="_CPPv2N3fly9potential7GenericE"></span><span id="fly::potential::Generic"></span><span class="target" id="classfly_1_1potential_1_1Generic"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Generic</span></span></span><a class="headerlink" href="#_CPPv4N3fly9potential7GenericE" title="Permalink to this definition">#</a><br /></dt>
@@ -313,29 +313,13 @@
 <dt class="sig sig-object cpp" id="_CPPv4N3fly9potential7Generic7hessianERN6system7HessianEN6system3SoAIRK6TypeIDRK6FrozenEERKN5neigh4ListEi">
 <span id="_CPPv3N3fly9potential7Generic7hessianERN6system7HessianEN6system3SoAIRK6TypeIDRK6FrozenEERKN5neigh4ListEi"></span><span id="_CPPv2N3fly9potential7Generic7hessianERN6system7HessianEN6system3SoAIRK6TypeIDRK6FrozenEERKN5neigh4ListEi"></span><span id="fly::potential::Generic::hessian__system::HessianR.system::SoA:TypeIDCR.FrozenCR:.neigh::ListCR.i"></span><span class="target" id="classfly_1_1potential_1_1Generic_1aa00265815aadbdb2fe9f64d682d8f1c4"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">auto</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">hessian</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">system</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="system.html#_CPPv4N3fly6system7HessianE" title="fly::system::Hessian"><span class="n"><span class="pre">Hessian</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">out</span></span>, <span class="n"><span class="pre">system</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="system.html#_CPPv4IDpEN3fly6system3SoAE" title="fly::system::SoA"><span class="n"><span class="pre">SoA</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">TypeID</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="n"><span class="pre">Frozen</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">in</span></span>, <span class="n"><span class="pre">neigh</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="neighbour.html#_CPPv4N3fly5neigh4ListE" title="fly::neigh::List"><span class="n"><span class="pre">List</span></span></a><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">nl</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">threads</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">1</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="o"><span class="pre">-&gt;</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><a class="headerlink" href="#_CPPv4N3fly9potential7Generic7hessianERN6system7HessianEN6system3SoAIRK6TypeIDRK6FrozenEERKN5neigh4ListEi" title="Permalink to this definition">#</a><br /></dt>
 <dd><p>Compute hessian matrix. </p>
-<p>Can assume the neighbour list are ready. The resulting hessian must be n by n (n = number of atoms) and only include contributions from the m active atoms i.e. have zeros for frozen atoms. As hessian matrices are always symmetric this function is only required to compute the lower diagonal portion.</p>
+<p>Can assume the neighbour list are ready. The resulting hessian must be n by n (n = number of atoms * spatial dims) and only include contributions from the m active atoms i.e. have zeros for frozen atoms. As hessian matrices are always symmetric this function is only required to compute the lower diagonal portion.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>in</strong> – Per-atom data used by hessian for computation. </p></li>
 <li><p><strong>out</strong> – Hessian matrix to write output to. </p></li>
 <li><p><strong>nl</strong> – Neighbour list (in ready state i.e. <a class="reference internal" href="neighbour.html#classfly_1_1neigh_1_1List_1a89efa6e7fff008bfdd016acbe6a9ede3"><span class="std std-ref">neigh::List::update()</span></a> or <a class="reference internal" href="neighbour.html#classfly_1_1neigh_1_1List_1a4d5b423b46d3c6fd5506c3771aefc45e"><span class="std std-ref">neigh::List::rebuild()</span></a> called) configured with a cut-off at least <code class="docutils literal notranslate"><a class="reference internal" href="#classfly_1_1potential_1_1Generic_1ab3a4c98e498ec3351081285cfbd14c2c"><span class="std std-ref"><span class="pre">r_cut()</span></span></a></code>. </p></li>
-<li><p><strong>threads</strong> – Number of openMP threads to use. </p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4N3fly9potential7Generic10mw_hessianERN6system7HessianEN6system3SoAIRK6TypeIDRK6FrozenEEi">
-<span id="_CPPv3N3fly9potential7Generic10mw_hessianERN6system7HessianEN6system3SoAIRK6TypeIDRK6FrozenEEi"></span><span id="_CPPv2N3fly9potential7Generic10mw_hessianERN6system7HessianEN6system3SoAIRK6TypeIDRK6FrozenEEi"></span><span id="fly::potential::Generic::mw_hessian__system::HessianR.system::SoA:TypeIDCR.FrozenCR:.i"></span><span class="target" id="classfly_1_1potential_1_1Generic_1ad7724495017364afbdaafc1fbc200104"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">auto</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">mw_hessian</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">system</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="system.html#_CPPv4N3fly6system7HessianE" title="fly::system::Hessian"><span class="n"><span class="pre">Hessian</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">out</span></span>, <span class="n"><span class="pre">system</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="system.html#_CPPv4IDpEN3fly6system3SoAE" title="fly::system::SoA"><span class="n"><span class="pre">SoA</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">TypeID</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="n"><span class="pre">Frozen</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">in</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">threads</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">1</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="o"><span class="pre">-&gt;</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><a class="headerlink" href="#_CPPv4N3fly9potential7Generic10mw_hessianERN6system7HessianEN6system3SoAIRK6TypeIDRK6FrozenEEi" title="Permalink to this definition">#</a><br /></dt>
-<dd><p><a class="reference internal" href="system.html#structfly_1_1builtin__properties_1_1Mass"><span class="std std-ref">Mass</span></a> weight a hessian matrix. </p>
-<p>As hessian matrices are always symmetric this function only acts on the lower diagonal portion.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>in</strong> – Input data. </p></li>
-<li><p><strong>out</strong> – Hessian matrix (computed with .<a class="reference internal" href="#classfly_1_1potential_1_1Generic_1aa00265815aadbdb2fe9f64d682d8f1c4"><span class="std std-ref">hessian()</span></a>). </p></li>
 <li><p><strong>threads</strong> – Number of openMP threads to use. </p></li>
 </ul>
 </dd>
@@ -369,7 +353,7 @@
 <dt class="sig sig-object cpp" id="_CPPv4N3fly9potential7DataEAM7DataEAMERK7OptionsNSt8ifstreamE">
 <span id="_CPPv3N3fly9potential7DataEAM7DataEAMERK7OptionsNSt8ifstreamE"></span><span id="_CPPv2N3fly9potential7DataEAM7DataEAMERK7OptionsNSt8ifstreamE"></span><span id="fly::potential::DataEAM::DataEAM__OptionsCR.std::ifstream"></span><span class="target" id="classfly_1_1potential_1_1DataEAM_1a4fd5e1154f01fa4a80e19d143f518483"></span><span class="sig-name descname"><span class="n"><span class="pre">DataEAM</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N3fly9potential7DataEAM7OptionsE" title="fly::potential::DataEAM::Options"><span class="n"><span class="pre">Options</span></span></a><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">opt</span></span>, <span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">ifstream</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">in</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3fly9potential7DataEAM7DataEAMERK7OptionsNSt8ifstreamE" title="Permalink to this definition">#</a><br /></dt>
 <dd><p>Parse the LAMMPS-style eam/fs stream and construct an <a class="reference internal" href="#classfly_1_1potential_1_1DataEAM"><span class="std std-ref">DataEAM</span></a> object. </p>
-<p>For detail on file specification see: <a class="reference external" href="https://docs.lammps.org/pair_eam.html">https://docs.lammps.org/pair_eam.html</a></p>
+<p>For detail on file specification see: <a class="reference external" href="https://docs.lammps.org/pair_eam.html">https://docs.lammps.org/pair_eam.html</a> </p>
 </dd></dl>
 
 <dl class="cpp function">
@@ -529,22 +513,6 @@
 </dd></dl>
 
 <dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4N3fly9potential3EAM10mw_hessianERN6system7HessianEN6system3SoAIRK6TypeIDRK6FrozenEEi">
-<span id="_CPPv3N3fly9potential3EAM10mw_hessianERN6system7HessianEN6system3SoAIRK6TypeIDRK6FrozenEEi"></span><span id="_CPPv2N3fly9potential3EAM10mw_hessianERN6system7HessianEN6system3SoAIRK6TypeIDRK6FrozenEEi"></span><span id="fly::potential::EAM::mw_hessian__system::HessianR.system::SoA:TypeIDCR.FrozenCR:.i"></span><span class="target" id="classfly_1_1potential_1_1EAM_1a42c35cd46b04d7e25fef0b83a3fb6879"></span><span class="kt"><span class="pre">auto</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">mw_hessian</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">system</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="system.html#_CPPv4N3fly6system7HessianE" title="fly::system::Hessian"><span class="n"><span class="pre">Hessian</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">out</span></span>, <span class="n"><span class="pre">system</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="system.html#_CPPv4IDpEN3fly6system3SoAE" title="fly::system::SoA"><span class="n"><span class="pre">SoA</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">TypeID</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="n"><span class="pre">Frozen</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">in</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">threads</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">1</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="o"><span class="pre">-&gt;</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><a class="headerlink" href="#_CPPv4N3fly9potential3EAM10mw_hessianERN6system7HessianEN6system3SoAIRK6TypeIDRK6FrozenEEi" title="Permalink to this definition">#</a><br /></dt>
-<dd><p><a class="reference internal" href="system.html#structfly_1_1builtin__properties_1_1Mass"><span class="std std-ref">Mass</span></a> weight hessian matrix. </p>
-<p>As hessian matrices are always symmetric this function only acts on the lower diagonal portion.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>in</strong> – Input data. </p></li>
-<li><p><strong>out</strong> – Hessian matrix (computed with .<a class="reference internal" href="#classfly_1_1potential_1_1EAM_1a6ef717527c52ebd02b4586a98d12ab4d"><span class="std std-ref">hessian()</span></a>). </p></li>
-<li><p><strong>threads</strong> – Number of openMP threads to use. </p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4NK3fly9potential3EAM5r_cutEv">
 <span id="_CPPv3NK3fly9potential3EAM5r_cutEv"></span><span id="_CPPv2NK3fly9potential3EAM5r_cutEv"></span><span id="fly::potential::EAM::r_cutC"></span><span class="target" id="classfly_1_1potential_1_1EAM_1a06eb44378e628ab06d6e8e6a5451ba8c"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">auto</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">r_cut</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="k"><span class="pre">noexcept</span></span><span class="w"> </span><span class="o"><span class="pre">-&gt;</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><a class="headerlink" href="#_CPPv4NK3fly9potential3EAM5r_cutEv" title="Permalink to this definition">#</a><br /></dt>
 <dd><p>Get this potentials cut-off radius. </p>
@@ -639,6 +607,9 @@
     </aside>
   </div>
 </div><script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
     <script src="../_static/sphinx_highlight.js"></script>
     <script src="../_static/scripts/furo.js"></script>

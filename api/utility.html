@@ -5,7 +5,7 @@
     <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 <link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="System" href="system.html" /><link rel="prev" title="Library API reference" href="../api.html" />
 
-    <link rel="shortcut icon" href="../_static/favicon.ico"/><!-- Generated with Sphinx 6.1.3 and Furo 2022.12.07 -->
+    <link rel="shortcut icon" href="../_static/favicon.ico"/><!-- Generated with Sphinx 5.3.0 and Furo 2022.12.07 -->
         <title>Utility - OpenFLY documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?digest=91d0f0d1c444bdcb17a68e833c7a53903343c195" />
@@ -268,24 +268,26 @@
 <h2>Core<a class="headerlink" href="#core" title="Permalink to this heading">#</a></h2>
 <p>File: <code class="docutils literal notranslate"><span class="pre">libfly/core.hpp</span></code></p>
 <p>Miscellaneous utilities. </p>
-<p><div class="admonition-todo admonition" id="id1">
+<p><p><div class="admonition-todo admonition" id="id1">
 <p class="admonition-title">Todo</p>
 <p>refactor to trailing return type syntax.</p>
 </div>
 </p>
+ </p>
 <section id="configuration-macros">
 <h3>Configuration macros<a class="headerlink" href="#configuration-macros" title="Permalink to this heading">#</a></h3>
 <dl class="cpp macro">
 <dt class="sig sig-object cpp" id="c.FLY_SPATIAL_DIMS">
 <span class="target" id="core_8hpp_1a417994ea07b0f6a1fce3b729a376c15f"></span><span class="sig-name descname"><span class="n"><span class="pre">FLY_SPATIAL_DIMS</span></span></span><a class="headerlink" href="#c.FLY_SPATIAL_DIMS" title="Permalink to this definition">#</a><br /></dt>
 <dd><p>Specify the number of spatial dimensions at compile time, defaults to 3. </p>
-<p><span class="target" id="configure-fly-spatial-dims"></span><p>To customize, at the compilation <a class="reference internal" href="../user/building.html#compiling-openfly"><span class="std std-ref">configuration</span></a>
+<p><p><span class="target" id="configure-fly-spatial-dims"></span><p>To customize, at the compilation <a class="reference internal" href="../user/building.html#compiling-openfly"><span class="std std-ref">configuration</span></a>
 step append:</p>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">-DCMAKE_CXX_FLAGS=&#39;-DFLY_SPATIAL_DIMS=&lt;number&gt;&#39;</span>
 </pre></div>
 </div>
 <p>replacing <code class="docutils literal notranslate"><span class="pre">&lt;number&gt;</span></code> with the number of dimensions.</p>
 </p>
+ </p>
 </dd></dl>
 
 </section>
@@ -355,7 +357,8 @@ step append:</p>
 <dt class="sig sig-object cpp" id="_CPPv4N3fly12spatial_dimsE">
 <span id="_CPPv3N3fly12spatial_dimsE"></span><span id="_CPPv2N3fly12spatial_dimsE"></span><span id="fly::spatial_dims__i"></span><span class="target" id="core_8hpp_1a2c9732ae95a862dd132adfe203bc74ee"></span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">fly</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">spatial_dims</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">3</span></span><a class="headerlink" href="#_CPPv4N3fly12spatial_dimsE" title="Permalink to this definition">#</a><br /></dt>
 <dd><p>The number of spatial dimensions. </p>
-<p>Must be greater than or equal to 2. Configurable using the <a class="reference internal" href="#configure-fly-spatial-dims"><span class="std std-ref">FLY_SPATIAL_DIMS</span></a> macro.</p>
+<p><p>Must be greater than or equal to 2. Configurable using the <a class="reference internal" href="#configure-fly-spatial-dims"><span class="std std-ref">FLY_SPATIAL_DIMS</span></a> macro.</p>
+ </p>
 </dd></dl>
 
 <hr class="docutils" />
@@ -431,7 +434,7 @@ step append:</p>
 <dt class="sig sig-object cpp" id="_CPPv4IDpEN3fly12always_falseE">
 <span id="_CPPv3IDpEN3fly12always_falseE"></span><span id="_CPPv2IDpEN3fly12always_falseE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="core_8hpp_1ae3be2d4bc9709f5797b991cce31639a2"></span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">fly</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">always_false</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">false</span></span><a class="headerlink" href="#_CPPv4IDpEN3fly12always_falseE" title="Permalink to this definition">#</a><br /></dt>
 <dd><p>Non-deducible <code class="docutils literal notranslate"><span class="pre">false</span></code> for use in <code class="docutils literal notranslate"><span class="pre">static_assert</span></code>. </p>
-<p><p>Example:</p>
+<p><p><p>Example:</p>
 <div class="code highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;libfly/utility/core.hpp&quot;</span>
 
 <span class="k">template</span><span class="w"> </span><span class="o">&lt;</span><span class="k">typename</span><span class="w"> </span><span class="nc">T</span><span class="o">&gt;</span><span class="w"> </span><span class="k">struct</span><span class="w"> </span><span class="nc">referance_banned</span><span class="w"> </span><span class="p">{};</span>
@@ -445,6 +448,7 @@ step append:</p>
 </pre></div>
 </div>
 </p>
+ </p>
 </dd></dl>
 
 <hr class="docutils" />
@@ -604,7 +608,8 @@ step append:</p>
 <span class="p">}</span>
 </pre></div>
 </div>
-<p>Additionally, this will detect if <code class="docutils literal notranslate"><span class="pre">f</span></code> is callable with an array of indexes, e.g. (in the notation from above):</p>
+<p>Additionally, this will detect if <code class="docutils literal notranslate"><span class="pre">f</span></code> is callable with an array of indexes, e.g. (in the notation from
+above):</p>
 <div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">f</span><span class="p">(</span><span class="n">Arr</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="p">{</span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="n">j</span><span class="p">,</span><span class="w"> </span><span class="p">...,</span><span class="w"> </span><span class="n">n</span><span class="p">});</span>
 </pre></div>
 </div>
@@ -924,12 +929,13 @@ y_n &amp; = 1 \times x_1\times x_{2} \times \dots \times x_{n-1}\end{split}\]</d
 <dt class="sig sig-object cpp" id="_CPPv4N3fly7XoshiroE">
 <span id="_CPPv3N3fly7XoshiroE"></span><span id="_CPPv2N3fly7XoshiroE"></span><span id="fly::Xoshiro"></span><span class="target" id="classfly_1_1Xoshiro"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Xoshiro</span></span></span><a class="headerlink" href="#_CPPv4N3fly7XoshiroE" title="Permalink to this definition">#</a><br /></dt>
 <dd><p>A &lt;random&gt; compatible implementation of the xoshiro256** 1.0 PRNG. </p>
-<p><p>From <a class="reference external" href="https://prng.di.unimi.it/">the original</a>:</p>
+<p><p><p>From <a class="reference external" href="https://prng.di.unimi.it/">the original</a>:</p>
 <blockquote>
 <div><p>This is xoshiro256** 1.0, one of our all-purpose, rock-solid generators. It has excellent (sub-ns) speed, a state (256 bits)
 that is large enough for any parallel application, and it passes all tests we are aware of.</p>
 </div></blockquote>
 </p>
+ </p>
 <div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-types">Public Types</p>
 <dl class="cpp type">
@@ -1030,7 +1036,7 @@ that is large enough for any parallel application, and it passes all tests we ar
 <dt class="sig sig-object cpp" id="_CPPv4N3fly6SplineE">
 <span id="_CPPv3N3fly6SplineE"></span><span id="_CPPv2N3fly6SplineE"></span><span id="fly::Spline"></span><span class="target" id="classfly_1_1Spline"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Spline</span></span></span><a class="headerlink" href="#_CPPv4N3fly6SplineE" title="Permalink to this definition">#</a><br /></dt>
 <dd><p>Computes a set of natural cubic spline coefficients for a uniformly tabulated function. </p>
-<p>See Wikipedia algorithm: <a class="reference external" href="https://en.wikipedia.org/wiki/Spline_(mathematics)">https://en.wikipedia.org/wiki/Spline_(mathematics)</a></p>
+<p>See Wikipedia algorithm: <a class="reference external" href="https://en.wikipedia.org/wiki/Spline_(mathematics)">https://en.wikipedia.org/wiki/Spline_(mathematics)</a> </p>
 <div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
 <dl class="cpp function">
@@ -1183,12 +1189,13 @@ that is large enough for any parallel application, and it passes all tests we ar
 <dt class="sig sig-object cpp" id="_CPPv4N3fly8centroidEN6system3SoAIRK8PositionEE">
 <span id="_CPPv3N3fly8centroidEN6system3SoAIRK8PositionEE"></span><span id="_CPPv2N3fly8centroidEN6system3SoAIRK8PositionEE"></span><span id="fly::centroid__system::SoA:PositionCR:"></span><span class="target" id="lattice_8hpp_1aa2f432bba43da508434b240dea5900f1"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N3fly3VecE" title="fly::Vec"><span class="n"><span class="pre">Vec</span></span></a><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">fly</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">centroid</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">system</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="system.html#_CPPv4IDpEN3fly6system3SoAE" title="fly::system::SoA"><span class="n"><span class="pre">SoA</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">Position</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">x</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3fly8centroidEN6system3SoAIRK8PositionEE" title="Permalink to this definition">#</a><br /></dt>
 <dd><p>Compute the centroid of a vector of atoms, <code class="docutils literal notranslate"><span class="pre">x</span></code>. </p>
-<p><p>For a set of atoms with positions <span class="math notranslate nohighlight">\(x_i\)</span> this is defined as:</p>
+<p><p><p>For a set of atoms with positions <span class="math notranslate nohighlight">\(x_i\)</span> this is defined as:</p>
 <div class="math-wrapper docutils container">
 <div class="math notranslate nohighlight">
 \[\frac{1}{N} \sum_{i=1}^{N}{x_i}\]</div>
 </div>
 </p>
+ </p>
 </dd></dl>
 
 <dl class="cpp function">
@@ -1351,6 +1358,9 @@ that is large enough for any parallel application, and it passes all tests we ar
     </aside>
   </div>
 </div><script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
     <script src="../_static/sphinx_highlight.js"></script>
     <script src="../_static/scripts/furo.js"></script>

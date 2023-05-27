@@ -19,6 +19,7 @@
 // openFLY. If not, see <https://www.gnu.org/licenses/>.
 
 #include <fmt/chrono.h>
+#include <fmt/color.h>
 #include <fmt/core.h>
 #include <fmt/format.h>
 #include <fmt/ranges.h>
@@ -908,7 +909,7 @@ namespace fly {
 
       auto nan = duration_cast<nanoseconds>(elapsed);
 
-      fmt::print("{} | {:>4} {:>5} {:>5} {:>5}\n", name, sec, mil, mic, nan);
+      fmt::print(fmt::fg(fmt::color::hot_pink), "{} | {:>4} {:>5} {:>5} {:>5}\n", name, sec, mil, mic, nan);
     };
 
     if constexpr (std::is_void_v<std::invoke_result_t<F &&, Args &&...>>) {

@@ -42,9 +42,9 @@ namespace fly::env {
    */
   class Mechanism {
   public:
-    double barrier;      ///< Energy barrier (``eSp - e0``).
-    double delta;        ///< Energy change (eF - e0).
-    double kinetic_pre;  ///< Arrhenius pre factor.
+    double barrier = -1;      ///< Energy barrier (``eSp - e0``).
+    double delta = -1;        ///< Energy change (eF - e0).
+    double kinetic_pre = -1;  ///< Arrhenius pre factor.
 
     double err_fwd = std::numeric_limits<double>::max();  ///< Forward reconstruction error.
     double err_sp = std::numeric_limits<double>::max();   ///< Saddle point reconstruction error.
@@ -52,8 +52,8 @@ namespace fly::env {
     bool poison_sp = false;   ///< If true this mechanism's SP cannot be reconstructed.
     bool poison_fwd = false;  ///< If true this mechanism's final state cannot be reconstructed.
 
-    system::VoS<Delta> delta_sp;   ///< Displacement vectors from initial to saddle-point.
-    system::VoS<Delta> delta_fwd;  ///< Displacement vectors from initial to final.
+    system::VoS<Delta> delta_sp{};   ///< Displacement vectors from initial to saddle-point.
+    system::VoS<Delta> delta_fwd{};  ///< Displacement vectors from initial to final.
 
     /**
      * @brief Lib cereal serialization support.

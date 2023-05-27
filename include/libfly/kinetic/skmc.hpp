@@ -246,7 +246,15 @@ namespace fly::kinetic {
 
     {  // Initial minimisation
       system::SoA<Position, PotentialGradient> out(cell.size());
+
       bool err = timeit("Minimise", [&] { return m_minimiser.minimise(out, cell, m_pot, num_threads); });
+
+      env::Mechanism tmp;
+
+      if (timeit("SKMC: call", f, 0, std::as_const(cell), -1, -1, tmp, std::as_const(out), -1)) {
+        return;
+      }
+
       cell[r_] = out[r_];
       verify(!err, "Minimiser failed");
 
@@ -276,7 +284,7 @@ namespace fly::kinetic {
       //
       bool stop = false;
 
-      timeit("SKMC-loop\n", [&] {
+      timeit("SKMC: total", [&] {
         ///////////// Select mechanism /////////////
         auto const& [m, atom, dt, basin, changed] = super.kmc_choice(rng);
 
@@ -353,7 +361,7 @@ namespace fly::kinetic {
 
         time += dt;
 
-        stop = timeit("SKMC-call",
+        stop = timeit("SKMC: call",
                       f,
                       time,
                       std::as_const(cell),
@@ -390,6 +398,8 @@ namespace fly::kinetic {
 
         cell[r_] = rel_recon[r_];  // Update cell after constructing the hint.
 
+        dprint(m_opt.debug, "SKMC: Iteration #{} time = {:.3e}\n", i, time);
+
         auto new_envs = timeit("SKMC: Update", [&] {
           return kinetic::update_cat(m_mast, m_cat, cell, num_threads, hint);  //
         });
@@ -401,8 +411,6 @@ namespace fly::kinetic {
         ///////////// Update SuperBasin /////////////
 
         super.connect_from(basin, atom, m, cell, m_cat);
-
-        dprint(m_opt.debug, "SKMC: Iteration #{} time = {:.3e}\n", i, time);
       });
 
       if (stop) {

@@ -19,6 +19,7 @@
 // <https://www.gnu.org/licenses/>.
 
 #include <algorithm>
+#include <exception>
 #include <string>
 #include <vector>
 
@@ -39,6 +40,16 @@ namespace fly {
    */
   class Spline {
   public:
+    /**
+     * @brief An error type to signify that a value oustide the bounds of the tabulated function has been requested.
+     */
+    struct OutOfBounds : RuntimeError {
+      /**
+       * @brief Construct a new Out Of Bounds object from a RuntimeError.
+       */
+      OutOfBounds(RuntimeError const& err) : RuntimeError(err) {}
+    };
+
     /**
      * @brief Construct an empty Spline
      */
@@ -125,12 +136,13 @@ namespace fly {
       //
       ASSERT(x >= 0, "x={}, not less than zero", x);
 
-      ASSERT(static_cast<std::size_t>(x * m_inv_dx) < m_spines.size() + 10,
-             "x={} is outside tabulated region with x_max={}",
-             x,
-             static_cast<double>(m_spines.size()) * m_dx + m_dx);
+      auto i = static_cast<std::size_t>(x * m_inv_dx);
 
-      auto i = std::min(static_cast<std::size_t>(x * m_inv_dx), m_spines.size() - 1);
+      if (i >= m_spines.size()) {
+        throw OutOfBounds{error("x={} is outside tabulated region with x_max={}", x, static_cast<double>(m_spines.size()) * m_dx + m_dx)};
+      }
+
+      //   ASSERT(i < m_spines.size(), "x={} is outside tabulated region with x_max={}", x, static_cast<double>(m_spines.size()) * m_dx + m_dx);
 
       //   //   ASSERT(static_cast<std::size_t>(x * m_inv_dx) < m_spines.size(),
       //   //          "x={} is outside tabulated region with i={}, len={}",

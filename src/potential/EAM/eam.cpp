@@ -50,20 +50,16 @@ namespace fly::potential {
     return (0.5 * v_sum) + f_sum;
   }
 
-  void EAM::gradient(system::SoA<PotentialGradient&> out,
-                     system::SoA<TypeID const&, Frozen const&> in,
-                     neigh::List const& nl,
-                     int num_threads) {
+  void EAM::gradient(system::SoA<PotentialGradient&> out, system::SoA<TypeID const&, Frozen const&> in, neigh::List const& nl, int num_threads) {
     //
     verify(in.size() == out.size(), "EAM gradient size mismatch in={} out={}", in.size(), out.size());
 
     // Usually a noop
     m_aux.destructive_resize(in.size());
 
-// First sum computes density  at each real atom, runs over frozen+active atoms.
-#pragma omp parallel for num_threads(num_threads) schedule(static)
-    // Compute rho at all
-    for (Eigen::Index b = 0; b < in.size(); b++) {
+    // First sum computes density  at each real atom, runs over frozen+active atoms.
+
+    auto loop_body_1 = [&](Eigen::Index b) {
       double rho = 0;
 
       // Computes rho at atom
@@ -74,12 +70,24 @@ namespace fly::potential {
 
       // Compute F'(rho) at atom
       m_aux(Fprime{}, b) = m_data->f(in(id_, b)).fp(rho);
+    };
+
+    if (num_threads == 1) {
+      // Allows exception propagation in single threaded code.
+      for (Eigen::Index b = 0; b < in.size(); b++) {
+        loop_body_1(b);
+      }
+    } else {
+#pragma omp parallel for num_threads(num_threads) schedule(static)
+      // Compute rho at all
+      for (Eigen::Index b = 0; b < in.size(); b++) {
+        loop_body_1(b);
+      }
     }
 
-// Second sum computes gradient, only runs over active atoms
-#pragma omp parallel for num_threads(num_threads) schedule(static)
-    //
-    for (Eigen::Index g = 0; g < in.size(); ++g) {
+    // Second sum computes gradient, only runs over active atoms
+
+    auto loop_body_2 = [&](Eigen::Index g) {
       //
       Vec grad = Vec::Zero();
 
@@ -87,8 +95,7 @@ namespace fly::potential {
         nl.for_neighbours(g, r_cut(), [&](auto a, double r, Vec const& dr) {
           //
 
-          double mag = m_data->v(in(id_, a), in(id_, g)).fp(r)
-                       + m_aux(Fprime{}, g) * m_data->phi(in(id_, a), in(id_, g)).fp(r)
+          double mag = m_data->v(in(id_, a), in(id_, g)).fp(r) + m_aux(Fprime{}, g) * m_data->phi(in(id_, a), in(id_, g)).fp(r)
                        + m_aux(Fprime{}, a) * m_data->phi(in(id_, g), in(id_, a)).fp(r);
 
           grad -= (mag / r) * dr;
@@ -97,13 +104,22 @@ namespace fly::potential {
 
       // Write grad to atom
       out(g_, g) = grad;
+    };
+
+    if (num_threads == 1) {
+      // Allows exception propagation in single threaded code.
+      for (Eigen::Index g = 0; g < in.size(); ++g) {
+        loop_body_2(g);
+      }
+    } else {
+#pragma omp parallel for num_threads(num_threads) schedule(static)
+      for (Eigen::Index g = 0; g < in.size(); ++g) {
+        loop_body_2(g);
+      }
     }
   }
 
-  void EAM::hessian(system::Hessian& out,
-                    system::SoA<TypeID const&, Frozen const&> in,
-                    neigh::List const& nl,
-                    int num_threads) {
+  void EAM::hessian(system::Hessian& out, system::SoA<TypeID const&, Frozen const&> in, neigh::List const& nl, int num_threads) {
     // Usually a noop, make space in aux
     m_aux.destructive_resize(in.size());
 
@@ -177,10 +193,7 @@ namespace fly::potential {
 
                      m_data->f(in(id_, a)).fp(m_aux(Rho{}, a)) * m_data->phi(in(id_, z), in(id_, a)).fpp(r);
 
-          double ABFpp = (A - B
-                          - m_data->f(in(id_, a)).fpp(m_aux(Rho{}, a))
-                                * ipow<2>(m_data->phi(in(id_, z), in(id_, a)).fp(r)))
-                         / (r * r);
+          double ABFpp = (A - B - m_data->f(in(id_, a)).fpp(m_aux(Rho{}, a)) * ipow<2>(m_data->phi(in(id_, z), in(id_, a)).fp(r))) / (r * r);
 
           out(z, z) += A * Mat::Identity() - ABFpp * dr * dr.transpose();
 
@@ -192,22 +205,18 @@ namespace fly::potential {
           if (a > z && !in(fzn_, a)) {
             double BArr = (B - A) / (r * r);
 
-            double ur
-                = m_data->f(in(id_, z)).fpp(m_aux(Rho{}, z)) * m_data->phi(in(id_, a), in(id_, z)).fp(r) / r;
+            double ur = m_data->f(in(id_, z)).fpp(m_aux(Rho{}, z)) * m_data->phi(in(id_, a), in(id_, z)).fp(r) / r;
 
-            double ru
-                = m_data->f(in(id_, a)).fpp(m_aux(Rho{}, a)) * m_data->phi(in(id_, z), in(id_, a)).fp(r) / r;
+            double ru = m_data->f(in(id_, a)).fpp(m_aux(Rho{}, a)) * m_data->phi(in(id_, z), in(id_, a)).fp(r) / r;
 
-            out(a, z).noalias() += -BArr * dr * dr.transpose() - A * Mat::Identity()
-                                   + ur * dr * m_aux(Mu{}, z).transpose()
-                                   - ru * m_aux(Mu{}, a) * dr.transpose();
+            out(a, z).noalias()
+                += -BArr * dr * dr.transpose() - A * Mat::Identity() + ur * dr * m_aux(Mu{}, z).transpose() - ru * m_aux(Mu{}, a) * dr.transpose();
           }
 
           // Finally compute overlap terms of z coupling to active atom g via a. Each thread only writes to
           // e^th column blocks.
 
-          double ddFg
-              = m_data->f(in(id_, a)).fpp(m_aux(Rho{}, a)) * m_data->phi(in(id_, z), in(id_, a)).fp(r);
+          double ddFg = m_data->f(in(id_, a)).fpp(m_aux(Rho{}, a)) * m_data->phi(in(id_, z), in(id_, a)).fp(r);
 
           nl.for_neighbours(a, r_cut(), [&](auto g, double r_ag, Vec const& dr_ag) {
             // If interacting with a periodic image of ones-self then we need to include this term.

@@ -61,9 +61,7 @@ namespace fly::saddle {
   /////////// static functions ///////////
 
   // Reconstruct sp/minima according to reference geometry
-  static system::SoA<Position> reconstruct(env::Geometry<Index> const& ref,
-                                           system::VoS<Delta> const& m,
-                                           system::SoA<Position const&> in) {
+  static system::SoA<Position> reconstruct(env::Geometry<Index> const& ref, system::VoS<Delta> const& m, system::SoA<Position const&> in) {
     system::SoA<Position> sp(in);
 
     for (int j = 0; j < m.size(); ++j) {
@@ -76,9 +74,7 @@ namespace fly::saddle {
   /**
    * @brief Reconstruct and relax a mechanism's saddle point and minima.
    */
-  Master::Recon Master::recon_relax(env::Geometry<Index> const& geo,
-                                    env::Mechanism const& m,
-                                    system::SoA<Position const&, TypeID const&, Frozen const&> in) {
+  Master::Recon Master::recon_relax(env::Geometry<Index> const& geo, env::Mechanism const& m, system::SoA<Position const&, TypeID const&, Frozen const&> in) {
     //
     struct Recon res {
       reconstruct(geo, m.delta_fwd, in), reconstruct(geo, m.delta_sp, in), {}, {},
@@ -191,9 +187,7 @@ namespace fly::saddle {
     }
   }
 
-  std::vector<Master::LocalisedGeo> Master::package(std::vector<int> const& ix,
-                                                    env::Catalogue const& cat,
-                                                    int num_threads) {
+  std::vector<Master::LocalisedGeo> Master::package(std::vector<int> const& ix, env::Catalogue const& cat, int num_threads) {
     //
     std::vector<LocalisedGeo> out_data(ix.size());
 
@@ -208,9 +202,7 @@ namespace fly::saddle {
     return out_data;
   }
 
-  std::vector<Master::Found> Master::find_mechs(std::vector<LocalisedGeo> const& geo_data,
-                                                SoA in,
-                                                std::optional<Hint> const& hint) {
+  std::vector<Master::Found> Master::find_mechs(std::vector<LocalisedGeo> const& geo_data, SoA in, std::optional<Hint> const& hint) {
     // Early exit!
     if (geo_data.empty()) {
       return {};
@@ -271,10 +263,7 @@ namespace fly::saddle {
 
             barriers.erase(last, barriers.end());
 
-            fmt::print("FINDER: @{:<4} found {:>3} mech(s) {::.3f}\n",
-                       geo_data[j].centre,
-                       out[j].mechs().size(),
-                       barriers);
+            fmt::print("FINDER: @{:<4} found {:>3} mech(s) {::.3f}\n", geo_data[j].centre, out[j].mechs().size(), barriers);
 
           } else {
             fmt::print("FINDER: @{:<4} symmetry-break!\n", geo_data[j].centre);
@@ -287,8 +276,7 @@ namespace fly::saddle {
     for (auto& f : out) {
       if (f) {
         for (auto& m : f.m_mechs) {
-          m.kinetic_pre
-              = std::sqrt(std::exp(m_log_prod_eigen - m.kinetic_pre) / (2 * M_PI * 1.6605390666050e-27));
+          m.kinetic_pre = std::sqrt(std::exp(m_log_prod_eigen - m.kinetic_pre) / (2 * M_PI * 1.6605390666050e-27));
         }
       }
     }
@@ -299,18 +287,11 @@ namespace fly::saddle {
       for (std::size_t i = 0; i < out.size(); ++i) {
         if (out[i]) {
           for (auto& mech : out[i].m_mechs) {
-            fmt::print(stderr,
-                       "FINDER: @{} frame={}, Delta={}eV, A={:e}Hz\n",
-                       geo_data[i].centre,
-                       c,
-                       mech.barrier,
-                       mech.kinetic_pre);
+            fmt::print(stderr, "FINDER: @{} frame={}, Delta={}eV, A={:e}Hz\n", geo_data[i].centre, c, mech.barrier, mech.kinetic_pre);
 
             if (m_opt.fout) {
-              m_opt.fout->commit(
-                  [&] { m_opt.fout->write(r_, reconstruct(geo_data[i].geo, mech.delta_sp, in)); });
-              m_opt.fout->commit(
-                  [&] { m_opt.fout->write(r_, reconstruct(geo_data[i].geo, mech.delta_fwd, in)); });
+              m_opt.fout->commit([&] { m_opt.fout->write(r_, reconstruct(geo_data[i].geo, mech.delta_sp, in)); });
+              m_opt.fout->commit([&] { m_opt.fout->write(r_, reconstruct(geo_data[i].geo, mech.delta_fwd, in)); });
             }
 
             c += m_opt.fout ? 2 : 1;
@@ -322,11 +303,7 @@ namespace fly::saddle {
     return out;
   }
 
-  void Master::process_hint(Found& out,
-                            LocalisedGeo const& geo_data,
-                            SoA in,
-                            Hint const& hint,
-                            std::vector<system::SoA<Position>>& cache) {
+  void Master::process_hint(Found& out, LocalisedGeo const& geo_data, SoA in, Hint const& hint, std::vector<system::SoA<Position>>& cache) {
     // This is copypasta from recon_relax as we need the axis.
 
     system::SoA<Position> re_sp = reconstruct(hint.geo, hint.delta_sp, hint.prev_state);
@@ -389,11 +366,7 @@ namespace fly::saddle {
 
   ///////////////////////////////////////////////////////
 
-  void Master::find_n(Found& out,
-                      LocalisedGeo const& geo_data,
-                      SoA in,
-                      neigh::List const& nl_pert,
-                      std::optional<Hint> const& hint) {
+  void Master::find_n(Found& out, LocalisedGeo const& geo_data, SoA in, neigh::List const& nl_pert, std::optional<Hint> const& hint) {
     // Cache saddle-points.
     std::vector<system::SoA<Position>> cache;
 
@@ -438,13 +411,7 @@ namespace fly::saddle {
           }
         }
 
-        fmt::print("FINDER: {} mech(s) @{}: fail={}, tot={}, t_min={}deg, n-cache={}\n",
-                   out.m_mechs.size(),
-                   geo_data.centre,
-                   fail,
-                   tot,
-                   t_min,
-                   cache.size());
+        fmt::print("FINDER: {} mech(s) @{}: fail={}, tot={}, t_min={}deg, n-cache={}\n", out.m_mechs.size(), geo_data.centre, fail, tot, t_min, cache.size());
       }
     }
   }
@@ -654,12 +621,11 @@ namespace fly::saddle {
       {
         fly::io::BinaryFile file("crash.gsd", fly::io::create);
 
-        fmt::print(
-            stderr,
-            "Append symmetries threw @{}, this implies a symmetrical saddle-point but sym-breaking minima, "
-            "perhaps the minimiser reached the wrong minima i.e. failed to follow the minimum mode or the "
-            "sp was higher order. Failure was written to \"crash.gsd\" in the current working directory\n",
-            geo_data.centre);
+        fmt::print(stderr,
+                   "Append symmetries threw @{}, this implies a symmetrical saddle-point but sym-breaking minima, "
+                   "perhaps the minimiser reached the wrong minima i.e. failed to follow the minimum mode or the "
+                   "sp was higher order. Failure was written to \"crash.gsd\" in the current working directory\n",
+                   geo_data.centre);
 
         file.commit([&] {
           file.write("particles/N", fly::safe_cast<std::uint32_t>(in.size()));
@@ -685,11 +651,9 @@ namespace fly::saddle {
     }
 
     for (std::size_t k = 0; k < num_new; k++) {
-#pragma omp task untied default(none) firstprivate(n, k, num_new) \
-    shared(out, in, cache, geo_data, dimer, mech)
+#pragma omp task untied default(none) firstprivate(n, k, num_new) shared(out, in, cache, geo_data, dimer, mech)
       {
-        std::optional recon_sp
-            = check_mech(out, dimer, out.m_mechs[out.m_mechs.size() - num_new + k], k, geo_data, in);
+        std::optional recon_sp = check_mech(out, dimer, out.m_mechs[out.m_mechs.size() - num_new + k], k, geo_data, in);
 
         if (mech.poison_sp) {
           // This check may be too strong
@@ -727,23 +691,32 @@ namespace fly::saddle {
 
     //  Do batch_size SP searches
     for (Batch& elem : batch) {
-#pragma omp task untied default(none) firstprivate(theta_tol) \
-    shared(elem, in, nl_pert, batch, cache, geo_data)
+#pragma omp task untied default(none) firstprivate(theta_tol) shared(stderr, elem, in, nl_pert, batch, cache, geo_data)
       {
-        perturb(elem.dimer, in, geo_data.centre, nl_pert);
-
-        if (m_count_frozen == 0) {
-          centroid_align(elem.dimer, in);
-        }
-
         system::SoA<Position&, Axis&, Frozen const&, TypeID const&> dimer(in.size());
 
         dimer.rebind(r_, elem.dimer);
         dimer.rebind(ax_, elem.dimer);
         dimer.rebind(fzn_, in);
-        dimer.rebind(id_, in);
 
-        elem.exit = find_sp(dimer, in, cache, theta_tol);
+        for (int retry = 0;;) {
+          perturb(elem.dimer, in, geo_data.centre, nl_pert);
+
+          if (m_count_frozen == 0) {
+            centroid_align(elem.dimer, in);
+          }
+
+          dimer.rebind(id_, in);
+
+          try {
+            elem.exit = find_sp(dimer, in, cache, theta_tol);
+            break;
+          } catch (Spline::OutOfBounds& err) {
+            if (++retry > 3) {
+              throw error("Consecutive spline-out-of-bounds @{} prev: {}", geo_data.centre, err.what());
+            }
+          }
+        }
 
         if (elem.exit == Dimer::success) {
           elem.mech = saddle_2_mech(in, dimer, geo_data.geo);
@@ -978,16 +951,11 @@ namespace fly::saddle {
         }
       }
 
-      throw error("Mechanism @{} with energy barrier = {}eV is poisoned! err_sp={}, err_min={}",
-                  geo[0][i_],
-                  mech.barrier,
-                  mech.err_sp,
-                  mech.err_fwd);
+      throw error("Mechanism @{} with energy barrier = {}eV is poisoned! err_sp={}, err_min={}", geo[0][i_], mech.barrier, mech.err_sp, mech.err_fwd);
     }
 
     if (m_opt.debug) {
-      fmt::print(
-          "FINDER: Mech ΔEsp={:.3e}, ΔEfwd={:.3e}, N_zeros={}\n", mech.barrier, mech.delta, count_zeros);
+      fmt::print("FINDER: Mech ΔEsp={:.3e}, ΔEfwd={:.3e}, N_zeros={}\n", mech.barrier, mech.delta, count_zeros);
 
       for (int i = 0; i < m_num_zero_modes + 3; i++) {
         fmt::print("FINDER: sp mode {} = {}\n", i, freq[i]);
@@ -1028,10 +996,9 @@ namespace fly::saddle {
   /**
    * @brief Given a saddle point produce a min->sp->min pathway
    */
-  std::optional<Master::Pathway> Master::do_adj_min(
-      system::SoA<Position const&, Axis const&, Frozen const&, TypeID const&> dimer,
-      system::SoA<Position const&> in,
-      Index::scalar_t centre) {
+  std::optional<Master::Pathway> Master::do_adj_min(system::SoA<Position const&, Axis const&, Frozen const&, TypeID const&> dimer,
+                                                    system::SoA<Position const&> in,
+                                                    Index::scalar_t centre) {
     //   Minimisations
 
     double disp = gnorm(dimer[r_] - in[r_]);
@@ -1153,8 +1120,7 @@ namespace fly::saddle {
     }
 
     if (m_opt.debug) {
-      fmt::print(
-          "FINDER: Null space of Hessian has dimension  = {}, exp = {}\n", m_num_zero_modes, exp_zero_modes);
+      fmt::print("FINDER: Null space of Hessian has dimension  = {}, exp = {}\n", m_num_zero_modes, exp_zero_modes);
 
       for (int i = 0; i < m_num_zero_modes + 5; i++) {
         fmt::print("FINDER: Initial min mode {} = {}\n", i, freq[i]);
@@ -1163,10 +1129,8 @@ namespace fly::saddle {
   }
 
   // Perturb in-place positions around centre and write axis,
-  auto Master::perturb(system::SoA<Position&, Axis&> out,
-                       system::SoA<Position const&, Frozen const&> in,
-                       Index::scalar_t centre,
-                       neigh::List const& nl) -> double {
+  auto Master::perturb(system::SoA<Position&, Axis&> out, system::SoA<Position const&, Frozen const&> in, Index::scalar_t centre, neigh::List const& nl)
+      -> double {
     //
     Xoshiro& prng = thread().prng;
 
@@ -1226,8 +1190,7 @@ namespace fly::saddle {
 
     ASSERT(!in(Frozen{}, centre), "perturbation centred on a frozen atom {}", centre);
 
-    out(r_, centre)
-        += Vec::NullaryExpr([&] { return gauss(prng); });  // p * std::abs(gauss(prng)) * std::sqrt(3);
+    out(r_, centre) += Vec::NullaryExpr([&] { return gauss(prng); });  // p * std::abs(gauss(prng)) * std::sqrt(3);
     out(ax_, centre) += Vec::NullaryExpr([&] { return normal(prng); });
 
     out[ax_] /= gnorm(out[ax_]);  // normalize
@@ -1284,11 +1247,7 @@ namespace fly::saddle {
       }
     }
 
-    dprint(m_opt.debug,
-           "FINDER: Mech is new, min distance: old-sp={:.3e} old-min={:.3e}, theta-min={:.1f}\n",
-           min_d_sp,
-           min_d_fwd,
-           min_d_theta);
+    dprint(m_opt.debug, "FINDER: Mech is new, min distance: old-sp={:.3e} old-min={:.3e}, theta-min={:.1f}\n", min_d_sp, min_d_fwd, min_d_theta);
 
     return true;
   }

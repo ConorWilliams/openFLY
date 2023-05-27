@@ -80,8 +80,7 @@ namespace fly::potential {
      * @param threads Number of openMP threads to use.
      * @return double The potential energy of the system of atoms.
      */
-    auto energy(system::SoA<TypeID const&, Frozen const&> in, neigh::List const& nl, int threads = 1)
-        -> double;
+    auto energy(system::SoA<TypeID const&, Frozen const&> in, neigh::List const& nl, int threads = 1) -> double;
 
     /**
      * @brief Compute potential energy gradient.
@@ -93,10 +92,7 @@ namespace fly::potential {
      * @param nl Neighbour list (in ready state i.e. neigh::List::update() or neigh::List::rebuild() called).
      * @param threads Number of openMP threads to use.
      */
-    auto gradient(system::SoA<PotentialGradient&> out,
-                  system::SoA<TypeID const&, Frozen const&> in,
-                  neigh::List const& nl,
-                  int threads = 1) -> void;
+    auto gradient(system::SoA<PotentialGradient&> out, system::SoA<TypeID const&, Frozen const&> in, neigh::List const& nl, int threads = 1) -> void;
 
     /**
      * @brief Compute hessian matrix.
@@ -111,10 +107,7 @@ namespace fly::potential {
      * @param nl Neighbour list (in ready state i.e. neigh::List::update() or neigh::List::rebuild() called).
      * @param threads Number of openMP threads to use.
      */
-    auto hessian(system::Hessian& out,
-                 system::SoA<TypeID const&, Frozen const&> in,
-                 neigh::List const& nl,
-                 int threads = 1) -> void;
+    auto hessian(system::Hessian& out, system::SoA<TypeID const&, Frozen const&> in, neigh::List const& nl, int threads = 1) -> void;
 
   private:
     std::shared_ptr<DataEAM const> m_data;

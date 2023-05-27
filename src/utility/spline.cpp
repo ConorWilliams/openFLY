@@ -25,7 +25,12 @@
 namespace fly {
 
   Spline::Spline(std::vector<double> y, double dx) : m_dx(dx), m_inv_dx(1 / dx) {
-    //
+    // Soft pad end of spline
+    double last = y.back();
+
+    for (size_t i = 0; i < 5; i++) {
+      y.push_back(last);
+    }
 
     std::size_t n = y.size() - 1;
 

@@ -297,6 +297,7 @@ step append:</p>
 <dt class="sig sig-object cpp" id="_CPPv4N3fly12RuntimeErrorE">
 <span id="_CPPv3N3fly12RuntimeErrorE"></span><span id="_CPPv2N3fly12RuntimeErrorE"></span><span id="fly::RuntimeError"></span><span class="target" id="structfly_1_1RuntimeError"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">RuntimeError</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">runtime_error</span></span><a class="headerlink" href="#_CPPv4N3fly12RuntimeErrorE" title="Permalink to this definition">#</a><br /></dt>
 <dd><p>libFLY’s catchable error type. </p>
+<p>Subclassed by <a class="reference internal" href="#structfly_1_1Spline_1_1OutOfBounds"><span class="std std-ref">fly::Spline::OutOfBounds</span></a></p>
 </dd></dl>
 
 <hr class="docutils" />
@@ -1119,6 +1120,21 @@ that is large enough for any parallel application, and it passes all tests we ar
 </dd></dl>
 
 </div>
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv4N3fly6Spline11OutOfBoundsE">
+<span id="_CPPv3N3fly6Spline11OutOfBoundsE"></span><span id="_CPPv2N3fly6Spline11OutOfBoundsE"></span><span id="fly::Spline::OutOfBounds"></span><span class="target" id="structfly_1_1Spline_1_1OutOfBounds"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">OutOfBounds</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><span class="n"><span class="pre">fly</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N3fly12RuntimeErrorE" title="fly::RuntimeError"><span class="n"><span class="pre">RuntimeError</span></span></a><a class="headerlink" href="#_CPPv4N3fly6Spline11OutOfBoundsE" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>An error type to signify that a value oustide the bounds of the tabulated function has been requested. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N3fly6Spline11OutOfBounds11OutOfBoundsERK12RuntimeError">
+<span id="_CPPv3N3fly6Spline11OutOfBounds11OutOfBoundsERK12RuntimeError"></span><span id="_CPPv2N3fly6Spline11OutOfBounds11OutOfBoundsERK12RuntimeError"></span><span id="fly::Spline::OutOfBounds::OutOfBounds__RuntimeErrorCR"></span><span class="target" id="structfly_1_1Spline_1_1OutOfBounds_1a0c9397d1859e34c60ff575fd253c850b"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">OutOfBounds</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N3fly12RuntimeErrorE" title="fly::RuntimeError"><span class="n"><span class="pre">RuntimeError</span></span></a><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">err</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N3fly6Spline11OutOfBounds11OutOfBoundsERK12RuntimeError" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Construct a new Out Of Bounds object from a <a class="reference internal" href="#structfly_1_1RuntimeError"><span class="std std-ref">RuntimeError</span></a>. </p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
 </dd></dl>
 
 </section>

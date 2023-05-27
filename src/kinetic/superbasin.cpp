@@ -69,11 +69,15 @@ namespace fly::kinetic {
 
     auto tau = compute_tau();
 
-    dprint(m_opt.debug, "SuperBasin: density={::.3f}\n", tau.cwiseAbs() / tau.sum());
+    tau /= tau.sum();
+
+    // std::cout << "Mat = \n" << m_prob << std::endl;
+
+    dprint(m_opt.debug, "SuperBasin: density={::.3f}\n", tau);
 
     int count = 0;
 
-    // Sum over all basin->escape rate times basin modifiers, omit normalising factor of 1/tau.sum()
+    // Sum over all basin->escape rate times basin modifiers, already normalized by tau.sum().
     double const r_sum = [&]() {
       //
       double sum = 0;
@@ -94,6 +98,8 @@ namespace fly::kinetic {
 
       return sum;
     }();
+
+    // r_sum has been normalized by tau.sum()
 
     ASSERT(count > 0, "count = {}", count);
     ASSERT(r_sum > 0, "r_sum = {}", r_sum);
@@ -116,9 +122,8 @@ namespace fly::kinetic {
       throw error("Hit end of super choice");
     }();
 
-    double const inv_tau = 1 / tau.sum();
-    double const eff_rate = tau[safe_cast<Eigen::Index>(basin)] * inv_tau * exit_mech.m_rate;
-    double const prob = 100 * eff_rate / (inv_tau * r_sum);
+    double const eff_rate = tau[safe_cast<Eigen::Index>(basin)] * exit_mech.m_rate;
+    double const prob = 100 * eff_rate / r_sum;
 
     dprint(m_opt.debug,
            "SuperBasin: SKMC choice @atom={} ΔE={:.3f}eV : {:.3f}% of {}\n",
@@ -131,7 +136,7 @@ namespace fly::kinetic {
     return {
         *exit_mech.m_mech,
         exit_mech.m_atom_index,
-        -std::log(uniform(psudo_rng)) / (r_sum * inv_tau),
+        -std::log(uniform(psudo_rng)) / r_sum,
         basin,
         m_occupied != basin,
     };

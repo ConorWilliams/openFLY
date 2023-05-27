@@ -254,6 +254,8 @@ namespace fly::saddle {
       for (std::size_t j = 0; j < geo_data.size(); ++j) {
 #pragma omp task untied default(none) firstprivate(j) shared(out, in, nl_pert, geo_data, hint)
         {
+          fmt::print("FINDER: @{:<4} finding...\n", geo_data[j].centre);
+
           find_n(out[j], geo_data[j], in, nl_pert, hint);
 
           if (out[j]) {
@@ -945,7 +947,7 @@ namespace fly::saddle {
 
     // Debugging extreme poisoning
 
-    if (false && mech.poison_fwd && mech.barrier < .5) {
+    if (mech.poison_fwd && mech.barrier < .5) {
 #pragma omp critical
       {
         fly::io::BinaryFile file("poison.gsd", fly::io::create);

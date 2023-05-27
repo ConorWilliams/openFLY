@@ -108,15 +108,15 @@ fly::system::SoA<TypeID, Position> explicit_V(std::vector<Vec> const &vac,
 int main() {
   //
 
-  constexpr auto a = 2.855;  // eam 55 or meam 67
+  constexpr auto a = 2.867;  // eam 55 or meam 67
 
   system::Supercell perfect = motif_to_lattice(bcc_iron_motif(a), {6, 6, 6});
 
   DetectVacancies detect(0.75, perfect.box(), perfect);
 
-  system::Supercell cell = remove_atoms(perfect, {});  // 173
+  system::Supercell cell = remove_atoms(perfect, {86});  // 173
 
-  Vec r_C = Vec::Constant(3.14) + a * Vec{0.5, 0.5, 0} + a * Vec{0, 0, 1};
+  Vec r_C = Vec::Constant(3.14) + a * Vec{1., 0.5, 0} + a * Vec{0, 0, 1};
 
   cell = add_atoms(cell, {system::Atom<TypeID, Position, Frozen>{1, r_C, false}});
 
@@ -143,11 +143,11 @@ int main() {
 
   // Paper 1 -Effect of interfacial bonding on dislocation strengthening in graphene nanosheet reinforced
   // iron composite: A molecular dynamics study, https://doi.org/10.1016/j.commatsci.2021.110309
-  std::string const model = "EAM_Dynamo_HepburnAckland_2008_FeC__MO_143977152728_005";
+  //   std::string const model = "EAM_Dynamo_HepburnAckland_2008_FeC__MO_143977152728_005";
 
   // Structural, elastic, and thermal properties of cementite (Fe3C) were studied using a modified embedded
   // atom method (MEAM) potential for iron-carbon (Fe-C) alloys
-  // std::string const model = "MEAM_LAMMPS_LiyanageKimHouze_2014_FeC__MO_075279800195_001";
+  std::string const model = "MEAM_LAMMPS_LiyanageKimHouze_2014_FeC__MO_075279800195_001";
 
   kinetic::SKMC runner = {
       {
@@ -178,18 +178,12 @@ int main() {
           cell.box(),
       },
       potential::Generic{
-          potential::EAM{
-              system::TypeMap<>{cell.map()},
-              std::make_shared<potential::DataEAM>(
-                potential::DataEAM{
-                  {
-                    .debug = false,
-                    .symmetric = false,
-                  },
-                  std::ifstream{"data/hepburn.eam.fs"}
-                }
-              ),
-          },
+         potential::KIM_API{
+            potential::KIM_API::Options{
+                .model_name = model,
+            },
+            system::TypeMap<>{cell.map()},
+          },  
       },
       {
           {},

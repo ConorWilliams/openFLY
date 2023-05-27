@@ -38,19 +38,36 @@
 #include "libfly/system/supercell.hpp"
 #include "libfly/system/typemap.hpp"
 #include "libfly/utility/core.hpp"
+#include "libfly/utility/data.hpp"
 #include "libfly/utility/lattice.hpp"
 #include "libfly/utility/random.hpp"
 
 using namespace fly;
 
+double sym_2_mass(std::string_view symbol) {
+  using namespace fly::data;
+
+  auto it = std::find_if(atoms.begin(), atoms.end(), [&](auto const &sym) { return sym.symbol == symbol; });
+
+  if (it == atoms.end()) {
+    throw error("Symbol \"{}\" not found in the periodic table!", symbol);
+  }
+
+  return it->mass;
+}
+
 template <typename... T>
-system::Supercell<system::TypeMap<>, Position, Frozen, T...> bcc_iron_motif(double a = 2.855300) {
+system::Supercell<system::TypeMap<Mass>, Position, Frozen, T...> bcc_iron_motif(double a) {
   //
-  system::TypeMap<> FeH(3);
+  system::TypeMap<Mass> FeH(3);
 
   FeH.set(0, tp_, "Fe");
   FeH.set(1, tp_, "H");
   FeH.set(2, tp_, "V");
+
+  for (std::uint32_t i = 0; i < FeH.num_types(); i++) {
+    FeH.set(i, m_, sym_2_mass(FeH.get(i, tp_)));
+  }
 
   Mat basis{
       {a, 0, 0},
@@ -87,30 +104,25 @@ fly::system::SoA<TypeID, Position> explicit_V(std::vector<Vec> const &vac, syste
   return special;
 }
 
-int main() {
+double run_until_escape(std::string ofname, double temp) {
   //
 
-  system::Supercell perfect = motif_to_lattice(bcc_iron_motif(), {6, 6, 6});
+  constexpr auto a = 2.855;  // eam 55 or meam 67
+
+  system::Supercell perfect = motif_to_lattice(bcc_iron_motif(a), {6, 6, 6});
 
   DetectVacancies detect(0.75, perfect.box(), perfect);
 
-  system::Supercell cell = remove_atoms(perfect, {1, 3});
+  std::vector<Eigen::Index> V1 = {1};
+  std::vector<Eigen::Index> V2 = {1, 3};
+
+  system::Supercell cell = remove_atoms(perfect, V1);
 
   Vec r_H = {2.857 / 2 + 3.14, 2.857 / 2 + 3.14, 2.857 / 4 + 3.14};
 
-  //   cell = add_atoms(cell, {system::Atom<TypeID, Position, Frozen>(1, r_H, false)});
+  cell = add_atoms(cell, {system::Atom<TypeID, Position, Frozen>{1, r_H, false}});
 
-  //   cell = add_atoms(
-  //       cell, {system::Atom<TypeID, Position, Frozen, Hash>(1, {2.857 / 2 + 3.14, 2.857 / 2 + 3.14, 2.857
-  //       / 4 * 2 + 3.14}, false, 0)});
-
-  //   cell = add_atoms(cell, {system::Atom<TypeID, Position, Frozen, Hash>(1, {0.992116, 6.01736, 4.56979},
-  //   false, 0)});
-
-  //   cell(r_, 431) = Vec{4.5896, 4.5892, 5.91909};
-  //   cell(r_, 0) = Vec{4.45211, 4.45172, 4.2526};
-
-  fly::io::BinaryFile file("build/gsd/sim.gsd", fly::io::create);
+  fly::io::BinaryFile file("build/gsd/" + ofname + ".gsd", fly::io::create);
 
   file.commit([&] {
     file.write(cell.box());
@@ -122,21 +134,27 @@ int main() {
     file.write(r_, cell);
 
     file.write("log/time", -1.);
+
     file.write("log/energy", -1.);
     file.write("log/barrier", -1.);
     file.write("log/kinetic", -1.);
+
+    file.write("log/vv_max", -1.);
+    file.write("log/vv_min", -1.);
   });
+
+  std::string const model = "EAM_Builtin";
 
   kinetic::SKMC runner = {
       {
           .debug = true,
-          .fread = "build/gsd/cat.v2.2.bin",
+          .fread = "build/gsd/cat." + model + ".bin",
           .opt_cache = {
               .barrier_tol = 0.45,
               .debug = true,
               .opt_basin = {
                   .debug = true,
-                  .temp = 500,
+                  .temp = temp,
               },
               .opt_sb = {
                   .debug = true,
@@ -150,23 +168,24 @@ int main() {
           }
       },
       cell.box(),
+      cell.map(),
       {
           {},
           cell.box(),
       },
       potential::Generic{
-          potential::EAM{
-              cell.map(),
-              std::make_shared<potential::DataEAM>(
-                potential::DataEAM{
-                  {
-                    .debug = false, 
-                    .symmetric = false,
-                  }, 
-                  std::ifstream{"data/wen.eam.fs"}
-                }
-              ),
-          },
+            potential::EAM{
+                system::TypeMap<>{cell.map()},
+                std::make_shared<potential::DataEAM>(
+                  potential::DataEAM{
+                    {
+                      .debug = false,
+                      .symmetric = false,
+                    },
+                    std::ifstream{"data/wen.eam.fs"}
+                  }
+                ),
+            },
       },
       {
           {},
@@ -211,17 +230,17 @@ int main() {
 
                 v_diss = VV > 5;  // Vacancy-cluster dissociation criterion
 
+                double vh_min = std::numeric_limits<double>::max();
+
                 // H-escape testing
                 if (auto last = post.size() - 1; cell(id_, last) == 1) {
-                  double vh = std::numeric_limits<double>::max();
-
                   for (auto const &v : vac) {
-                    vh = std::min(vh, min_image(post(r_, last), v));
+                    vh_min = std::min(vh_min, min_image(post(r_, last), v));
                   }
 
-                  fmt::print("Min V-H = {:.3e}\n", vh);
+                  fmt::print("Min V-H = {:.3e}\n", vh_min);
 
-                  h_escaped = vh > 6;  // H-escape criterion set here.
+                  h_escaped = vh_min > 4;  // H-escape criterion set here.
                 }
 
                 // Write to GSD
@@ -247,15 +266,24 @@ int main() {
                   file.write("log/energy", Ef);
                   file.write("log/barrier", mech.barrier);
                   file.write("log/kinetic", mech.kinetic_pre);
+                  file.write("log/vv_max", VV);
+                  file.write("log/vv_min", vh_min);
                 });
 
                 fmt::print("Just wrote frame index No. {}\n", file.n_frames() - 1);
 
-                return v_diss;
+                return h_escaped;
               });
 
   fmt::print("It took {:.3e}s to terminate\n", run_time);
   fmt::print("H escaped = {}, cluster dissociated = {}\n", h_escaped, v_diss);
+
+  return run_time;
+}
+
+int main() {
+  //
+  double dt = run_until_escape("V1H1_escape", 300);
 
   return 0;
 }

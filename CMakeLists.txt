@@ -134,10 +134,10 @@ target_link_libraries(libFLY PUBLIC
 # target_compile_features(skmcFLY PRIVATE cxx_std_17)
 # target_link_libraries(skmcFLY PRIVATE libFLY)
 # add_backward(skmcFLY)
-add_executable(carbonFLY apps/carbon.cpp ${BACKWARD_ENABLE})
-target_compile_features(carbonFLY PRIVATE cxx_std_17)
-target_link_libraries(carbonFLY PRIVATE libFLY)
-add_backward(carbonFLY)
+add_executable(hydrogenFLY apps/hydrogen.cpp ${BACKWARD_ENABLE})
+target_compile_features(hydrogenFLY PRIVATE cxx_std_17)
+target_link_libraries(hydrogenFLY PRIVATE libFLY)
+add_backward(hydrogenFLY)
 
 # Dev mode
 if(FLY_DEVELOPER_MODE)

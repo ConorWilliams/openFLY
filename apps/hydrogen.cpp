@@ -1,12 +1,15 @@
 
 
+#include <fmt/chrono.h>
 #include <fmt/core.h>
+#include <fmt/os.h>
 #include <omp.h>
 
 //
 
 #include <algorithm>
 #include <array>
+#include <cmath>
 #include <cstddef>
 #include <ctime>
 #include <fstream>
@@ -116,13 +119,13 @@ double run_until_escape(std::string ofname, double temp) {
   std::vector<Eigen::Index> V1 = {1};
   std::vector<Eigen::Index> V2 = {1, 3};
 
-  system::Supercell cell = remove_atoms(perfect, V1);
+  system::Supercell cell = remove_atoms(perfect, V2);
 
   Vec r_H = {2.857 / 2 + 3.14, 2.857 / 2 + 3.14, 2.857 / 4 + 3.14};
 
   cell = add_atoms(cell, {system::Atom<TypeID, Position, Frozen>{1, r_H, false}});
 
-  fly::io::BinaryFile file("build/gsd/" + ofname + ".gsd", fly::io::create);
+  fly::io::BinaryFile file(ofname, fly::io::create);
 
   file.commit([&] {
     file.write(cell.box());
@@ -141,6 +144,8 @@ double run_until_escape(std::string ofname, double temp) {
 
     file.write("log/vv_max", -1.);
     file.write("log/vv_min", -1.);
+
+    file.write("log/temp", temp);  // Meta-data
   });
 
   std::string const model = "EAM_Builtin";
@@ -245,29 +250,30 @@ double run_until_escape(std::string ofname, double temp) {
 
                 // Write to GSD
 
-                file.commit([&] {
-                  file.write("particles/N", fly::safe_cast<std::uint32_t>(cell.size()));
+                timeit("IO", [&] {
+                  file.commit([&] {
+                    file.write("particles/N", fly::safe_cast<std::uint32_t>(cell.size()));
 
-                  file.write(r_, pre);
+                    file.write(r_, pre);
 
-                  file.write("log/energy", E0);
-                });
+                    file.write("log/energy", E0);
+                  });
+                  file.commit([&] {
+                    //
+                    auto vpost = explicit_V(vac, tmp);
 
-                file.commit([&] {
-                  //
-                  auto vpost = explicit_V(vac, tmp);
+                    file.write("particles/N", fly::safe_cast<std::uint32_t>(vpost.size()));
 
-                  file.write("particles/N", fly::safe_cast<std::uint32_t>(vpost.size()));
+                    file.write(id_, vpost);
+                    file.write(r_, vpost);
 
-                  file.write(id_, vpost);
-                  file.write(r_, vpost);
-
-                  file.write("log/time", time);
-                  file.write("log/energy", Ef);
-                  file.write("log/barrier", mech.barrier);
-                  file.write("log/kinetic", mech.kinetic_pre);
-                  file.write("log/vv_max", VV);
-                  file.write("log/vv_min", vh_min);
+                    file.write("log/time", time);
+                    file.write("log/energy", Ef);
+                    file.write("log/barrier", mech.barrier);
+                    file.write("log/kinetic", mech.kinetic_pre);
+                    file.write("log/vv_max", VV);
+                    file.write("log/vv_min", vh_min);
+                  });
                 });
 
                 fmt::print("Just wrote frame index No. {}\n", file.n_frames() - 1);
@@ -283,7 +289,37 @@ double run_until_escape(std::string ofname, double temp) {
 
 int main() {
   //
-  double dt = run_until_escape("V1H1_escape", 300);
+  std::string prefix = "build/data/V2/escape";
+
+  auto out = fmt::output_file(fmt::format("{}/time.csv", prefix), fmt::file::CREATE | fmt::file::APPEND | fmt::file::WRONLY);
+
+  std::size_t n = 5;
+  std::size_t rep = 10;
+
+  double lo = 300;
+  double hi = 800;
+
+  // Want to uniformly sample inverse temprature range between 300K and 800K
+
+  double inv_lo = 1. / lo;
+  double inv_hi = 1. / hi;
+
+  double dif = (inv_lo - inv_hi) / static_cast<double>(n - 1);
+
+  for (double inv_T = inv_lo; inv_T > inv_hi - 0.5 * dif; inv_T -= dif) {
+    //
+    double temp = 1 / inv_T;
+
+    fmt::print("T={}, inv={}\n", temp, inv_T);
+
+    for (std::size_t i = 0; i < rep; i++) {
+      //
+      double dt = run_until_escape(fmt::format("{}/gsd/{:.1f}K.{}.gsd", prefix, temp, i), temp);
+
+      out.print("{:%Y-%m-%d %H:%M:%S} {:.5f} {:e}\n", fmt::localtime(std::time(nullptr)), temp, dt);
+      out.flush();
+    }
+  }
 
   return 0;
 }

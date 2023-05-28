@@ -5,7 +5,7 @@
     <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 <link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="Neighbours" href="neighbour.html" /><link rel="prev" title="System" href="system.html" />
 
-    <link rel="shortcut icon" href="../_static/favicon.ico"/><!-- Generated with Sphinx 5.3.0 and Furo 2022.12.07 -->
+    <link rel="shortcut icon" href="../_static/favicon.ico"/><!-- Generated with Sphinx 6.2.1 and Furo 2022.12.07 -->
         <title>Crystal systems - OpenFLY documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?digest=91d0f0d1c444bdcb17a68e833c7a53903343c195" />
@@ -275,8 +275,7 @@
 <dt class="sig sig-object cpp" id="_CPPv4I0ENK3fly6system12Orthorhombic11canon_imageE3VecRKN5Eigen10MatrixBaseI1EEE">
 <span id="_CPPv3I0ENK3fly6system12Orthorhombic11canon_imageERKN5Eigen10MatrixBaseI1EEE"></span><span id="_CPPv2I0ENK3fly6system12Orthorhombic11canon_imageERKN5Eigen10MatrixBaseI1EEE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">E</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classfly_1_1system_1_1Orthorhombic_1a647c3b312b7dca7741eca2700613e3cf"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="utility.html#_CPPv4N3fly3VecE" title="fly::Vec"><span class="n"><span class="pre">Vec</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">canon_image</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">Eigen</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">MatrixBase</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0ENK3fly6system12Orthorhombic11canon_imageE3VecRKN5Eigen10MatrixBaseI1EEE" title="fly::system::Orthorhombic::canon_image::E"><span class="n"><span class="pre">E</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">x</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4I0ENK3fly6system12Orthorhombic11canon_imageE3VecRKN5Eigen10MatrixBaseI1EEE" title="Permalink to this definition">#</a><br /></dt>
 <dd><p>Maps an atom into the canonical cell. </p>
-<p><p>Guarantees <span class="math notranslate nohighlight">\(0 \le x_i &lt; \text{extent}_i\)</span> for all <span class="math notranslate nohighlight">\(i\)</span>.</p>
- </p>
+<p>Guarantees <span class="math notranslate nohighlight">\(0 \le x_i &lt; \text{extent}_i\)</span> for all <span class="math notranslate nohighlight">\(i\)</span>.</p>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
 <p>Assumes atoms are within the extents of the non-periodic axes!</p>
@@ -400,8 +399,6 @@
 <dt class="sig sig-object cpp" id="_CPPv4I0ENK3fly6system9Triclinic11canon_imageE3VecRKN5Eigen10MatrixBaseI1EEE">
 <span id="_CPPv3I0ENK3fly6system9Triclinic11canon_imageERKN5Eigen10MatrixBaseI1EEE"></span><span id="_CPPv2I0ENK3fly6system9Triclinic11canon_imageERKN5Eigen10MatrixBaseI1EEE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">E</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classfly_1_1system_1_1Triclinic_1adff2d87692131b911ea9fa4bc055ad79"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="utility.html#_CPPv4N3fly3VecE" title="fly::Vec"><span class="n"><span class="pre">Vec</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">canon_image</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">Eigen</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">MatrixBase</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0ENK3fly6system9Triclinic11canon_imageE3VecRKN5Eigen10MatrixBaseI1EEE" title="fly::system::Triclinic::canon_image::E"><span class="n"><span class="pre">E</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">x</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4I0ENK3fly6system9Triclinic11canon_imageE3VecRKN5Eigen10MatrixBaseI1EEE" title="Permalink to this definition">#</a><br /></dt>
 <dd><p>Maps an atom into the canonical cell. </p>
-<p><p></p>
- </p>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
 <p>Assumes atoms are within the extents of the non-periodic axes!</p>
@@ -519,8 +516,6 @@
 <dt class="sig sig-object cpp" id="_CPPv4I0ENK3fly6system9HyperGrid8cell_idxEiRKN5Eigen10MatrixBaseI1EEE">
 <span id="_CPPv3I0ENK3fly6system9HyperGrid8cell_idxERKN5Eigen10MatrixBaseI1EEE"></span><span id="_CPPv2I0ENK3fly6system9HyperGrid8cell_idxERKN5Eigen10MatrixBaseI1EEE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">E</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classfly_1_1system_1_1HyperGrid_1a4159276ab00df32cab63b3385b989f3f"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">cell_idx</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">Eigen</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">MatrixBase</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0ENK3fly6system9HyperGrid8cell_idxEiRKN5Eigen10MatrixBaseI1EEE" title="fly::system::HyperGrid::cell_idx::E"><span class="n"><span class="pre">E</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">x</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="k"><span class="pre">noexcept</span></span><a class="headerlink" href="#_CPPv4I0ENK3fly6system9HyperGrid8cell_idxEiRKN5Eigen10MatrixBaseI1EEE" title="Permalink to this definition">#</a><br /></dt>
 <dd><p>Compute the cell index from an atoms canonical position. </p>
-<p><p></p>
- </p>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
 <p>Assumes atoms are in the extents of the HyperGrid or in the surrounding one-cell buffer i.e. ghost atoms.</p>
@@ -628,9 +623,6 @@
     </aside>
   </div>
 </div><script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-    <script src="../_static/jquery.js"></script>
-    <script src="../_static/underscore.js"></script>
-    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
     <script src="../_static/sphinx_highlight.js"></script>
     <script src="../_static/scripts/furo.js"></script>

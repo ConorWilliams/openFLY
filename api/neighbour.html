@@ -5,7 +5,7 @@
     <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 <link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="Environments" href="env.html" /><link rel="prev" title="Crystal systems" href="crystal_systems.html" />
 
-    <link rel="shortcut icon" href="../_static/favicon.ico"/><!-- Generated with Sphinx 5.3.0 and Furo 2022.12.07 -->
+    <link rel="shortcut icon" href="../_static/favicon.ico"/><!-- Generated with Sphinx 6.2.1 and Furo 2022.12.07 -->
         <title>Neighbours - OpenFLY documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?digest=91d0f0d1c444bdcb17a68e833c7a53903343c195" />
@@ -249,7 +249,7 @@
 <p>Neighbour-lists are used to find the atoms within some cut-off of all atoms efficiently. The cache efficiency of all <a class="reference internal" href="#classfly_1_1neigh_1_1List"><span class="std std-ref">List</span></a>’s major operations can be enhances by pre-sorting the atoms according to their grid index, this can be done with the <a class="reference internal" href="#sort_8hpp_1a5c07fd2995e75516c7edbe92f8003212"><span class="std std-ref">fly::neigh::sort()</span></a> function.</p>
 <p>Designed with the intention of being reused; <a class="reference internal" href="#classfly_1_1neigh_1_1List"><span class="std std-ref">List</span></a> separates the building, updating and using of the neighbour-lists, performed by <a class="reference internal" href="#classfly_1_1neigh_1_1List_1a4d5b423b46d3c6fd5506c3771aefc45e"><span class="std std-ref">List::rebuild()</span></a>, <a class="reference internal" href="#classfly_1_1neigh_1_1List_1a89efa6e7fff008bfdd016acbe6a9ede3"><span class="std std-ref">List::update()</span></a> and <a class="reference internal" href="#classfly_1_1neigh_1_1List_1ad2cfcf599c7f420000f362b06c9c3053"><span class="std std-ref">List::for_neighbours()</span></a> respectively.</p>
 <p><a class="reference internal" href="#classfly_1_1neigh_1_1List"><span class="std std-ref">List</span></a> resolves periodicity using <em>ghost</em> atoms, these are stored and managed internally.</p>
-<p><p><div class="admonition-implementation-notes admonition">
+<p><div class="admonition-implementation-notes admonition">
 <p class="admonition-title">Implementation notes</p>
 <p>Construction of a neighbour-list occurs as follows:</p>
 <ol class="arabic simple">
@@ -262,7 +262,6 @@
 index of the real atom it may be an image of, this allows us to map ghost atoms to real atoms.</p>
 </div>
 </p>
- </p>
 <div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
 <dl class="cpp function">
@@ -501,9 +500,6 @@ calling this function:</p>
     </aside>
   </div>
 </div><script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-    <script src="../_static/jquery.js"></script>
-    <script src="../_static/underscore.js"></script>
-    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
     <script src="../_static/sphinx_highlight.js"></script>
     <script src="../_static/scripts/furo.js"></script>

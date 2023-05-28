@@ -5,7 +5,7 @@
     <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 <link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="Potentials" href="potential.html" /><link rel="prev" title="Environments" href="env.html" />
 
-    <link rel="shortcut icon" href="../_static/favicon.ico"/><!-- Generated with Sphinx 5.3.0 and Furo 2022.12.07 -->
+    <link rel="shortcut icon" href="../_static/favicon.ico"/><!-- Generated with Sphinx 6.2.1 and Furo 2022.12.07 -->
         <title>Input/Output (IO) - OpenFLY documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?digest=91d0f0d1c444bdcb17a68e833c7a53903343c195" />
@@ -242,7 +242,7 @@
 <h2>GSD formatted binary IO<a class="headerlink" href="#gsd-formatted-binary-io" title="Permalink to this heading">#</a></h2>
 <p>File: <code class="docutils literal notranslate"><span class="pre">libfly/io/gsd.hpp</span></code></p>
 <p>Binary IO support in the GSD format. </p>
-<p><p><p>LibFLY supports writing <a class="reference external" href="https://github.com/glotzerlab/hoomd-blue">HOOMD-blue’s</a> <a class="reference external" href="https://github.com/glotzerlab/gsd">GSD</a> file
+<p><p>LibFLY supports writing <a class="reference external" href="https://github.com/glotzerlab/hoomd-blue">HOOMD-blue’s</a> <a class="reference external" href="https://github.com/glotzerlab/gsd">GSD</a> file
 format. This file format is widely supported, see the <a class="reference external" href="https://gsd.readthedocs.io/">GSD documentation</a> for details. In summary GSD
 is a binary file with efficient random access to frames. GSD allows all particle properties to vary from one frame to the next.</p>
 <p>The GSD format models a hierarchical data structure, the outermost hierarchy is the <strong>frame</strong> which are index numerically. Each
@@ -251,7 +251,6 @@ Values are well defined for all fields at all frames. When a data chunk is prese
 frame. When it is not present, the data chunk of the same name at frame <code class="docutils literal notranslate"><span class="pre">0</span></code> defines the values for frame <code class="docutils literal notranslate"><span class="pre">i</span></code>. When <code class="docutils literal notranslate"><span class="pre">N</span></code> is
 zero, an index entry may be written for a data chunk with no actual data written to the file for that chunk.</p>
 </p>
- </p>
 <dl class="cpp enum">
 <dt class="sig sig-object cpp" id="_CPPv4N3fly2io5FlagsE">
 <span id="_CPPv3N3fly2io5FlagsE"></span><span id="_CPPv2N3fly2io5FlagsE"></span><span class="target" id="gsd_8hpp_1a56cb2ed9b87614dcf94b06b3a2f0ff56"></span><span class="k"><span class="pre">enum</span></span><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">fly</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">io</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">Flags</span></span></span><a class="headerlink" href="#_CPPv4N3fly2io5FlagsE" title="Permalink to this definition">#</a><br /></dt>
@@ -577,9 +576,6 @@ zero, an index entry may be written for a data chunk with no actual data written
     </aside>
   </div>
 </div><script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-    <script src="../_static/jquery.js"></script>
-    <script src="../_static/underscore.js"></script>
-    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
     <script src="../_static/sphinx_highlight.js"></script>
     <script src="../_static/scripts/furo.js"></script>

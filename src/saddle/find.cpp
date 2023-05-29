@@ -589,8 +589,7 @@ namespace fly::saddle {
     }
   }
 
-  // Add mech should: add one or more mechs and return true or return false if no mech was added due to a mech
-  // collision
+  // Add mech should: add one or more mechs and return true or return false if no mech was added due to a mech collision
   bool Master::add_mech(Found& out,
                         SoA in,
                         env::Mechanism&& mech,

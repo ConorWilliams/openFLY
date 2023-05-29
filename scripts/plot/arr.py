@@ -1,8 +1,15 @@
 
 from matplotlib import pyplot as plt
 import numpy as np
+import argparse
 
-fname = "build/data/V1/escape/time.csv"
+parser = argparse.ArgumentParser(description="Arrhenous plot")
+
+parser.add_argument("path", default="time.csv", help="Path to csv formatted input file")
+
+args = parser.parse_args()
+
+fname = args.path
 
 temp = []
 time = []

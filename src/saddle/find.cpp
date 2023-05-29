@@ -658,9 +658,7 @@ namespace fly::saddle {
     for (std::size_t k = 0; k < num_new; k++) {
 #pragma omp task untied default(none) firstprivate(n, k, num_new) shared(out, in, cache, geo_data, dimer, mech)
       {
-        std::optional<system::SoA<Position>> recon_sp = {};
-
-        recon_sp = check_mech(out, dimer, out.m_mechs[out.m_mechs.size() - num_new + k], k, geo_data, in);
+        std::optional recon_sp = check_mech(out, dimer, out.m_mechs[out.m_mechs.size() - num_new + k], k, geo_data, in);
 
         if (mech.poison_sp) {
           // This check may be too strong

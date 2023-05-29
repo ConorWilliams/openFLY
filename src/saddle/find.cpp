@@ -82,7 +82,7 @@ namespace fly::saddle {
 
     auto& thr = thread();
 
-    {  // Minima
+    try {  // Minima
       system::SoA<Position, PotentialGradient, TypeID const&, Frozen const&> minima(in.size());
       minima.rebind(id_, in);
       minima.rebind(fzn_, in);
@@ -91,10 +91,11 @@ namespace fly::saddle {
       if (!thr.min.minimise(minima, minima, thr.pot, 1)) {
         res.rel_min = std::move(minima);
       }
+    } catch (Spline::OutOfBounds& err) {
+      res.rel_min = std::nullopt;
     }
 
-    {  // SP
-
+    try {  // SP
       system::SoA<Position, Axis, TypeID const&, Frozen const&> dim(in.size());
       dim.rebind(id_, in);
       dim.rebind(fzn_, in);
@@ -113,6 +114,8 @@ namespace fly::saddle {
       if (!thr.dimer.find_sp(dim, dim, in, thr.pot, {}, m_count_frozen, 1)) {
         res.rel_sp = std::move(dim);
       }
+    } catch (Spline::OutOfBounds& err) {
+      res.rel_sp = std::nullopt;
     }
 
     return res;
@@ -244,9 +247,11 @@ namespace fly::saddle {
 #pragma omp single nowait
     {
       for (std::size_t j = 0; j < geo_data.size(); ++j) {
-#pragma omp task untied default(none) firstprivate(j) shared(out, in, nl_pert, geo_data, hint)
+#pragma omp task untied default(none) firstprivate(j) shared(stdout, out, in, nl_pert, geo_data, hint)
         {
           fmt::print("FINDER: @{:<4} finding...\n", geo_data[j].centre);
+
+          fflush(stdout);
 
           find_n(out[j], geo_data[j], in, nl_pert, hint);
 
@@ -653,7 +658,9 @@ namespace fly::saddle {
     for (std::size_t k = 0; k < num_new; k++) {
 #pragma omp task untied default(none) firstprivate(n, k, num_new) shared(out, in, cache, geo_data, dimer, mech)
       {
-        std::optional recon_sp = check_mech(out, dimer, out.m_mechs[out.m_mechs.size() - num_new + k], k, geo_data, in);
+        std::optional<system::SoA<Position>> recon_sp = {};
+
+        recon_sp = check_mech(out, dimer, out.m_mechs[out.m_mechs.size() - num_new + k], k, geo_data, in);
 
         if (mech.poison_sp) {
           // This check may be too strong

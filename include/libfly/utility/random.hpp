@@ -68,7 +68,7 @@ namespace fly {
      *
      * @param seed The PRNG's seed, must not be everywhere zero.
      */
-    explicit constexpr Xoshiro(std::array<result_type, 4> const& seed) : m_state{seed} {
+    explicit Xoshiro(std::array<result_type, 4> const& seed) : m_state{seed} {
       if (seed == std::array<result_type, 4>{0, 0, 0, 0}) {
         throw error("{} is a bad seed!", seed);
       }

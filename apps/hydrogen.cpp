@@ -107,7 +107,7 @@ fly::system::SoA<TypeID, Position> explicit_V(std::vector<Vec> const &vac, syste
   return special;
 }
 
-double run_until_escape(std::string ofname, double temp) {
+double run_until_escape(std::string ofname, std::string ifname, double temp) {
   //
 
   constexpr auto a = 2.855;  // eam 55 or meam 67
@@ -118,8 +118,9 @@ double run_until_escape(std::string ofname, double temp) {
 
   std::vector<Eigen::Index> V1 = {1};
   std::vector<Eigen::Index> V2 = {1, 3};
+  std::vector<Eigen::Index> V3 = {1, 2, 3};
 
-  system::Supercell cell = remove_atoms(perfect, V2);
+  system::Supercell cell = remove_atoms(perfect, V3);
 
   Vec r_H = {2.857 / 2 + 3.14, 2.857 / 2 + 3.14, 2.857 / 4 + 3.14};
 
@@ -153,7 +154,7 @@ double run_until_escape(std::string ofname, double temp) {
   kinetic::SKMC runner = {
       {
           .debug = true,
-          .fread = "build/gsd/cat." + model + ".bin",
+          .fread = ifname,
           .opt_cache = {
               .barrier_tol = 0.45,
               .debug = true,
@@ -289,9 +290,13 @@ double run_until_escape(std::string ofname, double temp) {
 
 int main() {
   //
-  std::string prefix = "build/data/V2/escape";
+  std::string prefix = "build/data/V3";
 
-  auto out = fmt::output_file(fmt::format("{}/time.csv", prefix), fmt::file::CREATE | fmt::file::APPEND | fmt::file::WRONLY);
+  fmt::print("PREFIX={}\n", prefix);
+
+  fmt::print("threads={}\n", omp_get_max_threads());
+
+  auto out = fmt::output_file(fmt::format("{}/escape/time.csv", prefix), fmt::file::CREATE | fmt::file::APPEND | fmt::file::WRONLY);
 
   std::size_t n = 5;
   std::size_t rep = 10;
@@ -314,7 +319,7 @@ int main() {
 
     for (std::size_t i = 0; i < rep; i++) {
       //
-      double dt = run_until_escape(fmt::format("{}/gsd/{:.1f}K.{}.gsd", prefix, temp, i), temp);
+      double dt = run_until_escape(fmt::format("{}/escape/gsd/{:.1f}K.{}.gsd", prefix, temp, i), fmt::format("{}/cat.h.bin", prefix), temp);
 
       out.print("{:%Y-%m-%d %H:%M:%S} {:.5f} {:e}\n", fmt::localtime(std::time(nullptr)), temp, dt);
       out.flush();

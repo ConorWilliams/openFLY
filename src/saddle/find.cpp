@@ -930,28 +930,25 @@ namespace fly::saddle {
         fly::io::BinaryFile file("poison.gsd", fly::io::create);
 
         file.commit([&] {
-          file.write("particles/N", fly::safe_cast<std::uint32_t>(in.size()));
+          file.write("particles/N", fly::safe_cast<std::uint32_t>(in.size()));  // 0
           file.write(m_box);
           file.write(r_, in);
           file.write(id_, in);
         });
-
-        file.commit([&, rev = rev] { file.write(r_, rev); });
-        file.commit([&, sp = sp] { file.write(r_, sp); });
-        file.commit([&, fwd = fwd] { file.write(r_, fwd); });
-
-        file.commit([&] { file.write(id_, in); });
-        file.commit([&, re_sp = re_sp] { file.write(r_, re_sp); });
-        file.commit([&, re_min = re_min] { file.write(r_, re_min); });
-
-        file.commit([&] { file.write(id_, in); });
-
-        if (rel_sp) {
-          file.commit([&, rel_sp = rel_sp] { file.write(r_, *rel_sp); });
-        }
-
-        if (rel_min) {
-          file.commit([&, rel_min = rel_min] { file.write(r_, *rel_min); });
+        file.commit([&, rev = rev] { file.write(r_, rev); });                 // 1
+        file.commit([&, sp = sp] { file.write(r_, sp); });                    // 2
+        file.commit([&, fwd = fwd] { file.write(r_, fwd); });                 // 3
+                                                                              //
+        file.commit([&] { file.write(id_, in); });                            // 4 == 0
+        file.commit([&, re_sp = re_sp] { file.write(r_, re_sp); });           // 5
+        file.commit([&, re_min = re_min] { file.write(r_, re_min); });        // 6
+                                                                              //
+        file.commit([&] { file.write(id_, in); });                            // 7 == 4 == 0
+        if (rel_sp) {                                                         //
+          file.commit([&, rel_sp = rel_sp] { file.write(r_, *rel_sp); });     // 8
+        }                                                                     //
+        if (rel_min) {                                                        //
+          file.commit([&, rel_min = rel_min] { file.write(r_, *rel_min); });  // 9
         }
       }
 

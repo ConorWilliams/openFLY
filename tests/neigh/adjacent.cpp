@@ -14,7 +14,7 @@
 
 #include "libfly/neigh/adjacent.hpp"
 
-#include <catch2/catch_test_macros.hpp>
+#include <catch2/catch.hpp>
 
 #include "libfly/system/atom.hpp"
 #include "libfly/system/boxes/orthorhombic.hpp"

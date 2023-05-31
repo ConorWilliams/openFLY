@@ -14,7 +14,7 @@
 
 #include "libfly/system/boxes/orthorhombic.hpp"
 
-#include <catch2/catch_test_macros.hpp>
+#include <catch2/catch.hpp>
 #include <optional>
 #include <random>
 

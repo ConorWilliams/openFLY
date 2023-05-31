@@ -11,6 +11,6 @@ add_executable(testFLY ${FLY_TEST_SOURCES})
 
 target_link_libraries(testFLY PRIVATE libFLY Catch2::Catch2WithMain Nauty)
 
-target_compile_features(testFLY PRIVATE cxx_std_17)
+target_compile_features(testFLY PRIVATE cxx_std_20)
 
 catch_discover_tests(testFLY)

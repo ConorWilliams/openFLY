@@ -14,7 +14,7 @@
 
 #include "libfly/utility/core.hpp"
 
-#include <catch2/catch_test_macros.hpp>
+#include <catch2/catch.hpp>
 #include <type_traits>
 
 static_assert(std::is_same_v<fly::first_t<int, void, float>, int>);

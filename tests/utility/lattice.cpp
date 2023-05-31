@@ -17,7 +17,7 @@
 
 #include "libfly/utility/lattice.hpp"
 
-#include <catch2/catch_test_macros.hpp>
+#include <catch2/catch.hpp>
 
 #include "libfly/utility/core.hpp"
 

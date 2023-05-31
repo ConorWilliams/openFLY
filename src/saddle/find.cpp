@@ -819,7 +819,20 @@ namespace fly::saddle {
 
       mech.delta_sp.emplace_back(sp(r_, i) - rev(r_, i));
       mech.delta_fwd.emplace_back(fwd(r_, i) - rev(r_, i));
+      mech.axis.emplace_back(dimer(ax_, i));
     }
+
+    Axis::scalar_t sum = 0;
+
+    for (auto&& elem : mech.axis) {
+      sum += gnorm_sq(elem[ax_]);
+    }
+
+    double len = std::sqrt(sum);
+
+    fmt::print("len={}\n", len);
+
+    exit(0);
 
     //////////////// Partial hessian compute. ////////////////
 

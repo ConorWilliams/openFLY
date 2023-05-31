@@ -52,6 +52,7 @@ namespace fly::env {
     bool poison_sp = false;   ///< If true this mechanism's SP cannot be reconstructed.
     bool poison_fwd = false;  ///< If true this mechanism's final state cannot be reconstructed.
 
+    system::VoS<Axis> axis{};        ///< The axis of the dimer at the saddle-point, this is normalised.
     system::VoS<Delta> delta_sp{};   ///< Displacement vectors from initial to saddle-point.
     system::VoS<Delta> delta_fwd{};  ///< Displacement vectors from initial to final.
 

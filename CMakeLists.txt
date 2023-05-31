@@ -53,9 +53,9 @@ target_include_directories(libFLY PUBLIC "$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR
 target_include_directories(libFLY PRIVATE "$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src>")
 target_include_directories(libFLY PRIVATE "$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/external>")
 
-target_compile_features(libFLY PUBLIC cxx_std_17)
+target_compile_features(libFLY PUBLIC cxx_std_20)
 
-# Find dpenedancies
+# Find depenedancies
 include(ExternalProject)
 
 # System

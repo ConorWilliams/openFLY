@@ -281,8 +281,7 @@ namespace fly::saddle {
      * @param cat Catalogue in ready state.
      * @param num_threads Number of openMP threads to use for this operation.
      */
-    static auto package(std::vector<int> const& ix, env::Catalogue const& cat, int num_threads = 1)
-        -> std::vector<LocalisedGeo>;
+    static auto package(std::vector<int> const& ix, env::Catalogue const& cat, int num_threads = 1) -> std::vector<LocalisedGeo>;
 
     /**
      * @brief A hint for ensuring ergodic pathways.
@@ -290,7 +289,7 @@ namespace fly::saddle {
     struct Hint {
       system::SoA<Position> prev_state;  ///< A reference to the previous state of the system
       Index::scalar_t centre;            ///< Central atom of mech that brought us to current state.
-      system::VoS<Delta> delta_sp;       ///< To SP of mechanism that brought us to current state.
+      env::Mechanism mech;               ///< The mechanism that brought us to current state.
       env::Geometry<Index> geo;          ///< Geometry around central atom in previous state.
     };
 
@@ -304,8 +303,7 @@ namespace fly::saddle {
      * @param in Description of system to search in.
      * @param hint A hint to aid in
      */
-    auto find_mechs(std::vector<LocalisedGeo> const& geos, SoA in, std::optional<Hint> const& hint = {})
-        -> std::vector<Found>;
+    auto find_mechs(std::vector<LocalisedGeo> const& geos, SoA in, std::optional<Hint> const& hint = {}) -> std::vector<Found>;
 
   private:
     // Per thread variables
@@ -342,8 +340,8 @@ namespace fly::saddle {
     std::vector<Eigen::Index> m_sep_list;  // atom i is furthest from sep_list[i]
     int m_num_zero_modes;                  // Degree of freedom in each input
     int m_count_frozen;                    // The number of frozen atoms in the input.
-    double m_log_prod_eigen;  // the log(prod e_i) with e_i the the eigen values of the mass weighted hessian
-                              // matrix.
+    double m_log_prod_eigen;               // the log(prod e_i) with e_i the the eigen values of the mass weighted hessian
+                                           // matrix.
 
     ///////////////////////////////////////////////////////////////////////////////////
 
@@ -354,18 +352,10 @@ namespace fly::saddle {
                   std::vector<system::SoA<Position>>& cache,
                   LocalisedGeo const& geo_data);
 
-    void process_hint(Found& out,
-                      LocalisedGeo const& geo_data,
-                      SoA in,
-                      Hint const& hint,
-                      std::vector<system::SoA<Position>>& cache);
+    void process_hint(Found& out, LocalisedGeo const& geo_data, SoA in, Hint const& hint, std::vector<system::SoA<Position>>& cache);
 
     // Find all mechs and write to geo_data
-    void find_n(Found& out,
-                LocalisedGeo const& geo_data,
-                SoA in,
-                neigh::List const& nl_pert,
-                std::optional<Hint> const& hint);
+    void find_n(Found& out, LocalisedGeo const& geo_data, SoA in, neigh::List const& nl_pert, std::optional<Hint> const& hint);
 
     bool find_batch(int tot,
                     Found& out,
@@ -409,10 +399,9 @@ namespace fly::saddle {
     /**
      * @brief Given a saddle point produce a min->sp->min pathway
      */
-    std::optional<Pathway> do_adj_min(
-        system::SoA<Position const&, Axis const&, Frozen const&, TypeID const&> dimer,
-        system::SoA<Position const&> in,
-        Index::scalar_t centre);
+    std::optional<Pathway> do_adj_min(system::SoA<Position const&, Axis const&, Frozen const&, TypeID const&> dimer,
+                                      system::SoA<Position const&> in,
+                                      Index::scalar_t centre);
 
     //////////////////////////////////////////////
 
@@ -429,10 +418,7 @@ namespace fly::saddle {
     void calc_minima_hess(SoA in);
 
     // Perturb in-place positions around centre and write axis, returns the stddev used
-    auto perturb(system::SoA<Position&, Axis&> out,
-                 system::SoA<Position const&, Frozen const&> in,
-                 Index::scalar_t centre,
-                 neigh::List const& nl) -> double;
+    auto perturb(system::SoA<Position&, Axis&> out, system::SoA<Position const&, Frozen const&> in, Index::scalar_t centre, neigh::List const& nl) -> double;
 
     /**
      * @brief True if mech has been seen before.
@@ -443,28 +429,22 @@ namespace fly::saddle {
      * @brief Compute every symmetric version of new_mech (according to syms), if not in mechs append to
      * mechs.
      */
-    std::size_t append_syms(std::vector<env::Catalogue::SelfSymetry> const& syms,
-                            env::Mechanism const& new_mech,
-                            std::vector<env::Mechanism>& mechs) const;
+    std::size_t append_syms(std::vector<env::Catalogue::SelfSymetry> const& syms, env::Mechanism const& new_mech, std::vector<env::Mechanism>& mechs) const;
 
     struct Recon {
-      system::SoA<Position> min;                     ///< Reconstructed minima
-      system::SoA<Position> sp;                      ///< Reconstructed sp
-      std::optional<system::SoA<Position>> rel_min;  ///< Relaxed reconstructed minima
-      std::optional<system::SoA<Position>> rel_sp;   ///< Relaxed reconstructed sp
+      system::SoA<Position> min;                     ///< Reconstructed minima.
+      system::SoA<Position> sp;                      ///< Reconstructed sp.
+      std::optional<system::SoA<Position>> rel_min;  ///< Relaxed reconstructed minima.
+      std::optional<system::SoA<Position>> rel_sp;   ///< Relaxed reconstructed sp.
+      std::optional<system::SoA<Axis>> rel_ax;       ///< Relaxed reconstructed axis.
     };
 
-    void dump_recon(system::SoA<Position const&, TypeID const&> in,
-                    Index::scalar_t centre,
-                    Recon const& recon,
-                    system::SoA<Position const&> dimer) const;
+    void dump_recon(system::SoA<Position const&, TypeID const&> in, Index::scalar_t centre, Recon const& recon, system::SoA<Position const&> dimer) const;
 
     /**
      * @brief Reconstruct and relax a mechanism's saddle point and minima.
      */
-    Recon recon_relax(env::Geometry<Index> const& geo,
-                      env::Mechanism const& m,
-                      system::SoA<Position const&, TypeID const&, Frozen const&> in);
+    Recon recon_relax(env::Geometry<Index> const& geo, env::Mechanism const& m, system::SoA<Position const&, TypeID const&, Frozen const&> in);
 
     ThreadData& thread() { return m_data[safe_cast<std::size_t>(omp_get_thread_num())]; }
 

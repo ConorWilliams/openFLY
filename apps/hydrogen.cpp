@@ -265,31 +265,31 @@ double run_until_escape(std::string ofname, std::string ifname, double temp, int
 
                 // Write to GSD
 
-                // timeit("IO", [&] {
-                //   file.commit([&] {
-                //     file.write("particles/N", fly::safe_cast<std::uint32_t>(cell.size()));
+                timeit("IO", [&] {
+                  file.commit([&] {
+                    file.write("particles/N", fly::safe_cast<std::uint32_t>(cell.size()));
 
-                //     file.write(r_, pre);
+                    file.write(r_, pre);
 
-                //     file.write("log/energy", E0);
-                //   });
-                //   file.commit([&] {
-                //     //
-                //     auto vpost = explicit_V(vac, tmp);
+                    file.write("log/energy", E0);
+                  });
+                  file.commit([&] {
+                    //
+                    auto vpost = explicit_V(vac, tmp);
 
-                //     file.write("particles/N", fly::safe_cast<std::uint32_t>(vpost.size()));
+                    file.write("particles/N", fly::safe_cast<std::uint32_t>(vpost.size()));
 
-                //     file.write(id_, vpost);
-                //     file.write(r_, vpost);
+                    file.write(id_, vpost);
+                    file.write(r_, vpost);
 
-                //     file.write("log/time", time);
-                //     file.write("log/energy", Ef);
-                //     file.write("log/barrier", mech.barrier);
-                //     file.write("log/kinetic", mech.kinetic_pre);
-                //     file.write("log/vv_max", VV);
-                //     file.write("log/vv_min", vh_min);
-                //   });
-                // });
+                    file.write("log/time", time);
+                    file.write("log/energy", Ef);
+                    file.write("log/barrier", mech.barrier);
+                    file.write("log/kinetic", mech.kinetic_pre);
+                    file.write("log/vv_max", VV);
+                    file.write("log/vv_min", vh_min);
+                  });
+                });
 
                 fmt::print("Just wrote frame index No. {}\n", file.n_frames() - 1);
 

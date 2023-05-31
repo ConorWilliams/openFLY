@@ -312,12 +312,7 @@ namespace fly::kinetic {
         double dR_err_frac = dR_err / m.err_fwd;
         double dE_err_frac = dE_err / std::abs(m.delta);
 
-        dprint(m_opt.debug,
-               "SKMC: dE_err={:.3f}[{:.3f}], dR_err={:.3f}[{:.3f}]\n",
-               dE_err,
-               dE_err_frac,
-               dR_err,
-               dR_err_frac);
+        dprint(m_opt.debug, "SKMC: dE_err={:.3f}[{:.3f}], dR_err={:.3f}[{:.3f}]\n", dE_err, dE_err_frac, dR_err, dR_err_frac);
 
         {  // Test for reconstruction failures.
 
@@ -361,15 +356,7 @@ namespace fly::kinetic {
 
         time += dt;
 
-        stop = timeit("SKMC: call",
-                      f,
-                      time,
-                      std::as_const(cell),
-                      E0,
-                      atom,
-                      m,
-                      system::SoA<Position const&>{rel_recon},
-                      Ef);
+        stop = timeit("SKMC: call", f, time, std::as_const(cell), E0, atom, m, system::SoA<Position const&>{rel_recon}, Ef);
 
         if (stop) {
           return;  // Early exit
@@ -386,13 +373,15 @@ namespace fly::kinetic {
           hint = saddle::Master::Hint{
               system::SoA<Position>{cell},
               atom,
-              m.delta_sp,
+              m,
               m_cat.get_geo(atom),
           };
 
-          // Transform SP deltas as appropriate
+          // Transform mech frame as appropriate
           for (Eigen::Index j = 0; j < m.delta_sp.size(); j++) {
-            hint->delta_sp[j][del_].noalias() = O * m.delta_sp[j][del_];
+            hint->mech.axis[j][ax_].noalias() = O * m.axis[j][ax_];
+            hint->mech.delta_sp[j][del_].noalias() = O * m.delta_sp[j][del_];
+            hint->mech.delta_fwd[j][del_].noalias() = O * m.delta_fwd[j][del_];
           }
         }
 

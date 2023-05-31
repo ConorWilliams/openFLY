@@ -14,8 +14,8 @@
 // implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
 // for more details.
 
-// You should have received a copy of the GNU General Public License along with openFLY. If not, see
-// <https://www.gnu.org/licenses/>.
+// You should have received a copy of the GNU General Public License along with openFLY.
+// If not, see <https://www.gnu.org/licenses/>.
 
 #include <algorithm>
 #include <cmath>
@@ -142,8 +142,7 @@ namespace fly::kinetic {
      * @param tol The L2 tolerance between ``in`` and a basin state for them to be considered "the same".
      * @return Returns the previously occupied basin's index or ``std::nullopt`` if no match is found.
      */
-    auto find_occupy(std::size_t hash, system::SoA<Position const &> in, double tol)
-        -> std::optional<std::size_t>;
+    auto find_occupy(std::size_t hash, system::SoA<Position const &> in, double tol) -> std::optional<std::size_t>;
 
   private:
     Options m_opt;

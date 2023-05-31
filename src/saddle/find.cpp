@@ -77,7 +77,7 @@ namespace fly::saddle {
   Master::Recon Master::recon_relax(env::Geometry<Index> const& geo, env::Mechanism const& m, system::SoA<Position const&, TypeID const&, Frozen const&> in) {
     //
     struct Recon res {
-      reconstruct(geo, m.delta_fwd, in), reconstruct(geo, m.delta_sp, in), {}, {},
+      reconstruct(geo, m.delta_fwd, in), reconstruct(geo, m.delta_sp, in), {}, {}, {}
     };
 
     auto& thr = thread();
@@ -100,11 +100,12 @@ namespace fly::saddle {
       dim.rebind(id_, in);
       dim.rebind(fzn_, in);
 
-      // Ensures Axis transforms with the symmetry
-      dim[ax_] = res.sp[r_] - in[r_];
-      // ... and normalise.
-      dim[ax_] /= gnorm(dim[ax_]);
-      // Align res.sp post-use for constructing axis!
+      dim[ax_] = 0;
+
+      for (int j = 0; j < m.axis.size(); ++j) {
+        dim(ax_, geo[j][i_]) = m.axis[j][ax_];
+      }
+
       if (m_count_frozen == 0) {
         centroid_align(res.sp, in);
       }
@@ -113,6 +114,7 @@ namespace fly::saddle {
 
       if (!thr.dimer.find_sp(dim, dim, in, thr.pot, {}, m_count_frozen, 1)) {
         res.rel_sp = std::move(dim);
+        res.rel_ax = std::move(dim);
       }
     } catch (Spline::OutOfBounds& err) {
       res.rel_sp = std::nullopt;
@@ -309,29 +311,26 @@ namespace fly::saddle {
   }
 
   void Master::process_hint(Found& out, LocalisedGeo const& geo_data, SoA in, Hint const& hint, std::vector<system::SoA<Position>>& cache) {
-    // This is copypasta from recon_relax as we need the axis.
+    //
 
-    system::SoA<Position> re_sp = reconstruct(hint.geo, hint.delta_sp, hint.prev_state);
+    verify(hint.mech.poison_sp == false, "Connot use a poisoned hint!");
 
     system::SoA<Position, Axis, TypeID const&, Frozen const&> dimer(in.size());
 
     dimer.rebind(id_, in);
     dimer.rebind(fzn_, in);
 
-    // Ensures Axis transforms with the symmetry
-    dimer[ax_] = re_sp[r_] - hint.prev_state[r_];
-    // ... and normalise.
-    dimer[ax_] /= gnorm(dimer[ax_]);
-    // Align post-use for constructing axis!
-    if (m_count_frozen == 0) {
-      centroid_align(re_sp, hint.prev_state);
-    }
-    dimer[r_] = re_sp[r_];
+    dimer[r_] = hint.prev_state[r_];
 
-    if (thread().dimer.find_sp(dimer, dimer, hint.prev_state, thread().pot, {}, m_count_frozen, 1)) {
+    auto recon = recon_relax(hint.geo, hint.mech, dimer);
+
+    if (!recon.rel_sp || !recon.rel_ax) {
       fmt::print("FINDER: Hint's find_sp failed!\n");
       return;
     }
+
+    dimer[ax_] = (*recon.rel_ax)[ax_];
+    dimer[r_] = (*recon.rel_sp)[r_];
 
     if (std::optional mech = saddle_2_mech(in, dimer, geo_data.geo)) {
       double b = mech->barrier;
@@ -362,7 +361,7 @@ namespace fly::saddle {
       file.write(r_, hint.prev_state);
     });
 
-    file.commit([&] { file.write(r_, re_sp); });
+    file.commit([&] { file.write(r_, *recon.rel_sp); });
 
     file.commit([&] { file.write(r_, dimer); });
 
@@ -822,18 +821,21 @@ namespace fly::saddle {
       mech.axis.emplace_back(dimer(ax_, i));
     }
 
-    Axis::scalar_t sum = 0;
+    {
+      Axis::scalar_t sum = 0;
 
-    for (auto&& elem : mech.axis) {
-      sum += gnorm_sq(elem[ax_]);
+      for (auto&& elem : mech.axis) {
+        sum += gnorm_sq(elem[ax_]);
+      }
+
+      double len = std::sqrt(sum);
+
+      verify(len > 0.85, "Mechanism axis length={}", len);
+
+      for (auto&& elem : mech.axis) {
+        elem[ax_] /= len;
+      }
     }
-
-    double len = std::sqrt(sum);
-
-    fmt::print("len={}\n", len);
-
-    exit(0);
-
     //////////////// Partial hessian compute. ////////////////
 
     thr.pot_nl.rebuild(sp, 1);
@@ -876,7 +878,7 @@ namespace fly::saddle {
     ref.rebind(fzn_, in);
     ref.rebind(id_, in);
 
-    auto [re_min, re_sp, rel_min, rel_sp] = recon_relax(geo, mech, ref);
+    auto [re_min, re_sp, rel_min, rel_sp, _] = recon_relax(geo, mech, ref);
 
     double const r_tol = m_opt.capture_r_tol;
     double const e_tol = m_opt.capture_E_tol;
@@ -1233,10 +1235,14 @@ namespace fly::saddle {
       double n1 = 0;
       double n2 = 0;
 
+      double dot_ax = 0;
+
       for (Eigen::Index i = 0; i < m.delta_sp.size(); ++i) {
         n1 += gnorm_sq(maybe.delta_sp[i][del_]);
         n2 += gnorm_sq(m.delta_sp[i][del_]);
         dot += gdot(maybe.delta_sp[i][del_], m.delta_sp[i][del_]);
+
+        dot_ax += gdot(maybe.axis[i][ax_], m.axis[i][ax_]);
       }
 
       n1 = std::sqrt(n1);
@@ -1244,19 +1250,24 @@ namespace fly::saddle {
 
       double theta = std::acos(std::clamp(dot / (n1 * n2), -1., 1.)) / (2 * M_PI) * 360;
 
+      double ax_theta = std::acos(std::clamp(dot_ax, -1., 1.)) / (2 * M_PI) * 360;
+
+      ax_theta = std::min(ax_theta, 180 - ax_theta);  // Find accute angle
+
       min_d_sp = std::min(min_d_sp, d_sp);
       min_d_fwd = std::min(min_d_fwd, d_fwd);
       min_d_theta = std::min(min_d_theta, theta);
 
-      if (d_sp < m_opt.mech_tol && d_fwd < m_opt.mech_tol && theta < 10) {
+      if (d_sp < m_opt.mech_tol && d_fwd < m_opt.mech_tol && theta < 10 && ax_theta < 5) {
         dprint(m_opt.debug,
                "FINDER: Mech is NOT new, distance: old-sp={:.3f} old-min={:.3f}, theta={:.1f}, n1={:.3f}, "
-               "n2={:.3f}\n",
+               "n2={:.3f} ax_theta={:.1f}\n",
                d_sp,
                d_fwd,
                theta,
                n1,
-               n2);
+               n2,
+               ax_theta);
         return false;
       }
     }
@@ -1276,6 +1287,7 @@ namespace fly::saddle {
     //
     for (auto const& [O, perm] : syms) {
       for (std::size_t i = 0; i < perm.size(); ++i) {
+        mech.axis[Eigen::Index(i)][ax_].noalias() = O * new_mech.axis[perm[i]][ax_];
         mech.delta_sp[Eigen::Index(i)][del_].noalias() = O * new_mech.delta_sp[perm[i]][del_];
         mech.delta_fwd[Eigen::Index(i)][del_].noalias() = O * new_mech.delta_fwd[perm[i]][del_];
       }

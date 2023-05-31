@@ -16,6 +16,7 @@
 #include <iostream>
 #include <limits>
 #include <random>
+#include <string>
 #include <string_view>
 #include <utility>
 #include <variant>
@@ -107,7 +108,7 @@ fly::system::SoA<TypeID, Position> explicit_V(std::vector<Vec> const &vac, syste
   return special;
 }
 
-double run_until_escape(std::string ofname, std::string ifname, double temp) {
+double run_until_escape(std::string ofname, std::string ifname, double temp, int n_vac) {
   //
 
   constexpr auto a = 2.855;  // eam 55 or meam 67
@@ -116,11 +117,24 @@ double run_until_escape(std::string ofname, std::string ifname, double temp) {
 
   DetectVacancies detect(0.75, perfect.box(), perfect);
 
-  std::vector<Eigen::Index> V1 = {1};
-  std::vector<Eigen::Index> V2 = {1, 3};
-  std::vector<Eigen::Index> V3 = {1, 2, 3};
+  std::vector<Eigen::Index> Vs;
 
-  system::Supercell cell = remove_atoms(perfect, V3);
+  switch (n_vac) {
+    default:
+      throw error("n_vac={} oob", n_vac);
+    case 5:
+      Vs.push_back(86);
+    case 4:
+      Vs.push_back(74);
+    case 3:
+      Vs.push_back(2);
+    case 2:
+      Vs.push_back(3);
+    case 1:
+      Vs.push_back(1);
+  }
+
+  system::Supercell cell = remove_atoms(perfect, Vs);
 
   Vec r_H = {2.857 / 2 + 3.14, 2.857 / 2 + 3.14, 2.857 / 4 + 3.14};
 
@@ -288,9 +302,22 @@ double run_until_escape(std::string ofname, std::string ifname, double temp) {
   return run_time;
 }
 
-int main() {
+int main(int argc, char *argv[]) {
   //
-  std::string prefix = "build/data/V3";
+
+  if (argc != 2) {
+    throw error("Require number of vacancies as argument!");
+  }
+
+  std::string num_vac = argv[1];
+
+  auto n_vac = std::stoi(argv[1]);
+
+  fmt::print("Requested {} vacancies\n", n_vac);
+
+  verify(0 < n_vac && n_vac <= 5, "n_vac={} is oob", n_vac);
+
+  std::string prefix = fmt::format("build/data/V{}", n_vac);
 
   fmt::print("PREFIX={}\n", prefix);
 
@@ -319,7 +346,7 @@ int main() {
 
     for (std::size_t i = 0; i < rep; i++) {
       //
-      double dt = run_until_escape(fmt::format("{}/escape/gsd/{:.1f}K.{}.gsd", prefix, temp, i), fmt::format("{}/cat.h.bin", prefix), temp);
+      double dt = run_until_escape(fmt::format("{}/escape/gsd/{:.1f}K.{}.gsd", prefix, temp, i), fmt::format("{}/cat.h.bin", prefix), temp, n_vac);
 
       out.print("{:%Y-%m-%d %H:%M:%S} {:.5f} {:e}\n", fmt::localtime(std::time(nullptr)), temp, dt);
       out.flush();

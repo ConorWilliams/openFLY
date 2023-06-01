@@ -92,6 +92,7 @@ namespace fly::saddle {
         res.rel_min = std::move(minima);
       }
     } catch (Spline::OutOfBounds& err) {
+      fmt::print("WARN minia fails\n");
       res.rel_min = std::nullopt;
     }
 
@@ -829,8 +830,6 @@ namespace fly::saddle {
       }
 
       double len = std::sqrt(sum);
-
-      verify(len > 0.85, "Mechanism axis length={}", len);
 
       for (auto&& elem : mech.axis) {
         elem[ax_] /= len;

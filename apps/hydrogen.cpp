@@ -184,7 +184,7 @@ double run_until_escape(std::string ofname, std::string ifname, double temp, int
               .num_threads = omp_get_max_threads(),
               .max_searches = 200,
               .max_failed_searches = 75,
-              .debug = false,
+              .debug = true,
           }
       },
       cell.box(),

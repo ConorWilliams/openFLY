@@ -69,9 +69,9 @@ namespace fly::minimise {
       /** @brief Trust tolerance, set larger to reduce trust radius change. */
       double proj_tol = 0;
       /** @brief Maximum trust radius e.g max steps size (Angstroms). */
-      double max_trust = 0.25;
+      double max_trust = 0.50;
       /** @brief Minimum trust radius e.g initial step size (Angstroms). */
-      double min_trust = 0.05;
+      double min_trust = 0.01;
       /** @brief Trust radius expansion rate. */
       double grow_trust = 1.5;
       /** @brief Trust radius contraction rate. */

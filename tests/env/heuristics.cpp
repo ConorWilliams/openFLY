@@ -16,7 +16,7 @@
 
 #include <fmt/core.h>
 
-#include <catch2/catch.hpp>
+#include <catch2/catch_test_macros.hpp>
 #include <random>
 
 #include "libfly/env/geometry.hpp"

@@ -14,7 +14,7 @@
 
 #include "libfly/system/SoA.hpp"
 
-#include <catch2/catch.hpp>
+#include <catch2/catch_test_macros.hpp>
 #include <utility>
 
 #include "libfly/system/property.hpp"

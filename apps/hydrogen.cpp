@@ -372,6 +372,12 @@ int main(int argc, char *argv[]) {
 
       while (n_h < rep || n_v < rep) {
         //
+        if (n_h >= 50 || n_v >= 50) {
+          fmt::print("Reached 50 escapes or dissociations at {:.1f}K\n", temp);
+          break;
+        }
+
+        //
         std::size_t uid = dis(gen);
 
         auto gsd_file = fmt::format("{}/gsd/{:.1f}K.u{}.gsd", prefix, temp, uid);

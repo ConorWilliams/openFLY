@@ -11,6 +11,7 @@
 #include <array>
 #include <cmath>
 #include <cstddef>
+#include <cstdlib>
 #include <ctime>
 #include <fstream>
 #include <iostream>
@@ -108,12 +109,22 @@ fly::system::SoA<TypeID, Position> explicit_V(std::vector<Vec> const &vac, syste
   return special;
 }
 
-double run_until_escape(std::string ofname, std::string ifname, double temp, int n_vac) {
+enum class stop_critia {
+  h_escaped,
+  v_dissociated,
+};
+
+struct result {
+  stop_critia crit;
+  double time;
+};
+
+auto run_until_escape(std::string ofname, std::string ifname, double temp, int n_vac) -> result {
   //
 
   constexpr auto a = 2.855;  // eam 55 or meam 67
 
-  system::Supercell perfect = motif_to_lattice(bcc_iron_motif(a), {6, 6, 6});
+  system::Supercell perfect = motif_to_lattice(bcc_iron_motif(a), {8, 8, 8});
 
   DetectVacancies detect(0.75, perfect.box(), perfect);
 
@@ -123,11 +134,11 @@ double run_until_escape(std::string ofname, std::string ifname, double temp, int
     default:
       throw error("n_vac={} oob", n_vac);
     case 5:
-      Vs.push_back(86);
+      Vs.push_back(146);
     case 4:
-      Vs.push_back(74);
+      Vs.push_back(129);
     case 3:
-      Vs.push_back(2);
+      Vs.push_back(14);
     case 2:
       Vs.push_back(3);
     case 1:
@@ -240,13 +251,13 @@ double run_until_escape(std::string ofname, std::string ifname, double temp, int
 
                 std::vector vac = detect.detect_vacancies(tmp);
 
-                fmt::print("Found {} vacancies @{:::.2f}\n", vac.size(), vac);
+                // fmt::print("Found {} vacancies @{:::.2f}\n", vac.size(), vac);
 
                 // V-dis testing
 
                 double const VV = kruskal_max(vac, min_image);
 
-                fmt::print("MST max V-V = {:.3e}\n", VV);
+                // fmt::print("MST max V-V = {:.3e}\n", VV);
 
                 v_diss = VV > 5;  // Vacancy-cluster dissociation criterion
 
@@ -258,7 +269,7 @@ double run_until_escape(std::string ofname, std::string ifname, double temp, int
                     vh_min = std::min(vh_min, min_image(post(r_, last), v));
                   }
 
-                  fmt::print("Min V-H = {:.3e}\n", vh_min);
+                  // fmt::print("Min V-H = {:.3e}\n", vh_min);
 
                   h_escaped = vh_min > 4;  // H-escape criterion set here.
                 }
@@ -266,13 +277,13 @@ double run_until_escape(std::string ofname, std::string ifname, double temp, int
                 // Write to GSD
 
                 timeit("IO", [&] {
+                  //
                   file.commit([&] {
                     file.write("particles/N", fly::safe_cast<std::uint32_t>(cell.size()));
-
                     file.write(r_, pre);
-
                     file.write("log/energy", E0);
                   });
+
                   file.commit([&] {
                     //
                     auto vpost = explicit_V(vac, tmp);
@@ -291,66 +302,105 @@ double run_until_escape(std::string ofname, std::string ifname, double temp, int
                   });
                 });
 
-                fmt::print("Just wrote frame index No. {}\n", file.n_frames() - 1);
+                // fmt::print("Just wrote frame index No. {}\n", file.n_frames() - 1);
 
-                return h_escaped;
+                return h_escaped || v_diss;
               });
 
   fmt::print("It took {:.3e}s to terminate\n", run_time);
   fmt::print("H escaped = {}, cluster dissociated = {}\n", h_escaped, v_diss);
 
-  return run_time;
+  if (h_escaped) {
+    return {stop_critia::h_escaped, run_time};
+  }
+
+  if (v_diss) {
+    return {stop_critia::v_dissociated, run_time};
+  }
+
+  throw error("Unexpected termination condition");
 }
 
 int main(int argc, char *argv[]) {
-  //
-
-  if (argc != 2) {
-    throw error("Require number of vacancies as argument!");
-  }
-
-  std::string num_vac = argv[1];
-
-  auto n_vac = std::stoi(argv[1]);
-
-  fmt::print("Requested {} vacancies\n", n_vac);
-
-  verify(0 < n_vac && n_vac <= 5, "n_vac={} is oob", n_vac);
-
-  std::string prefix = fmt::format("build/data/V{}", n_vac);
-
-  fmt::print("PREFIX={}\n", prefix);
-
-  fmt::print("threads={}\n", omp_get_max_threads());
-
-  auto out = fmt::output_file(fmt::format("{}/escape/time.csv", prefix), fmt::file::CREATE | fmt::file::APPEND | fmt::file::WRONLY);
-
-  std::size_t n = 5;
-  std::size_t rep = 10;
-
-  double lo = 300;
-  double hi = 800;
-
-  // Want to uniformly sample inverse temprature range between 300K and 800K
-
-  double inv_lo = 1. / lo;
-  double inv_hi = 1. / hi;
-
-  double dif = (inv_lo - inv_hi) / static_cast<double>(n - 1);
-
-  for (double inv_T = inv_lo; inv_T > inv_hi - 0.5 * dif; inv_T -= dif) {
-    //
-    double temp = 1 / inv_T;
-
-    fmt::print("T={}, inv={}\n", temp, inv_T);
-
-    for (std::size_t i = 0; i < rep; i++) {
-      //
-      double dt = run_until_escape(fmt::format("{}/escape/gsd/{:.1f}K.{}.gsd", prefix, temp, i), fmt::format("{}/cat.h.bin", prefix), temp, n_vac);
-
-      out.print("{:%Y-%m-%d %H:%M:%S} {:.5f} {:e}\n", fmt::localtime(std::time(nullptr)), temp, dt);
-      out.flush();
+  try {
+    if (argc != 2) {
+      throw error("Require number of vacancies as argument!");
     }
+
+    std::string num_vac = argv[1];
+
+    auto n_vac = std::stoi(argv[1]);
+
+    fmt::print("Requested {} vacancies\n", n_vac);
+
+    verify(0 < n_vac && n_vac <= 5, "n_vac={} is oob", n_vac);
+
+    std::string prefix = fmt::format("cluster/V{}", n_vac);
+
+    fmt::print("PREFIX={}\n", prefix);
+
+    fmt::print("threads={}\n", omp_get_max_threads());
+
+    auto out_h = fmt::output_file(fmt::format("{}/escape.csv", prefix), fmt::file::CREATE | fmt::file::APPEND | fmt::file::WRONLY);
+    auto out_v = fmt::output_file(fmt::format("{}/dis.csv", prefix), fmt::file::CREATE | fmt::file::APPEND | fmt::file::WRONLY);
+
+    std::size_t n = 10;    /// Number of temperatures to sample
+    std::size_t rep = 10;  /// Number of repetitions at each temperature
+
+    double lo = 300;
+    double hi = 800;
+
+    // Want to uniformly sample inverse temprature range between 300K and 800K
+
+    double inv_lo = 1. / lo;
+    double inv_hi = 1. / hi;
+
+    double dif = (inv_lo - inv_hi) / static_cast<double>(n - 1);
+
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_int_distribution<std::size_t> dis;
+
+    for (double inv_T = inv_lo; inv_T > inv_hi - 0.5 * dif; inv_T -= dif) {
+      //
+      double temp = 1 / inv_T;
+
+      fmt::print("T={}, inv={}\n", temp, inv_T);
+
+      std::size_t n_h = 0;
+      std::size_t n_v = n_vac == 1 ? rep : 0;
+
+      while (n_h < rep || n_v < rep) {
+        //
+        std::size_t uid = dis(gen);
+
+        auto gsd_file = fmt::format("{}/gsd/{:.1f}K.u{}.gsd", prefix, temp, uid);
+        auto cat_file = fmt::format("{}/cat.h.bin", prefix);
+
+        auto [term, dt] = run_until_escape(gsd_file, cat_file, temp, n_vac);
+
+        switch (term) {
+          case stop_critia::h_escaped:
+            out_h.print("{:%Y-%m-%d %H:%M:%S} {} {:.5f} {:e}\n", fmt::localtime(std::time(nullptr)), uid, temp, dt);
+            out_h.flush();
+            ++n_h;
+            break;
+          case stop_critia::v_dissociated:
+            out_v.print("{:%Y-%m-%d %H:%M:%S} {} {:.5f} {:e}\n", fmt::localtime(std::time(nullptr)), uid, temp, dt);
+            out_v.flush();
+            ++n_v;
+            break;
+        }
+
+        // double dt
+      }
+    }
+  } catch (std::exception const &e) {
+    fmt::print("Caught exception: {}\n", e.what());
+    return 1;
+  } catch (...) {
+    fmt::print("Terminated with unknown exception\n");
+    return 1;
   }
 
   return 0;

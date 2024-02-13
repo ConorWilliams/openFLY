@@ -85,20 +85,20 @@ find_package(cereal CONFIG REQUIRED)
 # Ancient voodoo that is autoconf
 ExternalProject_Add(
     nauty
-    URL "https://pallini.di.uniroma1.it/nauty27r4.tar.gz"
-    URL_HASH "SHA256=b810c85a6fe299f3b4c9f24aaf929cac7f9546c2f35c20e1dd0adbc7408848a6"
+    URL "https://pallini.di.uniroma1.it/nauty2_8_8.tar.gz"
+    URL_HASH "SHA256=159d2156810a6bb240410cd61eb641add85088d9f15c888cdaa37b8681f929ce"
     PREFIX ${CMAKE_BINARY_DIR}/nauty
     CONFIGURE_COMMAND ${CMAKE_BINARY_DIR}/nauty/src/nauty/configure --enable-tls
-    BUILD_COMMAND make -j4
-    TEST_COMMAND make checks
+    BUILD_COMMAND make -j32
+    TEST_COMMAND make checks -j32
     INSTALL_COMMAND ""
     BUILD_IN_SOURCE 1
-    LOG_CONFIGURE ON
-    LOG_DOWNLOAD ON
-    LOG_INSTALL ON
-    LOG_BUILD ON
-    LOG_TEST ON
-    LOG_OUTPUT_ON_FAILURE ON
+    # LOG_CONFIGURE ON
+    # LOG_DOWNLOAD ON
+    # LOG_INSTALL ON
+    # LOG_BUILD ON
+    # LOG_TEST ON
+    # LOG_OUTPUT_ON_FAILURE ON
 )
 
 add_library(Nauty STATIC IMPORTED ${CMAKE_BINARY_DIR}/nauty/src/nauty/nauty.a)

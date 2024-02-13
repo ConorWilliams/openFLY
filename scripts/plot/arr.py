@@ -45,7 +45,12 @@ print(f"dE = {dE} pm {err}")
 plt.semilogy(1 / temp, time, "k+")
 plt.semilogy(1 / temp, np.exp(np.polyval(z, x)))
 
-plt.show()
+
+plt.savefig("arr.pdf")
+
+
+
+# plt.show()
 
 
 

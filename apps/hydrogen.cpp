@@ -337,7 +337,7 @@ void loop_main(int n_vac, bool hy) {
 
   fmt::print("threads={}\n", omp_get_max_threads());
 
-  auto out_h_s = fmt::format("{}/escape.csv", prefix);
+  auto out_h_s = fmt::format("{}/escape{}.csv", prefix, hy ? "" : ".no_h");
   auto out_v_s = fmt::format("{}/dis{}.csv", prefix, hy ? "" : ".no_h");
 
   auto out_h = fmt::output_file(out_h_s, fmt::file::CREATE | fmt::file::APPEND | fmt::file::WRONLY);

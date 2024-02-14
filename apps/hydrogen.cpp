@@ -390,7 +390,7 @@ void loop_main(int n_vac, bool hy) {
       std::size_t uid = dis(gen);
 
       auto gsd_file = fmt::format("{}/gsd/{:.1f}K.u{}.gsd", prefix, temp, uid);
-      auto cat_file = fmt::format("{}/cat.h.bin", prefix);
+      auto cat_file = fmt::format("{}/cat{}.bin", prefix, hy ? ".h" : "");
 
       auto [term, dt] = run_sim(gsd_file, cat_file, temp, n_vac, hy);
 

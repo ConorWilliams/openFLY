@@ -353,7 +353,7 @@ namespace fly::saddle {
 
     static int count = 0;
 
-    fly::io::BinaryFile file(fmt::format("build/gsd/hint.{}.gsd", count++), fly::io::create);
+    fly::io::BinaryFile file(fmt::format("hint.{}.gsd", count++), fly::io::create);
 
     file.commit([&] {
       file.write("particles/N", fly::safe_cast<std::uint32_t>(in.size()));

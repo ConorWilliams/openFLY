@@ -112,6 +112,7 @@ fly::system::SoA<TypeID, Position> explicit_V(std::vector<Vec> const &vac, syste
 enum class stop_criteria {
   h_escaped,
   v_dissociated,
+  both,
 };
 
 struct result {
@@ -231,7 +232,7 @@ auto run_sim(std::string ofname, std::string ifname, double temp, int n_vac, boo
   bool h_escaped = false;
 
   static constexpr double v_dis_crit = 5;
-  static constexpr double h_esc_crit = 4;
+  static constexpr double h_esc_crit = 5;
 
   runner.skmc(cell,
               omp_get_max_threads(),
@@ -314,6 +315,10 @@ auto run_sim(std::string ofname, std::string ifname, double temp, int n_vac, boo
   fmt::print("It took {:.3e}s to terminate\n", run_time);
   fmt::print("H escaped = {}, cluster dissociated = {}\n", h_escaped, v_dis);
 
+  if (h_escaped && v_dis) {
+    return {stop_criteria::both, run_time};
+  }
+
   if (h_escaped) {
     return {stop_criteria::h_escaped, run_time};
   }
@@ -394,20 +399,18 @@ void loop_main(int n_vac, bool hy) {
 
       auto [term, dt] = run_sim(gsd_file, cat_file, temp, n_vac, hy);
 
-      switch (term) {
-        case stop_criteria::h_escaped:
-          if (!hy) {
-            throw error("no h cannot escape!");
-          }
-          out_h.print("{:%Y-%m-%d %H:%M:%S} {} {:.5f} {:e}\n", fmt::localtime(std::time(nullptr)), uid, temp, dt);
-          out_h.flush();
-          ++n_h;
-          break;
-        case stop_criteria::v_dissociated:
-          out_v.print("{:%Y-%m-%d %H:%M:%S} {} {:.5f} {:e}\n", fmt::localtime(std::time(nullptr)), uid, temp, dt);
-          out_v.flush();
-          ++n_v;
-          break;
+      if (term == stop_criteria::both || term == stop_criteria::h_escaped) {
+        if (!hy) {
+          throw error("no h cannot escape!");
+        }
+        out_h.print("{:%Y-%m-%d %H:%M:%S} {} {:.5f} {:e}\n", fmt::localtime(std::time(nullptr)), uid, temp, dt);
+        out_h.flush();
+        ++n_h;
+      }
+      if (term == stop_criteria::both || term == stop_criteria::v_dissociated) {
+        out_v.print("{:%Y-%m-%d %H:%M:%S} {} {:.5f} {:e}\n", fmt::localtime(std::time(nullptr)), uid, temp, dt);
+        out_v.flush();
+        ++n_v;
       }
     }
   }

@@ -117,6 +117,8 @@ enum class stop_criteria {
 
 struct result {
   stop_criteria crit;
+  double msd;
+  double msd_c_align;
   double time;
 };
 
@@ -153,6 +155,8 @@ auto run_sim(std::string ofname, std::string ifname, double temp, int n_vac, boo
   }
 
   fly::io::BinaryFile file(ofname, fly::io::create);
+
+  // Write first frame to GSD
 
   file.commit([&] {
     file.write(cell.box());
@@ -234,6 +238,13 @@ auto run_sim(std::string ofname, std::string ifname, double temp, int n_vac, boo
   static constexpr double v_dis_crit = 5;
   static constexpr double h_esc_crit = 5;
 
+  double msd = 0;
+  double msd_c_align = 0;
+
+  std::size_t n = 0;
+
+  system::SoA<Position> init(cell.size());
+
   runner.skmc(cell,
               omp_get_max_threads(),
               [&](double time,                         ///< Total time just after system at post
@@ -245,6 +256,11 @@ auto run_sim(std::string ofname, std::string ifname, double temp, int n_vac, boo
                   double Ef                            ///< Energy of system in state post.
               ) {
                 //
+                if (n == 0) {
+                  init = pre;
+                }
+
+                //
                 run_time = time;
 
                 fly::system::SoA<TypeID const &, Position const &> tmp(cell.size());
@@ -254,13 +270,9 @@ auto run_sim(std::string ofname, std::string ifname, double temp, int n_vac, boo
 
                 std::vector vac = detect.detect_vacancies(tmp);
 
-                // fmt::print("Found {} vacancies @{:::.2f}\n", vac.size(), vac);
-
                 // ----------- V-dis testing
 
                 double const VV = kruskal_max(vac, min_image);
-
-                // fmt::print("MST max V-V = {:.3e}\n", VV);
 
                 v_dis = VV > v_dis_crit;
 
@@ -274,57 +286,80 @@ auto run_sim(std::string ofname, std::string ifname, double temp, int n_vac, boo
                     vh_min = std::min(vh_min, min_image(post(r_, last), v));
                   }
 
-                  // fmt::print("Min V-H = {:.3e}\n", vh_min);
-
                   h_escaped = vh_min > h_esc_crit;  // H-escape criterion set here.
+                }
+
+                bool end = h_escaped || v_dis;
+
+                if (end) {
+                  //
+                  msd = 0;
+
+                  for (std::size_t i = 0; i < pre.size(); ++i) {
+                    if (cell(id_, i) == 0) {
+                      msd += (pre(r_, i) - init(r_, i)).squaredNorm();
+                    }
+                  }
+
+                  msd_c_align = 0;
+
+                  centroid_align(init, pre);
+
+                  for (std::size_t i = 0; i < pre.size(); ++i) {
+                    if (cell(id_, i) == 0) {
+                      msd_c_align += (pre(r_, i) - init(r_, i)).squaredNorm();
+                    }
+                  }
                 }
 
                 // Write to GSD
 
-                timeit("IO", [&] {
-                  //
-                  file.commit([&] {
-                    file.write("particles/N", fly::safe_cast<std::uint32_t>(cell.size()));
-                    file.write(r_, pre);
-                    file.write("log/energy", E0);
-                  });
-
-                  file.commit([&] {
+                if (n < 10 || end) {
+                  timeit("IO", [&] {
                     //
-                    auto vpost = explicit_V(vac, tmp);
+                    file.commit([&] {
+                      file.write("particles/N", fly::safe_cast<std::uint32_t>(cell.size()));
+                      file.write(r_, pre);
+                      file.write("log/energy", E0);
+                    });
 
-                    file.write("particles/N", fly::safe_cast<std::uint32_t>(vpost.size()));
+                    file.commit([&] {
+                      //
+                      auto vpost = explicit_V(vac, tmp);
 
-                    file.write(id_, vpost);
-                    file.write(r_, vpost);
+                      file.write("particles/N", fly::safe_cast<std::uint32_t>(vpost.size()));
 
-                    file.write("log/time", time);
-                    file.write("log/energy", Ef);
-                    file.write("log/barrier", mech.barrier);
-                    file.write("log/kinetic", mech.kinetic_pre);
-                    file.write("log/vv_max", VV);
-                    file.write("log/vv_min", vh_min);
+                      file.write(id_, vpost);
+                      file.write(r_, vpost);
+
+                      file.write("log/time", time);
+                      file.write("log/energy", Ef);
+                      file.write("log/barrier", mech.barrier);
+                      file.write("log/kinetic", mech.kinetic_pre);
+                      file.write("log/vv_max", VV);
+                      file.write("log/vv_min", vh_min);
+                    });
                   });
-                });
+                }
 
-                // fmt::print("Just wrote frame index No. {}\n", file.n_frames() - 1);
+                ++n;
 
-                return h_escaped || v_dis;
+                return end;
               });
 
   fmt::print("It took {:.3e}s to terminate\n", run_time);
   fmt::print("H escaped = {}, cluster dissociated = {}\n", h_escaped, v_dis);
 
   if (h_escaped && v_dis) {
-    return {stop_criteria::both, run_time};
+    return {stop_criteria::both, msd, msd_c_align, run_time};
   }
 
   if (h_escaped) {
-    return {stop_criteria::h_escaped, run_time};
+    return {stop_criteria::h_escaped, msd, msd_c_align, run_time};
   }
 
   if (v_dis) {
-    return {stop_criteria::v_dissociated, run_time};
+    return {stop_criteria::v_dissociated, msd, msd_c_align, run_time};
   }
 
   throw error("Unexpected termination condition");
@@ -348,10 +383,10 @@ void loop_main(int n_vac, bool hy) {
   auto out_h = fmt::output_file(out_h_s, fmt::file::CREATE | fmt::file::APPEND | fmt::file::WRONLY);
   auto out_v = fmt::output_file(out_v_s, fmt::file::CREATE | fmt::file::APPEND | fmt::file::WRONLY);
 
-  std::size_t n = 10;         /// Number of temperatures to sample.
+  std::size_t n = 20;         /// Number of temperatures to sample.
   std::size_t rep_h = 10;     /// Number of repetitions at each temperature.
   std::size_t rep_v = 10;     //
-  std::size_t max_reps = 25;  /// Max reps at each temperature.
+  std::size_t max_reps = 50;  /// Max reps at each temperature.
 
   double lo = 300;
   double hi = 800;
@@ -397,18 +432,18 @@ void loop_main(int n_vac, bool hy) {
       auto gsd_file = fmt::format("{}/gsd/{:.1f}K.u{}.gsd", prefix, temp, uid);
       auto cat_file = fmt::format("{}/cat{}.bin", prefix, hy ? ".h" : "");
 
-      auto [term, dt] = run_sim(gsd_file, cat_file, temp, n_vac, hy);
+      auto [term, msd, msd_c, dt] = run_sim(gsd_file, cat_file, temp, n_vac, hy);
 
       if (term == stop_criteria::both || term == stop_criteria::h_escaped) {
         if (!hy) {
           throw error("no h cannot escape!");
         }
-        out_h.print("{:%Y-%m-%d %H:%M:%S} {} {:.5f} {:e}\n", fmt::localtime(std::time(nullptr)), uid, temp, dt);
+        out_h.print("{:%Y-%m-%d %H:%M:%S} {} {} {} {:.5f} {:e}\n", fmt::localtime(std::time(nullptr)), uid, msd, msd_c, temp, dt);
         out_h.flush();
         ++n_h;
       }
       if (term == stop_criteria::both || term == stop_criteria::v_dissociated) {
-        out_v.print("{:%Y-%m-%d %H:%M:%S} {} {:.5f} {:e}\n", fmt::localtime(std::time(nullptr)), uid, temp, dt);
+        out_v.print("{:%Y-%m-%d %H:%M:%S} {} {} {} {:.5f} {:e}\n", fmt::localtime(std::time(nullptr)), uid, msd, msd_c, temp, dt);
         out_v.flush();
         ++n_v;
       }

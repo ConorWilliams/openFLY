@@ -285,14 +285,29 @@ namespace fly::kinetic {
       bool stop = false;
 
       timeit("SKMC: total", [&] {
-        ///////////// Select mechanism /////////////
-        auto const& [m, atom, dt, basin, changed] = super.kmc_choice(rng);
+        //
+        std::size_t p_count = 0;
 
+        ///////////// Select mechanism /////////////
+      choice:
+
+        auto [m, atom, dt, basin, changed] = super.kmc_choice(rng);
+
+        if (!m.poison_fwd) {
+          goto pass;
+        }
+
+        if (p_count < 10000) {
+          p_count++;
+          goto choice;
+        }
+
+        verify(!m.poison_fwd, "KMC chose a poisoned mechanisms with dE={}", m.barrier);
+
+      pass:
         cell[r_] = super.state(basin)[r_];
 
         ///////////// Reconstruct mech /////////////
-
-        verify(!m.poison_fwd, "KMC chose a poisoned mechanisms with dE={}", m.barrier);
 
         double E0 = energy(cell);  // Energy before mechanism
 

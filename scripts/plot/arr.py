@@ -83,10 +83,10 @@ plt.semilogy(1 / temp, np.exp(y_ransac), label="RANSAC")
 
 # ---------- IO ----------
 
+
+plt.title(fname)
 plt.legend()
 plt.savefig("arr.pdf")
-
-
 
 # plt.show()
 

@@ -4,6 +4,8 @@
 /cluster
 /build
 
+*.pdf
+*.csv
 
 data/xyz
 data/*.fs

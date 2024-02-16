@@ -13,6 +13,7 @@
 #include <cstddef>
 #include <cstdlib>
 #include <ctime>
+#include <deque>
 #include <fstream>
 #include <iostream>
 #include <limits>
@@ -117,9 +118,81 @@ enum class stop_criteria {
 
 struct result {
   stop_criteria crit;
-  double msd;
-  double msd_c_align;
+  double msd_h;
+  double msd_f;
   double time;
+};
+
+struct frame_cache {
+  //
+  struct frame_data {
+    system::SoA<Position> pre;
+    system::SoA<Position> post;
+    std::vector<Vec> vac;
+    double E0;
+    double time;
+    double Ef;
+    double mech_barrier;
+    double mech_kinetic_pre;
+  };
+
+  void push(frame_data &&data) {
+    //
+    if (head_cache.size() < cache_size) {
+      head_cache.push_back(std::move(data));
+      return;
+    }
+
+    //
+    if (tail_cache.size() >= cache_size) {
+      tail_cache.pop_front();
+    }
+    tail_cache.push_back(data);
+  }
+
+  void dump_cache(fly::io::BinaryFile &file, fly::system::SoA<TypeID const &> cell) {
+    for (auto &&f : head_cache) {
+      dump(file, cell, f);
+    }
+    for (auto &&f : tail_cache) {
+      dump(file, cell, f);
+    }
+  }
+
+private:
+  std::size_t cache_size = 256;
+
+  std::vector<frame_data> head_cache;
+  std::deque<frame_data> tail_cache;
+
+  static void dump(fly::io::BinaryFile &file, fly::system::SoA<TypeID const &> cell, frame_data const &f) {
+    //
+    file.commit([&] {
+      file.write("particles/N", fly::safe_cast<std::uint32_t>(f.pre.size()));
+      file.write(r_, f.pre);
+      file.write("log/energy", f.E0);
+    });
+
+    fly::system::SoA<TypeID const &, Position const &> tmp(f.post.size());
+
+    tmp.rebind(r_, f.post);
+    tmp.rebind(id_, cell);
+
+    file.commit([&] {
+      //
+      auto vpost = explicit_V(f.vac, tmp);
+
+      file.write("particles/N", fly::safe_cast<std::uint32_t>(vpost.size()));
+
+      file.write(id_, vpost);
+      file.write(r_, vpost);
+
+      file.write("log/time", f.time);
+      file.write("log/energy", f.Ef);
+      file.write("log/barrier", f.mech_barrier);
+      file.write("log/kinetic", f.mech_kinetic_pre);
+    });
+  }
 };
 
 auto run_sim(std::string ofname, std::string ifname, double temp, int n_vac, bool hy) -> result {
@@ -238,16 +311,16 @@ auto run_sim(std::string ofname, std::string ifname, double temp, int n_vac, boo
   static constexpr double v_dis_crit = 5;
   static constexpr double h_esc_crit = 5;
 
-  double msd = 0;
-  double msd_c_align = 0;
+  double msd_h = 0;
+  double msd_f = 0;
 
   std::size_t n = 0;
 
   system::SoA<Position> init(cell.size());
 
-  runner.skmc(cell,
-              omp_get_max_threads(),
-              [&](double time,                         ///< Total time just after system at post
+  frame_cache cache;
+
+  auto func = [&](double time,                         ///< Total time just after system at post
                   system::SoA<Position const &> pre,   ///< State just before mech applied
                   double E0,                           ///< Energy of the system in state pre.
                   int,                                 ///< Index of central atom of mechanism
@@ -255,115 +328,108 @@ auto run_sim(std::string ofname, std::string ifname, double temp, int n_vac, boo
                   system::SoA<Position const &> post,  ///< Final state of system after this iteration / mech
                   double Ef                            ///< Energy of system in state post.
               ) {
-                //
-                if (n == 0) {
-                  init = pre;
-                }
+    //
+    if (n == 0) {
+      init = post;  ///< First call is a minimisation, so post is the minimised state.
+    }
 
-                //
-                run_time = time;
+    //
+    run_time = time;
 
-                fly::system::SoA<TypeID const &, Position const &> tmp(cell.size());
+    fly::system::SoA<TypeID const &, Position const &> tmp(cell.size());
 
-                tmp.rebind(r_, post);
-                tmp.rebind(id_, cell);
+    tmp.rebind(r_, post);
+    tmp.rebind(id_, cell);
 
-                std::vector vac = detect.detect_vacancies(tmp);
+    std::vector vac = detect.detect_vacancies(tmp);
 
-                // ----------- V-dis testing
+    // ----------- V-dis testing
 
-                double const VV = kruskal_max(vac, min_image);
+    double const VV = kruskal_max(vac, min_image);
 
-                v_dis = VV > v_dis_crit;
+    v_dis = VV > v_dis_crit;
 
-                double vh_min = std::numeric_limits<double>::max();
+    double vh_min = std::numeric_limits<double>::max();
 
-                //----------- H-escape testing
+    //----------- H-escape testing
 
-                if (auto last = post.size() - 1; hy) {
-                  //
-                  for (auto const &v : vac) {
-                    vh_min = std::min(vh_min, min_image(post(r_, last), v));
-                  }
+    auto last = post.size() - 1;
 
-                  h_escaped = vh_min > h_esc_crit;  // H-escape criterion set here.
-                }
+    if (hy) {
+      //
+      for (auto const &v : vac) {
+        vh_min = std::min(vh_min, min_image(post(r_, last), v));
+      }
 
-                bool end = h_escaped || v_dis;
+      h_escaped = vh_min > h_esc_crit;  // H-escape criterion set here.
+    }
 
-                if (end) {
-                  //
-                  msd = 0;
+    bool end = h_escaped || v_dis;
 
-                  for (std::size_t i = 0; i < pre.size(); ++i) {
-                    if (cell(id_, i) == 0) {
-                      msd += (pre(r_, i) - init(r_, i)).squaredNorm();
-                    }
-                  }
+    if (end) {
+      //
+      centroid_align(init, post);
 
-                  msd_c_align = 0;
+      msd_h = 0;
+      msd_f = 0;
 
-                  centroid_align(init, pre);
+      if (hy) {
+        msd_h = (post(r_, last) - init(r_, last)).squaredNorm();
+      }
 
-                  for (std::size_t i = 0; i < pre.size(); ++i) {
-                    if (cell(id_, i) == 0) {
-                      msd_c_align += (pre(r_, i) - init(r_, i)).squaredNorm();
-                    }
-                  }
-                }
+      for (std::size_t i = 0; i < post.size(); ++i) {
+        if (cell(id_, i) == 0) {
+          msd_f += (post(r_, i) - init(r_, i)).squaredNorm();
+        }
+      }
+    }
 
-                // Write to GSD
+    // Write to GSD
 
-                if (n < 10 || end) {
-                  timeit("IO", [&] {
-                    //
-                    file.commit([&] {
-                      file.write("particles/N", fly::safe_cast<std::uint32_t>(cell.size()));
-                      file.write(r_, pre);
-                      file.write("log/energy", E0);
-                    });
+    cache.push({
+        system::SoA<Position>{pre},
+        system::SoA<Position>{post},
+        std::move(vac),
+        E0,
+        time,
+        Ef,
+        mech.barrier,
+        mech.kinetic_pre,
+    });
 
-                    file.commit([&] {
-                      //
-                      auto vpost = explicit_V(vac, tmp);
+    ++n;
 
-                      file.write("particles/N", fly::safe_cast<std::uint32_t>(vpost.size()));
+    return end;
+  };
 
-                      file.write(id_, vpost);
-                      file.write(r_, vpost);
-
-                      file.write("log/time", time);
-                      file.write("log/energy", Ef);
-                      file.write("log/barrier", mech.barrier);
-                      file.write("log/kinetic", mech.kinetic_pre);
-                      file.write("log/vv_max", VV);
-                      file.write("log/vv_min", vh_min);
-                    });
-                  });
-                }
-
-                ++n;
-
-                return end;
-              });
+  try {
+    runner.skmc(cell, omp_get_max_threads(), func);
+  } catch (...) {
+    cache.dump_cache(file, cell);
+    throw;
+  }
 
   fmt::print("It took {:.3e}s to terminate\n", run_time);
   fmt::print("H escaped = {}, cluster dissociated = {}\n", h_escaped, v_dis);
 
+  cache.dump_cache(file, cell);
+
   if (h_escaped && v_dis) {
-    return {stop_criteria::both, msd, msd_c_align, run_time};
+    return {stop_criteria::both, msd_h, msd_f, run_time};
   }
 
   if (h_escaped) {
-    return {stop_criteria::h_escaped, msd, msd_c_align, run_time};
+    return {stop_criteria::h_escaped, msd_h, msd_f, run_time};
   }
 
   if (v_dis) {
-    return {stop_criteria::v_dissociated, msd, msd_c_align, run_time};
+    return {stop_criteria::v_dissociated, msd_h, msd_f, run_time};
   }
 
   throw error("Unexpected termination condition");
 }
+
+// TODO: investigate timing, io dump first/last 1000 frames, msd of hydrogen
 
 void loop_main(int n_vac, bool hy) {
   //
@@ -402,7 +468,7 @@ void loop_main(int n_vac, bool hy) {
   std::mt19937 gen(rd());
   std::uniform_int_distribution<std::size_t> dis;
 
-  for (double inv_T = inv_lo; inv_T > inv_hi - 0.5 * dif; inv_T -= dif) {
+  for (double inv_T = inv_hi; inv_T < inv_lo + 0.5 * dif; inv_T += dif) {
     //
     double temp = 1 / inv_T;
 
@@ -429,21 +495,21 @@ void loop_main(int n_vac, bool hy) {
       //
       std::size_t uid = dis(gen);
 
-      auto gsd_file = fmt::format("{}/gsd/{:.1f}K.u{}.gsd", prefix, temp, uid);
+      auto gsd_file = fmt::format("{}/gsd/{:.0f}K.u{}.gsd", prefix, temp, uid);
       auto cat_file = fmt::format("{}/cat{}.bin", prefix, hy ? ".h" : "");
 
-      auto [term, msd, msd_c, dt] = run_sim(gsd_file, cat_file, temp, n_vac, hy);
+      auto [term, msd_h, msd_f, dt] = run_sim(gsd_file, cat_file, temp, n_vac, hy);
 
       if (term == stop_criteria::both || term == stop_criteria::h_escaped) {
         if (!hy) {
           throw error("no h cannot escape!");
         }
-        out_h.print("{:%Y-%m-%d %H:%M:%S} {} {} {} {:.5f} {:e}\n", fmt::localtime(std::time(nullptr)), uid, msd, msd_c, temp, dt);
+        out_h.print("{:%Y-%m-%d %H:%M:%S} {} {} {} {} {:e}\n", fmt::localtime(std::time(nullptr)), uid, msd_h, msd_f, temp, dt);
         out_h.flush();
         ++n_h;
       }
       if (term == stop_criteria::both || term == stop_criteria::v_dissociated) {
-        out_v.print("{:%Y-%m-%d %H:%M:%S} {} {} {} {:.5f} {:e}\n", fmt::localtime(std::time(nullptr)), uid, msd, msd_c, temp, dt);
+        out_v.print("{:%Y-%m-%d %H:%M:%S} {} {} {} {} {:e}\n", fmt::localtime(std::time(nullptr)), uid, msd_h, msd_f, temp, dt);
         out_v.flush();
         ++n_v;
       }

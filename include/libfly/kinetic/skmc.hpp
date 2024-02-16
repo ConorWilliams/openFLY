@@ -290,8 +290,7 @@ namespace fly::kinetic {
 
         ///////////// Select mechanism /////////////
       choice:
-
-        auto [m, atom, dt, basin, changed] = super.kmc_choice(rng);
+        auto [m, atom, dt, basin, changed] = timeit("SKMC: Choice", [&] { return super.kmc_choice(rng); });
 
         if (!m.poison_fwd) {
           goto pass;
@@ -371,7 +370,7 @@ namespace fly::kinetic {
 
         time += dt;
 
-        stop = timeit("SKMC: call", f, time, std::as_const(cell), E0, atom, m, system::SoA<Position const&>{rel_recon}, Ef);
+        stop = timeit("SKMC: call user", f, time, std::as_const(cell), E0, atom, m, system::SoA<Position const&>{rel_recon}, Ef);
 
         if (stop) {
           return;  // Early exit
@@ -404,7 +403,7 @@ namespace fly::kinetic {
 
         dprint(m_opt.debug, "SKMC: Iteration #{} time = {:.3e}\n", i, time);
 
-        auto new_envs = timeit("SKMC: Update", [&] {
+        auto new_envs = timeit("SKMC: Update catalogue", [&] {
           return kinetic::update_cat(m_mast, m_cat, cell, num_threads, hint);  //
         });
 

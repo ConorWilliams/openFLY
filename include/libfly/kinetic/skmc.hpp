@@ -304,13 +304,20 @@ namespace fly::kinetic {
         verify(!m.poison_fwd, "KMC chose a poisoned mechanisms with dE={}", m.barrier);
 
       pass:
-        cell[r_] = super.state(basin)[r_];
+        if (changed) {
+          //
+          cell[r_] = super.state(basin)[r_];
+
+          if (!m_cat.rebuild(cell, num_threads).empty()) {
+            throw error("Should have seen this basin before");
+          }
+        }
 
         ///////////// Reconstruct mech /////////////
 
         double E0 = energy(cell);  // Energy before mechanism
 
-        Mat O = m_cat.reconstruct(raw_recon, m, atom, cell, !changed, num_threads);
+        Mat O = m_cat.reconstruct(raw_recon, m, atom, cell, true, num_threads);
 
         auto err = timeit("SKMC: Minimise", [&] {
           return m_minimiser.minimise(rel_recon, raw_recon, m_pot, num_threads);  //

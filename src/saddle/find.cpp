@@ -938,7 +938,7 @@ namespace fly::saddle {
 
     // Debugging extreme poisoning
 
-    if (mech.poison_fwd && mech.barrier < .5) {
+    if (mech.poison_fwd && false) {
 #pragma omp critical
       {
         fly::io::BinaryFile file("poison.gsd", fly::io::create);

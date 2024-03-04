@@ -494,6 +494,10 @@ namespace {
       //
       double temp = 1 / inv_T;
 
+      // if (temp > 470) {
+      //   continue;
+      // }
+
       fmt::print("T={}, inv={}\n", temp, inv_T);
 
       std::size_t n_h = 0;

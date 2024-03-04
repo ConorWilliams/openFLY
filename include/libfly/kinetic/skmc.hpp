@@ -29,6 +29,7 @@
 #include "libfly/neigh/list.hpp"
 #include "libfly/potential/generic.hpp"
 #include "libfly/saddle/dimer.hpp"
+#include "libfly/saddle/except.hpp"
 #include "libfly/saddle/find.hpp"
 #include "libfly/system/SoA.hpp"
 #include "libfly/system/box.hpp"
@@ -406,13 +407,21 @@ namespace fly::kinetic {
           }
         }
 
-        cell[r_] = rel_recon[r_];  // Update cell after constructing the hint.
+        cell[r_].swap(rel_recon[r_]);
+        bool new_envs = false;
 
-        dprint(m_opt.debug, "SKMC: Iteration #{} time = {:.3e}\n", i, time);
+        try {
+          dprint(m_opt.debug, "SKMC: Iteration #{} time = {:.3e}\n", i, time);
 
-        auto new_envs = timeit("SKMC: Update catalogue", [&] {
-          return kinetic::update_cat(m_mast, m_cat, cell, num_threads, hint);  //
-        });
+          new_envs = timeit("SKMC: Update catalogue", [&] {
+            return kinetic::update_cat(m_mast, m_cat, cell, num_threads, hint);  //
+          });
+
+        } catch (fly::not_at_min const& e) {
+          fmt::print("CAUGHT: {}\n", e.what());
+          time -= dt;
+          cell[r_].swap(rel_recon[r_]);
+        }
 
         if (new_envs) {
           dump_cat();

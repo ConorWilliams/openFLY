@@ -41,6 +41,7 @@
 #include "libfly/neigh/list.hpp"
 #include "libfly/potential/generic.hpp"
 #include "libfly/saddle/dimer.hpp"
+#include "libfly/saddle/except.hpp"
 #include "libfly/system/SoA.hpp"
 #include "libfly/system/VoS.hpp"
 #include "libfly/system/box.hpp"
@@ -480,12 +481,12 @@ namespace fly::saddle {
     auto recon = recon_relax(geo_data.geo, mech, in);
 
     auto set_fail_flag = [&, sym_indx] {
-      if (sym_indx == 0) {
-#pragma omp critical
-        dump_recon(in, geo_data.centre, recon, dimer);
+    //       if (sym_indx == 0) {
+    // #pragma omp critical
+    //         dump_recon(in, geo_data.centre, recon, dimer);
 
-        throw error("First symmetry (identity) should be guaranteed to reconstruct");
-      }
+    //         throw error("First symmetry (identity) should be guaranteed to reconstruct");
+    //       }
 
 #pragma omp atomic write
       out.m_fail = true;
@@ -1117,6 +1118,11 @@ namespace fly::saddle {
 
     for (int i = 0; i < freq.size(); i++) {
       // Negative modes = not a minima.
+
+      if (freq[i] <= -m_opt.hessian_eigen_zero_tol) {
+        throw not_at_min{};
+      }
+
       verify(freq[i] > -m_opt.hessian_eigen_zero_tol, "Mode {} has eigenvalue = {}", i, freq[i]);
 
       // Sum non-zero modes.

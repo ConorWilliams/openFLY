@@ -24,6 +24,10 @@ msd_f = []
 with open(fname) as file:
     for line in file:
         bits = line.split()
+
+        if float(float(bits[-2])) < 470:
+            continue
+
         time.append(float(bits[-1]))
         temp.append(float(bits[-2]))
 
@@ -54,6 +58,8 @@ if (args.msd):
 ax1.semilogy(inv_temp, time, "r+", label="Lifetime")
 ax1.set_xlabel("Inverse-temperature/K^-1")
 ax1.set_ylabel("Lifetime")
+
+ax1.set_ylim(1e-11, 1e-5)
 
 if (args.msd):
     ax2.semilogy(inv_temp, diff, "b+", label="Diffusivity")
@@ -116,7 +122,7 @@ def plot_area(ax, x, f, z, dz, color, label):
     # Remove duplicates
     x = np.unique(np.sort(x)) 
     ax.semilogy(x, np.exp(f(z, x)), "k--")
-    y_lo, y_hi = bands(f, z, dz, x, 2) 
+    y_lo, y_hi = bands(f, z, dz, x, 1) 
     ax.fill_between(x, np.exp(y_lo), np.exp(y_hi), color=color, alpha=0.2)
 
 f, z, dz = fit_ols(x, y_t)
@@ -138,7 +144,7 @@ if (args.msd):
 # ---------- Robust regression ----------
 
 
-def fit_robust(x, y, trials = 10):
+def fit_robust(x, y, trials = 100):
 
     xp = x.reshape(-1, 1)
     yp = y.reshape(-1, 1)

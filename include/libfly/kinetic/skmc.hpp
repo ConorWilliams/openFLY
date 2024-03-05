@@ -108,11 +108,23 @@ namespace fly::kinetic {
 
       // Refine tolerance's, Refines only occur at new environments
       for (auto const& f : fails) {
+        
         auto n = cat.calc_self_syms(f).size();
+
+        if (n == 1){
+          continue;
+        }
+
         verify(n > 1, "Env @{} cannot get any less symmetric!", f);
+
         do {
           double new_tol = cat.refine_tol(f, cat.get_ref(f).delta_max() / 1.5);
+
           verify(new_tol > 1e-6, "Probably converging to a true symmetry!");
+
+          // TODO maybe remove^
+
+
         } while (n == cat.calc_self_syms(f).size());
       }
 

@@ -471,6 +471,10 @@ namespace {
     auto out_h = fmt::output_file(out_h_s, fmt::file::CREATE | fmt::file::APPEND | fmt::file::WRONLY);
     auto out_v = fmt::output_file(out_v_s, fmt::file::CREATE | fmt::file::APPEND | fmt::file::WRONLY);
 
+    auto out_l_s = fmt::format("{}/sim{}.log", prefix,  hy ? "" : ".no_h");
+
+    auto out_l = fmt::output_file(out_l_s, fmt::file::CREATE | fmt::file::APPEND | fmt::file::WRONLY);
+
     std::size_t n = 20;          /// Number of temperatures to sample.
     std::size_t rep_h = 10;      /// Number of repetitions at each temperature.
     std::size_t rep_v = 10;      //
@@ -525,6 +529,9 @@ namespace {
         auto cat_file = fmt::format("{}/cat{}.bin", prefix, hy ? ".h" : "");
 
         auto [term, msd_h, msd_f, dt] = run_sim(gsd_file, cat_file, temp, n_vac, hy);
+
+        out_l.print("{:%Y-%m-%d %H:%M:%S} {} {} {} {} {} {:e}\n", fmt::localtime(std::time(nullptr)), uid, static_cast<int>(term), msd_h, msd_f, temp, dt);
+        out_l.flush();
 
         if (term == stop_criteria::both || term == stop_criteria::h_escaped) {
           if (!hy) {

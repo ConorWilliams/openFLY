@@ -25,8 +25,8 @@ with open(fname) as file:
     for line in file:
         bits = line.split()
 
-        if float(float(bits[-2])) < 470:
-            continue
+        # if float(float(bits[-2])) < 470:
+        #     continue
 
         time.append(float(bits[-1]))
         temp.append(float(bits[-2]))
@@ -59,7 +59,7 @@ ax1.semilogy(inv_temp, time, "r+", label="Lifetime")
 ax1.set_xlabel("Inverse-temperature/K^-1")
 ax1.set_ylabel("Lifetime")
 
-ax1.set_ylim(1e-11, 1e-5)
+# ax1.set_ylim(1e-11, 1e-5)
 
 if (args.msd):
     ax2.semilogy(inv_temp, diff, "b+", label="Diffusivity")

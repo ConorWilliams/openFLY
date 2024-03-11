@@ -528,6 +528,8 @@ namespace {
         auto gsd_file = fmt::format("{}/gsd/{:.0f}K.u{}.gsd", prefix, temp, uid);
         auto cat_file = fmt::format("{}/cat{}.bin", prefix, hy ? ".h" : "");
 
+        // Reverse 
+
         auto [term, msd_h, msd_f, dt] = run_sim(gsd_file, cat_file, temp, n_vac, hy);
 
         out_l.print("{:%Y-%m-%d %H:%M:%S} {} {} {} {} {} {:e}\n", fmt::localtime(std::time(nullptr)), uid, static_cast<int>(term), msd_h, msd_f, temp, dt);

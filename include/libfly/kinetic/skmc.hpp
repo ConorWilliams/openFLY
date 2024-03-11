@@ -274,6 +274,7 @@ namespace fly::kinetic {
       dprint(m_opt.debug, "Minimised energy = {}eV\n", energy(cell));
     }
 
+
     if (kinetic::update_cat(m_mast, m_cat, cell, num_threads)) {
       dump_cat();
     }
@@ -281,6 +282,20 @@ namespace fly::kinetic {
     std::random_device rd;
 
     Xoshiro rng(rd);
+
+    auto jiggle = [&](){
+
+      // Random pertubation
+      for (std::uniform_real_distribution<double> dist(-0.1, 0.1); auto& elem : cell[r_]) {
+        elem += dist(rng);
+      }
+
+      // Minimization
+      system::SoA<Position, PotentialGradient> out(cell.size());
+      bool err = timeit("Minimise", [&] { return m_minimiser.minimise(out, cell, m_pot, num_threads); });
+      verify(!err, "Minimiser failed");
+      cell[r_] = out[r_];
+    };
 
     double time = 0;
 
@@ -371,9 +386,17 @@ namespace fly::kinetic {
             do {
               double new_tol = m_cat.refine_tol(atom);
               dprint(m_opt.debug, "SKMC: Refined tolerance to {}\n", new_tol);
+              
               // Here we could provide a hint from the failed mechanism but it is not guaranteed that the new
               // unknown environments have anything to do with the mech that brought us here
-              new_envs = new_envs || kinetic::update_cat(m_mast, m_cat, cell, num_threads);
+              try {
+                new_envs = new_envs || kinetic::update_cat(m_mast, m_cat, cell, num_threads);
+              } catch (fly::not_at_min const& e) {
+                // Handle...
+                fmt::print("WARNING: recon not at min");
+                
+                return;
+              }
             } while (initial_assign == m_cat.get_ref(atom).cat_index());
 
             if (new_envs) {
@@ -433,6 +456,7 @@ namespace fly::kinetic {
           fmt::print("CAUGHT: {}\n", e.what());
           time -= dt;
           cell[r_].swap(rel_recon[r_]);
+          return; // Next iteration.
         }
 
         if (new_envs) {
